@@ -425,6 +425,10 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         val dir = "/sdcard/Android/data/$pkgHome/files"
         val uri = "content://$pkgHome.theme"
         sh("mkdir -p $dir 2>/dev/null; true")
+        // restore_key_services (Nâng cao) chỉ chạy khi Home sạch có WRITE_SECURE_SETTINGS (upstream build-and-install.sh
+        // RESTORE_KEY_SERVICES=1). Tắt thì thu lại quyền cho gọn.
+        val khoiPhucPhim = runCatching { org.json.JSONObject(json).optBoolean("restore_key_services") }.getOrDefault(false)
+        sh("pm ${if (khoiPhucPhim) "grant" else "revoke"} $pkgHome android.permission.WRITE_SECURE_SETTINGS 2>/dev/null; true")
         ghiFileTheme("config.json", json.toByteArray())
         if (anhNen != null) ghiFileTheme("wallpaper.jpg", anhNen)
         else sh("rm -f $dir/wallpaper.jpg 2>/dev/null; content delete --uri $uri/wallpaper.jpg 2>/dev/null; true")

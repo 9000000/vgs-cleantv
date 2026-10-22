@@ -17,7 +17,15 @@ data class TuyChon(
     val chon: List<String>,
     val moTa: String,
     val canThan: Boolean,
-)
+    /** Tên + mô tả tiếng Việt (scripts/nang-cao-vi.json); rỗng = chưa dịch, hiện khoá + mô tả tiếng Anh. */
+    val ten: String = "",
+    val moTaVi: String = "",
+    val chonVi: Map<String, String> = emptyMap(),
+) {
+    fun tieuDe(): String = zone.vgs.tvsach.t(ten.ifBlank { khoa }, khoa)
+    fun moTaHien(): String = zone.vgs.tvsach.t(moTaVi.ifBlank { moTa }, moTa)
+    fun nhanChon(c: String): String = zone.vgs.tvsach.t(chonVi[c] ?: c, c)
+}
 
 object NangCao {
     fun nap(ctx: Context): List<TuyChon> = runCatching {
@@ -26,7 +34,8 @@ object NangCao {
             val o = a.getJSONObject(i)
             TuyChon(o.getString("khoa"), o.getString("kieu"), o.optInt("min", Int.MIN_VALUE), o.optInt("max", Int.MAX_VALUE),
                 o.optJSONArray("chon")?.let { c -> (0 until c.length()).map { c.getString(it) } } ?: emptyList(),
-                o.optString("moTa"), o.optBoolean("canThan"))
+                o.optString("moTa"), o.optBoolean("canThan"), o.optString("ten"), o.optString("moTaVi"),
+                o.optJSONObject("chonVi")?.let { m -> m.keys().asSequence().associateWith { m.getString(it) } } ?: emptyMap())
         }
     }.getOrDefault(emptyList())
 

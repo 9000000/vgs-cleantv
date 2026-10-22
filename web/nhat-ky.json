@@ -1,5 +1,17 @@
 [
  {
+  "ban": "2.1.1",
+  "ngay": "2026-10-22",
+  "vi": [
+   "Mục Nâng cao Việt hoá: 54 tuỳ chọn đều có tên và giải thích tiếng Việt dễ hiểu, tìm kiếm được bằng tiếng Việt; tên khoá kỹ thuật vẫn hiện nhỏ bên dưới để tra.",
+   "Sửa: \"Tự bật lại bắt phím remote\" (restore_key_services) cần quyền đặc biệt, app giờ tự cấp khi bật tuỳ chọn (trước đó bật lên vẫn không có tác dụng)."
+  ],
+  "en": [
+   "Advanced options localised: all 54 have Vietnamese names and plain descriptions, searchable in Vietnamese; the technical key still shows underneath.",
+   "Fix: restore_key_services needs a special permission, which the app now grants when the option is on (before, turning it on had no effect)."
+  ]
+ },
+ {
   "ban": "2.1",
   "ngay": "2026-10-22",
   "vi": [

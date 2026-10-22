@@ -33,5 +33,16 @@ for dong in open(readme, encoding="utf-8"):
         if khoa in APP_CO_SAN or khoa in da: continue
         da.add(khoa)
         ds.append({"khoa": khoa, **k, "moTa": re.sub(r"`", "", mo)[:400], "canThan": khoa in CAN_THAN})
+# Tên + mô tả tiếng Việt (scripts/nang-cao-vi.json, 22/10/2026): người không biết tiếng Anh vẫn dùng được.
+import os
+vi_tep = os.path.join(os.path.dirname(os.path.abspath(__file__)), "nang-cao-vi.json")
+vi = json.load(open(vi_tep, encoding="utf-8")) if os.path.exists(vi_tep) else {}
+thieu = []
+for x in ds:
+    v = vi.get(x["khoa"])
+    if not v: thieu.append(x["khoa"]); continue
+    x["ten"] = v["ten"]; x["moTaVi"] = v["moTa"]
+    if "chon" in v: x["chonVi"] = v["chon"]
+if thieu: print("CHƯA DỊCH (thêm vào scripts/nang-cao-vi.json):", ", ".join(thieu))
 json.dump(ds, open(out, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
 print(f"{len(ds)} tuỳ chọn ({sum(x['canThan'] for x in ds)} cẩn thận) -> {out}")

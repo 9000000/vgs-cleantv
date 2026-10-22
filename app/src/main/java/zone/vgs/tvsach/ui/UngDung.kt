@@ -766,7 +766,7 @@ private fun MucNangCao(vm: PhienLamViec) {
         if (daDat > 0) TextButton(onClick = { vm.nangCao.clear() }) { Text(t("Đặt lại tất cả về mặc định", "Reset all to default")) }
         val q = tim.trim().lowercase()
         listOf(false, true).forEach { canThan ->
-            val ds = vm.dsNangCao.filter { it.canThan == canThan && (q.isEmpty() || it.khoa.contains(q) || it.moTa.lowercase().contains(q)) }
+            val ds = vm.dsNangCao.filter { it.canThan == canThan && (q.isEmpty() || it.khoa.contains(q) || it.moTa.lowercase().contains(q) || it.ten.lowercase().contains(q) || it.moTaVi.lowercase().contains(q)) }
             if (ds.isEmpty()) return@forEach
             Text(if (canThan) t("⚠ Cẩn thận", "⚠ Careful") else t("Giao diện & hiệu ứng", "Look & effects"),
                 fontWeight = FontWeight.Bold, fontSize = 15.sp, color = if (canThan) Cam else Color.White, modifier = Modifier.padding(top = 8.dp))
@@ -778,8 +778,10 @@ private fun MucNangCao(vm: PhienLamViec) {
 @Composable
 private fun DongNangCao(tc: zone.vgs.tvsach.dulieu.TuyChon, gt: String, doi: (String) -> Unit) {
     Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(The2).padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(tc.khoa, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace, color = if (gt.isNotBlank()) Hong else Color.White)
-        Phu(tc.moTa)
+        Text(tc.tieuDe(), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = if (gt.isNotBlank()) Hong else Color.White)
+        // Khoá kỹ thuật vẫn hiện nhỏ (tra tài liệu CleanYourTV, hỏi trên nhóm) khi đã có tên tiếng Việt.
+        if (tc.tieuDe() != tc.khoa) Text(tc.khoa, fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = ChuPhu)
+        Phu(tc.moTaHien())
         when (tc.kieu) {
             "bool" -> Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ChonChip(t("Mặc định", "Default"), gt.isBlank()) { doi("") }
@@ -788,7 +790,7 @@ private fun DongNangCao(tc: zone.vgs.tvsach.dulieu.TuyChon, gt: String, doi: (St
             }
             "chon" -> Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ChonChip(t("Mặc định", "Default"), gt.isBlank()) { doi("") }
-                tc.chon.forEach { c -> ChonChip(c, gt == c) { doi(c) } }
+                tc.chon.forEach { c -> ChonChip(tc.nhanChon(c), gt == c) { doi(c) } }
             }
             else -> OutlinedTextField(gt, { doi(it) }, singleLine = tc.kieu == "so" || tc.kieu == "chu",
                 placeholder = { Text(when (tc.kieu) {
