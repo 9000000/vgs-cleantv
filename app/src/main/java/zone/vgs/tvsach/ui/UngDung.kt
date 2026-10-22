@@ -730,6 +730,7 @@ private fun ManHomeSach(vm: PhienLamViec) = Cuon {
         Hang(t("DNS chặn quảng cáo (AdGuard)", "Ad-blocking DNS (AdGuard)"), t("Không chặn được quảng cáo YouTube", "Does not block YouTube ads"), vm.dnsChanQc) { vm.dnsChanQc = it }
     }
     The(t("Tuỳ chỉnh thêm", "More options"), Icons.Rounded.Tune) {
+        Hang(t("Tên app to phía trên dock", "Large app name above the dock"), t("Tắt để Home gọn hơn, chỉ còn viền sáng", "Turn off for a calmer Home, just the glow"), vm.tenToTrenDock) { vm.tenToTrenDock = it }
         Hang(t("Hiện tên dưới mọi app", "Names under every app"), t("Ông bà dễ nhận app hơn", "Easier to recognise apps"), vm.tenDuoiApp) { vm.tenDuoiApp = it }
         Hang(t("Thư viện app", "App library"), t("Nút xem mọi app trên tivi, thêm / bớt khỏi Home", "A button listing every app; add or remove from Home"), vm.thuVienApp) { vm.thuVienApp = it }
         Hang(t("Chế độ tivi yếu", "Slow TV mode"), t("Bớt hiệu ứng chuyển động cho tivi cũ, ít RAM", "Calmer motion for old, low-memory TVs"), vm.tiviYeu) { vm.tiviYeu = it }

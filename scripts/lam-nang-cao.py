@@ -7,7 +7,7 @@ out = sys.argv[2] if len(sys.argv) > 2 else "app/src/main/assets/nang-cao.json"
 # App đã có công tắc / ô nhập riêng cho các khoá này (hoặc khoá không hợp nhập tay) — không lặp ở Nâng cao.
 APP_CO_SAN = {"dock_apps", "greeting_name", "lunar_date", "always_show_names", "app_library", "library_button",
     "home_idle_clock_minutes", "reduced_motion", "dock_glass", "app_glow", "wallpaper_dim", "show_stats",
-    "handle_view_inputs", "wallpaper", "race_calendar", "wallpaper_rotation_minutes"}
+    "handle_view_inputs", "wallpaper", "race_calendar", "wallpaper_rotation_minutes", "dock_title"}
 # Đụng tới remote, nguồn vào, app của hãng: sai là mất HDMI / remote hết ăn — nhóm "cẩn thận".
 CAN_THAN = {"live_tv_package", "live_tv_action", "live_tv_input_id", "source_panel_service", "source_panel_action",
     "source_panel_extra", "coocaa_sources", "input_action", "input_uri_scheme", "launch_actions", "app_banners",

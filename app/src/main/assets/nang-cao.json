@@ -132,14 +132,6 @@
 "moTaVi": "Số hàng app còn thấy dưới dock. Không đủ chỗ thì ô tự nhỏ lại."
 },
 {
-"khoa": "dock_title",
-"kieu": "bool",
-"moTa": "The focused dock app's name in large type above the dock (true); false keeps only the glow",
-"canThan": false,
-"ten": "Tên app to phía trên dock",
-"moTaVi": "Hiện tên app đang chọn bằng chữ to phía trên dock (mặc định bật). Tắt thì chỉ còn viền sáng quanh app."
-},
-{
 "khoa": "dock_row",
 "kieu": "bool",
 "moTa": "The dock as its own row with a band (true); false makes the dock apps the first tiles of one plain grid",

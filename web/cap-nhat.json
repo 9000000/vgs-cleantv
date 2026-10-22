@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 28,
-  "versionName": "2.1.2",
-  "apk": "https://pub-925dff61607e4e3da7398d3413ccd1da.r2.dev/CleanTV-2.1.2.apk",
-  "co": 11390511,
-  "ghiChu": "An toàn hơn: không bao giờ tắt các gói lõi của Android (sau vụ Mi TV Stick không khởi động lại được). Google TV chậm như Sony BRAVIA 2024: app nhận ra đúng lỗi nút Home và chỉ cách sửa.",
-  "ghiChuEn": "Safer: Android core packages are never disabled (after a Mi TV Stick that would not boot). Slow Google TVs such as Sony BRAVIA 2024: the app now recognises the Home-button case and shows the fix.",
+  "versionCode": 29,
+  "versionName": "2.1.3",
+  "apk": "https://pub-925dff61607e4e3da7398d3413ccd1da.r2.dev/CleanTV-2.1.3.apk",
+  "co": 11390443,
+  "ghiChu": "An toàn hơn cho cổng HDMI và Cài đặt: app tự giữ lại app tivi dùng để mở HDMI và Cài đặt. Công tắc tắt tên app to phía trên dock. Lời báo Google TV chỉ rõ cách quên Wi-Fi. Âm lịch đúng ngày cả khi tivi để tiếng Anh.",
+  "ghiChuEn": "Safer for HDMI and Settings: the app keeps whatever the TV uses to open inputs and Settings. A switch for the large app name above the dock. Clearer Google TV note (forget the Wi-Fi). Lunar date right even on English-language TVs.",
   "ngay": "2026-10-22"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "61353b367dfc39ef",
    "url": "/ota/du-lieu.json",
    "co": 1267388,
-   "tuBan": 28
+   "tuBan": 29
   },
   "tvhome.apk": {
    "phienBan": "70f0f2ca9475aa76",
    "url": "/ota/tvhome.apk",
    "co": 591967,
-   "tuBan": 28
+   "tuBan": 29
   }
  }
 }

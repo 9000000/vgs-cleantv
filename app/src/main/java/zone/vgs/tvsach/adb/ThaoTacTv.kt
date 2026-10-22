@@ -189,6 +189,18 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             ds = ds - hw.toSet()
         }
 
+        // App MỞ cổng HDMI / kênh (nhận VIEW vnd.android.cursor.item/channel) hay mở Cài đặt: tắt là
+        // Home sạch báo "TV này không hỗ trợ" khi chọn HDMI, nút Cài đặt không mở (22/10/2026: Sony KDL-43W800G mất HDMI,
+        // Sony W800C không vào Cài đặt). Hỏi chính tivi đang dùng app nào rồi giữ, không đoán theo tên.
+        if (ds.isNotEmpty()) {
+            val q = "cmd package query-activities --brief"
+            val giuHdmi = goiTrongDong(sh("$q -a android.intent.action.VIEW -t vnd.android.cursor.item/channel 2>/dev/null; true"))
+            val giuCaiDat = goiTrongDong(sh("$q -a android.settings.SETTINGS 2>/dev/null; $q -a android.intent.action.MAIN -c android.intent.category.PREFERENCE 2>/dev/null; true"))
+            ds.filter { it in giuHdmi }.forEach { boQua += it to t("Tivi dùng app này để mở cổng HDMI / kênh truyền hình: tắt là chọn HDMI báo không hỗ trợ.", "The TV opens HDMI inputs / channels with this app: disabling it breaks input switching.") }
+            ds.filter { it in giuCaiDat && it !in giuHdmi }.forEach { boQua += it to t("Tivi dùng app này để mở Cài đặt: tắt là nút Cài đặt không mở được.", "The TV opens Settings with this app: disabling it breaks the Settings button.") }
+            ds = ds - giuHdmi - giuCaiDat
+        }
+
         val daTat = mutableListOf<String>()
         val loi = mutableListOf<Pair<String, String>>()
         val heThong0 = pidHeThong()
@@ -225,6 +237,10 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         }
         return KetQuaTat(daTat, boQua, loi)
     }
+
+    /** Tên gói trong kết quả `query-activities --brief` (dòng dạng gói/lớp). */
+    private fun goiTrongDong(out: String): Set<String> =
+        out.lines().mapNotNull { Regex("""^\s*([A-Za-z_][A-Za-z0-9_.]*)/""").find(it)?.groupValues?.get(1) }.filter { TEN_GOI.matches(it) }.toSet()
 
     /**
      * PID của system_server: đổi = tivi vừa khởi động lại, kể cả kiểu chỉ khởi động lại phần mềm (tắt nhầm gói làm
@@ -337,8 +353,11 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         if (!bayGio.startsWith("$pkgHome/")) {
             bao(t("Home không chuyển được, trả lại Home gốc…", "Home did not switch, restoring the stock Home…"))
             traHomeGoc(sl)
-            return t("Home sau khi đổi là '${bayGio.ifBlank { "không rõ" }}'. Đã trả Home gốc. Trên Google TV thường do ", "Home resolved to '${bayGio.ifBlank { "unknown" }}'. The stock Home is back. On Google TV this usually means ") +
-                t("setupwraith cũng nhận Home: cần tắt nó trong danh sách (sau khi kết nối lại Wi-Fi) rồi làm lại.", "setupwraith also claims Home: disable it in the list (after re-joining Wi-Fi) and try again.")
+            if (bayGio.startsWith("$SETUP/") || dangBat(SETUP))
+                return t("Tivi vẫn như cũ (đã trả Home gốc). Đây là Google TV: trình cài đặt setupwraith cũng giữ nút Home, mà Wi-Fi lưu lúc cài tivi thuộc về nó nên app không tự tắt. Cách sửa: trên tivi vào Cài đặt > Mạng, quên mạng Wi-Fi rồi kết nối lại (hoặc cắm dây LAN); kết nối lại app, ở bước chọn gói tích thêm setupwraith (nhóm Google Home), dọn rồi cài Home sạch lại.",
+                    "The TV is as before (stock Home restored). This is Google TV: the setup app setupwraith also holds the Home button, and the Wi-Fi saved during setup belongs to it, so the app leaves it. Fix: on the TV, Settings > Network, forget the Wi-Fi and join it again (or use Ethernet); reconnect the app, tick setupwraith (Google Home group), clean and install the clean Home again.")
+            return t("Home sau khi đổi là '${bayGio.ifBlank { "không rõ" }}'. Đã trả Home gốc, tivi vẫn như cũ. Gửi góp ý kèm hãng, model để VGS thêm hỗ trợ.",
+                "Home resolved to '${bayGio.ifBlank { "unknown" }}'. The stock Home is back, the TV is as before. Send feedback with the brand and model so VGS can add support.")
         }
 
         // Xiaomi: bản com.gathin.tvhome cài từ trước (bị hãng chặn) thì gỡ, để không còn hai Home sạch.

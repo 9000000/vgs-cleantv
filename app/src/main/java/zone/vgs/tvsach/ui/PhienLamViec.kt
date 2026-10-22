@@ -100,6 +100,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     // Tuỳ chỉnh thêm (1.7, các "switch" của launcher — upstream themes/README.md).
     var amLich by mutableStateOf(true)
     var tenDuoiApp by mutableStateOf(false)
+    /** Tên app to phía trên dock (dock_title, launcher mặc định bật); góp ý 22/10/2026 muốn tắt cho đỡ rối. */
+    var tenToTrenDock by mutableStateOf(true)
     var thuVienApp by mutableStateOf(false)
     var dongHoKhiYen by mutableStateOf(0)
     var tiviYeu by mutableStateOf(false)
@@ -470,6 +472,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val j = runCatching { io { tv.docCauHinhTv() } }.getOrNull() ?: return
         amLich = j.optBoolean("lunar_date", amLich)
         tenDuoiApp = j.optBoolean("always_show_names", false)
+        tenToTrenDock = j.optBoolean("dock_title", true)
         thuVienApp = j.optBoolean("app_library", false)
         dongHoKhiYen = j.optInt("home_idle_clock_minutes", 0)
         tiviYeu = j.optBoolean("reduced_motion", false)
@@ -560,9 +563,13 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         thanhPho?.let { put("weather_lat", it.lat); put("weather_lon", it.lon); put("weather_place", it.ten) }
         if (ghimMayChieu.isNotEmpty()) put("projector_actions", JSONArray(ghimMayChieu.map { (comp, nhan) -> "$nhan=$comp" }))
         put("lunar_date", amLich)
+        // Âm lịch tính theo múi giờ: launcher tự chọn theo ngôn ngữ tivi, tivi để tiếng Anh ở VN thì lệch một ngày quanh
+        // ngày sóc (Formovie L206, 22/10/2026: 12/9 thay vì 13/9). Ghi múi giờ của điện thoại khi là +7 / +8.
+        if (amLich) (java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 3_600_000).takeIf { it == 7 || it == 8 }?.let { put("lunar_utc_offset", it) }
         // Launcher 2.6: nút Input trên remote (VIEW_INPUTS) mở bảng chọn nguồn của Home sạch — đi cùng công tắc nút Input.
         if (nutInput) put("handle_view_inputs", true)
         if (tenDuoiApp) put("always_show_names", true)
+        if (!tenToTrenDock) put("dock_title", false)
         if (thuVienApp) { put("app_library", true); put("library_button", true) }
         if (dongHoKhiYen > 0) put("home_idle_clock_minutes", dongHoKhiYen)
         if (tiviYeu) put("reduced_motion", true)

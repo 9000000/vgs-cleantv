@@ -1,5 +1,21 @@
 [
  {
+  "ban": "2.1.3",
+  "ngay": "2026-10-22",
+  "vi": [
+   "Trước khi dọn, app hỏi tivi app nào đang mở cổng HDMI / kênh và app nào mở Cài đặt, rồi luôn giữ lại (Sony KDL-43W800G mất HDMI, Sony W800C không vào Cài đặt sau khi dọn).",
+   "Công tắc mới \"Tên app to phía trên dock\" ở mục Tuỳ chỉnh thêm: tắt cho Home gọn hơn.",
+   "Cài Home sạch trên Google TV mà setupwraith giành Home: lời báo chỉ từng bước quên Wi-Fi rồi kết nối lại.",
+   "Âm lịch tính theo múi giờ của điện thoại: tivi để tiếng Anh ở Việt Nam không còn lệch một ngày."
+  ],
+  "en": [
+   "Before cleaning, the app asks the TV which apps open HDMI inputs / channels and Settings, and always keeps them (a Sony KDL-43W800G lost HDMI, a Sony W800C lost Settings).",
+   "New \"Large app name above the dock\" switch under More options.",
+   "Installing the clean Home on Google TV when setupwraith claims Home: the note now gives the forget-Wi-Fi steps.",
+   "The lunar date uses the phone's time zone: English-language TVs in Vietnam are no longer a day off."
+  ]
+ },
+ {
   "ban": "2.1.2",
   "ngay": "2026-10-22",
   "vi": [
