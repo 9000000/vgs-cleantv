@@ -1,5 +1,17 @@
 [
  {
+  "ban": "2.1.2",
+  "ngay": "2026-10-22",
+  "vi": [
+   "Luôn giữ các gói lõi của Android (ext services/shared, module metadata, overlay mainline), theo CleanYourTV sau vụ một Mi TV Stick không khởi động lại được (#884).",
+   "Google TV mở Home chậm (Sony 65S30 / BRAVIA BF1): app đọc được màn đang hiện bằng cách thứ hai; vẫn không rõ mà tivi còn setupwraith thì hiện thẳng hướng dẫn quên Wi-Fi, thay vì báo \"không rõ\"."
+  ],
+  "en": [
+   "Android core packages (ext services/shared, module metadata, mainline overlays) are always kept, following CleanYourTV after a Mi TV Stick never booted again (#884).",
+   "Google TVs that open Home slowly (Sony 65S30 / BRAVIA BF1): the app reads the screen a second way; if it still can't tell and setupwraith is on, it shows the forget-Wi-Fi fix instead of \"unknown\"."
+  ]
+ },
+ {
   "ban": "2.1.1",
   "ngay": "2026-10-22",
   "vi": [

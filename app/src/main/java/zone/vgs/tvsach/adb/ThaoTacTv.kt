@@ -454,11 +454,15 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
 
     /** Gói của màn đang hiện trên tivi (đọc cửa sổ đang giữ tiêu điểm — chạy được từ Android 8 tới 14). */
     fun goiDangHien(): String {
-        repeat(3) {
+        val ten = Regex("""([A-Za-z0-9_.]+)/[A-Za-z0-9_.$]+""")
+        repeat(5) {
             val w = sh("dumpsys window | grep -E 'mCurrentFocus|mFocusedApp' | head -2")
-            val pkg = Regex("""([A-Za-z0-9_.]+)/[A-Za-z0-9_.$]+""").find(w)?.groupValues?.get(1) ?: ""
-            if (pkg.isNotBlank()) return pkg
-            Thread.sleep(800) // đang chuyển màn, tiêu điểm tạm trống
+            ten.find(w)?.groupValues?.get(1)?.let { return it }
+            // Sony BRAVIA BF1 (Google TV 12, 22/10/2026): Home Google mở chậm, cửa sổ chưa nhận tiêu điểm — đọc activity
+            // đang chạy trên cùng thay vào.
+            val a = sh("dumpsys activity activities | grep -E 'topResumedActivity|mResumedActivity' | head -2")
+            ten.find(a)?.groupValues?.get(1)?.let { return it }
+            Thread.sleep(1000) // đang chuyển màn, tiêu điểm tạm trống
         }
         return ""
     }
@@ -501,6 +505,12 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             // ganChuyenHomeCu (stock_home_redirect) CHƯA bật: thử trên máy ảo Android TV 14 ngày 22/10/2026 chưa thấy chuyển
             // về được — upstream mới thử trên XGIMI thật. Chưa thử chạy được thì không đưa ra cho người dùng.
             if (pkg == pkgHome) return KetQuaPhimHome(true, gianh, "", "")
+            // Không đọc được màn nào đang hiện mà Google TV còn bật setupwraith: gần như chắc là ca setupwraith giữ Home,
+            // báo đúng cách sửa (quên Wi-Fi…) thay vì "không rõ" (Sony 65S30, 22/10/2026).
+            if (pkg.isBlank() && dangBat(SETUP)) {
+                lyDo = "setupwraith"
+                return tra(HOME_GOC_BIET.firstOrNull { dangBat(it) } ?: "")
+            }
             if (KeHoach.laHomeCvte(pkg)) {
                 lyDo = "cvte"
                 return tra(pkg)

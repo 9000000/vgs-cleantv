@@ -54,6 +54,13 @@ object KeHoach {
     )
     private val GIU_DAU = listOf("com.android.providers.", "com.android.networkstack", "com.google.android.networkstack")
 
+    /**
+     * Gói lõi của Android (upstream 22dc48f, #884: Mi TV Stick không khởi động lại được sau khi một danh sách tắt chúng):
+     * ext services/shared, module metadata, overlay mainline. Trình cấp quyền / cài app đã nằm trong GIU_CHINH_XAC.
+     */
+    private val GIU_LOI = Regex("""^com\.(google\.)?android\.(ext\.services|ext\.shared|modulemetadata)$|^com\.google\.android\.overlay\.modules""")
+    fun laGoiLoi(pkg: String) = GIU_LOI.containsMatchIn(pkg)
+
     /** Tên kiểu này thường là đường hình HDMI, remote, bàn phím: chỉ tắt khi danh sách đúng mẫu ghi rõ. */
     private val TU_NGUY_HIEM = listOf(
         "tvinput", "tvservice", "tv.service", "inputmethod", "bluetooth", "rcu", "remote", "autopair",
@@ -91,7 +98,7 @@ object KeHoach {
 
     fun laGoiCanGiu(pkg: String, tt: TrangThaiGoi): Boolean =
         pkg in GIU_CHINH_XAC || GIU_DAU.any { pkg.startsWith(it) } || pkg in tt.banPhim || pkg == tt.homeHienTai ||
-            GIU_MAY_CHIEU.containsMatchIn(pkg) || laHomeCvte(pkg)
+            GIU_MAY_CHIEU.containsMatchIn(pkg) || laHomeCvte(pkg) || laGoiLoi(pkg)
 
     fun lap(du: DuLieu, mau: MauTv?, tt: TrangThaiGoi): List<MucGoi> {
         val ketQua = LinkedHashMap<String, MucGoi>()

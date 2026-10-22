@@ -58,4 +58,15 @@ class KeHoachTest {
         assertTrue(KeHoach.laHomeCvte("com.cvte.tv.launcher.space.skin"))
         assertFalse(KeHoach.laHomeCvte("com.cvte.tv.appstore"))
     }
+
+    /** Upstream #884: Mi TV Stick không khởi động lại sau khi tắt gói lõi Android. */
+    @Test fun goiLoiAndroid_luonGiu() {
+        val tt = TrangThaiGoi(caiDat = emptySet(), daTat = emptySet(), coBieuTuong = emptySet(), homeHienTai = "", banPhim = emptySet())
+        listOf("com.google.android.ext.services", "com.android.ext.shared", "com.google.android.modulemetadata",
+            "com.google.android.overlay.modules.permissioncontroller", "com.google.android.permissioncontroller",
+            "com.google.android.packageinstaller", "com.android.providers.tv").forEach {
+            assertTrue(it, KeHoach.laGoiCanGiu(it, tt))
+        }
+        assertFalse(KeHoach.laGoiCanGiu("com.google.android.feedback", tt))
+    }
 }
