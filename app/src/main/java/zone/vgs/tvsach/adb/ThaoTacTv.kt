@@ -763,7 +763,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             val ssid = Regex("""mWifiInfo SSID: "([^"]*)"""").find(dump)?.groupValues?.get(1) ?: return null
             val dau = dump.indexOf("Configured networks Begin"); val cuoi = dump.indexOf("Configured networks End")
             if (dau < 0 || cuoi < dau) return ""
-            val khoi = dump.substring(dau, cuoi).split(Regex("""\n(?=\s*ID: \d+ )"""))
+            val khoi = dump.substring(dau, cuoi).split(Regex("""\n(?=[\s*]*ID: \d+ )"""))
             val cua = khoi.firstOrNull { it.contains("SSID: \"$ssid\"") } ?: return ""
             return Regex("""cname=([^ \n]+)""").find(cua)?.groupValues?.get(1) ?: ""
         }

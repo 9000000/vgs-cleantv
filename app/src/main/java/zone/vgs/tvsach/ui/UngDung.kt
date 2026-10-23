@@ -742,17 +742,18 @@ private fun ManHomeSach(vm: PhienLamViec) = Cuon {
         OutlinedTextField(vm.tenChao, { vm.tenChao = it }, label = { Text(t("Tên chào (vd: Nhà bác Hùng)", "Greeting name (e.g. The Smiths)")) },
             singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
         Text(t("Thời tiết trên Home", "Weather on Home"), fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp))
-        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ChonChip(t("Không hiện", "Off"), vm.thanhPho == null) { vm.thanhPho = null }
-            vm.thanhPho?.takeIf { it !in THANH_PHO }?.let { tp -> ChonChip(tp.ten, true) { } }
-            THANH_PHO.forEach { tp -> ChonChip(tp.ten, vm.thanhPho == tp) { vm.thanhPho = tp } }
-        }
-        OutlinedTextField(vm.timXa, { vm.timXa = it }, label = { Text(t("Hoặc tìm phường / xã của bạn", "Or find your ward / commune")) },
+        OutlinedTextField(vm.timXa, { vm.timXa = it }, label = { Text(t("Tìm phường / xã của bạn", "Find your ward / commune")) },
             placeholder = { Text(t("vd: Bến Thành, Cửa Lò", "e.g. Ben Thanh, Cua Lo")) },
             singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
         vm.ketQuaXa.forEach { x ->
             Text("${x.ten} · ${x.tinh}", fontSize = 14.sp, modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp))
                 .clickable { vm.chonXa(x) }.padding(horizontal = 12.dp, vertical = 10.dp))
+        }
+        Phu(t("Hoặc chọn nhanh thành phố:", "Or pick a city:"))
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ChonChip(t("Không hiện", "Off"), vm.thanhPho == null) { vm.thanhPho = null }
+            vm.thanhPho?.takeIf { it !in THANH_PHO }?.let { tp -> ChonChip(tp.ten, true) { } }
+            THANH_PHO.forEach { tp -> ChonChip(tp.ten, vm.thanhPho == tp) { vm.thanhPho = tp } }
         }
         Phu(t("Dữ liệu thời tiết: Open-Meteo.com (CC BY 4.0), tivi tự lấy nửa giờ một lần. Toạ độ phường/xã © OpenStreetMap.", "Weather data: Open-Meteo.com (CC BY 4.0), refreshed by the TV every 30 minutes. Ward locations © OpenStreetMap."))
         Hang(t("Âm lịch dưới ngày dương", "Lunar date under the date"), t("Ví dụ: 2/9 âm lịch · Bính Ngọ", "e.g. Lunar 2/9 · Year of the Horse"), vm.amLich) { vm.amLich = it }

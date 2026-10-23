@@ -123,10 +123,10 @@ index 4cee7a6..335d9e1 100644
          <intent>
              <action android:name="android.settings.SETTINGS" />
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Config.java b/launcher/app/src/main/java/com/gathin/tvhome/Config.java
-index 6071c88..12399c9 100644
+index 7fbc06a..69dee21 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/Config.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/Config.java
-@@ -82,6 +82,9 @@ final class Config {
+@@ -85,6 +85,9 @@ final class Config {
      final boolean advancedEffects;
      final int rowsBelowDock;
      final boolean shamsiDate;
@@ -136,16 +136,16 @@ index 6071c88..12399c9 100644
      /** Name after the greeting ("Good morning, Mr. Trịnh"); empty for the greeting alone. */
      final String greetingName;
      final boolean moduleCards;
-@@ -198,7 +201,7 @@ final class Config {
-                    Festival festival, int[] inputKeycodes, List<String> appKeys, String stockHomeRedirect,
-                    List<RaceWeekend.Race> raceCalendar, boolean cinematicHome, boolean ambientGlow, boolean appGlow, int homeIdleClockMinutes,
+@@ -218,7 +221,7 @@ final class Config {
+                    List<RaceWeekend.Race> raceCalendar, boolean cinematicHome, boolean ambientGlow, boolean appGlow, boolean fadeRows, int homeIdleClockMinutes,
                     boolean keyFilter, boolean dockGlass, String glowStyle, boolean wallpaperCaptions,
--                   boolean handleViewInputs, boolean tileMenu, boolean dockEvenPadding) {
-+                   boolean handleViewInputs, boolean tileMenu, boolean dockEvenPadding, boolean lunarDate, int lunarUtcOffset) {
+                    boolean handleViewInputs, boolean tileMenu, boolean dockEvenPadding, boolean cinematicDots, boolean cinematicWhiteFocus, boolean wifiStatusColor, int cinematicScrim, int cinematicArt,
+-                   Map<String, Set<String>> wallpaperMoods) {
++                   Map<String, Set<String>> wallpaperMoods, boolean lunarDate, int lunarUtcOffset) {
          this.handleViewInputs = handleViewInputs;
          this.tileMenu = tileMenu;
          this.inputKeycodes = inputKeycodes;
-@@ -226,6 +229,8 @@ final class Config {
+@@ -246,6 +249,8 @@ final class Config {
          this.animations = animations;
          this.advancedEffects = advancedEffects;
          this.shamsiDate = shamsiDate;
@@ -154,7 +154,7 @@ index 6071c88..12399c9 100644
          this.greetingName = greetingName;
          this.moduleCards = moduleCards;
          this.reducedMotion = reducedMotion;
-@@ -306,6 +311,8 @@ final class Config {
+@@ -334,6 +339,8 @@ final class Config {
          boolean animations = res.getBoolean(R.bool.animations);
          boolean advancedEffects = res.getBoolean(R.bool.advanced_effects);
          boolean shamsi = res.getBoolean(R.bool.shamsi_date);
@@ -163,7 +163,7 @@ index 6071c88..12399c9 100644
          String greetingName = res.getString(R.string.greeting_name).trim();
          boolean moduleCards = res.getBoolean(R.bool.module_cards);
          boolean reducedMotion = res.getBoolean(R.bool.reduced_motion);
-@@ -376,6 +383,8 @@ final class Config {
+@@ -412,6 +419,8 @@ final class Config {
              animations = bool(json, "animations", animations);
              advancedEffects = bool(json, "advanced_effects", advancedEffects);
              shamsi = bool(json, "shamsi_date", shamsi);
@@ -172,12 +172,12 @@ index 6071c88..12399c9 100644
              greetingName = string(json, "greeting_name", greetingName).trim();
              moduleCards = bool(json, "module_cards", moduleCards);
              reducedMotion = bool(json, "reduced_motion", reducedMotion);
-@@ -470,7 +479,7 @@ final class Config {
+@@ -515,7 +524,7 @@ final class Config {
                  Math.max(0, Math.min(100, skyIntensity)), settingsKeycodes, settingsKeyPanel, restoreKeyServices, wallpaperEnabled, wallpaper,
                  wallpapers, rotationMinutes, wallpaperDim, dockOpacity, wallpaperOrder, applied,
-                 festival, inputKeycodes, appKeys, stockHomeRedirect, json == null ? Collections.emptyList() : raceCalendar(json), cinematic, ambientGlow, appGlow,
--                Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding);
-+                Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding, lunar, lunarOffset);
+                 festival, inputKeycodes, appKeys, stockHomeRedirect, json == null ? Collections.emptyList() : raceCalendar(json), cinematic, ambientGlow, appGlow, fadeRows,
+-                Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding, cinematicDots, cinematicWhiteFocus, wifiStatusColor, cinematicScrim, cinematicArt, wallpaperMoods);
++                Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding, cinematicDots, cinematicWhiteFocus, wifiStatusColor, cinematicScrim, cinematicArt, wallpaperMoods, lunar, lunarOffset);
      }
  
      /**
@@ -320,10 +320,10 @@ index 0000000..4181780
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 5be43c9..77497e6 100644
+index 40bee38..58b3565 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-@@ -172,13 +172,25 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -178,13 +178,25 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private int wifiIcon;
      /** The pills have been filled in once; later resumes refresh them after the first frame. */
      private boolean pillsShown;
@@ -349,7 +349,7 @@ index 5be43c9..77497e6 100644
      private boolean shamsi;
      /** greeting_name: said after the greeting, which is shown in capitals. */
      private String greetingName = "";
-@@ -335,6 +347,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -342,6 +354,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // The pill follows the network callbacks and each return to Home; only the diya's flame follows the
              // signal level, so only it needs this minute's binder calls (about 7 ms on the UI thread).
              if (festive) updateWifiLabel();
@@ -357,7 +357,7 @@ index 5be43c9..77497e6 100644
              sky.update();
              wallpaperPlayer.update();
              handler.postDelayed(this, MINUTE_MS);
-@@ -433,12 +446,26 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -444,12 +457,26 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          raceSessions = findViewById(R.id.raceSessions);
          showStats = cfg.showStats;
          shamsi = cfg.shamsiDate;
@@ -384,17 +384,17 @@ index 5be43c9..77497e6 100644
          }
          vpnApp = cfg.vpnApp;
          moduleCards = cfg.moduleCards;
-@@ -500,7 +527,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -511,7 +538,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              public void onChildViewDetachedFromWindow(@NonNull View v) {
              }
          });
 -        if (dockRow) grid.addItemDecoration(new DockDecoration(COLUMNS, density, cinematic, cfg.alwaysShowNames, cfg.dockOpacity, cfg.dockGlass, cfg.dockEvenPadding));
 +        // CleanTV/VGS: dock_band false keeps the dock row and its big title but drops the dark band behind it.
 +        if (dockRow && Weather.flag(this, "dock_band", true)) grid.addItemDecoration(new DockDecoration(COLUMNS, density, cinematic, cfg.alwaysShowNames, cfg.dockOpacity, cfg.dockGlass, cfg.dockEvenPadding));
+         if (cfg.fadeRows) TopFade.attach(grid, 48 * density);
          // Reduced motion: the tiles are simply there, with no entrance (reloadApps skips it there too).
          if (animations && !reducedMotion) {
-             grid.setLayoutAnimation(new LayoutAnimationController(
-@@ -656,7 +684,27 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -672,7 +700,27 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -422,7 +422,7 @@ index 5be43c9..77497e6 100644
          btnSettings.setOnKeyListener(pillKeys);
          btnReorder.setOnKeyListener(pillKeys);
          btnLibraryTop.setOnKeyListener(pillKeys);
-@@ -835,6 +883,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -853,6 +901,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -430,7 +430,7 @@ index 5be43c9..77497e6 100644
          sky.update();
          wallpaperPlayer.start();
          handler.postDelayed(minuteTick, MINUTE_MS);
-@@ -1861,6 +1910,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1897,6 +1946,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -461,7 +461,7 @@ index 5be43c9..77497e6 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2239,6 +2312,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2284,6 +2357,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              greeting.setTextColor(greetingColor);
          }
          if (shamsi) shamsiDate.setText(Shamsi.today(getResources()));
@@ -469,7 +469,7 @@ index 5be43c9..77497e6 100644
      }
  
      // ---- race-weekend panel (a theme's race_calendar) -----------------------------------------------
-@@ -2377,7 +2451,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2422,7 +2496,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = name.length() < text.length() && name.length() < 5 ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -482,7 +482,7 @@ index 5be43c9..77497e6 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2575,6 +2653,29 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2626,6 +2704,29 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              if (v.equals("-")) return -1;
              try { return Integer.parseInt(v); } catch (NumberFormatException e) { return null; }
          }
@@ -512,7 +512,7 @@ index 5be43c9..77497e6 100644
          return null;
      }
  
-@@ -2946,10 +3047,77 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2997,10 +3098,77 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
@@ -5396,7 +5396,7 @@ index b6b7970..3eae781 100644
 +    </string-array>
  </resources>
 diff --git a/launcher/app/src/main/res/values/config.xml b/launcher/app/src/main/res/values/config.xml
-index f600676..1297b31 100644
+index c38384e..92957bd 100644
 --- a/launcher/app/src/main/res/values/config.xml
 +++ b/launcher/app/src/main/res/values/config.xml
 @@ -177,6 +177,8 @@

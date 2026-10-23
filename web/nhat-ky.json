@@ -1,5 +1,21 @@
 [
  {
+  "ban": "2.3",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Theo CleanYourTV mới nhất: 243 mẫu tivi của 70 hãng (thêm TCL, Sony, Motorola, TiVo, AIWA…)",
+   "Nâng cao có 64 tuỳ chọn, thêm: hàng app mờ dần khi cuộn, ảnh nền theo buổi sáng/chiều/tối, biểu tượng Wi-Fi đổi màu, chỉnh Home điện ảnh",
+   "Thời tiết: ô tìm phường/xã lên đầu, thành phố lớn là nút chọn nhanh",
+   "Tivi lưu nhiều mạng Wi-Fi: đọc đúng mạng đang dùng trước khi tắt trình cài đặt Google"
+  ],
+  "en": [
+   "Latest CleanYourTV: 243 TV models from 70 brands (new TCL, Sony, Motorola, TiVo, AIWA…)",
+   "Advanced has 64 options, new: rows fade as they scroll, wallpapers by time of day, coloured Wi-Fi icon, cinematic Home tuning",
+   "Weather: ward search box first, big cities as quick picks",
+   "TVs with several saved Wi-Fi networks: the one in use is read correctly before the Google setup app is disabled"
+  ]
+ },
+ {
   "ban": "2.2",
   "ngay": "2026-10-23",
   "vi": [

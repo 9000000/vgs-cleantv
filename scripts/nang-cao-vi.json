@@ -230,5 +230,37 @@
   "dock_even_padding": {
     "ten": "Viền dải dock đều",
     "moTa": "Khoảng cách từ mép dải dock tới các ô bằng khoảng cách giữa các ô, đều cả bốn phía (mặc định tắt)."
+  },
+  "wifi_status_color": {
+    "ten": "Biểu tượng Wi-Fi đổi màu",
+    "moTa": "Biểu tượng Wi-Fi xanh lá khi tivi có mạng, trắng khi mất mạng (mặc định tắt)."
+  },
+  "app_library_selection": {
+    "ten": "Chọn app Home trong Thư viện",
+    "moTa": "Trong Thư viện app, bấm OK để tích / bỏ tích app hiện ở Home; app đã tích xếp trước. Cần bật Thư viện app."
+  },
+  "wallpaper_moods": {
+    "ten": "Ảnh nền theo buổi",
+    "moTa": "Bộ ảnh xoay vòng chia theo sáng / chiều / tối: {\"morning\": [...], \"evening\": [...], \"night\": [...]} với tên file trong wallpapers/. Giờ mặt trời mọc / lặn tính theo vị trí; buổi nào thiếu thì xoay hết các ảnh."
+  },
+  "cinematic_dots": {
+    "ten": "Chấm vị trí dưới tên app (Home điện ảnh)",
+    "moTa": "Khi bật Home điện ảnh, hiện các chấm vị trí dock dưới tên app (mặc định bật)."
+  },
+  "cinematic_white_focus": {
+    "ten": "Viền chọn màu trắng (Home điện ảnh)",
+    "moTa": "Khi bật Home điện ảnh, viền chọn trên dock giữ màu trắng thay vì lấy màu của app (mặc định tắt)."
+  },
+  "cinematic_scrim": {
+    "ten": "Độ tối nền sau tên app (Home điện ảnh)",
+    "moTa": "0 đến 100, mặc định 100. Thấp hơn thì hình nền lộ ra nhiều hơn."
+  },
+  "cinematic_art": {
+    "ten": "Độ đậm ảnh app (Home điện ảnh)",
+    "moTa": "0 đến 100, mặc định 50: độ rõ của ảnh làm mờ từ app đang chọn. 0 là không che hình nền."
+  },
+  "fade_rows": {
+    "ten": "Hàng app mờ dần khi cuộn",
+    "moTa": "Hàng app mờ dần khi cuộn lên dưới đồng hồ thay vì bị cắt thẳng. Tốn thêm khoảng 6 MB bộ nhớ đồ hoạ ở 1080p (mặc định tắt)."
   }
 }

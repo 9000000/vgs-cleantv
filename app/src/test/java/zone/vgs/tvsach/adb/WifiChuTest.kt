@@ -26,5 +26,9 @@ WifiConfigManager - Configured networks End ----
 
     @Test fun khongDungWifi() = assertNull(ThaoTacTv.chuWifiDangDung(dump("<unknown ssid>")))
 
+    /** Android ghi "* " trước dòng ID của mạng đang nối (máy ảo Android 14, 23/10/2026). */
+    @Test fun dongIdCoDauSao() = assertEquals("com.android.tv.settings",
+        ThaoTacTv.chuWifiDangDung(dump("\"NhaMinh\"").replace("ID: 1 SSID", "* ID: 1 SSID")))
+
     @Test fun khongThayKhoi() = assertEquals("", ThaoTacTv.chuWifiDangDung(dump("\"Khac\"")))
 }
