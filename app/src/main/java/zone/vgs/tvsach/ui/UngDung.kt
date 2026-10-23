@@ -1040,6 +1040,7 @@ private fun ManXong(vm: PhienLamViec) = Cuon {
             runCatching { uri.openUri("https://vgs.zone/dang-ky?tu=cleantv-app&next=/cleantv") }
         }
     }
+    TheGuiDanhSach(vm)
     NutGopY(vm)
     NutChinh(t("Tắt ADB & kết thúc", "Turn off ADB & finish"), enabled = !vm.dangBan, icon = Icons.Rounded.Lock) { vm.tatAdbVaKetThuc() }
     Phu(t("Sau đó trên tivi: Tuỳ chọn nhà phát triển → tắt Gỡ lỗi USB, chọn \"Thu hồi uỷ quyền gỡ lỗi USB\". Bản sao lưu vẫn trong điện thoại để khôi phục.",
@@ -1267,4 +1268,27 @@ private fun HopChonMau(vm: PhienLamViec) {
         },
         containerColor = The1,
     )
+}
+
+/** Gửi danh sách gói cho VGS (23/10/2026): người dùng tự bấm, để làm mẫu cho tivi chưa có trong danh sách. */
+@Composable
+private fun TheGuiDanhSach(vm: PhienLamViec) {
+    The(t("Giúp người dùng cùng dòng tivi", "Help owners of the same TV"), Icons.Rounded.Share) {
+        if (vm.dsDaGui) {
+            Phu(t("Đã gửi, cảm ơn bạn! VGS sẽ xem và thêm tivi này vào danh sách.", "Sent, thank you! VGS will review it and add this TV to the lists."), Xanh)
+            return@The
+        }
+        Phu(t("Gửi cho VGS model tivi và danh sách gói đang tắt, để làm mẫu cho người dùng cùng dòng tivi. Không gửi tên, email hay danh sách app bạn cài — trừ khi bạn tự ghi chỗ liên hệ.",
+            "Send VGS this TV's model and the packages that are off, to build a list for owners of the same TV. No name, email or app list — unless you add a contact."))
+        Text(t("Dùng thử rồi, tivi chạy:", "After trying it, the TV:"), fontSize = 14.sp)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ChonChip(t("Ổn hết", "Works fine"), vm.dsDanhGia == "on") { vm.dsDanhGia = "on" }
+            ChonChip(t("Có chỗ chưa ổn", "Has issues"), vm.dsDanhGia == "chua-on") { vm.dsDanhGia = "chua-on" }
+        }
+        OutlinedTextField(vm.dsGhiChu, { if (it.length <= 1000) vm.dsGhiChu = it }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp),
+            label = { Text(if (vm.dsDanhGia == "on") t("Ghi chú (không bắt buộc)", "Note (optional)") else t("Chưa ổn ở đâu? (HDMI, remote, giọng nói…)", "What's wrong? (HDMI, remote, voice…)")) })
+        OutlinedTextField(vm.dsLienHe, { if (it.length <= 120) vm.dsLienHe = it }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp),
+            label = { Text(t("Email / Zalo để VGS hỏi lại (không bắt buộc)", "Email to reach you (optional)")) })
+        NutPhu(t("Gửi danh sách gói cho VGS", "Send the package list to VGS"), Icons.Rounded.Share) { if (!vm.dangBan) vm.guiDanhSach() }
+    }
 }

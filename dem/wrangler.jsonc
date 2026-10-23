@@ -4,5 +4,7 @@
   "main": "src/index.js",
   "compatibility_date": "2026-09-01",
   "d1_databases": [{ "binding": "DB", "database_name": "cleantv-dem", "database_id": "5295f78c-9fe2-44eb-99bb-89d9757106ac" }],
-  "vars": { "APK_MOI": "https://pub-925dff61607e4e3da7398d3413ccd1da.r2.dev/CleanTV.apk" }
+  "r2_buckets": [{ "binding": "APK", "bucket_name": "cleantv" }],
+  // 30 lượt / 60 giây mỗi IP (băm) cho /tai và /su-kien; quá thì không ghi D1.
+  "ratelimits": [{ "name": "GIOI_HAN", "namespace_id": "2310", "simple": { "limit": 30, "period": 60 } }]
 }

@@ -455,6 +455,27 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    // ---------- Gửi danh sách gói cho VGS (màn Xong, 23/10/2026) ----------
+    var dsDanhGia by mutableStateOf("on")
+    var dsGhiChu by mutableStateOf("")
+    var dsLienHe by mutableStateOf("")
+    var dsDaGui by mutableStateOf(false)
+
+    /** Đọc lại gói đang tắt trên tivi rồi gửi kèm model + đánh giá (người dùng tự bấm). */
+    fun guiDanhSach() = chay(t("Đang gửi danh sách…", "Sending the list…")) {
+        val tt = io { tv.docTrangThai() }
+        val tv0 = thongTin
+        val du = org.json.JSONObject()
+            .put("hang", tv0?.manufacturer?.ifBlank { tv0.brand } ?: "").put("model", tv0?.model ?: "").put("device", tv0?.device ?: "")
+            .put("android", tv0?.android ?: "").put("mau", mauChon?.id ?: "")
+            .put("danhGia", dsDanhGia).put("ghiChu", dsGhiChu.trim()).put("lienHe", dsLienHe.trim())
+            .put("goi", org.json.JSONArray(tt.daTat.sorted()))
+            .put("giu", org.json.JSONArray((ketQua?.boQua ?: emptyList()).map { it.first }))
+        val ok = io { zone.vgs.tvsach.Dem.guiDanhSach(ctx, du) }
+        if (!ok) error(t("Chưa gửi được (mạng?). Thử lại sau nhé.", "Couldn't send (network?). Try again later."))
+        dsDaGui = true
+    }
+
     fun chupManHinh() = chay(t("Đang chụp màn hình tivi…", "Taking a TV screenshot…")) {
         val bytes = io { tv.chupManHinh() }
         anhTv = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)

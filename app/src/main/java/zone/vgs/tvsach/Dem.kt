@@ -34,6 +34,19 @@ object Dem {
         }.start()
     }
 
+    /**
+     * Danh sách gói người dùng TỰ BẤM gửi ở màn Xong (23/10/2026): model tivi, gói đang tắt, gói app giữ lại, đánh giá
+     * và ghi chú — để làm mẫu cho tivi chưa có trong danh sách. Gọi trên luồng nền; trả true khi máy chủ nhận.
+     */
+    fun guiDanhSach(ctx: Context, du: JSONObject): Boolean = runCatching {
+        val body = du.put("may", maMay(ctx.applicationContext)).put("ban", BuildConfig.VERSION_NAME).toString().toByteArray()
+        val c = URL(DIA_CHI.replace("/su-kien", "/danh-sach")).openConnection() as HttpURLConnection
+        c.requestMethod = "POST"; c.doOutput = true; c.connectTimeout = 10000; c.readTimeout = 10000
+        c.setRequestProperty("Content-Type", "application/json")
+        c.outputStream.use { it.write(body) }
+        (c.responseCode == 200).also { c.disconnect() }
+    }.getOrDefault(false)
+
     /** Gọi lúc mở app: "mo" mỗi ngày một lần; "cap-nhat" khi số bản khác lần trước. */
     fun moApp(ctx: Context) {
         val p = ctx.getSharedPreferences("dem", Context.MODE_PRIVATE)

@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.4.1",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Màn Xong có thẻ \"Giúp người dùng cùng dòng tivi\": chọn Ổn hết / Có chỗ chưa ổn, ghi chú, bấm gửi model tivi và danh sách gói đang tắt cho VGS (không gửi tên, email hay danh sách app) — góp ý của nguyenducbinh9x (tivi Hiker)"
+  ],
+  "en": [
+   "Done screen: \"Help owners of the same TV\" — rate it, add a note and send the TV model and disabled packages to VGS (no name, email or app list)"
+  ]
+ },
+ {
   "ban": "2.4",
   "ngay": "2026-10-23",
   "vi": [

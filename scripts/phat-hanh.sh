@@ -13,7 +13,8 @@ NAME=$(grep -E '^\s*versionName = ' app/build.gradle.kts | grep -oE '"[^"]+"' | 
 mkdir -p web/ota
 # APK nằm trên Cloudflare R2 (bucket cleantv): bản mới nhất + bản theo số. Khoá Cloudflare (CF_API_TOKEN, CF_ACCOUNT_ID)
 # đọc từ file $CF_ENV (mặc định .env.cloudflare ở gốc repo, không nằm trong git).
-R2=https://pub-925dff61607e4e3da7398d3413ccd1da.r2.dev
+# Link tải đi qua Worker cleantv-dem (binding R2 APK), không dùng tên miền thử pub-…r2.dev (23/10/2026).
+R2=https://cleantv-dem.vgszone.workers.dev/apk
 CF_ENV="${CF_ENV:-.env.cloudflare}"
 [ -f "$CF_ENV" ] && { set -a; . "$CF_ENV"; set +a; }
 : "${CF_API_TOKEN:?Thiếu CF_API_TOKEN (xem .env.cloudflare)}"

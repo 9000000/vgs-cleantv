@@ -8,9 +8,52 @@ async function bam(chu) {
   return [...new Uint8Array(d)].slice(0, 8).map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
-async function ghi(env, r) {
-  await env.DB.prepare(`INSERT INTO su_kien (luc, loai, may, ban, tivi, so, them, quoc_gia) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
-    .bind(new Date().toISOString(), r.loai, r.may || "", r.ban || "", r.tivi || "", r.so || 0, r.them || "", r.quoc_gia || "").run();
+// Ghi một sự kiện, bỏ bản trùng: cùng máy + loại + tivi + ghi chú trong [trongGiay] giây gần nhất (lượt tải: cả ngày,
+// vì mã máy của lượt tải đã là băm IP+ngày). Một câu lệnh, nên vòng lặp gửi lại y hệt không tốn thêm dòng ghi D1.
+async function ghi(env, r, trongGiay = 600) {
+  await env.DB.prepare(`INSERT INTO su_kien (luc, loai, may, ban, tivi, so, them, quoc_gia)
+      SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8 WHERE NOT EXISTS (
+        SELECT 1 FROM su_kien WHERE loai = ?2 AND may = ?3 AND tivi = ?5 AND them = ?7 AND luc >= ?9)`)
+    .bind(new Date().toISOString(), r.loai, r.may || "", r.ban || "", r.tivi || "", r.so || 0, r.them || "", r.quoc_gia || "",
+      new Date(Date.now() - trongGiay * 1000).toISOString()).run();
+}
+
+/** Hạn mức theo IP (binding Rate Limiting của Workers, 23/10/2026): quá hạn thì vẫn trả lời bình thường nhưng không ghi. */
+async function trongHan(env, req) {
+  if (!env.GIOI_HAN) return true;
+  const ip = req.headers.get("cf-connecting-ip") || "";
+  try { return (await env.GIOI_HAN.limit({ key: await bam(ip) })).success; } catch { return true; }
+}
+
+/** File APK từ R2 (binding APK, bucket cleantv) — thay tên miền thử pub-…r2.dev (23/10/2026). */
+async function guiApk(env, req, ten) {
+  if (!/^CleanTV(-[0-9][0-9A-Za-z.-]*)?\.apk$/.test(ten)) return new Response("Không có", { status: 404 });
+  const coRange = req.headers.has("range");
+  const coDieuKien = ["if-none-match", "if-modified-since", "if-match", "if-unmodified-since"].some(k => req.headers.has(k));
+  const tuyChon = {};
+  if (coRange) tuyChon.range = req.headers;
+  if (coDieuKien) tuyChon.onlyIf = req.headers;
+  // HEAD: chỉ cần siêu dữ liệu.
+  const obj = req.method === "HEAD" ? await env.APK.head(ten) : await env.APK.get(ten, tuyChon);
+  if (!obj) return new Response("Không có", { status: 404 });
+  const h = new Headers();
+  obj.writeHttpMetadata(h);
+  h.set("content-type", "application/vnd.android.package-archive");
+  h.set("content-disposition", `attachment; filename="${ten}"`);
+  h.set("etag", obj.httpEtag);
+  h.set("accept-ranges", "bytes");
+  // Bản có số (CleanTV-2.4.apk) không bao giờ đổi; CleanTV.apk là bản mới nhất nên cache ngắn.
+  h.set("cache-control", ten === "CleanTV.apk" ? "public, max-age=300" : "public, max-age=31536000, immutable");
+  h.set("content-length", String(obj.size));
+  if (req.method === "HEAD") return new Response(null, { headers: h });
+  if (!("body" in obj)) return new Response(null, { status: 304, headers: h });
+  if (coRange && obj.range) {
+    const off = obj.range.offset ?? 0, len = obj.range.length ?? obj.size - off;
+    h.set("content-range", `bytes ${off}-${off + len - 1}/${obj.size}`);
+    h.set("content-length", String(len));
+    return new Response(obj.body, { status: 206, headers: h });
+  }
+  return new Response(obj.body, { headers: h });
 }
 
 export default {
@@ -24,9 +67,11 @@ export default {
       const ngay = new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10);
       const may = await bam(`${ip}|${ngay}|${env.MUOI || "cleantv"}`);
       const nguon = cat(url.searchParams.get("tu"), 40);
-      ctx.waitUntil(ghi(env, { loai: "tai", may, them: nguon, quoc_gia: qg }).catch(() => {}));
-      return Response.redirect(env.APK_MOI, 302);
+      if (req.method === "GET" && await trongHan(env, req)) ctx.waitUntil(ghi(env, { loai: "tai", may, them: nguon, quoc_gia: qg }, 86400).catch(() => {}));
+      return Response.redirect(new URL("/apk/CleanTV.apk", url).toString(), 302);
     }
+
+    if (url.pathname.startsWith("/apk/") && (req.method === "GET" || req.method === "HEAD")) return guiApk(env, req, url.pathname.slice(5));
 
     // Tín hiệu từ app.
     if (url.pathname === "/su-kien" && req.method === "POST") {
@@ -34,11 +79,34 @@ export default {
       if (raw.length > 2000) return new Response("qua dai", { status: 413 });
       let b; try { b = JSON.parse(raw); } catch { return new Response("sai", { status: 400 }); }
       if (!LOAI.has(b.loai) || !/^[a-f0-9-]{8,40}$/i.test(b.may || "")) return new Response("sai", { status: 400 });
+      if (!(await trongHan(env, req))) return new Response("ok");
       ctx.waitUntil(ghi(env, {
         loai: b.loai, may: cat(b.may, 40), ban: cat(b.ban, 10), tivi: cat(b.tivi, 80),
         so: Math.max(0, Math.min(10000, Number(b.so) || 0)), them: cat(b.them, 120), quoc_gia: qg,
       }).catch(() => {}));
       return new Response("ok");
+    }
+
+    // Danh sách gói người dùng TỰ BẤM gửi từ màn Xong (23/10/2026): model tivi + gói đang tắt + đánh giá, để làm mẫu
+    // cho tivi chưa có trong danh sách. Không IP, không email (trừ khi người dùng tự ghi chỗ liên hệ).
+    if (url.pathname === "/danh-sach" && req.method === "POST") {
+      const raw = await req.text();
+      if (raw.length > 40000) return new Response("qua dai", { status: 413 });
+      let b; try { b = JSON.parse(raw); } catch { return new Response("sai", { status: 400 }); }
+      const goi = (a, n) => (Array.isArray(a) ? a : []).map(x => cat(x, 120)).filter(x => /^[A-Za-z0-9_.]+$/.test(x)).slice(0, n);
+      if (!/^[a-f0-9-]{8,40}$/i.test(b.may || "")) return new Response("sai", { status: 400 });
+      if (!(await trongHan(env, req))) return new Response("ok");
+      await env.DB.prepare(`INSERT INTO danh_sach (luc, may, ban, hang, model, device, android, mau, danh_gia, ghi_chu, lien_he, goi, giu, quoc_gia)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
+        new Date().toISOString(), cat(b.may, 40), cat(b.ban, 10), cat(b.hang, 60), cat(b.model, 80), cat(b.device, 80), cat(b.android, 10),
+        cat(b.mau, 80), b.danhGia === "on" ? "on" : "chua-on", cat(b.ghiChu, 1000), cat(b.lienHe, 120),
+        JSON.stringify(goi(b.goi, 400)), JSON.stringify(goi(b.giu, 100)), qg).run();
+      return new Response("ok");
+    }
+    if (url.pathname === "/danh-sach" && req.method === "GET") {
+      if (!env.XEM_KHOA || req.headers.get("x-khoa") !== env.XEM_KHOA) return new Response("Không có quyền", { status: 403 });
+      const r = await env.DB.prepare(`SELECT * FROM danh_sach ORDER BY luc DESC LIMIT 50`).all();
+      return Response.json(r.results, { headers: { "cache-control": "no-store" } });
     }
 
     // Số liệu dạng JSON cho admin vgs.zone (tab CleanTV) — khoá đi bằng header, không nằm trong URL.
@@ -49,7 +117,8 @@ export default {
     }
 
     if (url.pathname === "/thong-ke") {
-      if (!env.XEM_KHOA || url.searchParams.get("khoa") !== env.XEM_KHOA) return new Response("Không có quyền", { status: 403 });
+      // Khoá qua header như /so-lieu (không để trong URL: lộ qua log, lịch sử trình duyệt). Xem số ở vgs.zone/admin#cleantv.
+      if (!env.XEM_KHOA || req.headers.get("x-khoa") !== env.XEM_KHOA) return new Response("Không có quyền", { status: 403 });
       return new Response(await trangThongKe(env), { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } });
     }
     return new Response("CleanTV", { status: 404 });
