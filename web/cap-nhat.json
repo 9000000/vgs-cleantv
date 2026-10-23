@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 32,
-  "versionName": "2.1.6",
-  "apk": "https://pub-925dff61607e4e3da7398d3413ccd1da.r2.dev/CleanTV-2.1.6.apk",
+  "versionCode": 33,
+  "versionName": "2.1.7",
+  "apk": "https://pub-925dff61607e4e3da7398d3413ccd1da.r2.dev/CleanTV-2.1.7.apk",
   "co": 11432371,
-  "ghiChu": "Đặt ảnh của bạn làm hình nền tivi (chọn từ điện thoại). Tivi Xiaomi bản Trung Quốc: chọn HDMI trên Home sạch mở đúng cổng. Nút Home bị app khác giành (hộp nhà mạng): app tự bật bắt phím Home.",
-  "ghiChuEn": "Use your own photo as the TV wallpaper (picked on the phone). China-market Xiaomi TVs: HDMI rows on the clean Home open the right port. Home button taken by another app (operator boxes): the app turns on the Home-key helper itself.",
+  "ghiChu": "Fire TV: app báo rõ ngay khi kết nối là chỉ dọn được, không thay được Home (Amazon khoá), và không dẫn sang bước cài Home sạch nữa.",
+  "ghiChuEn": "Fire TV: the app now says up front that it can clean but not replace Home (Amazon locks it), and skips the clean Home step.",
   "ngay": "2026-10-23"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "62b95ccb22c93284",
    "url": "/ota/du-lieu.json",
    "co": 1267388,
-   "tuBan": 32
+   "tuBan": 33
   },
   "tvhome.apk": {
    "phienBan": "20da132cf5e64ff9",
    "url": "/ota/tvhome.apk",
    "co": 592195,
-   "tuBan": 32
+   "tuBan": 33
   }
  }
 }

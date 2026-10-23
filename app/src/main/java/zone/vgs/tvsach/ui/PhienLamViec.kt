@@ -510,6 +510,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     }
 
     fun caiHomeSach() = chay(t("Đang cài Home sạch…", "Installing the clean Home…")) {
+        if (laFireTv) error(t("Fire TV không cho app nào thay màn Home (Amazon khoá). CleanTV chỉ dọn được quảng cáo và app rác trên Fire TV.", "Fire TV does not let any app replace Home (Amazon locks it). On Fire TV CleanTV can only clean ads and junk apps."))
         val sl = saoLuu ?: io { tv.damBaoSaoLuu(thongTin!!, getprop, ip) }.also { saoLuu = it }
         nhatKy.clear()
         val apk = io { zone.vgs.tvsach.CapNhat.moAsset(ctx, tv.apkHome).readBytes() }
@@ -680,6 +681,14 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         saoLuu = kho.doc(info.khoaLuu)
         taiLaiSaoLuu()
     }
+
+    /**
+     * Fire TV / Fire OS (23/10/2026, Fire TV Cube 2 AFTR): Amazon giữ Home cho launcher của họ — đặt Home bị bỏ qua,
+     * launcher là gói được bảo vệ không tắt được, dịch vụ trợ năng không nhận phím Home (upstream TROUBLESHOOTING
+     * "Fire TV"). Chỉ dọn được, không thay Home.
+     */
+    val laFireTv: Boolean get() = (thongTin?.model?.startsWith("AFT") == true) ||
+        trangThai?.caiDat?.contains("com.amazon.tv.launcher") == true
 
     /** Tivi có Home sạch (bản nào cũng được): đã từng dọn bằng CleanTV / CleanYourTV. */
     val coDauCleanTv: Boolean get() = trangThai?.let { tt -> ThaoTacTv.HOME_SACH.any { it in tt.caiDat } } == true

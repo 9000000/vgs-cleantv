@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.1.7",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Fire TV / Fire TV Stick / Fire TV Cube: app nhận ra Fire OS và báo ngay là chỉ dọn được quảng cáo, theo dõi, app rác; màn Home thì Amazon khoá cho launcher của họ nên không thay được. Bỏ bước cài Home sạch trên Fire TV để khỏi tưởng app lỗi."
+  ],
+  "en": [
+   "Fire TV / Stick / Cube: the app recognises Fire OS and says right away that it can clean ads, tracking and junk apps but can't replace Home, which Amazon locks to its launcher. The clean Home step is skipped there."
+  ]
+ },
+ {
   "ban": "2.1.6",
   "ngay": "2026-10-23",
   "vi": [
