@@ -496,9 +496,14 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         sh("mkdir -p $dir 2>/dev/null; true")
         // restore_key_services (Nâng cao) chỉ chạy khi Home sạch có WRITE_SECURE_SETTINGS (upstream build-and-install.sh
         // RESTORE_KEY_SERVICES=1). Tắt thì thu lại quyền cho gọn.
-        val khoiPhucPhim = runCatching { org.json.JSONObject(json).optBoolean("restore_key_services") }.getOrDefault(false)
+        val moi = runCatching { org.json.JSONObject(json) }.getOrNull()
+        val khoiPhucPhim = moi?.optBoolean("restore_key_services") ?: false
         sh("pm ${if (khoiPhucPhim) "grant" else "revoke"} $pkgHome android.permission.WRITE_SECURE_SETTINGS 2>/dev/null; true")
-        ghiFileTheme("config.json", json.toByteArray())
+        // Khoá chuyển đè Home cũ do damBaoPhimHome gắn (tivi không cho tắt Home gốc): đổi giao diện không được làm mất nó.
+        val ghi = moi?.takeIf { !it.has("stock_home_redirect") }?.let { m ->
+            docCauHinhTv()?.optString("stock_home_redirect")?.takeIf { it.isNotBlank() }?.let { m.put("stock_home_redirect", it).toString() }
+        } ?: json
+        ghiFileTheme("config.json", ghi.toByteArray())
         if (anhNen != null) ghiFileTheme("wallpaper.jpg", anhNen)
         else sh("rm -f $dir/wallpaper.jpg 2>/dev/null; content delete --uri $uri/wallpaper.jpg 2>/dev/null; true")
         // Bộ ảnh xoay vòng (wallpapers/): xoá bộ cũ trước, theme không có bộ ảnh thì chỉ xoá.
@@ -571,14 +576,41 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             if (gianh.isNotEmpty() || sl != null) sh("input keyevent KEYCODE_HOME")
             return KetQuaPhimHome(false, gianh.toList(), pkg, lyDo)
         }
+        /**
+         * Home gốc không tắt được hoặc hãng tự bật lại (SCBC R3 Android 14, 23/10/2026: tắt tvlauncher 3 lần, lần nào bấm
+         * Home cũng về nó): tắt tiếp là vô ích. Bật lại mọi gói vừa tắt, để Home sạch tự mở đè mỗi khi màn Home cũ hiện ra
+         * (stock_home_redirect của HomeKeyService, upstream #479/#1116). Thử trên máy ảo Android TV 14: tvlauncher vẫn bật
+         * và vẫn là Home mặc định, bấm Home từ Cài đặt 3/3 lần ra Home sạch. Không được thì gỡ khoá ra, trả null.
+         */
+        fun chuyenDe(pkg: String): KetQuaPhimHome? {
+            if (laBoMachCvte()) return null
+            bao(t("Tivi không cho tắt '$pkg': cho Home sạch tự mở đè lên Home cũ…", "The TV won't keep '$pkg' disabled: letting the clean Home open over the old one…"))
+            if (gianh.isNotEmpty()) {
+                gianh.forEach { p -> sh("pm enable --user 0 $p"); sl?.daTatBoiApp?.remove(p); if (sl?.homeGocDaTat == p) sl.homeGocDaTat = "" }
+                sl?.let { luuSaoLuu(it) }
+                gianh.clear()
+            }
+            if (!ganChuyenHomeCu(pkg)) return null
+            Thread.sleep(1500)
+            sh("cmd package set-home-activity --user 0 $cmpHome")
+            sh("input keyevent KEYCODE_HOME")
+            Thread.sleep(3000)
+            if (goiDangHien() == pkgHome) return KetQuaPhimHome(true, emptyList(), "", "chuyen", true)
+            boChuyenHomeCu()
+            return null
+        }
         repeat(4) { lan ->
             sh("cmd package set-home-activity --user 0 $cmpHome")
             sh("input keyevent KEYCODE_HOME")
             Thread.sleep(2500)
             val pkg = goiDangHien()
-            // ganChuyenHomeCu (stock_home_redirect) CHƯA bật: thử trên máy ảo Android TV 14 ngày 22/10/2026 chưa thấy chuyển
-            // về được — upstream mới thử trên XGIMI thật. Chưa thử chạy được thì không đưa ra cho người dùng.
             if (pkg == pkgHome) return KetQuaPhimHome(true, gianh, "", "", daBatBatPhim)
+            // Đã tắt mà vẫn hiện: hãng bật lại sau lưng.
+            if (pkg in gianh) {
+                chuyenDe(pkg)?.let { return it }
+                lyDo = "khong-tat"
+                return tra(pkg)
+            }
             // Không đọc được màn nào đang hiện mà Google TV còn bật setupwraith: gần như chắc là ca setupwraith giữ Home,
             // báo đúng cách sửa (quên Wi-Fi…) thay vì "không rõ" (Sony 65S30, 22/10/2026).
             if (pkg.isBlank() && dangBat(SETUP)) {
@@ -616,6 +648,13 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             if (sl.homeGocDaTat.isBlank() && pkg in HOME_GOC_BIET + listOf(sl.homeTruoc.substringBefore('/'))) sl.homeGocDaTat = pkg
             luuSaoLuu(sl)
             gianh += pkg
+            // Lệnh tắt bị từ chối (gói được hãng bảo vệ) hoặc vừa tắt đã bật lại.
+            Thread.sleep(800)
+            if (dangBat(pkg)) {
+                chuyenDe(pkg)?.let { return it }
+                lyDo = "khong-tat"
+                return tra(pkg)
+            }
         }
         return tra(goiDangHien())
     }
@@ -666,13 +705,21 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
      * remote) thì HomeKeyService thấy màn Home cũ hiện lên là mở lại Home sạch. Ghi khoá vào config.json đang có trên
      * tivi + bật HomeKeyService.
      */
-    fun ganChuyenHomeCu(pkg: String) {
-        if (!TEN_GOI.matches(pkg)) return
-        val dir = "/sdcard/Android/data/$pkgHome/files"
-        val cu = sh("content read --uri content://$pkgHome.theme/config.json 2>/dev/null || cat $dir/config.json 2>/dev/null").trim()
-        val j = runCatching { org.json.JSONObject(cu) }.getOrNull() ?: return
-        if (j.optString("stock_home_redirect") == pkg) { batDichVu("HomeKeyService"); return }
-        j.put("stock_home_redirect", pkg)
+    fun ganChuyenHomeCu(pkg: String): Boolean {
+        if (!TEN_GOI.matches(pkg)) return false
+        val j = docCauHinhTv() ?: return false
+        if (j.optString("stock_home_redirect") != pkg) {
+            j.put("stock_home_redirect", pkg)
+            ghiFileTheme("config.json", j.toString().toByteArray())
+            ghiFileTheme("theme_revision", java.util.UUID.randomUUID().toString().replace("-", "").toByteArray())
+        }
+        batDichVu("HomeKeyService")
+        return true
+    }
+
+    private fun boChuyenHomeCu() {
+        val j = docCauHinhTv() ?: return
+        if (j.remove("stock_home_redirect") == null) return
         ghiFileTheme("config.json", j.toString().toByteArray())
         batDichVu("HomeKeyService")
     }

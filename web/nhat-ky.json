@@ -1,5 +1,17 @@
 [
  {
+  "ban": "2.6.1",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Tivi không cho tắt Home gốc (tắt xong tự bật lại, vd SCBC R3 Android 14): nút Home giờ vẫn ra Home sạch — app để Home gốc bật và cho Home sạch tự mở đè lên.",
+   "Không được thì app trả tivi như cũ và báo rõ lý do, không thử tắt lặp lại."
+  ],
+  "en": [
+   "TVs that turn the stock Home back on after it is disabled (e.g. SCBC R3, Android 14): the Home button now still opens the clean Home, which opens over the stock one.",
+   "If that fails too, the app leaves the TV as it was and says why, instead of retrying."
+  ]
+ },
+ {
   "ban": "2.6",
   "ngay": "2026-10-23",
   "vi": [

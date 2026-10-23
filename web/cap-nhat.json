@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 46,
-  "versionName": "2.6",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.apk",
-  "co": 11563916,
-  "ghiChu": "Theo CleanYourTV mới (248 mẫu); dòng thời tiết gọn hơn; thêm chốt an toàn như repo gốc.",
-  "ghiChuEn": "Latest CleanYourTV (248 models); tidier weather line; the original repo's safety checks.",
+  "versionCode": 47,
+  "versionName": "2.6.1",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.1.apk",
+  "co": 11563924,
+  "ghiChu": "Sửa nút Home trên tivi không cho tắt Home gốc (SCBC R3…): Home sạch tự mở đè lên Home cũ",
+  "ghiChuEn": "Home button fix for TVs that won't keep the stock Home disabled: the clean Home opens over it",
   "ngay": "2026-10-23"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "f572077f2d80a190",
    "url": "/ota/du-lieu.json",
    "co": 1402074,
-   "tuBan": 46
+   "tuBan": 47
   },
   "tvhome.apk": {
    "phienBan": "414be35d49d85742",
    "url": "/ota/tvhome.apk",
    "co": 598251,
-   "tuBan": 46
+   "tuBan": 47
   }
  }
 }
