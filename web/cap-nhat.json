@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 39,
-  "versionName": "2.5",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.5.apk",
-  "co": 11534396,
-  "ghiChu": "Mới: Khoá trẻ em — hẹn giờ khoá tivi, mở bằng mã PIN.",
-  "ghiChuEn": "New: Kids lock — lock the TV on a schedule, unlock with a PIN.",
+  "versionCode": 40,
+  "versionName": "2.5.1",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.5.1.apk",
+  "co": 11534576,
+  "ghiChu": "Hỏi lại khi bạn tự tích gói mà nhiều tivi phải giữ; gửi danh sách kèm chẩn đoán Home.",
+  "ghiChuEn": "Asks again before disabling packages most TVs keep; the list you send includes Home diagnostics.",
   "ngay": "2026-10-23"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "d78b76ee70af41c3",
    "url": "/ota/du-lieu.json",
    "co": 1367068,
-   "tuBan": 39
+   "tuBan": 40
   },
   "tvhome.apk": {
    "phienBan": "bf674ba3c0446f2c",
    "url": "/ota/tvhome.apk",
    "co": 596831,
-   "tuBan": 39
+   "tuBan": 40
   }
  }
 }

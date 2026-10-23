@@ -1,5 +1,6 @@
 package zone.vgs.tvsach.ui
 
+import zone.vgs.tvsach.dulieu.KeHoach
 import zone.vgs.tvsach.dulieu.XaPhuong
 import androidx.compose.foundation.layout.Row
 import zone.vgs.tvsach.AnhTivi
@@ -636,7 +637,28 @@ private fun ManChonGoi(vm: PhienLamViec) {
             if (!vm.khongCaiHome) NutPhu(if (vm.daCoHomeSach) t("Bỏ qua, chỉ đổi giao diện", "Skip, just change the theme") else t("Bỏ qua, chỉ cài Home sạch", "Skip, just install the clean Home"),
                 Icons.Rounded.Home, enabled = !vm.dangBan) { vm.boQuaDon() }
         }
-        if (hoi) AlertDialog(
+        val nenGiu = vm.muc.filter { vm.chon[it.pkg] == true && KeHoach.nenGiu(it) }
+        if (hoi && nenGiu.isNotEmpty()) AlertDialog(
+            onDismissRequest = { hoi = false }, containerColor = The1,
+            icon = { Icon(Icons.Rounded.Warning, null, tint = Cam) },
+            title = { Text(t("Khoan đã: ${nenGiu.size} gói nhiều tivi phải giữ", "Wait: ${nenGiu.size} packages most TVs keep")) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(t("Bạn tự tích các gói dưới đây, nhưng nhiều danh sách đã thử ghi là PHẢI GIỮ (tắt có thể mất nút Input, HDMI, remote, Cài đặt…):",
+                        "You ticked these, but many tested lists say KEEP them (disabling can break the Input key, HDMI, the remote, Settings…):"))
+                    nenGiu.take(8).forEach { Text("• ${tenDep(it.pkg)} (${it.pkg}) — " + t("${it.soMauGiu} danh sách giữ", "kept by ${it.soMauGiu} lists"), fontSize = 13.sp, color = ChuPhu) }
+                    if (nenGiu.size > 8) Text(t("… và ${nenGiu.size - 8} gói nữa", "… and ${nenGiu.size - 8} more"), fontSize = 13.sp, color = ChuPhu)
+                }
+            },
+            confirmButton = { TextButton(onClick = { nenGiu.forEach { vm.chon[it.pkg] = false }; hoi = false; vm.batDauTat() }) { Text(t("Bỏ tích các gói này rồi dọn", "Untick them and clean"), fontWeight = FontWeight.SemiBold) } },
+            dismissButton = {
+                Row {
+                    TextButton(onClick = { hoi = false; vm.batDauTat() }) { Text(t("Vẫn tắt cả", "Disable all anyway"), color = Cam) }
+                    TextButton(onClick = { hoi = false }) { Text(t("Thôi", "Cancel")) }
+                }
+            },
+        )
+        else if (hoi) AlertDialog(
             onDismissRequest = { hoi = false }, containerColor = The1,
             icon = { Icon(Icons.Rounded.Shield, null, tint = Hong) },
             title = { Text(t("Dọn $so gói?", "Clean $so packages?")) },

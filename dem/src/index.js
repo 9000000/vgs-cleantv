@@ -96,11 +96,11 @@ export default {
       const goi = (a, n) => (Array.isArray(a) ? a : []).map(x => cat(x, 120)).filter(x => /^[A-Za-z0-9_.]+$/.test(x)).slice(0, n);
       if (!/^[a-f0-9-]{8,40}$/i.test(b.may || "")) return new Response("sai", { status: 400 });
       if (!(await trongHan(env, req))) return new Response("ok");
-      await env.DB.prepare(`INSERT INTO danh_sach (luc, may, ban, hang, model, device, android, mau, danh_gia, ghi_chu, lien_he, goi, giu, quoc_gia)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
+      await env.DB.prepare(`INSERT INTO danh_sach (luc, may, ban, hang, model, device, android, mau, danh_gia, ghi_chu, lien_he, goi, giu, quoc_gia, chan_doan)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
         new Date().toISOString(), cat(b.may, 40), cat(b.ban, 10), cat(b.hang, 60), cat(b.model, 80), cat(b.device, 80), cat(b.android, 10),
         cat(b.mau, 80), b.danhGia === "on" ? "on" : "chua-on", cat(b.ghiChu, 1000), cat(b.lienHe, 120),
-        JSON.stringify(goi(b.goi, 400)), JSON.stringify(goi(b.giu, 100)), qg).run();
+        JSON.stringify(goi(b.goi, 400)), JSON.stringify(goi(b.giu, 100)), qg, String(b.chanDoan ?? "").replace(/[\u0000-\u0008]/g, "").slice(0, 3000)).run();
       return new Response("ok");
     }
     if (url.pathname === "/danh-sach" && req.method === "GET") {

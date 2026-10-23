@@ -39,6 +39,13 @@ data class TrangThaiGoi(
 )
 
 object KeHoach {
+    /**
+     * Gói người dùng TỰ tích mà nhiều danh sách ghi phải giữ (23/10/2026: TCL BeyondTV4 tắt com.tcl.suspension = nút
+     * Input/bảng nhanh, 30 danh sách giữ). App không tích sẵn những gói này; bấm Dọn thì hỏi lại.
+     */
+    const val GIU_CANH_BAO = 10
+    fun nenGiu(m: MucGoi): Boolean = !m.chonSan && m.soMauGiu >= GIU_CANH_BAO && m.soMauGiu > m.soMauTat
+
 
     /** Không bao giờ đưa vào danh sách tắt: tivi cần để chạy, hoặc app này cần để làm việc. */
     private val GIU_CHINH_XAC = setOf(

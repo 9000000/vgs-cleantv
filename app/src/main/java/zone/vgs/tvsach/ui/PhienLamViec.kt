@@ -122,6 +122,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var homeXong by mutableStateOf(false)
     /** Lần thử nút Home thật gần nhất ra Home sạch (thuPhimHome). */
     var phimHomeOk by mutableStateOf(true)
+    /** Kết quả bấm thử nút Home lần gần nhất, gửi kèm danh sách gói để chẩn đoán. */
+    var phimHomeGhi = ""
     var themeChon by mutableStateOf(zone.vgs.tvsach.dulieu.THEMES.first())
 
     // Máy chiếu: màn của hãng dò được + những màn đã ghim vào nút "Máy chiếu" trên Home sạch (comp → nhãn).
@@ -540,6 +542,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             .put("danhGia", dsDanhGia).put("ghiChu", dsGhiChu.trim()).put("lienHe", dsLienHe.trim())
             .put("goi", org.json.JSONArray(tt.daTat.sorted()))
             .put("giu", org.json.JSONArray((ketQua?.boQua ?: emptyList()).map { it.first }))
+        du.put("chanDoan", (io { tv.chanDoanHome() } + "\n# phim-home " + phimHomeGhi).take(3000))
         val ok = io { zone.vgs.tvsach.Dem.guiDanhSach(ctx, du) }
         if (!ok) error(t("Chưa gửi được (mạng?). Thử lại sau nhé.", "Couldn't send (network?). Try again later."))
         dsDaGui = true
@@ -639,6 +642,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val kq = io { tv.damBaoPhimHome(sl) { s -> ghiTuIo(s) } }
         veApp()
         phimHomeOk = kq.ok
+        phimHomeGhi = (if (kq.ok) "ok" else if (kq.gianh.isNotEmpty()) "lui" else "loi") + " gianh=" + kq.gianh.joinToString(",") + " conLai=" + kq.conLai + " lyDo=" + kq.lyDo
         if (kq.daBatBatPhim) { nutHome = true; ghi(t("Đã bật \"Remote gửi phím Home lạ\" vì nút Home của tivi bị app khác giành.", "Turned on \"Remote sends an odd Home key\" because another app held the Home button.")) }
         if (kq.gianh.isNotEmpty() || !kq.ok) {
             // ok: đã tắt và chạy; lui: đã tắt nhưng không được nên bật lại; loi: không tắt gì.

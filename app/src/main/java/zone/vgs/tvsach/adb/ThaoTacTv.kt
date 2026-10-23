@@ -66,6 +66,13 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         sh("cmd package query-activities --brief -a android.intent.action.MAIN -c $cat").lines()
             .mapNotNull { Regex("""^\s*([A-Za-z0-9_.]+)/""").find(it)?.groupValues?.get(1) }.toSet()
 
+    /** Vài dòng chẩn đoán Home (gửi kèm danh sách khi người dùng bấm gửi, 23/10/2026): Home mặc định, app nhận Home, màn đang hiện. */
+    fun chanDoanHome(): String = runCatching {
+        sh("echo '# resolve'; $HOME_QUERY 2>&1 | tail -2; echo '# query'; cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME 2>&1 | grep '/' | head -12; " +
+            "echo '# focus'; dumpsys window 2>/dev/null | grep -m2 -E 'mCurrentFocus|mFocusedApp'; echo '# a11y'; settings get secure enabled_accessibility_services")
+            .lines().map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n").take(2500)
+    }.getOrDefault("")
+
     fun homeHienTai(): String = sh(HOME_QUERY).lines().lastOrNull { it.isNotBlank() }?.trim() ?: ""
 
     fun chupManHinh(): ByteArray = adb.chupPng()

@@ -13,9 +13,11 @@ install the clean Home, restore, pin projector buttons or switch the kids lock (
 times or the PIN). No email, name, app list, IP address or location.
 GỬI DANH SÁCH GÓI (CHỈ KHI BẠN BẤM) / PACKAGE LIST (ONLY WHEN YOU TAP)
 Nút "Gửi danh sách gói cho VGS" ở màn cuối gửi model tivi, phiên bản Android, danh sách gói đang tắt trên tivi,
-đánh giá và ghi chú bạn viết (cùng email/Zalo nếu bạn tự ghi), để VGS làm danh sách mẫu cho tivi cùng dòng.
+đánh giá và ghi chú bạn viết (cùng email/Zalo nếu bạn tự ghi), kèm vài dòng chẩn đoán màn Home (Home mặc định,
+app nhận Home, màn đang hiện), để VGS làm danh sách mẫu cho tivi cùng dòng.
 The "Send the package list to VGS" button on the last screen sends the TV model, Android version, the packages
-that are off on the TV, your rating and note (and a contact only if you type one), to build lists for the same TV.
+that are off on the TV, your rating and note (and a contact only if you type one) plus a few Home diagnostics
+(default Home, apps answering Home, the screen in front), to build lists for the same TV.
 
 CleanTV dùng các phần mềm mã nguồn mở sau. / CleanTV uses the following open-source software.
 

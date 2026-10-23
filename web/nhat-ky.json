@@ -1,5 +1,17 @@
 [
  {
+  "ban": "2.5.1",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Bấm Dọn mà bạn tự tích gói nhiều danh sách ghi phải giữ (vd nút Input của TCL) thì app hỏi lại: bỏ tích rồi dọn, hoặc vẫn tắt",
+   "Nút Gửi danh sách gói gửi kèm vài dòng chẩn đoán màn Home, để VGS xử lý tivi / hộp chưa nhận Home sạch"
+  ],
+  "en": [
+   "Ticked a package most tested lists keep (e.g. the TCL Input key)? The app asks again before cleaning",
+   "The package list you send now includes a few Home diagnostics"
+  ]
+ },
+ {
   "ban": "2.5",
   "ngay": "2026-10-23",
   "vi": [
