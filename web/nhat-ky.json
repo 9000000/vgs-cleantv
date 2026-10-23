@@ -1,5 +1,21 @@
 [
  {
+  "ban": "2.2",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Home sạch theo CleanYourTV mới nhất: bấm nút Menu trên remote ở một app là mở menu Di chuyển / Thêm vào dock (tiện cho remote không giữ OK được), chặn Home gốc tự bật lại chạy lại được, góc dải dock bo khớp ô app, Home áp ngay chỉnh trong cài đặt launcher.",
+   "Danh sách đã thử lên 232 mẫu / 67 hãng (thêm 2 máy chiếu Formovie, nhiều Sony, Grundig, Fire TV Stick…); Nâng cao 56 tuỳ chọn, đã Việt hoá hết.",
+   "Xiaomi bản Trung Quốc: cổng HDMI đang cắm thiết bị (tivi đổi tên dòng thành tên thiết bị, kiểu \"Playback_2 · HDMI2\") giờ cũng mở đúng cổng.",
+   "Hộp/tivi Android 7 trở xuống: app báo rõ ngay là chỉ dọn được, Home sạch cần Android 8+."
+  ],
+  "en": [
+   "The clean Home follows the latest CleanYourTV: the remote's Menu key on an app opens Move / Add to dock (handy where OK can't be held), the stock-Home redirect works again, dock band corners match the tiles, Launcher settings apply at once.",
+   "Tested lists: 232 models / 67 brands (two Formovie projectors, more Sony, Grundig, Fire TV Stick…); 56 Advanced options, all translated.",
+   "China-market Xiaomi: HDMI ports with a device plugged in (the row is renamed after the device, e.g. \"Playback_2 · HDMI2\") now open the right port.",
+   "Android 7 and older: the app says right away it can only clean; the clean Home needs Android 8+."
+  ]
+ },
+ {
   "ban": "2.1.7",
   "ngay": "2026-10-23",
   "vi": [

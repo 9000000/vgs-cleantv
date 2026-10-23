@@ -510,6 +510,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     }
 
     fun caiHomeSach() = chay(t("Đang cài Home sạch…", "Installing the clean Home…")) {
+        if (laAndroidCu) error(t("Home sạch cần Android 8 trở lên, tivi/hộp này là Android ${thongTin?.android}. CleanTV chỉ dọn được quảng cáo và app rác trên máy này.", "The clean Home needs Android 8 or later; this TV/box runs Android ${thongTin?.android}. CleanTV can only clean ads and junk apps here."))
         if (laFireTv) error(t("Fire TV không cho app nào thay màn Home (Amazon khoá). CleanTV chỉ dọn được quảng cáo và app rác trên Fire TV.", "Fire TV does not let any app replace Home (Amazon locks it). On Fire TV CleanTV can only clean ads and junk apps."))
         val sl = saoLuu ?: io { tv.damBaoSaoLuu(thongTin!!, getprop, ip) }.also { saoLuu = it }
         nhatKy.clear()
@@ -689,6 +690,12 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
      */
     val laFireTv: Boolean get() = (thongTin?.model?.startsWith("AFT") == true) ||
         trangThai?.caiDat?.contains("com.amazon.tv.launcher") == true
+
+    /** Android 7 trở xuống (SDK < 26): Home sạch cần Android 8+ (23/10/2026, hộp MXQ Pro Android 7.1). Chỉ dọn được. */
+    val laAndroidCu: Boolean get() = thongTin?.sdk?.let { it in 1..25 } == true
+
+    /** Không cài được Home sạch trên tivi này: chỉ dọn. */
+    val khongCaiHome: Boolean get() = laFireTv || laAndroidCu
 
     /** Tivi có Home sạch (bản nào cũng được): đã từng dọn bằng CleanTV / CleanYourTV. */
     val coDauCleanTv: Boolean get() = trangThai?.let { tt -> ThaoTacTv.HOME_SACH.any { it in tt.caiDat } } == true

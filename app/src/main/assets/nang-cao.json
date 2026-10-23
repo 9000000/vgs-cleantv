@@ -172,6 +172,14 @@
 "moTaVi": "Nút Wi-Fi và Cài đặt thành nút tròn chỉ có biểu tượng; nút Nguồn vào vẫn giữ chữ (mặc định tắt)."
 },
 {
+"khoa": "icon_only_inputs",
+"kieu": "bool",
+"moTa": "The Inputs pill as a round icon button too, its label kept as the TalkBack description (false by default). Works with or without icon_only_buttons",
+"canThan": false,
+"ten": "Nút Nguồn vào chỉ có biểu tượng",
+"moTaVi": "Nút Nguồn vào (HDMI…) cũng thành nút tròn chỉ có biểu tượng như Wi-Fi và Cài đặt (mặc định tắt)."
+},
+{
 "khoa": "top_menu",
 "kieu": "bool",
 "moTa": "Inputs, Wi-Fi and Settings folded into one round gear, centred on the header: OK drops a menu with the three, hold OK keeps the launcher menu (false by default)",
@@ -204,6 +212,14 @@
 "canThan": false,
 "ten": "Ảnh nền màu đầy đủ",
 "moTaVi": "Ảnh nền màu đầy đủ 32-bit, hết bị sọc ở nền tối như bầu trời đêm, nhưng tốn gấp đôi bộ nhớ. Chỉ nên bật cho tivi có từ 2 GB RAM (mặc định tắt)."
+},
+{
+"khoa": "library_apps",
+"kieu": "ds",
+"moTa": "Packages pre-seeded into the App library's \"added\" set at startup (config.xml library_apps, or a theme's config.json). They show on Home as if the owner had added them in the App library UI, and stay removable there (a removed one stays hidden); empty (off) by default",
+"canThan": false,
+"ten": "App có sẵn trong thư viện",
+"moTaVi": "Các app này được thêm sẵn lên Home như thể bạn đã thêm trong Thư viện app; vẫn bỏ ra được. Ghi tên gói, cách nhau bằng dấu phẩy (mặc định trống)."
 },
 {
 "khoa": "shamsi_date",
@@ -324,7 +340,7 @@
 {
 "khoa": "tile_menu",
 "kieu": "bool",
-"moTa": "Hold OK on a tile opens a small menu: Move, Remove from Home (with app_library) and App info. false (the default) keeps holding OK as a shortcut to the app's App info page",
+"moTa": "Hold OK or press the remote's Menu key on a tile to open a small menu: Move, Remove from Home (with app_library) and App info. false (the default) keeps holding OK as a shortcut to the app's App info page and leaves Menu unchanged",
 "canThan": false,
 "ten": "Giữ OK để mở menu app",
 "moTaVi": "Giữ OK trên một app: menu Di chuyển, Thêm vào dock / Thay app khác, Bỏ khỏi Home, Thông tin app. CleanTV bật sẵn; tắt thì giữ OK mở thẳng trang Thông tin app."
@@ -396,7 +412,7 @@
 {
 "khoa": "app_keys",
 "kieu": "ds",
-"moTa": "Remote buttons that open an app, as \"190:com.google.android.youtube.tv\" or \"KEYCODE_BUTTON_3:com.google.android.youtube.tv\", or by scancode as \"scan:490:com.wbd.hbomax\" for remotes that share one keycode between app buttons (Sony BRAVIA), for InputKeyService or HomeKeyService",
+"moTa": "Remote buttons that open an app, as \"190:com.google.android.youtube.tv\" or \"KEYCODE_BUTTON_3:com.google.android.youtube.tv\", or by scancode as \"scan:490:com.wbd.hbomax\" for remotes that share one keycode between app buttons (Sony BRAVIA), for InputKeyService or HomeKeyService. \"input:<input id>\" in place of the package switches to a TV input instead, e.g. \"scan:227:input:com.tcl.tvinput/.passthrou",
 "canThan": true,
 "ten": "Nút remote mở app",
 "moTaVi": "Gán nút remote để mở app, dạng 190:com.google.android.youtube.tv hoặc scan:490:com.wbd.hbomax (remote Sony dùng chung mã cho các nút app)."
@@ -432,6 +448,14 @@
 "canThan": false,
 "ten": "Home kiểu điện ảnh",
 "moTaVi": "Phần trên màn hình hiện ảnh lớn của app đang chọn, tên to hơn, \"Mở lần cuối\", chấm vị trí, viền sáng theo màu app và dock trong suốt (mặc định tắt)."
+},
+{
+"khoa": "dock_even_padding",
+"kieu": "bool",
+"moTa": "The dock band's padding equals the gap between its tiles on all four sides, as far as the grid's edges leave room (false by default)",
+"canThan": false,
+"ten": "Viền dải dock đều",
+"moTaVi": "Khoảng cách từ mép dải dock tới các ô bằng khoảng cách giữa các ô, đều cả bốn phía (mặc định tắt)."
 },
 {
 "khoa": "ambient_glow",

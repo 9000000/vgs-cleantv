@@ -507,6 +507,11 @@ private fun ManThongTin(vm: PhienLamViec) = Cuon {
             }
         }
     }
+    if (vm.laAndroidCu && !vm.laFireTv) Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color(0xFF3A2A10)).padding(12.dp)) {
+        Icon(Icons.Rounded.Warning, null, tint = Cam); Spacer(Modifier.width(8.dp))
+        Phu(t("Máy này chạy Android ${vm.thongTin?.android}: CleanTV dọn được quảng cáo, theo dõi và app rác, nhưng KHÔNG cài được Home sạch (cần Android 8 trở lên).",
+            "This device runs Android ${vm.thongTin?.android}: CleanTV can clean ads, tracking and junk apps but can NOT install the clean Home (needs Android 8 or later)."))
+    }
     if (vm.laFireTv) Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color(0xFF3A2A10)).padding(12.dp)) {
         Icon(Icons.Rounded.Warning, null, tint = Cam); Spacer(Modifier.width(8.dp))
         Phu(t("Fire TV: CleanTV dọn được quảng cáo, theo dõi và app rác, nhưng KHÔNG thay được màn Home. Amazon khoá Home cho launcher của họ, không app nào thay được.",
@@ -601,7 +606,7 @@ private fun ManChonGoi(vm: PhienLamViec) {
         var hoi by remember { mutableStateOf(false) }
         Column(Modifier.background(Nen).padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             NutChinh(t("Sao lưu & dọn $so gói", "Back up & clean $so packages"), enabled = !vm.dangBan && so > 0, icon = Icons.Rounded.CleaningServices) { hoi = true }
-            if (!vm.laFireTv) NutPhu(if (vm.daCoHomeSach) t("Bỏ qua, chỉ đổi giao diện", "Skip, just change the theme") else t("Bỏ qua, chỉ cài Home sạch", "Skip, just install the clean Home"),
+            if (!vm.khongCaiHome) NutPhu(if (vm.daCoHomeSach) t("Bỏ qua, chỉ đổi giao diện", "Skip, just change the theme") else t("Bỏ qua, chỉ cài Home sạch", "Skip, just install the clean Home"),
                 Icons.Rounded.Home, enabled = !vm.dangBan) { vm.boQuaDon() }
         }
         if (hoi) AlertDialog(
@@ -679,7 +684,7 @@ private fun ManDangTat(vm: PhienLamViec) = Cuon {
             Phu(t("Bấm Home, mở YouTube/Netflix, chuyển HDMI, mở Cài đặt, thử remote và giọng nói.", "Press Home, open YouTube/Netflix, switch HDMI, open Settings, try the remote and voice."))
             NutPhu(t("Xem màn hình tivi", "View TV screen"), Icons.Rounded.Screenshot) { vm.chupManHinh() }
         }
-        if (vm.laFireTv) NutChinh(t("Xong (Fire TV không thay được Home)", "Done (Fire TV can't change Home)"), icon = Icons.Rounded.CheckCircle) { vm.man = Man.XONG }
+        if (vm.khongCaiHome) NutChinh(if (vm.laFireTv) t("Xong (Fire TV không thay được Home)", "Done (Fire TV can't change Home)") else t("Xong (máy này không cài được Home sạch)", "Done (no clean Home on this device)"), icon = Icons.Rounded.CheckCircle) { vm.man = Man.XONG }
         else {
             NutChinh(t("Tiếp: Home sạch", "Next: clean Home"), icon = Icons.Rounded.Home) { vm.man = Man.HOME_SACH }
             NutPhu(t("Bỏ qua Home sạch", "Skip clean Home")) { vm.man = Man.XONG }
