@@ -729,7 +729,7 @@ private fun ManHomeSach(vm: PhienLamViec) = Cuon {
             Text("${x.ten} · ${x.tinh}", fontSize = 14.sp, modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp))
                 .clickable { vm.chonXa(x) }.padding(horizontal = 12.dp, vertical = 10.dp))
         }
-        Phu(t("Dữ liệu thời tiết: Open-Meteo.com (CC BY 4.0), tivi tự lấy nửa giờ một lần.", "Weather data: Open-Meteo.com (CC BY 4.0), refreshed by the TV every 30 minutes."))
+        Phu(t("Dữ liệu thời tiết: Open-Meteo.com (CC BY 4.0), tivi tự lấy nửa giờ một lần. Toạ độ phường/xã © OpenStreetMap.", "Weather data: Open-Meteo.com (CC BY 4.0), refreshed by the TV every 30 minutes. Ward locations © OpenStreetMap."))
         Hang(t("Âm lịch dưới ngày dương", "Lunar date under the date"), t("Ví dụ: 2/9 âm lịch · Bính Ngọ", "e.g. Lunar 2/9 · Year of the Horse"), vm.amLich) { vm.amLich = it }
         Hang(t("Nút màn hình chờ", "Screensaver button"), t("Bấm là bật ảnh / đồng hồ, tiện khi nghe nhạc", "Starts the photo / clock screensaver, handy with music"), vm.nutManCho) { vm.nutManCho = it }
         Hang(t("Gom nút trên cùng thành icon", "Compact icon buttons"), t("Một cụm gọn, bỏ chữ", "One tidy cluster, no labels"), vm.gonNut) { vm.gonNut = it }

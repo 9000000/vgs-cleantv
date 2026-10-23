@@ -40,3 +40,7 @@ CleanTV by VGS includes or builds on the following third-party work.
 8. Optional ad-blocking DNS: AdGuard DNS (dns.adguard-dns.com), a public service; no code included.
 
 The full licence texts shown inside the app are in app/src/main/assets/giay-phep.txt.
+
+Ward/commune coordinates (app/src/main/assets/xa.json): centroids from OpenStreetMap,
+© OpenStreetMap contributors, available under the Open Database License (ODbL 1.0),
+https://www.openstreetmap.org/copyright. Ward names: vietmap-company/vietnam_administrative_address.
