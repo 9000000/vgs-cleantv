@@ -1,5 +1,8 @@
 package zone.vgs.tvsach.ui
 
+import androidx.compose.foundation.layout.Row
+import zone.vgs.tvsach.AnhTivi
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
@@ -135,9 +138,19 @@ fun UngDung(vm: PhienLamViec = viewModel()) {
                 )
             }
             vm.anhTv?.let { anh ->
+                val ctxAnh = LocalContext.current
                 AlertDialog(
                     onDismissRequest = { vm.anhTv = null },
-                    confirmButton = { TextButton(onClick = { vm.anhTv = null }) { Text(t("Đóng", "Close")) } },
+                    confirmButton = {
+                        Row {
+                            if (AnhTivi.luuDuoc) TextButton(onClick = {
+                                val ok = AnhTivi.luu(ctxAnh, anh)
+                                Toast.makeText(ctxAnh, if (ok) t("Đã lưu vào Ảnh › CleanTV", "Saved to Pictures › CleanTV") else t("Không lưu được ảnh", "Couldn't save the picture"), Toast.LENGTH_SHORT).show()
+                            }) { Text(t("Lưu ảnh", "Save"), fontWeight = FontWeight.SemiBold) }
+                            TextButton(onClick = { AnhTivi.chiaSe(ctxAnh, anh) }) { Text(t("Chia sẻ", "Share")) }
+                            TextButton(onClick = { vm.anhTv = null }) { Text(t("Đóng", "Close")) }
+                        }
+                    },
                     title = { Text(t("Màn hình tivi", "TV screen")) },
                     text = { Image(anh.asImageBitmap(), null, Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp))) },
                     containerColor = The1,
