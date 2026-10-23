@@ -667,6 +667,13 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
     fun xoaSaoLuuTrenTv() { runCatching { sh("rm -f $TEP_SAO_LUU_TV") } }
 
     /** Gói đang bị tắt bằng tay / bằng shell (enabled=3: disable-user), không gồm gói hãng tắt sẵn từ xưởng. */
+    /** Bật lại một gói; trả true khi tivi báo đã bật. Có bản sao lưu thì bỏ gói đó khỏi danh sách CleanTV đã tắt. */
+    fun batLaiGoi(p: String, sl: BanSaoLuu?): Boolean {
+        val ok = runCatching { sh("pm enable --user 0 $p") }.getOrDefault("").contains("enabled")
+        if (ok && sl != null && p in sl.daTatBoiApp) { sl.daTatBoiApp -= p; luuSaoLuu(sl) }
+        return ok
+    }
+
     fun goiTatBoiNguoiDung(): List<String> =
         sh("for p in \$(pm list packages -d | cut -d: -f2); do dumpsys package \$p | grep -q 'User 0:.*enabled=3' && echo \$p; done")
             .lines().map { it.trim() }.filter { TEN_GOI.matches(it) }.sorted()

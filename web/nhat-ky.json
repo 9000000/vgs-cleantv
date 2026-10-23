@@ -1,5 +1,16 @@
 [
  {
+  "ban": "2.5.3",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Khôi phục có mục \"Bật lại từng app\": đọc từ tivi mọi app đang tắt (kể cả khi đã cài lại CleanTV hay không có bản sao lưu), tích app cần bật rồi bấm Bật lại — góp ý @9000000 (GitHub)",
+   "Màn tivi đã kết nối luôn có nút vào mục này, kể cả tivi chưa dọn bằng CleanTV"
+  ],
+  "en": [
+   "Restore has \"Re-enable single apps\": every disabled app read from the TV (even after reinstalling CleanTV or with no backup), tick and re-enable"
+  ]
+ },
+ {
   "ban": "2.5.2",
   "ngay": "2026-10-23",
   "vi": [

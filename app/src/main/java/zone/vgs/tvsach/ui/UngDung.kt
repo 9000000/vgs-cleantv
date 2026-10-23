@@ -569,6 +569,7 @@ private fun ManThongTin(vm: PhienLamViec) = Cuon {
     NutPhu(t("Khoá trẻ em (hẹn giờ + mã PIN)", "Kids lock (schedule + PIN)"), Icons.Rounded.Lock) { vm.moKhoaTre() }
     if (vm.saoLuu != null) NutPhu(t("Khôi phục tivi này", "Restore this TV"), Icons.Rounded.Restore) { vm.man = Man.KHOI_PHUC }
     else if (vm.coDauCleanTv) NutPhu(t("Khôi phục (không có sao lưu)", "Restore (no backup)"), Icons.Rounded.Restore) { vm.man = Man.KHOI_PHUC }
+    else NutPhu(t("Bật lại app đã tắt", "Re-enable disabled apps"), Icons.Rounded.Restore) { vm.man = Man.KHOI_PHUC }
 }
 
 @Composable
@@ -1113,6 +1114,7 @@ private fun ManKhoiPhuc(vm: PhienLamViec) = Cuon {
             vm.chayKhoiPhucKhongSaoLuu(goHomeKsl)
         }
         vm.nhatKy.takeLast(4).forEach { Text(it, fontSize = 12.sp, fontFamily = FontFamily.Monospace, color = ChuPhu) }
+        TheBatTungApp(vm)
         return@Cuon
     }
     DauTrang({ OIcon(Icons.Rounded.Restore, 72.dp) }, t("Khôi phục ${sl.ten}", "Restore ${sl.ten}"),
@@ -1127,6 +1129,36 @@ private fun ManKhoiPhuc(vm: PhienLamViec) = Cuon {
         vm.chayKhoiPhuc(sl.launcherDaCai && goHome)
     }
     vm.nhatKy.takeLast(4).forEach { Text(it, fontSize = 12.sp, fontFamily = FontFamily.Monospace, color = ChuPhu) }
+    TheBatTungApp(vm)
+}
+
+/** Bật lại từng app (issue vgs-cleantv#3): danh sách gói đang tắt đọc thẳng từ tivi, tích cái nào bật cái đó. */
+@Composable
+private fun TheBatTungApp(vm: PhienLamViec) {
+    The(t("Bật lại từng app", "Re-enable single apps"), Icons.Rounded.Apps) {
+        Phu(t("Chỉ muốn bật lại vài app lỡ tắt? App đọc từ tivi mọi app đang tắt (kể cả khi đã cài lại CleanTV), bạn tích cái cần bật.",
+            "Only need a few apps back? The app reads every disabled app from the TV (even after reinstalling CleanTV); tick the ones to turn on."))
+        val ds = vm.dsTatTv
+        if (ds == null) {
+            NutPhu(t("Xem các app đang tắt", "See disabled apps"), Icons.Rounded.Search) { vm.docDsTat() }
+            return@The
+        }
+        if (ds.isEmpty()) Phu(t("Tivi không có app nào đang tắt.", "No apps are disabled on the TV."))
+        val cuaCleanTv = vm.saoLuu?.daTatBoiApp.orEmpty()
+        ds.forEach { p ->
+            val chon = vm.chonBatLai[p] == true
+            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable { vm.chonBatLai[p] = !chon }.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(chon, { vm.chonBatLai[p] = it })
+                Column(Modifier.weight(1f)) {
+                    Text(tenDep(p), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                    Text(p + if (p in cuaCleanTv) t(" · do CleanTV tắt", " · disabled by CleanTV") else "", fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = ChuPhu, maxLines = 1)
+                }
+            }
+        }
+        if (vm.batLaiBao.isNotEmpty()) Phu(vm.batLaiBao, Xanh)
+        val so = vm.chonBatLai.count { it.value }
+        if (ds.isNotEmpty()) NutPhu(t("Bật lại $so app đã chọn", "Re-enable $so selected"), Icons.Rounded.Restore, enabled = so > 0 && !vm.dangBan) { vm.batLaiDaChon() }
+    }
 }
 
 // ---------------- Nhắc + hướng dẫn chế độ nhà phát triển ----------------

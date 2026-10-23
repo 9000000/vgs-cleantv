@@ -815,6 +815,30 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         goiTatKhongSaoLuu = io { tv.goiTatBoiNguoiDung() }
     }
 
+    // ---------- Bật lại từng app (issue vgs-cleantv#3, 23/10/2026) ----------
+    /** Gói đang tắt kiểu disable-user, đọc thẳng từ tivi (không cần bản sao lưu); null = chưa đọc. */
+    var dsTatTv by mutableStateOf<List<String>?>(null)
+    val chonBatLai = androidx.compose.runtime.mutableStateMapOf<String, Boolean>()
+    var batLaiBao by mutableStateOf("")
+
+    fun docDsTat() = chay(t("Đang đọc app đang tắt trên tivi…", "Reading disabled apps on the TV…")) {
+        dsTatTv = io { tv.goiTatBoiNguoiDung() }; chonBatLai.clear(); batLaiBao = ""
+    }
+
+    fun batLaiDaChon() = chay(t("Đang bật lại…", "Re-enabling…")) {
+        val ds = chonBatLai.filterValues { it }.keys.sorted()
+        val sl = saoLuu
+        var ok = 0
+        ds.forEachIndexed { i, p ->
+            thongBao = t("Bật lại ${i + 1}/${ds.size}: $p", "Re-enabling ${i + 1}/${ds.size}: $p")
+            if (io { tv.batLaiGoi(p, sl) }) ok++
+        }
+        dsTatTv = io { tv.goiTatBoiNguoiDung() }; chonBatLai.clear()
+        batLaiBao = if (ok == ds.size) t("Đã bật lại $ok app.", "Re-enabled $ok apps.") else t("Bật lại được $ok/${ds.size} app; app còn lại tivi không cho bật.", "Re-enabled $ok/${ds.size}; the TV refused the rest.")
+        zone.vgs.tvsach.Dem.gui(ctx, "khoi-phuc", tenTiviDem(), ok, "tung-app")
+        if (sl != null) saoLuu = sl
+    }
+
     fun chayKhoiPhucKhongSaoLuu(goLauncher: Boolean) = chay(t("Đang khôi phục…", "Restoring…")) {
         nhatKy.clear()
         val loiKp = io { tv.khoiPhucKhongSaoLuu(goLauncher) { s -> ghiTuIo(s) } }
@@ -831,6 +855,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         dock.clear(); tenChao = ""; homeXong = false; dnsChanQc = false; dangKhoiPhuc = false; khoiPhucXong = false; anhTv = null
         laMayChieu = false; mayChieu = null; ghimMayChieu.clear()
         nhatKy.clear(); saoLuu = null; saoLuuTuTv = false; goiTatKhongSaoLuu = null; epSetupwraith = false
+        dsTatTv = null; chonBatLai.clear(); batLaiBao = ""
         taiLaiSaoLuu()
     }
 

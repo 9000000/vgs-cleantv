@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 41,
-  "versionName": "2.5.2",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.5.2.apk",
-  "co": 11534904,
-  "ghiChu": "Ô app điện thoại (Chrome, Thư viện…) tô màu theo icon, không còn nền xám.",
-  "ghiChuEn": "Phone-app tiles (Chrome, Gallery…) take their icon's colour instead of grey.",
+  "versionCode": 42,
+  "versionName": "2.5.3",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.5.3.apk",
+  "co": 11534908,
+  "ghiChu": "Khôi phục: bật lại từng app đã tắt, kể cả khi đã cài lại CleanTV.",
+  "ghiChuEn": "Restore: re-enable single disabled apps, even after reinstalling CleanTV.",
   "ngay": "2026-10-23"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "c95a2a540514c180",
    "url": "/ota/du-lieu.json",
    "co": 1367068,
-   "tuBan": 41
+   "tuBan": 42
   },
   "tvhome.apk": {
    "phienBan": "95e201fd03484ace",
    "url": "/ota/tvhome.apk",
    "co": 597011,
-   "tuBan": 41
+   "tuBan": 42
   }
  }
 }
