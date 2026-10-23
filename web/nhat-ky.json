@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.6.2",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Google TV còn trình cài đặt setupwraith (nhiều TCL): app không tắt Home Google mà thử cho Home sạch tự mở đè khi bấm Home. Không được thì tivi vẫn như cũ và app chỉ cách quên Wi-Fi như trước."
+  ],
+  "en": [
+   "Google TV with setupwraith still on (many TCL sets): instead of disabling Google's Home, the app now tries letting the clean Home open over it on Home. If that fails the TV stays as it was and the app explains the forget-Wi-Fi fix as before."
+  ]
+ },
+ {
   "ban": "2.6.1",
   "ngay": "2026-10-23",
   "vi": [

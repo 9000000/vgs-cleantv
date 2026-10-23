@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 47,
-  "versionName": "2.6.1",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.1.apk",
+  "versionCode": 48,
+  "versionName": "2.6.2",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.2.apk",
   "co": 11563924,
-  "ghiChu": "Sửa nút Home trên tivi không cho tắt Home gốc (SCBC R3…): Home sạch tự mở đè lên Home cũ",
-  "ghiChuEn": "Home button fix for TVs that won't keep the stock Home disabled: the clean Home opens over it",
+  "ghiChu": "Google TV (TCL…): nút Home vẫn về Home Google thì Home sạch thử tự mở đè, không tắt gì",
+  "ghiChuEn": "Google TV (TCL…): when Home still opens Google's Home, the clean Home now tries opening over it, disabling nothing",
   "ngay": "2026-10-23"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "f572077f2d80a190",
    "url": "/ota/du-lieu.json",
    "co": 1402074,
-   "tuBan": 47
+   "tuBan": 48
   },
   "tvhome.apk": {
    "phienBan": "414be35d49d85742",
    "url": "/ota/tvhome.apk",
    "co": 598251,
-   "tuBan": 47
+   "tuBan": 48
   }
  }
 }

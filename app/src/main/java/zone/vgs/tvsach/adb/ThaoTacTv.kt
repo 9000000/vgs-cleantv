@@ -384,10 +384,10 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         if (!bayGio.startsWith("$pkgHome/")) {
             bao(t("Home không chuyển được, trả lại Home gốc…", "Home did not switch, restoring the stock Home…"))
             traHomeGoc(sl)
-            if (bayGio.startsWith("$SETUP/") || dangBat(SETUP))
-                return t("Tivi vẫn như cũ (đã trả Home gốc). Đây là Google TV: trình cài đặt setupwraith cũng giữ nút Home, mà Wi-Fi lưu lúc cài tivi thuộc về nó nên app không tự tắt. Cách sửa: trên tivi vào Cài đặt > Mạng, quên mạng Wi-Fi rồi kết nối lại (hoặc cắm dây LAN); kết nối lại app, ở bước chọn gói tích thêm setupwraith (nhóm Google Home), dọn rồi cài Home sạch lại.",
-                    "The TV is as before (stock Home restored). This is Google TV: the setup app setupwraith also holds the Home button, and the Wi-Fi saved during setup belongs to it, so the app leaves it. Fix: on the TV, Settings > Network, forget the Wi-Fi and join it again (or use Ethernet); reconnect the app, tick setupwraith (Google Home group), clean and install the clean Home again.")
-            return t("Home sau khi đổi là '${bayGio.ifBlank { "không rõ" }}'. Đã trả Home gốc, tivi vẫn như cũ. Gửi góp ý kèm hãng, model để VGS thêm hỗ trợ.",
+            // Google TV còn setupwraith (2.6.2): Home gốc đã trả lại, vẫn ghi cấu hình rồi để thuPhimHome cho Home sạch mở đè
+            // (damBaoPhimHome → chuyenDe); không được thì nó báo cách quên Wi-Fi.
+            if (!(bayGio.startsWith("$SETUP/") || dangBat(SETUP)))
+                return t("Home sau khi đổi là '${bayGio.ifBlank { "không rõ" }}'. Đã trả Home gốc, tivi vẫn như cũ. Gửi góp ý kèm hãng, model để VGS thêm hỗ trợ.",
                 "Home resolved to '${bayGio.ifBlank { "unknown" }}'. The stock Home is back, the TV is as before. Send feedback with the brand and model so VGS can add support.")
         }
 
@@ -584,7 +584,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
          */
         fun chuyenDe(pkg: String): KetQuaPhimHome? {
             if (laBoMachCvte()) return null
-            bao(t("Tivi không cho tắt '$pkg': cho Home sạch tự mở đè lên Home cũ…", "The TV won't keep '$pkg' disabled: letting the clean Home open over the old one…"))
+            bao(t("Không tắt '$pkg' được: cho Home sạch tự mở đè lên Home cũ…", "'$pkg' can't be disabled: letting the clean Home open over the old one…"))
             if (gianh.isNotEmpty()) {
                 gianh.forEach { p -> sh("pm enable --user 0 $p"); sl?.daTatBoiApp?.remove(p); if (sl?.homeGocDaTat == p) sl.homeGocDaTat = "" }
                 sl?.let { luuSaoLuu(it) }
@@ -615,7 +615,9 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             // báo đúng cách sửa (quên Wi-Fi…) thay vì "không rõ" (Sony 65S30, 22/10/2026).
             if (pkg.isBlank() && dangBat(SETUP)) {
                 lyDo = "setupwraith"
-                return tra(HOME_GOC_BIET.firstOrNull { dangBat(it) } ?: "")
+                val goc = HOME_GOC_BIET.firstOrNull { dangBat(it) } ?: ""
+                if (goc.isNotBlank()) chuyenDe(goc)?.let { return it }
+                return tra(goc)
             }
             if (KeHoach.laHomeCvte(pkg)) {
                 lyDo = "cvte"
@@ -636,11 +638,14 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
                 Thread.sleep(1500)
                 return@repeat
             }
-            if (lan == 3 || sl == null || pkg == SETUP || !nenTatVuiGianhHome(pkg)) return tra(pkg)
+            // Google TV còn setupwraith: không tắt Home Google (sự cố 1.1, TCL BeyondTV4 đen màn), chỉ cho Home sạch mở đè
+            // (2.6.2, ~10 TCL Google TV G07–G15 tối 23/10/2026 báo loi:launcherx). Không được thì báo cách quên Wi-Fi như cũ.
             if (pkg in HOME_GOC_BIET && dangBat(SETUP)) {
                 lyDo = "setupwraith"
+                chuyenDe(pkg)?.let { return it }
                 return tra(pkg)
             }
+            if (lan == 3 || sl == null || pkg == SETUP || !nenTatVuiGianhHome(pkg)) return tra(pkg)
             bao(t("Nút Home vẫn mở '$pkg', tắt nó…", "The Home button still opens '$pkg', disabling it…"))
             sh("pm disable-user --user 0 $pkg")
             if (pkg !in sl.daTatTruoc && pkg !in sl.daTatBoiApp) sl.daTatBoiApp += pkg
