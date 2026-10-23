@@ -686,6 +686,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             bao(t("Trả DNS về tự động…", "Setting DNS back to automatic…"))
             sh("settings put global private_dns_mode opportunistic; settings delete global private_dns_specifier")
         }
+        if (khoaDaCai()) { bao(t("Gỡ Khoá trẻ em…", "Removing the Kids lock…")); runCatching { tatKhoa(go = true) } }
         if (goLauncher) HOME_SACH.forEach { p ->
             if (sh("pm path $p").isNotBlank()) { bao(t("Gỡ Home sạch ($p)…", "Removing the clean Home ($p)…")); sh("pm uninstall $p") }
         }
@@ -738,7 +739,55 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             else sh("settings put global private_dns_specifier ${sl.dnsHostTruoc}")
             sl.dnsDaDoi = false; luuSaoLuu(sl)
         }
+        if (khoaDaCai()) { bao(t("Gỡ Khoá trẻ em…", "Removing the Kids lock…")); runCatching { tatKhoa(go = true) } }
         return loi
+    }
+
+    // ---------- Khoá trẻ em (app zone.vgs.cleantv.khoa, 23/10/2026) ----------
+
+    private val khoaUri = "content://$PKG_KHOA"
+    private val khoaDv = "$PKG_KHOA/zone.vgs.khoa.KhoaDichVu"
+
+    fun khoaDaCai(): Boolean = sh("pm path $PKG_KHOA 2>/dev/null").contains("package:")
+
+    /** Trạng thái trên tivi (không có PIN): {bat, khung, moTamPhut, coPin, moTamDen, dangKhoa, dichVuChay}; null nếu chưa cài. */
+    fun docKhoa(): org.json.JSONObject? {
+        if (!khoaDaCai()) return null
+        val out = sh("content call --uri $khoaUri --method doc 2>/dev/null")
+        val a = out.indexOf("json="); val b = out.lastIndexOf("}]")
+        return if (a < 0 || b <= a) null else runCatching { org.json.JSONObject(out.substring(a + 5, b)) }.getOrNull()
+    }
+
+    /** Cài (nếu cần), cấp quyền tự canh gác, ghi cấu hình, bật dịch vụ khoá. [json] không chứa dấu nháy đơn. */
+    fun caiKhoa(apk: ByteArray, json: String, bao: (String) -> Unit) {
+        require(!json.contains('\'')) { "json" }
+        if (!khoaDaCai()) {
+            bao(t("Cài app Khoá trẻ em lên tivi…", "Installing the Kids lock app on the TV…"))
+            adb.ghiFile("/data/local/tmp/khoa.apk", apk)
+            val out = sh("pm install -r /data/local/tmp/khoa.apk; rm -f /data/local/tmp/khoa.apk")
+            if (!out.contains("Success")) error(t("Cài không được: ${out.trim().lines().lastOrNull()}", "Install failed: ${out.trim().lines().lastOrNull()}"))
+        }
+        sh("pm grant $PKG_KHOA android.permission.WRITE_SECURE_SETTINGS 2>/dev/null; cmd appops set $PKG_KHOA AUTO_START allow 2>/dev/null; true")
+        bao(t("Ghi giờ khoá và mã PIN…", "Saving the schedule and PIN…"))
+        val kq = sh("content call --uri $khoaUri --method dat --arg '$json'")
+        if (!kq.contains("ok=1")) error(t("Tivi không nhận cấu hình: ${kq.trim()}", "The TV rejected the settings: ${kq.trim()}"))
+        bao(t("Bật dịch vụ khoá…", "Turning the lock service on…"))
+        sh("s=\$(settings get secure enabled_accessibility_services); case \"\$s\" in *$khoaDv*) ;; null|'') settings put secure enabled_accessibility_services $khoaDv ;; *) settings put secure enabled_accessibility_services \"\$s:$khoaDv\" ;; esac; settings put secure accessibility_enabled 1")
+    }
+
+    /** Mở tạm [phut] phút từ điện thoại (0 = khoá lại ngay nếu đang trong giờ khoá). */
+    fun moTamKhoa(phut: Int) { sh("content call --uri $khoaUri --method mo-tam --arg $phut") }
+
+    /** Tắt khoá: cấu hình bat=false, bỏ dịch vụ khỏi danh sách trợ năng; [go] = gỡ luôn app. */
+    fun tatKhoa(go: Boolean) {
+        if (!khoaDaCai()) return
+        sh("content call --uri $khoaUri --method dat --arg '{\"bat\":false,\"khung\":[]}' 2>/dev/null; true")
+        val tc = sh("settings get secure enabled_accessibility_services").trim()
+        if (tc.contains(khoaDv)) {
+            val con = tc.split(':').filter { it.isNotBlank() && it != khoaDv && it != "null" }.joinToString(":")
+            if (con.isBlank()) sh("settings delete secure enabled_accessibility_services") else sh("settings put secure enabled_accessibility_services '$con'")
+        }
+        if (go) sh("pm uninstall $PKG_KHOA")
     }
 
     // ---------- Đóng ADB ----------
@@ -783,6 +832,8 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         val TU_MAY_CHIEU = Regex("projector|formovie|fengmi|xgimi|jmgo|dangbei|nebula|wanbo|byintek|keystone|autofocus|tixing|duijiao", RegexOption.IGNORE_CASE)
         const val PKG_HOME = "com.gathin.tvhome"
         const val PKG_HOME_XIAOMI = "com.ts.launcher"
+        /** App Khoá trẻ em (module khoa/). */
+        const val PKG_KHOA = "zone.vgs.cleantv.khoa"
         /** Bản sao lưu trên tivi: thư mục của shell, còn sau khi gỡ app / Home sạch, chỉ mất khi khôi phục cài đặt gốc. */
         const val TEP_SAO_LUU_TV = "/data/local/tmp/cleantv-sao-luu.json"
         /** Namespace Java của launcher: không đổi theo tên gói. */

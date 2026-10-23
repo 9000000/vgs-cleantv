@@ -3,12 +3,19 @@ Phần mềm miễn phí, cung cấp nguyên trạng, không kèm bảo hành. /
 
 SỐ LIỆU ẨN DANH / ANONYMOUS STATS
 Để biết app được dùng bao nhiêu và tivi nào hay lỗi, app gửi về máy chủ VGS (Cloudflare) khi: mở app (mỗi ngày
-một lần), cập nhật app, dọn tivi xong, cài Home sạch, khôi phục, ghim nút máy chiếu. Nội dung gửi: một mã máy
+một lần), cập nhật app, dọn tivi xong, cài Home sạch, khôi phục, ghim nút máy chiếu, bật/tắt khoá trẻ em (chỉ
+số khung giờ, không gửi giờ hay PIN). Nội dung gửi: một mã máy
 ngẫu nhiên do app tự sinh, số bản app, tên mẫu tivi (hãng, model, phiên bản Android), số gói đã tắt. KHÔNG gửi
 email, tên, danh sách app, địa chỉ IP hay vị trí. Lượt tải APK chỉ được đếm, không lưu IP.
 To see how the app is used and which TVs have problems, it sends a random app-generated ID, the app version,
 the TV model and how many packages were disabled when you open the app (once a day), update, clean a TV,
-install the clean Home, restore or pin projector buttons. No email, name, app list, IP address or location.
+install the clean Home, restore, pin projector buttons or switch the kids lock (just how many periods; never the
+times or the PIN). No email, name, app list, IP address or location.
+GỬI DANH SÁCH GÓI (CHỈ KHI BẠN BẤM) / PACKAGE LIST (ONLY WHEN YOU TAP)
+Nút "Gửi danh sách gói cho VGS" ở màn cuối gửi model tivi, phiên bản Android, danh sách gói đang tắt trên tivi,
+đánh giá và ghi chú bạn viết (cùng email/Zalo nếu bạn tự ghi), để VGS làm danh sách mẫu cho tivi cùng dòng.
+The "Send the package list to VGS" button on the last screen sends the TV model, Android version, the packages
+that are off on the TV, your rating and note (and a contact only if you type one), to build lists for the same TV.
 
 CleanTV dùng các phần mềm mã nguồn mở sau. / CleanTV uses the following open-source software.
 

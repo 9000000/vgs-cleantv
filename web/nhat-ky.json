@@ -1,5 +1,19 @@
 [
  {
+  "ban": "2.5",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Khoá trẻ em: phụ huynh đặt khung giờ khoá (tối, giờ học, giờ trưa hoặc tự đặt, chọn ngày trong tuần) và mã PIN 4 số ngay trên điện thoại",
+   "Tới giờ, tivi hiện màn khoá che mọi thứ (cả HDMI, YouTube), chặn phím remote; nhập đúng PIN trên tivi thì mở 60 phút, sai 5 lần phải chờ 1 phút; tắt tivi bật lại vẫn khoá",
+   "Từ điện thoại: mở tạm 60 phút, khoá lại ngay, tắt và gỡ khoá; Khôi phục tivi này cũng gỡ khoá"
+  ],
+  "en": [
+   "Kids lock: parents set lock periods (night, study time, nap or custom, by weekday) and a 4-digit PIN on the phone",
+   "During a period the TV shows a lock screen over everything (HDMI, YouTube too) and blocks the remote; the PIN unlocks it for 60 minutes, 5 wrong tries mean a 1-minute wait; it stays locked after a restart",
+   "From the phone: unlock for 60 minutes, lock now, turn off and remove; Restore this TV removes it too"
+  ]
+ },
+ {
   "ban": "2.4.1",
   "ngay": "2026-10-23",
   "vi": [

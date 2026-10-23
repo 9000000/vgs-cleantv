@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- CleanTV cấp qua ADB (pm grant) để app tự bật lại dịch vụ khoá nếu bị tắt trong Cài đặt. -->
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" tools:ignore="ProtectedPermissions" xmlns:tools="http://schemas.android.com/tools" />
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+
+    <application android:label="@string/ten_app" android:allowBackup="false" android:supportsRtl="true">
+        <service
+            android:name=".KhoaDichVu"
+            android:exported="true"
+            android:label="@string/ten_app"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data android:name="android.accessibilityservice" android:resource="@xml/khoa_tro_nang" />
+        </service>
+        <!-- Cấu hình chỉ ghi được từ ADB (shell có WRITE_SECURE_SETTINGS), app khác trên tivi không đổi được. -->
+        <provider
+            android:name=".CauHinhProvider"
+            android:authorities="zone.vgs.cleantv.khoa"
+            android:exported="true" />
+        <receiver android:name=".KhoiDong" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+        <service android:name=".CanhGac" android:permission="android.permission.BIND_JOB_SERVICE" android:exported="false" />
+    </application>
+</manifest>

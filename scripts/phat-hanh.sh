@@ -6,6 +6,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 export JAVA_HOME="${JAVA_HOME:-/opt/homebrew/opt/openjdk@17}"
+scripts/dung-khoa.sh
 ./gradlew assembleRelease -q --console=plain
 APK=app/build/outputs/apk/release/app-release.apk
 CODE=$(grep -E '^\s*versionCode = ' app/build.gradle.kts | grep -oE '[0-9]+')

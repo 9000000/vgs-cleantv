@@ -1,0 +1,52 @@
+import java.util.Properties
+
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+}
+
+// App "Khoá trẻ em" cài lên tivi (23/10/2026): khoá màn hình theo khung giờ, mở bằng PIN. CleanTV đóng sẵn APK này
+// trong assets (scripts/dung-khoa.sh) và cài khi phụ huynh bật. Ký cùng khoá với CleanTV.
+val kyFile = rootProject.file("ky.properties")
+val ky = Properties().apply { if (kyFile.exists()) kyFile.inputStream().use { load(it) } }
+
+android {
+    namespace = "zone.vgs.khoa"
+    compileSdk = 35
+    testOptions { unitTests.isReturnDefaultValues = true }
+
+    defaultConfig {
+        applicationId = "zone.vgs.cleantv.khoa"
+        minSdk = 26
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0"
+    }
+    signingConfigs {
+        if (kyFile.exists()) {
+            create("vgs") {
+                storeFile = rootProject.file(ky.getProperty("storeFile"))
+                storePassword = ky.getProperty("storePassword")
+                keyAlias = ky.getProperty("keyAlias")
+                keyPassword = ky.getProperty("keyPassword")
+            }
+        }
+    }
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
+            signingConfig = signingConfigs.findByName("vgs") ?: signingConfigs.getByName("debug")
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions { jvmTarget = "17" }
+}
+
+dependencies {
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.json:json:20240303")
+}
