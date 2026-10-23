@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 36,
-  "versionName": "2.3.1",
-  "apk": "https://pub-925dff61607e4e3da7398d3413ccd1da.r2.dev/CleanTV-2.3.1.apk",
-  "co": 11464959,
-  "ghiChu": "Xem màn hình tivi: thêm nút Lưu ảnh và Chia sẻ.",
-  "ghiChuEn": "View TV screen: new Save and Share buttons.",
+  "versionCode": 37,
+  "versionName": "2.4",
+  "apk": "https://pub-925dff61607e4e3da7398d3413ccd1da.r2.dev/CleanTV-2.4.apk",
+  "co": 11481335,
+  "ghiChu": "Màn Đổi giao diện làm lại: xem trước, 3 thẻ, Nâng cao gọn hơn; gợi ý mẫu tivi gần giống, chọn mẫu bằng ô tìm.",
+  "ghiChuEn": "Redesigned theme screen: live preview, 3 tabs, tidier Advanced; close-match TV lists and a searchable list picker.",
   "ngay": "2026-10-23"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "d78b76ee70af41c3",
    "url": "/ota/du-lieu.json",
    "co": 1367068,
-   "tuBan": 36
+   "tuBan": 37
   },
   "tvhome.apk": {
    "phienBan": "bf674ba3c0446f2c",
    "url": "/ota/tvhome.apk",
    "co": 596831,
-   "tuBan": 36
+   "tuBan": 37
   }
  }
 }

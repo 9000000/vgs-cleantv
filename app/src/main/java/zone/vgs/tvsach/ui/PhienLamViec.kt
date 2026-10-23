@@ -74,6 +74,14 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     private var getprop = ""
     var trangThai by mutableStateOf<TrangThaiGoi?>(null)
     var ungVien by mutableStateOf<List<Pair<MauTv, Int>>>(emptyList())
+    /** Mẫu cùng hãng tên máy gần giống (DuLieu.ganGiong): chỉ gợi ý, không tự chọn. */
+    var ganGiong by mutableStateOf<List<MauTv>>(emptyList())
+    /** Toàn bộ mẫu, cho hộp "Chọn mẫu khác". */
+    var tatCaMau by mutableStateOf<List<MauTv>>(emptyList())
+    var moChonMau by mutableStateOf(false)
+    /** Màn Home sạch: thẻ đang mở (0 Giao diện, 1 Home, 2 Tuỳ chỉnh) và màn Nâng cao riêng. */
+    var theHome by mutableStateOf(0)
+    var moNangCao by mutableStateOf(false)
     var mauChon by mutableStateOf<MauTv?>(null)
     var saoLuu by mutableStateOf<BanSaoLuu?>(null)
     /** Bản sao lưu vừa lấy từ tivi (điện thoại này không có). */
@@ -357,6 +365,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val du = io { DuLieu.nap(ctx) }
         ungVien = du.khopMau(info)
         mauChon = ungVien.firstOrNull()?.first
+        ganGiong = du.ganGiong(info, ungVien.map { it.first.id }.toSet())
+        tatCaMau = du.mau.sortedBy { it.ten.lowercase() }
         // Điện thoại không có bản sao lưu (gỡ app, đổi máy, người khác dọn) thì lấy bản trên tivi.
         val slMay = kho.doc(info.khoaLuu)
         saoLuu = (slMay ?: io { tv.docSaoLuuTrenTv(info.khoaLuu) })?.also { b ->

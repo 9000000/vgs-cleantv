@@ -80,7 +80,26 @@ class DuLieu(val mau: List<MauTv>, val thongKe: Map<String, ThongKeGoi>) {
             m to diem
         }.filter { it.second >= 3 }.sortedByDescending { it.second }.take(6)
     }
+
+    /**
+     * Mẫu cùng hãng có tên máy gần giống (Sony BRAVIA_VU3_4K ↔ VU31, 23/10/2026 góp ý Luongnam1020): khopMau đòi
+     * trùng nguyên chữ nên bỏ sót. Chỉ để GỢI Ý cho người dùng chọn, không tự chọn. Tối đa 3, trừ mẫu trong [bo].
+     */
+    fun ganGiong(tv: ThongTinTv, bo: Set<String> = emptySet()): List<MauTv> {
+        val hang = tv.brand.lowercase().take(4)
+        if (hang.length < 3) return emptyList()
+        val cuaTv = listOf(tv.device, tv.model, tv.productName).flatMap(::maMay).toSet()
+        if (cuaTv.isEmpty()) return emptyList()
+        return mau.filter { it.id.startsWith(hang) && it.id !in bo }.map { m ->
+            val cuaMau = maMay(m.header.lines().take(8).joinToString(" "))
+            m to cuaTv.count { a -> cuaMau.any { b -> a != b && kotlin.math.abs(a.length - b.length) <= 2 && (a.startsWith(b) || b.startsWith(a)) } }
+        }.filter { it.second > 0 }.sortedByDescending { it.second }.take(3).map { it.first }
+    }
 }
+
+/** Chữ giống mã máy: chữ + số, ≥ 3 ký tự, có ít nhất một số (vu3, 55x85j, mosr4). */
+private fun maMay(s: String): List<String> =
+    s.lowercase().split(Regex("[^a-z0-9]+")).filter { it.length >= 3 && it.any(Char::isDigit) && it !in TU_CHUNG }
 
 private val TU_CHUNG = setOf("smart tv", "android tv", "google tv", "tv", "atv", "mt5867", "mt9221", "full_", "generic")
 

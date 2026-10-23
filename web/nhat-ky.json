@@ -1,5 +1,19 @@
 [
  {
+  "ban": "2.4",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Màn Đổi giao diện làm lại: ảnh xem trước ở đầu, chia 3 thẻ Giao diện · Home · Tuỳ chỉnh, nút Áp dụng luôn ở đáy",
+   "Nâng cao thành màn riêng: ô tìm, lọc Đã đổi / Cẩn thận, chia 6 nhóm, mục đã đổi có chấm tím",
+   "Tivi chưa khớp mẫu: app gợi ý mẫu gần giống cùng hãng (vd Sony VU3 → VU31), nút Chọn mẫu khác tìm trong toàn bộ danh sách — góp ý của Luongnam1020"
+  ],
+  "en": [
+   "Redesigned theme screen: live preview on top, 3 tabs (Look · Home · Options), Apply always at the bottom",
+   "Advanced is its own screen: search, Changed / Careful filters, 6 groups, a dot on changed items",
+   "Unmatched TVs: close matches of the same brand are suggested (e.g. Sony VU3 → VU31), and any list can be picked by search"
+  ]
+ },
+ {
   "ban": "2.3.1",
   "ngay": "2026-10-23",
   "vi": [

@@ -1,5 +1,6 @@
 package zone.vgs.tvsach.ui
 
+import zone.vgs.tvsach.dulieu.XaPhuong
 import androidx.compose.foundation.layout.Row
 import zone.vgs.tvsach.AnhTivi
 import android.widget.Toast
@@ -176,7 +177,7 @@ private fun quayLai(vm: PhienLamViec) {
         Man.THONG_TIN, Man.KHOI_PHUC -> Man.KET_NOI
         Man.CHON_GOI -> Man.THONG_TIN
         Man.DANG_TAT -> Man.CHON_GOI
-        Man.HOME_SACH -> vm.manTruocHome
+        Man.HOME_SACH -> if (vm.moNangCao) { vm.moNangCao = false; Man.HOME_SACH } else vm.manTruocHome
         Man.XONG -> Man.HOME_SACH
         Man.HUONG_DAN, Man.GIAY_PHEP -> vm.manTruoc
         Man.CHINH -> Man.CHINH
@@ -546,8 +547,18 @@ private fun ManThongTin(vm: PhienLamViec) = Cuon {
         vm.ungVien.forEach { (m, diem) ->
             LuaChon(vm.mauChon == m, m.ten.take(90), "${m.goi.size} " + t("gói", "packages") + " · " + t("độ khớp", "match") + " $diem") { vm.mauChon = m }
         }
+        if (vm.ganGiong.isNotEmpty()) {
+            Phu(t("Mẫu gần giống (cùng hãng, tên máy khác một chút). Chọn nếu đúng dòng tivi của bạn:", "Close matches (same brand, slightly different model name). Pick one if it is your TV's line:"))
+            vm.ganGiong.forEach { m -> LuaChon(vm.mauChon == m, m.ten.take(90), "${m.goi.size} " + t("gói", "packages") + " · " + t("gần giống", "close match")) { vm.mauChon = m } }
+        }
+        // Mẫu chọn tay từ hộp "Chọn mẫu khác" (không nằm trong danh sách trên) vẫn hiện để thấy đang dùng mẫu nào.
+        vm.mauChon?.takeIf { c -> vm.ungVien.none { it.first == c } && c !in vm.ganGiong }?.let { m ->
+            LuaChon(true, m.ten.take(90), "${m.goi.size} " + t("gói", "packages") + " · " + t("bạn chọn", "your pick")) {}
+        }
         LuaChon(vm.mauChon == null, t("Không dùng mẫu, chỉ luật chung", "No list, general rules only"), null) { vm.mauChon = null }
+        NutPhu(t("Chọn mẫu khác (${vm.tatCaMau.size} mẫu)", "Pick another list (${vm.tatCaMau.size})"), Icons.Rounded.Search) { vm.moChonMau = true }
     }
+    if (vm.moChonMau) HopChonMau(vm)
     TheMayChieu(vm)
     NutChinh(t("Xem danh sách gói", "See packages"), enabled = !vm.dangBan, icon = Icons.AutoMirrored.Rounded.ArrowForward) { vm.lapKeHoach() }
     NutPhu(t("Xem màn hình tivi", "View TV screen"), Icons.Rounded.Screenshot) { vm.chupManHinh() }
@@ -708,17 +719,75 @@ private fun ManDangTat(vm: PhienLamViec) = Cuon {
 
 // ---------------- Home sạch ----------------
 
+/**
+ * Màn Home sạch / Đổi giao diện (làm lại 23/10/2026 theo bản phác anh Alex duyệt): ảnh xem trước ở đầu, ba thẻ
+ * Giao diện · Home · Tuỳ chỉnh, nút Áp dụng dính đáy; Nâng cao là màn riêng (ManNangCao).
+ */
 @Composable
-private fun ManHomeSach(vm: PhienLamViec) = Cuon {
-    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(t("Home sạch kiểu Apple TV", "Apple TV-style Home"), fontWeight = FontWeight.Black, fontSize = 22.sp)
-        Phu(t("Đồng hồ, thời tiết, dock app hay dùng và giao diện tuỳ chọn — không còn hàng quảng cáo.", "Clock, weather, a dock of favourite apps and a theme of your choice — no sponsored rows."))
+private fun ManHomeSach(vm: PhienLamViec) {
+    if (vm.moNangCao) { ManNangCao(vm); return }
+    Column(Modifier.fillMaxSize()) {
+        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            XemTruocHome(vm)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(t("Giao diện", "Look"), t("Home", "Home"), t("Tuỳ chỉnh", "Options")).forEachIndexed { i, ten ->
+                    val chon = vm.theHome == i
+                    Text(ten, fontSize = 14.sp, fontWeight = if (chon) FontWeight.Bold else FontWeight.Normal, textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f).clip(RoundedCornerShape(50)).background(if (chon) Tim.copy(alpha = 0.3f) else The2)
+                            .border(1.dp, if (chon) Tim else Vien, RoundedCornerShape(50)).clickable { vm.theHome = i }.padding(vertical = 10.dp))
+                }
+            }
+            when (vm.theHome) {
+                0 -> TheGiaoDien(vm)
+                1 -> TheHomeNoiDung(vm)
+                else -> TheTuyChinh(vm)
+            }
+            vm.nhatKy.takeLast(4).forEach { Text(it, fontSize = 12.sp, fontFamily = FontFamily.Monospace, color = ChuPhu) }
+        }
+        // Nút dính đáy: đổi thẻ nào cũng bấm được, không phải cuộn hết trang.
+        Column(Modifier.fillMaxWidth().background(The1).padding(horizontal = 16.dp, vertical = 10.dp)) {
+            if (vm.daCoHomeSach) NutChinh(if (vm.dangBan) t("Đang áp dụng…", "Applying…") else t("Áp dụng lên tivi", "Apply to the TV"),
+                enabled = !vm.dangBan, icon = Icons.Rounded.Palette) { vm.apDungTheme() }
+            else NutChinh(if (vm.dangBan) t("Đang cài…", "Installing…") else t("Cài Home sạch", "Install clean Home"), enabled = !vm.dangBan, icon = Icons.Rounded.Home) { vm.caiHomeSach() }
+        }
     }
-    The(t("Giao diện", "Theme"), Icons.Rounded.Palette) {
+}
+
+/** Ảnh xem trước Home: ảnh riêng / ảnh theme / dải màu, đồng hồ, dòng âm lịch + thời tiết, dock giả. */
+@Composable
+private fun XemTruocHome(vm: PhienLamViec) {
+    val ctx = LocalContext.current
+    val th = vm.themeChon
+    val anhRieng = vm.anhNenRieng
+    val anh = remember(th.id, anhRieng) {
+        runCatching {
+            if (anhRieng != null) android.graphics.BitmapFactory.decodeByteArray(anhRieng, 0, anhRieng.size, android.graphics.BitmapFactory.Options().apply { inSampleSize = 4 })
+            else (th.anhNen ?: th.anhXem)?.let { a -> ctx.assets.open(a).use { android.graphics.BitmapFactory.decodeStream(it, null, android.graphics.BitmapFactory.Options().apply { inSampleSize = 4 }) } }
+        }.getOrNull()?.asImageBitmap()
+    }
+    Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(RoundedCornerShape(16.dp)).background(Brush.linearGradient(th.mau.map { Color(it) })).border(1.dp, Vien, RoundedCornerShape(16.dp))) {
+        if (anh != null) Image(anh, null, Modifier.fillMaxSize(), contentScale = androidx.compose.ui.layout.ContentScale.Crop)
+        if (vm.lamToiNen > 0) Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = vm.lamToiNen / 100f)))
+        Column(Modifier.align(Alignment.TopStart).padding(12.dp)) {
+            if (vm.tenChao.isNotBlank()) Text(t("XIN CHÀO, ", "HELLO, ") + vm.tenChao.uppercase(), fontSize = 9.sp, color = Color.White.copy(alpha = 0.8f), maxLines = 1)
+            Text(java.text.SimpleDateFormat("HH:mm", java.util.Locale.US).format(java.util.Date()), fontSize = 26.sp, fontWeight = FontWeight.Light, color = Color.White)
+            val dong = listOfNotNull(if (vm.amLich) t("âm lịch", "lunar date") else null, vm.thanhPho?.ten).joinToString(" · ")
+            if (dong.isNotEmpty()) Text(dong, fontSize = 10.sp, color = Color.White.copy(alpha = 0.85f), maxLines = 1)
+        }
+        Row(Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(horizontal = 14.dp, vertical = 14.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            repeat(5) { i -> Box(Modifier.weight(1f).height(24.dp).clip(RoundedCornerShape(5.dp)).background(if (i == 0) Color.White else Color.White.copy(alpha = if (i < vm.dock.size) 0.6f else 0.25f))) }
+        }
+    }
+    Phu(t(th.tenVi, th.tenEn) + " · " + t(th.moTaVi, th.moTaEn) + if (anhRieng != null) t(" · ảnh của bạn", " · your picture") else "")
+}
+
+@Composable
+private fun TheGiaoDien(vm: PhienLamViec) {
+    The {
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             THEMES.forEach { th -> TheTheme(th, th == vm.themeChon) { vm.themeChon = th } }
         }
-        Phu(t(vm.themeChon.moTaVi, vm.themeChon.moTaEn))
         // Ảnh của chính mình làm hình nền (góp ý 23/10/2026): thay ảnh / bộ ảnh của theme, giữ màu và hiệu ứng theme.
         val chonAnh = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) vm.chonAnhNen(uri)
@@ -727,11 +796,29 @@ private fun ManHomeSach(vm: PhienLamViec) = Cuon {
             NutPhu(t("Dùng ảnh của bạn làm hình nền", "Use your own picture as wallpaper"), Icons.Rounded.Image) {
                 chonAnh.launch(androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly))
             }
-        else {
-            Phu(t("Đang dùng ảnh của bạn (${vm.anhNenRieng!!.size / 1024} KB), bấm Áp dụng để đưa lên tivi.", "Using your picture (${vm.anhNenRieng!!.size / 1024} KB); press Apply to send it to the TV."))
-            NutPhu(t("Bỏ ảnh riêng, dùng ảnh của theme", "Remove it, use the theme's picture"), Icons.Rounded.Close) { vm.anhNenRieng = null }
+        else NutPhu(t("Bỏ ảnh riêng (${vm.anhNenRieng!!.size / 1024} KB), dùng ảnh của theme", "Remove your picture (${vm.anhNenRieng!!.size / 1024} KB)"), Icons.Rounded.Close) { vm.anhNenRieng = null }
+        Text(t("Làm tối hình nền", "Dim the wallpaper"), fontSize = 14.sp)
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(0, 20, 40).forEach { p -> ChonChip(if (p == 0) t("Không", "None") else "$p%", vm.lamToiNen == p) { vm.lamToiNen = p } }
         }
     }
+    if (vm.dsNangCao.isNotEmpty()) {
+        val daDat = vm.nangCao.count { it.value.isNotBlank() }
+        Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(The1).border(1.dp, Vien, RoundedCornerShape(20.dp))
+            .clickable { vm.moNangCao = true }.padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Rounded.Tune, null, Modifier.size(20.dp), tint = Hong)
+            Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f)) {
+                Text(t("Nâng cao · ${vm.dsNangCao.size} tuỳ chọn", "Advanced · ${vm.dsNangCao.size} options"), fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                Phu(if (daDat > 0) t("$daDat mục đã đổi", "$daDat changed") else t("Cho người thích tỉ mỉ: hiệu ứng, lưới app, remote…", "For tinkerers: effects, grid, remote…"))
+            }
+            Icon(Icons.AutoMirrored.Rounded.ArrowForward, null, Modifier.size(18.dp), tint = ChuPhu)
+        }
+    }
+}
+
+@Composable
+private fun TheHomeNoiDung(vm: PhienLamViec) {
     The(t("Dock (tối đa $DOCK_TOI_DA, theo thứ tự chạm)", "Dock (up to $DOCK_TOI_DA, in tap order)"), Icons.Rounded.Apps) {
         vm.appChoDock().forEach { p ->
             val viTri = vm.dock.indexOf(p)
@@ -750,11 +837,7 @@ private fun ManHomeSach(vm: PhienLamViec) = Cuon {
             }
         }
     }
-    TheMayChieu(vm)
-    The(t("Tuỳ chọn", "Options"), Icons.Rounded.Tune) {
-        OutlinedTextField(vm.tenChao, { vm.tenChao = it }, label = { Text(t("Tên chào (vd: Nhà bác Hùng)", "Greeting name (e.g. The Smiths)")) },
-            singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
-        Text(t("Thời tiết trên Home", "Weather on Home"), fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp))
+    The(t("Thời tiết", "Weather"), Icons.Rounded.WbSunny) {
         OutlinedTextField(vm.timXa, { vm.timXa = it }, label = { Text(t("Tìm phường / xã của bạn", "Find your ward / commune")) },
             placeholder = { Text(t("vd: Bến Thành, Cửa Lò", "e.g. Ben Thanh, Cua Lo")) },
             singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
@@ -769,56 +852,89 @@ private fun ManHomeSach(vm: PhienLamViec) = Cuon {
             THANH_PHO.forEach { tp -> ChonChip(tp.ten, vm.thanhPho == tp) { vm.thanhPho = tp } }
         }
         Phu(t("Dữ liệu thời tiết: Open-Meteo.com (CC BY 4.0), tivi tự lấy nửa giờ một lần. Toạ độ phường/xã © OpenStreetMap.", "Weather data: Open-Meteo.com (CC BY 4.0), refreshed by the TV every 30 minutes. Ward locations © OpenStreetMap."))
-        Hang(t("Âm lịch dưới ngày dương", "Lunar date under the date"), t("Ví dụ: 2/9 âm lịch · Bính Ngọ", "e.g. Lunar 2/9 · Year of the Horse"), vm.amLich) { vm.amLich = it }
-        Hang(t("Nút màn hình chờ", "Screensaver button"), t("Bấm là bật ảnh / đồng hồ, tiện khi nghe nhạc", "Starts the photo / clock screensaver, handy with music"), vm.nutManCho) { vm.nutManCho = it }
-        Hang(t("Gom nút trên cùng thành icon", "Compact icon buttons"), t("Một cụm gọn, bỏ chữ", "One tidy cluster, no labels"), vm.gonNut) { vm.gonNut = it }
-        Hang(t("Nút Input trên remote mở bảng chọn HDMI", "Remote Input button opens the input picker"), t("Nên bật cho Google TV", "Recommended on Google TV"), vm.nutInput) { vm.nutInput = it }
-        Hang(t("Remote gửi phím Home lạ", "Remote sends an odd Home key"), t("Que Xiaomi…", "Xiaomi sticks…"), vm.nutHome) { vm.nutHome = it }
-        Hang(t("DNS chặn quảng cáo (AdGuard)", "Ad-blocking DNS (AdGuard)"), t("Không chặn được quảng cáo YouTube", "Does not block YouTube ads"), vm.dnsChanQc) { vm.dnsChanQc = it }
     }
-    The(t("Tuỳ chỉnh thêm", "More options"), Icons.Rounded.Tune) {
-        Hang(t("Tên app to phía trên dock", "Large app name above the dock"), t("Tắt để Home gọn hơn, chỉ còn viền sáng", "Turn off for a calmer Home, just the glow"), vm.tenToTrenDock) { vm.tenToTrenDock = it }
-        Hang(t("Hiện tên dưới mọi app", "Names under every app"), t("Ông bà dễ nhận app hơn", "Easier to recognise apps"), vm.tenDuoiApp) { vm.tenDuoiApp = it }
-        Hang(t("Thư viện app", "App library"), t("Nút xem mọi app trên tivi, thêm / bớt khỏi Home", "A button listing every app; add or remove from Home"), vm.thuVienApp) { vm.thuVienApp = it }
-        Hang(t("Chế độ tivi yếu", "Slow TV mode"), t("Bớt hiệu ứng chuyển động cho tivi cũ, ít RAM", "Calmer motion for old, low-memory TVs"), vm.tiviYeu) { vm.tiviYeu = it }
-        Hang(t("Hiệu ứng kính mờ", "Frosted glass effects"), t("Dock kính mờ, ánh sáng theo màu app", "Frosted dock, glow in the app's colour"), vm.hieuUngKinh) { vm.hieuUngKinh = it }
-        Hang(t("Hiện CPU / bộ nhớ", "Show CPU / memory"), t("Một dòng nhỏ dưới đồng hồ", "One small line under the clock"), vm.hienThongSo) { vm.hienThongSo = it }
-        Text(t("Đồng hồ khi để yên", "Clock when idle"), fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp))
+    The(t("Đồng hồ & lời chào", "Clock & greeting"), Icons.Rounded.Schedule) {
+        OutlinedTextField(vm.tenChao, { vm.tenChao = it }, label = { Text(t("Tên chào (vd: Nhà bác Hùng)", "Greeting name (e.g. The Smiths)")) },
+            singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
+        Hang(t("Âm lịch dưới ngày dương", "Lunar date under the date"), t("Ví dụ: 2/9 âm lịch · Bính Ngọ", "e.g. Lunar 2/9 · Year of the Horse"), vm.amLich) { vm.amLich = it }
+        Text(t("Đồng hồ khi để yên", "Clock when idle"), fontSize = 14.sp)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(0, 5, 15, 30).forEach { p -> ChonChip(if (p == 0) t("Tắt", "Off") else t("$p phút", "$p min"), vm.dongHoKhiYen == p) { vm.dongHoKhiYen = p } }
         }
-        Text(t("Làm tối hình nền", "Dim the wallpaper"), fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp))
-        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(0, 20, 40).forEach { p -> ChonChip(if (p == 0) t("Không", "None") else "$p%", vm.lamToiNen == p) { vm.lamToiNen = p } }
-        }
     }
-    MucNangCao(vm)
-    if (vm.daCoHomeSach) NutChinh(if (vm.dangBan) t("Đang áp dụng…", "Applying…") else t("Áp dụng giao diện", "Apply theme"),
-        enabled = !vm.dangBan, icon = Icons.Rounded.Palette) { vm.apDungTheme() }
-    else NutChinh(if (vm.dangBan) t("Đang cài…", "Installing…") else t("Cài Home sạch", "Install clean Home"), enabled = !vm.dangBan, icon = Icons.Rounded.Home) { vm.caiHomeSach() }
-    vm.nhatKy.takeLast(4).forEach { Text(it, fontSize = 12.sp, fontFamily = FontFamily.Monospace, color = ChuPhu) }
+    TheMayChieu(vm)
 }
 
-/** Mục Nâng cao: mọi tuỳ chọn còn lại của launcher (mô tả tiếng Anh lấy từ tài liệu CleanYourTV). */
 @Composable
-private fun MucNangCao(vm: PhienLamViec) {
-    if (vm.dsNangCao.isEmpty()) return
+private fun TheTuyChinh(vm: PhienLamViec) {
+    The(t("Hiển thị", "Display"), Icons.Rounded.Visibility) {
+        Hang(t("Tên app to phía trên dock", "Large app name above the dock"), t("Tắt để Home gọn hơn, chỉ còn viền sáng", "Turn off for a calmer Home, just the glow"), vm.tenToTrenDock) { vm.tenToTrenDock = it }
+        Hang(t("Hiện tên dưới mọi app", "Names under every app"), t("Ông bà dễ nhận app hơn", "Easier to recognise apps"), vm.tenDuoiApp) { vm.tenDuoiApp = it }
+        Hang(t("Gom nút trên cùng thành icon", "Compact icon buttons"), t("Một cụm gọn, bỏ chữ", "One tidy cluster, no labels"), vm.gonNut) { vm.gonNut = it }
+        Hang(t("Nút màn hình chờ", "Screensaver button"), t("Bấm là bật ảnh / đồng hồ, tiện khi nghe nhạc", "Starts the photo / clock screensaver, handy with music"), vm.nutManCho) { vm.nutManCho = it }
+        Hang(t("Thư viện app", "App library"), t("Nút xem mọi app trên tivi, thêm / bớt khỏi Home", "A button listing every app; add or remove from Home"), vm.thuVienApp) { vm.thuVienApp = it }
+        Hang(t("Hiện CPU / bộ nhớ", "Show CPU / memory"), t("Một dòng nhỏ dưới đồng hồ", "One small line under the clock"), vm.hienThongSo) { vm.hienThongSo = it }
+    }
+    The(t("Remote", "Remote"), Icons.Rounded.SettingsRemote) {
+        Hang(t("Nút Input trên remote mở bảng chọn HDMI", "Remote Input button opens the input picker"), t("Nên bật cho Google TV", "Recommended on Google TV"), vm.nutInput) { vm.nutInput = it }
+        Hang(t("Remote gửi phím Home lạ", "Remote sends an odd Home key"), t("Que Xiaomi, hộp nhà mạng…", "Xiaomi sticks, carrier boxes…"), vm.nutHome) { vm.nutHome = it }
+    }
+    The(t("Tivi yếu & mạng", "Slow TVs & network"), Icons.Rounded.Speed) {
+        Hang(t("Chế độ tivi yếu", "Slow TV mode"), t("Bớt hiệu ứng chuyển động cho tivi cũ, ít RAM", "Calmer motion for old, low-memory TVs"), vm.tiviYeu) { vm.tiviYeu = it }
+        Hang(t("Hiệu ứng kính mờ", "Frosted glass effects"), t("Dock kính mờ, ánh sáng theo màu app", "Frosted dock, glow in the app's colour"), vm.hieuUngKinh) { vm.hieuUngKinh = it }
+        Hang(t("DNS chặn quảng cáo (AdGuard)", "Ad-blocking DNS (AdGuard)"), t("Không chặn được quảng cáo YouTube", "Does not block YouTube ads"), vm.dnsChanQc) { vm.dnsChanQc = it }
+    }
+}
+
+/** Nhóm của một khoá Nâng cao, theo thứ tự hiện. */
+private val NHOM_NANG_CAO = listOf(
+    Triple("hinh-nen", "Hình nền & màu" to "Wallpaper & colour", Regex("^(background_color|sky_intensity|wallpaper_.*|accent_color|festival.*|glow_style|ambient_glow)$")),
+    Triple("dock", "Dock & lưới app" to "Dock & app grid", Regex("^(fill_dock|hidden_apps|columns|rows_below_dock|dock_.*|library_apps|app_library_selection|app_labels|app_banners|module_cards|reorder_button|tile_menu|fade_rows|focus_overshoot)$")),
+    Triple("thanh-tren", "Thanh trên & lời chào" to "Top bar & greeting", Regex("^(show_.*|icon_only_.*|top_menu|launcher_settings_button|wifi_.*|greeting|shamsi_date|vpn_app)$")),
+    Triple("dien-anh", "Home điện ảnh" to "Cinematic Home", Regex("^cinematic_.*$")),
+    Triple("remote", "Remote, HDMI & app hãng" to "Remote, HDMI & maker apps", Regex("^(live_tv_.*|source_panel_.*|coocaa_sources|launch_actions|input_.*|settings_key_.*|restore_key_services|app_keys|key_filter|stock_home_redirect|boot_to_live_tv)$")),
+)
+
+/** Màn Nâng cao riêng: tìm, lọc Đã đổi / Cẩn thận, chia nhóm, chấm tím ở mục đã đổi. */
+@Composable
+private fun ManNangCao(vm: PhienLamViec) {
     var tim by remember { mutableStateOf("") }
+    var loc by remember { mutableStateOf(0) } // 0 tất cả, 1 đã đổi, 2 cẩn thận
     val daDat = vm.nangCao.count { it.value.isNotBlank() }
-    Gap(t("Nâng cao · ${vm.dsNangCao.size} tuỳ chọn của Home sạch", "Advanced · ${vm.dsNangCao.size} clean Home options") +
-        if (daDat > 0) t(" · đã đặt $daDat", " · $daDat set") else "", Icons.Rounded.Tune) {
-        Phu(t("Cho người dùng nâng cao. Để trống = launcher tự quyết. Mô tả lấy nguyên văn từ tài liệu CleanYourTV (tiếng Anh). Nhóm \"Cẩn thận\" đụng tới remote, cổng HDMI, app của hãng: đặt sai có thể làm remote hoặc nguồn vào không chạy — bấm Khôi phục là về như cũ.",
-            "For advanced users. Empty = the launcher decides. Descriptions come from the CleanYourTV docs. The \"Careful\" group touches the remote, HDMI inputs and the maker's apps: a wrong value can break them — Restore puts everything back."))
-        OutlinedTextField(tim, { tim = it }, label = { Text(t("Tìm tuỳ chọn", "Search options")) }, singleLine = true,
-            modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
-        if (daDat > 0) TextButton(onClick = { vm.nangCao.clear() }) { Text(t("Đặt lại tất cả về mặc định", "Reset all to default")) }
-        val q = tim.trim().lowercase()
-        listOf(false, true).forEach { canThan ->
-            val ds = vm.dsNangCao.filter { it.canThan == canThan && (q.isEmpty() || it.khoa.contains(q) || it.moTa.lowercase().contains(q) || it.ten.lowercase().contains(q) || it.moTaVi.lowercase().contains(q)) }
-            if (ds.isEmpty()) return@forEach
-            Text(if (canThan) t("⚠ Cẩn thận", "⚠ Careful") else t("Giao diện & hiệu ứng", "Look & effects"),
-                fontWeight = FontWeight.Bold, fontSize = 15.sp, color = if (canThan) Cam else Color.White, modifier = Modifier.padding(top = 8.dp))
-            ds.forEach { tc -> DongNangCao(tc, vm.nangCao[tc.khoa] ?: "") { v -> if (v.isBlank()) vm.nangCao.remove(tc.khoa) else vm.nangCao[tc.khoa] = v } }
+    val q = XaPhuong.boDau(tim.trim())
+    val ds = vm.dsNangCao.filter { tc ->
+        (q.isEmpty() || tc.khoa.contains(q) || XaPhuong.boDau(tc.ten).contains(q) || XaPhuong.boDau(tc.moTaVi).contains(q) || tc.moTa.lowercase().contains(q)) &&
+            when (loc) { 1 -> !vm.nangCao[tc.khoa].isNullOrBlank(); 2 -> tc.canThan; else -> true }
+    }
+    Column(Modifier.fillMaxSize()) {
+        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(t("Nâng cao", "Advanced"), fontWeight = FontWeight.Black, fontSize = 22.sp, modifier = Modifier.weight(1f))
+                if (daDat > 0) TextButton(onClick = { vm.nangCao.clear() }) { Text(t("Trả mặc định", "Reset all")) }
+            }
+            Phu(t("Để \"Mặc định\" là Home sạch tự quyết. Mục \"Cẩn thận\" đụng tới remote, HDMI, app của hãng: đặt sai có thể làm remote hoặc nguồn vào không chạy — bấm Khôi phục là về như cũ.",
+                "\"Default\" lets the clean Home decide. \"Careful\" items touch the remote, HDMI and the maker's apps: a wrong value can break them — Restore puts everything back."))
+            OutlinedTextField(tim, { tim = it }, label = { Text(t("Tìm: tên app, đồng hồ, hình nền…", "Search: app name, clock, wallpaper…")) }, singleLine = true,
+                leadingIcon = { Icon(Icons.Rounded.Search, null) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(50))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ChonChip(t("Tất cả", "All"), loc == 0) { loc = 0 }
+                ChonChip(t("Đã đổi ($daDat)", "Changed ($daDat)"), loc == 1) { loc = 1 }
+                ChonChip(t("Cẩn thận", "Careful"), loc == 2) { loc = 2 }
+            }
+            val conLai = ds.toMutableList()
+            (NHOM_NANG_CAO.map { (id, ten, re) -> id to ten to re } + listOf("khac" to ("Khác" to "Other") to Regex(".*"))).forEach { (dau, re) ->
+                val (_, ten) = dau
+                val nhom = conLai.filter { re.matches(it.khoa) }
+                conLai.removeAll(nhom)
+                if (nhom.isEmpty()) return@forEach
+                Text("${t(ten.first, ten.second)} · ${nhom.size}", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = ChuPhu, modifier = Modifier.padding(top = 8.dp))
+                nhom.forEach { tc -> DongNangCao(tc, vm.nangCao[tc.khoa] ?: "") { v -> if (v.isBlank()) vm.nangCao.remove(tc.khoa) else vm.nangCao[tc.khoa] = v } }
+            }
+            if (ds.isEmpty()) Phu(t("Không có tuỳ chọn nào khớp.", "No matching options."))
+        }
+        Column(Modifier.fillMaxWidth().background(The1).padding(horizontal = 16.dp, vertical = 10.dp)) {
+            NutChinh(t("Xong, quay lại", "Done"), icon = Icons.Rounded.Check) { vm.moNangCao = false }
         }
     }
 }
@@ -826,7 +942,11 @@ private fun MucNangCao(vm: PhienLamViec) {
 @Composable
 private fun DongNangCao(tc: zone.vgs.tvsach.dulieu.TuyChon, gt: String, doi: (String) -> Unit) {
     Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(The2).padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(tc.tieuDe(), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = if (gt.isNotBlank()) Hong else Color.White)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (gt.isNotBlank()) { Box(Modifier.size(8.dp).clip(CircleShape).background(Tim)); Spacer(Modifier.width(8.dp)) }
+            Text(tc.tieuDe(), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = if (gt.isNotBlank()) Hong else Color.White, modifier = Modifier.weight(1f))
+            if (tc.canThan) Text(t("Cẩn thận", "Careful"), fontSize = 11.sp, color = Cam, modifier = Modifier.clip(RoundedCornerShape(50)).background(Cam.copy(alpha = 0.15f)).padding(horizontal = 8.dp, vertical = 2.dp))
+        }
         // Khoá kỹ thuật vẫn hiện nhỏ (tra tài liệu CleanYourTV, hỏi trên nhóm) khi đã có tên tiếng Việt.
         if (tc.tieuDe() != tc.khoa) Text(tc.khoa, fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = ChuPhu)
         Phu(tc.moTaHien())
@@ -1118,4 +1238,33 @@ private fun TheMayChieu(vm: PhienLamViec) {
         }
         Phu(t("Danh sách đã chép sẵn — dán vào ô nội dung trong hộp góp ý.", "The list is copied — paste it into the feedback box."))
     }
+}
+
+/** Hộp chọn tay một mẫu trong toàn bộ danh sách, có ô tìm (23/10/2026). */
+@Composable
+private fun HopChonMau(vm: PhienLamViec) {
+    var tim by remember { mutableStateOf("") }
+    val khoa = XaPhuong.boDau(tim.trim().lowercase())
+    val ds = remember(khoa, vm.tatCaMau) {
+        if (khoa.isEmpty()) vm.tatCaMau else vm.tatCaMau.filter { m -> khoa.split(" ").all { it in XaPhuong.boDau(m.ten.lowercase()) || it in m.id } }
+    }
+    AlertDialog(
+        onDismissRequest = { vm.moChonMau = false },
+        confirmButton = { TextButton(onClick = { vm.moChonMau = false }) { Text(t("Đóng", "Close")) } },
+        title = { Text(t("Chọn mẫu tivi", "Pick a TV list")) },
+        text = {
+            Column {
+                OutlinedTextField(tim, { tim = it }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                    label = { Text(t("Tìm hãng, model (vd: sony vu3, tcl c7)", "Search brand, model (e.g. sony vu3)")) })
+                Text(t("${ds.size} mẫu", "${ds.size} lists"), fontSize = 12.sp, modifier = Modifier.padding(vertical = 6.dp))
+                LazyColumn(Modifier.heightIn(max = 380.dp)) {
+                    items(ds.take(120), key = { it.id }) { m ->
+                        Text(m.ten.take(110), fontSize = 14.sp, modifier = Modifier.fillMaxWidth()
+                            .clickable { vm.mauChon = m; vm.moChonMau = false }.padding(vertical = 10.dp))
+                    }
+                }
+            }
+        },
+        containerColor = The1,
+    )
 }
