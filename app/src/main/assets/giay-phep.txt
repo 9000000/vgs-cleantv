@@ -23,6 +23,7 @@ CleanTV dùng các phần mềm mã nguồn mở sau. / CleanTV uses the followi
 6. Phông chữ Lexend (trong Home sạch, thay Outfit vì đủ dấu tiếng Việt) / Lexend font (in the clean Home)
    The Lexend Project Authors — https://github.com/googlefonts/lexend — SIL Open Font License 1.1 (mục C / section C)
 7. Dữ liệu thời tiết / Weather data: Open-Meteo.com — https://open-meteo.com — CC BY 4.0
+   Toạ độ phường/xã / Ward locations: © OpenStreetMap contributors — https://www.openstreetmap.org/copyright — ODbL 1.0
 8. DNS chặn quảng cáo (tuỳ chọn) / Optional ad-blocking DNS: AdGuard DNS — https://adguard-dns.io
 
 Tên các hãng tivi chỉ dùng để nói tivi nào chạy được; CleanTV không liên quan tới các hãng đó.
