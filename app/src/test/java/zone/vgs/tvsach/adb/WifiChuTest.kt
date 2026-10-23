@@ -30,5 +30,8 @@ WifiConfigManager - Configured networks End ----
     @Test fun dongIdCoDauSao() = assertEquals("com.android.tv.settings",
         ThaoTacTv.chuWifiDangDung(dump("\"NhaMinh\"").replace("ID: 1 SSID", "* ID: 1 SSID")))
 
+    /** Cùng tên "NhaMinh" lưu hai lần (khác bảo mật), một của setupwraith: không đoán, trả "" để xét mọi mạng. */
+    @Test fun trungTenHaiMang_khongDoan() = assertEquals("", ThaoTacTv.chuWifiDangDung(dump("\"NhaMinh\"").replace("ID: 0 SSID: \"MangCu\"", "ID: 0 SSID: \"NhaMinh\"")))
+
     @Test fun khongThayKhoi() = assertEquals("", ThaoTacTv.chuWifiDangDung(dump("\"Khac\"")))
 }

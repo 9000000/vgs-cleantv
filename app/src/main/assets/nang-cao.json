@@ -158,7 +158,7 @@
 {
 "khoa": "show_inputs_pill",
 "kieu": "bool",
-"moTa": "The Inputs pill in the top bar, shown when the TV has inputs (true by default); false hides it; what the remote's Input button does is unchanged",
+"moTa": "The Inputs pill in the top bar, shown when the TV has inputs (true by default); false hides it, and with top_menu it also leaves Inputs out of the gear's menu (streamers with no HDMI input, such as the Chromecast with Google TV); what the remote's Input button does is unchanged",
 "canThan": false,
 "ten": "Hiện nút Nguồn vào",
 "moTaVi": "Nút Nguồn vào (HDMI…) trên thanh trên cùng khi tivi có nguồn vào (mặc định bật). Tắt để ẩn; nút Input trên remote vẫn chạy như cũ."
@@ -182,7 +182,7 @@
 {
 "khoa": "top_menu",
 "kieu": "bool",
-"moTa": "Inputs, Wi-Fi and Settings folded into one round gear, centred on the header: OK drops a menu with the three, hold OK keeps the launcher menu (false by default)",
+"moTa": "Inputs, Wi-Fi and Settings folded into one round gear, centred on the header: OK drops a menu with the three plus Reorder apps, hold OK keeps the launcher menu (false by default)",
 "canThan": false,
 "ten": "Gom nút trên cùng vào một bánh răng",
 "moTaVi": "Nguồn vào, Wi-Fi và Cài đặt gom vào một nút bánh răng giữa thanh trên cùng: bấm OK hiện menu 3 mục, giữ OK mở menu của launcher (mặc định tắt)."
@@ -448,6 +448,14 @@
 "canThan": true,
 "ten": "Lọc phím remote",
 "moTaVi": "Tắt (false) để dịch vụ bắt phím ngừng lọc phím mà vẫn bật. Dùng cho tivi bị mất giữ phím âm lượng (TCL Google TV Android 12); khi đó các nút gán ở trên cũng thôi chạy."
+},
+{
+"khoa": "gamepad_passthrough",
+"kieu": "bool",
+"moTa": "true makes the key helpers stop filtering keys while a game controller is connected, so games see its buttons (Steam Link with an Xbox controller); the remote buttons above do nothing until it disconnects. Needs key_filter on. A voice remote that reports a joystick does not count. Off by default",
+"canThan": false,
+"ten": "Nhường phím cho tay cầm game",
+"moTaVi": "Bật thì khi có tay cầm game kết nối, dịch vụ bắt phím của Home sạch ngừng lọc phím để game nhận đủ nút (vd Steam Link với tay Xbox); các nút remote gán sẵn tạm không chạy tới khi rút tay cầm. Cần bật key_filter. Mặc định tắt."
 },
 {
 "khoa": "stock_home_redirect",

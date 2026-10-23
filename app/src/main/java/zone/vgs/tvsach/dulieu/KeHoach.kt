@@ -68,6 +68,15 @@ object KeHoach {
     private val GIU_LOI = Regex("""^com\.(google\.)?android\.(ext\.services|ext\.shared|modulemetadata)$|^com\.google\.android\.overlay\.modules""")
     fun laGoiLoi(pkg: String) = GIU_LOI.containsMatchIn(pkg)
 
+    /**
+     * Khối gói lõi của repo CleanYourTV (tools/disable.sh CORE_RE / CORE_OK, tests/test_core_packages.py, #884), chép
+     * nguyên văn: tatGoi từ chối mọi gói khớp ngay trước lệnh tắt, dù gói đến từ danh sách mẫu, luật chung hay người
+     * dùng tự tích (23/10/2026, Gathin muốn CleanTV có đủ các chốt an toàn của repo).
+     */
+    private val CORE_RE = Regex("""^(android|com\.android\.systemui|com\.android\.shell|com\.android\.phone|com\.android\.settings|com\.android\.tv\.settings|com\.(google\.)?android\.(permissioncontroller|packageinstaller|ext\.services|ext\.shared|modulemetadata)|com\.google\.android\.overlay\.modules.*|com\.android\.providers\..*)$""")
+    private val CORE_OK = Regex("""^com\.android\.providers\.(calendar|contacts|userdictionary|blockednumber)$""")
+    fun laGoiLoiAndroid(pkg: String) = CORE_RE.matches(pkg) && !CORE_OK.matches(pkg)
+
     /** Tên kiểu này thường là đường hình HDMI, remote, bàn phím: chỉ tắt khi danh sách đúng mẫu ghi rõ. */
     private val TU_NGUY_HIEM = listOf(
         "tvinput", "tvservice", "tv.service", "inputmethod", "bluetooth", "rcu", "remote", "autopair",

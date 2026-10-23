@@ -262,5 +262,9 @@
   "fade_rows": {
     "ten": "Hàng app mờ dần khi cuộn",
     "moTa": "Hàng app mờ dần khi cuộn lên dưới đồng hồ thay vì bị cắt thẳng. Tốn thêm khoảng 6 MB bộ nhớ đồ hoạ ở 1080p (mặc định tắt)."
+  },
+  "gamepad_passthrough": {
+    "ten": "Nhường phím cho tay cầm game",
+    "moTa": "Bật thì khi có tay cầm game kết nối, dịch vụ bắt phím của Home sạch ngừng lọc phím để game nhận đủ nút (vd Steam Link với tay Xbox); các nút remote gán sẵn tạm không chạy tới khi rút tay cầm. Cần bật key_filter. Mặc định tắt."
   }
 }

@@ -156,6 +156,14 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         val boQua = mutableListOf<Pair<String, String>>()
         var ds = goi.filter { TEN_GOI.matches(it) }.distinct()
 
+        // Chốt cuối như repo CleanYourTV: không bao giờ tắt gói lõi Android (#884) hay gói đang giữ nút Home (Home guard).
+        val homeNay = runCatching { homeHienTai().substringBefore('/') }.getOrDefault("")
+        ds.filter { zone.vgs.tvsach.dulieu.KeHoach.laGoiLoiAndroid(it) }.forEach {
+            boQua += it to t("Gói lõi của Android: tắt có thể làm tivi không khởi động lại được.", "Core Android package: disabling it can stop the TV from booting.")
+        }
+        if (homeNay.isNotBlank() && homeNay in ds) boQua += homeNay to t("Đang là màn Home của tivi: tắt là không còn Home.", "It is the TV's Home right now: disabling it leaves no Home.")
+        ds = ds.filter { p -> boQua.none { it.first == p } }
+
         // setupwraith: Wi-Fi lưu lúc cài đặt ban đầu thuộc về nó; tắt nó là Android xoá mạng đó và
         // tivi rớt Wi-Fi, mất luôn kết nối này.
         if (SETUP in ds && !epSetupwraith) {
@@ -850,7 +858,10 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             val dau = dump.indexOf("Configured networks Begin"); val cuoi = dump.indexOf("Configured networks End")
             if (dau < 0 || cuoi < dau) return ""
             val khoi = dump.substring(dau, cuoi).split(Regex("""\n(?=[\s*]*ID: \d+ )"""))
-            val cua = khoi.firstOrNull { it.contains("SSID: \"$ssid\"") } ?: return ""
+            // Cùng một tên Wi-Fi có thể lưu thành nhiều mạng (khác kiểu bảo mật): không biết đang nối mạng nào thì trả ""
+            // để xét mọi mạng đã lưu (lỗ hổng @SaviorOneZero tìm ra ở Gathin23/cleanyourtv#1091, 23/10/2026).
+            val trung = khoi.filter { it.contains("SSID: \"$ssid\"") }
+            val cua = trung.singleOrNull() ?: return ""
             return Regex("""cname=([^ \n]+)""").find(cua)?.groupValues?.get(1) ?: ""
         }
 

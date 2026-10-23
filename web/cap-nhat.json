@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 45,
-  "versionName": "2.5.6",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.5.6.apk",
-  "co": 11551292,
-  "ghiChu": "Mở lại Đổi giao diện không còn làm mất ảnh nền riêng.",
-  "ghiChuEn": "Reopening the theme screen no longer drops your own wallpaper.",
+  "versionCode": 46,
+  "versionName": "2.6",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.apk",
+  "co": 11563916,
+  "ghiChu": "Theo CleanYourTV mới (248 mẫu); dòng thời tiết gọn hơn; thêm chốt an toàn như repo gốc.",
+  "ghiChuEn": "Latest CleanYourTV (248 models); tidier weather line; the original repo's safety checks.",
   "ngay": "2026-10-23"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "c95a2a540514c180",
+   "phienBan": "f572077f2d80a190",
    "url": "/ota/du-lieu.json",
-   "co": 1367068,
-   "tuBan": 45
+   "co": 1402074,
+   "tuBan": 46
   },
   "tvhome.apk": {
-   "phienBan": "95e201fd03484ace",
+   "phienBan": "414be35d49d85742",
    "url": "/ota/tvhome.apk",
-   "co": 597011,
-   "tuBan": 45
+   "co": 598251,
+   "tuBan": 46
   }
  }
 }

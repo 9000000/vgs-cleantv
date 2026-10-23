@@ -1,6 +1,6 @@
 diff --git a/launcher/FONT-LICENSE-LEXEND-OFL.txt b/launcher/FONT-LICENSE-LEXEND-OFL.txt
 new file mode 100644
-index 0000000..b1477aa
+index 00000000..b1477aae
 --- /dev/null
 +++ b/launcher/FONT-LICENSE-LEXEND-OFL.txt
 @@ -0,0 +1,93 @@
@@ -98,7 +98,7 @@ index 0000000..b1477aa
 +FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 +OTHER DEALINGS IN THE FONT SOFTWARE.
 diff --git a/launcher/app/src/main/AndroidManifest.xml b/launcher/app/src/main/AndroidManifest.xml
-index 4cee7a6..335d9e1 100644
+index 80124b58..c4b8e169 100644
 --- a/launcher/app/src/main/AndroidManifest.xml
 +++ b/launcher/app/src/main/AndroidManifest.xml
 @@ -8,6 +8,8 @@
@@ -123,7 +123,7 @@ index 4cee7a6..335d9e1 100644
          <intent>
              <action android:name="android.settings.SETTINGS" />
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
-index ea00306..2914407 100644
+index ea003063..29144072 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 @@ -449,6 +449,13 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -165,7 +165,7 @@ index ea00306..2914407 100644
          if (live == null) return 0xFF444444;
          // Draw a private copy: changing the bounds of the drawable an ImageView shows would blank the tile.
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Config.java b/launcher/app/src/main/java/com/gathin/tvhome/Config.java
-index 7fbc06a..69dee21 100644
+index 6252d6d4..29676e59 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/Config.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/Config.java
 @@ -85,6 +85,9 @@ final class Config {
@@ -178,16 +178,16 @@ index 7fbc06a..69dee21 100644
      /** Name after the greeting ("Good morning, Mr. Trịnh"); empty for the greeting alone. */
      final String greetingName;
      final boolean moduleCards;
-@@ -218,7 +221,7 @@ final class Config {
+@@ -220,7 +223,7 @@ final class Config {
                     List<RaceWeekend.Race> raceCalendar, boolean cinematicHome, boolean ambientGlow, boolean appGlow, boolean fadeRows, int homeIdleClockMinutes,
                     boolean keyFilter, boolean dockGlass, String glowStyle, boolean wallpaperCaptions,
                     boolean handleViewInputs, boolean tileMenu, boolean dockEvenPadding, boolean cinematicDots, boolean cinematicWhiteFocus, boolean wifiStatusColor, int cinematicScrim, int cinematicArt,
--                   Map<String, Set<String>> wallpaperMoods) {
-+                   Map<String, Set<String>> wallpaperMoods, boolean lunarDate, int lunarUtcOffset) {
+-                   Map<String, Set<String>> wallpaperMoods, boolean gamepadPassthrough) {
++                   Map<String, Set<String>> wallpaperMoods, boolean gamepadPassthrough, boolean lunarDate, int lunarUtcOffset) {
          this.handleViewInputs = handleViewInputs;
          this.tileMenu = tileMenu;
          this.inputKeycodes = inputKeycodes;
-@@ -246,6 +249,8 @@ final class Config {
+@@ -248,6 +251,8 @@ final class Config {
          this.animations = animations;
          this.advancedEffects = advancedEffects;
          this.shamsiDate = shamsiDate;
@@ -196,7 +196,7 @@ index 7fbc06a..69dee21 100644
          this.greetingName = greetingName;
          this.moduleCards = moduleCards;
          this.reducedMotion = reducedMotion;
-@@ -334,6 +339,8 @@ final class Config {
+@@ -337,6 +342,8 @@ final class Config {
          boolean animations = res.getBoolean(R.bool.animations);
          boolean advancedEffects = res.getBoolean(R.bool.advanced_effects);
          boolean shamsi = res.getBoolean(R.bool.shamsi_date);
@@ -205,7 +205,7 @@ index 7fbc06a..69dee21 100644
          String greetingName = res.getString(R.string.greeting_name).trim();
          boolean moduleCards = res.getBoolean(R.bool.module_cards);
          boolean reducedMotion = res.getBoolean(R.bool.reduced_motion);
-@@ -412,6 +419,8 @@ final class Config {
+@@ -416,6 +423,8 @@ final class Config {
              animations = bool(json, "animations", animations);
              advancedEffects = bool(json, "advanced_effects", advancedEffects);
              shamsi = bool(json, "shamsi_date", shamsi);
@@ -214,18 +214,18 @@ index 7fbc06a..69dee21 100644
              greetingName = string(json, "greeting_name", greetingName).trim();
              moduleCards = bool(json, "module_cards", moduleCards);
              reducedMotion = bool(json, "reduced_motion", reducedMotion);
-@@ -515,7 +524,7 @@ final class Config {
+@@ -520,7 +529,7 @@ final class Config {
                  Math.max(0, Math.min(100, skyIntensity)), settingsKeycodes, settingsKeyPanel, restoreKeyServices, wallpaperEnabled, wallpaper,
                  wallpapers, rotationMinutes, wallpaperDim, dockOpacity, wallpaperOrder, applied,
                  festival, inputKeycodes, appKeys, stockHomeRedirect, json == null ? Collections.emptyList() : raceCalendar(json), cinematic, ambientGlow, appGlow, fadeRows,
--                Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding, cinematicDots, cinematicWhiteFocus, wifiStatusColor, cinematicScrim, cinematicArt, wallpaperMoods);
-+                Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding, cinematicDots, cinematicWhiteFocus, wifiStatusColor, cinematicScrim, cinematicArt, wallpaperMoods, lunar, lunarOffset);
+-                Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding, cinematicDots, cinematicWhiteFocus, wifiStatusColor, cinematicScrim, cinematicArt, wallpaperMoods, gamepadPassthrough);
++                Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding, cinematicDots, cinematicWhiteFocus, wifiStatusColor, cinematicScrim, cinematicArt, wallpaperMoods, gamepadPassthrough, lunar, lunarOffset);
      }
  
      /**
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Lunar.java b/launcher/app/src/main/java/com/gathin/tvhome/Lunar.java
 new file mode 100644
-index 0000000..4181780
+index 00000000..41817804
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/Lunar.java
 @@ -0,0 +1,132 @@
@@ -362,7 +362,7 @@ index 0000000..4181780
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 40bee38..58b3565 100644
+index dca4f842..2fbc630e 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -178,13 +178,25 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
@@ -436,7 +436,7 @@ index 40bee38..58b3565 100644
          if (cfg.fadeRows) TopFade.attach(grid, 48 * density);
          // Reduced motion: the tiles are simply there, with no entrance (reloadApps skips it there too).
          if (animations && !reducedMotion) {
-@@ -672,7 +700,27 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -673,7 +701,27 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -464,7 +464,7 @@ index 40bee38..58b3565 100644
          btnSettings.setOnKeyListener(pillKeys);
          btnReorder.setOnKeyListener(pillKeys);
          btnLibraryTop.setOnKeyListener(pillKeys);
-@@ -853,6 +901,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -854,6 +902,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -472,7 +472,7 @@ index 40bee38..58b3565 100644
          sky.update();
          wallpaperPlayer.start();
          handler.postDelayed(minuteTick, MINUTE_MS);
-@@ -1897,6 +1946,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1898,6 +1947,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -503,7 +503,7 @@ index 40bee38..58b3565 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2284,6 +2357,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2285,6 +2358,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              greeting.setTextColor(greetingColor);
          }
          if (shamsi) shamsiDate.setText(Shamsi.today(getResources()));
@@ -511,8 +511,8 @@ index 40bee38..58b3565 100644
      }
  
      // ---- race-weekend panel (a theme's race_calendar) -----------------------------------------------
-@@ -2422,7 +2496,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
-             text = name.length() < text.length() && name.length() < 5 ? "" : name;
+@@ -2430,7 +2504,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+             text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 -            if (!TextUtils.equals(btnWifi.getText(), label)) btnWifi.setText(label);
@@ -524,7 +524,7 @@ index 40bee38..58b3565 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2626,6 +2704,29 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2636,6 +2714,29 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              if (v.equals("-")) return -1;
              try { return Integer.parseInt(v); } catch (NumberFormatException e) { return null; }
          }
@@ -554,7 +554,7 @@ index 40bee38..58b3565 100644
          return null;
      }
  
-@@ -2997,10 +3098,77 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3019,10 +3120,77 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
@@ -634,7 +634,7 @@ index 40bee38..58b3565 100644
          row.findViewById(R.id.dot).setVisibility(View.GONE);
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Weather.java b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
 new file mode 100644
-index 0000000..e28715e
+index 00000000..e28715e0
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
 @@ -0,0 +1,130 @@
@@ -770,7 +770,7 @@ index 0000000..e28715e
 +}
 diff --git a/launcher/app/src/main/res/drawable/cum_bg.xml b/launcher/app/src/main/res/drawable/cum_bg.xml
 new file mode 100644
-index 0000000..c4d4ff9
+index 00000000..c4d4ff93
 --- /dev/null
 +++ b/launcher/app/src/main/res/drawable/cum_bg.xml
 @@ -0,0 +1,7 @@
@@ -783,7 +783,7 @@ index 0000000..c4d4ff9
 +</shape>
 diff --git a/launcher/app/src/main/res/drawable/cum_nut_bg.xml b/launcher/app/src/main/res/drawable/cum_nut_bg.xml
 new file mode 100644
-index 0000000..5e5b765
+index 00000000..5e5b765a
 --- /dev/null
 +++ b/launcher/app/src/main/res/drawable/cum_nut_bg.xml
 @@ -0,0 +1,11 @@
@@ -800,7 +800,7 @@ index 0000000..5e5b765
 +</selector>
 diff --git a/launcher/app/src/main/res/drawable/ic_dream.xml b/launcher/app/src/main/res/drawable/ic_dream.xml
 new file mode 100644
-index 0000000..82ac6d8
+index 00000000..82ac6d8d
 --- /dev/null
 +++ b/launcher/app/src/main/res/drawable/ic_dream.xml
 @@ -0,0 +1,7 @@
@@ -5210,7 +5210,7 @@ z7AL#2Q?Ga7#)@k?^UBJOm%*cVJ%=8TcIc6tZgR5g>Sp3+yBR#c#;oGS|BhcPCZ;I{
 y&Mn%vm42hXEs~JnWDgDkt;PS2gR7+EPzk(T^PF6^>pQvbxFZ<s>Pks*k^ci%K3%i`
 
 diff --git a/launcher/app/src/main/res/font/outfit_extralight.xml b/launcher/app/src/main/res/font/outfit_extralight.xml
-index 397e298..f12687b 100644
+index 397e2989..f12687b6 100644
 --- a/launcher/app/src/main/res/font/outfit_extralight.xml
 +++ b/launcher/app/src/main/res/font/outfit_extralight.xml
 @@ -1,13 +1,12 @@
@@ -5230,7 +5230,7 @@ index 397e298..f12687b 100644
          tools:targetApi="28" />
  </font-family>
 diff --git a/launcher/app/src/main/res/font/outfit_light.xml b/launcher/app/src/main/res/font/outfit_light.xml
-index 3633865..6ebb026 100644
+index 36338658..6ebb0262 100644
 --- a/launcher/app/src/main/res/font/outfit_light.xml
 +++ b/launcher/app/src/main/res/font/outfit_light.xml
 @@ -1,13 +1,12 @@
@@ -5250,7 +5250,7 @@ index 3633865..6ebb026 100644
          tools:targetApi="28" />
  </font-family>
 diff --git a/launcher/app/src/main/res/font/outfit_medium.xml b/launcher/app/src/main/res/font/outfit_medium.xml
-index 18d7699..ef32b90 100644
+index 18d76991..ef32b90f 100644
 --- a/launcher/app/src/main/res/font/outfit_medium.xml
 +++ b/launcher/app/src/main/res/font/outfit_medium.xml
 @@ -1,13 +1,12 @@
@@ -5270,7 +5270,7 @@ index 18d7699..ef32b90 100644
          tools:targetApi="28" />
  </font-family>
 diff --git a/launcher/app/src/main/res/font/outfit_regular.xml b/launcher/app/src/main/res/font/outfit_regular.xml
-index 1550b02..c7b78ea 100644
+index 1550b02e..c7b78eaf 100644
 --- a/launcher/app/src/main/res/font/outfit_regular.xml
 +++ b/launcher/app/src/main/res/font/outfit_regular.xml
 @@ -1,13 +1,12 @@
@@ -5290,7 +5290,7 @@ index 1550b02..c7b78ea 100644
          tools:targetApi="28" />
  </font-family>
 diff --git a/launcher/app/src/main/res/layout-iw/activity_main.xml b/launcher/app/src/main/res/layout-iw/activity_main.xml
-index f11791c..8774982 100644
+index f11791c6..87749826 100644
 --- a/launcher/app/src/main/res/layout-iw/activity_main.xml
 +++ b/launcher/app/src/main/res/layout-iw/activity_main.xml
 @@ -215,6 +215,22 @@
@@ -5317,32 +5317,10 @@ index f11791c..8774982 100644
  
                  <View
 diff --git a/launcher/app/src/main/res/layout/activity_main.xml b/launcher/app/src/main/res/layout/activity_main.xml
-index c5d56e7..65d80ec 100644
+index c5d56e73..f5104064 100644
 --- a/launcher/app/src/main/res/layout/activity_main.xml
 +++ b/launcher/app/src/main/res/layout/activity_main.xml
-@@ -254,6 +254,21 @@
-                             android:includeFontPadding="false"
-                             android:visibility="gone" />
- 
-+                        <!-- CleanTV/VGS: weather line ("30°C Trời quang · Vinh"), shown when config.json has weather_lat/lon. -->
-+                        <TextView
-+                            android:id="@+id/weather"
-+                            android:gravity="left"
-+                            android:layout_width="match_parent"
-+                            android:layout_height="wrap_content"
-+                            android:singleLine="true"
-+                            android:ellipsize="end"
-+                            android:textColor="#F2FFFFFF"
-+                            android:textSize="17sp"
-+                            android:fontFamily="@font/outfit_regular"
-+                            android:letterSpacing="0.01"
-+                            android:includeFontPadding="false"
-+                            android:visibility="gone" />
-+
-                         <TextClock
-                             android:id="@+id/date"
-                             android:gravity="left"
-@@ -270,6 +285,22 @@
+@@ -270,6 +270,38 @@
                              android:fontFamily="@string/font_regular"
                              android:letterSpacing="0.14"
                              android:textAllCaps="true" />
@@ -5362,10 +5340,26 @@ index c5d56e7..65d80ec 100644
 +                            android:letterSpacing="0.14"
 +                            android:textAllCaps="true"
 +                            android:visibility="gone" />
++                        <!-- CleanTV/VGS: weather line ("30°C Trời quang · Vinh") under the date and lunar lines, at the date's
++                             size so a long ward name doesn't take over the header (feedback 23/10/2026). -->
++                        <TextView
++                            android:id="@+id/weather"
++                            android:gravity="left"
++                            android:layout_width="match_parent"
++                            android:layout_height="wrap_content"
++                            android:layout_marginTop="4dp"
++                            android:singleLine="true"
++                            android:ellipsize="end"
++                            android:textColor="#B3FFFFFF"
++                            android:textSize="14sp"
++                            android:fontFamily="@font/outfit_regular"
++                            android:letterSpacing="0.04"
++                            android:includeFontPadding="false"
++                            android:visibility="gone" />
                      </LinearLayout>
                  </LinearLayout>
  
-@@ -312,6 +343,15 @@
+@@ -312,6 +344,15 @@
                      android:drawableStart="@drawable/ic_input"
                      android:nextFocusDown="@+id/grid" />
  
@@ -5381,7 +5375,7 @@ index c5d56e7..65d80ec 100644
                  <TextView
                      android:id="@+id/btnWifi"
                      style="@style/TopButton"
-@@ -329,6 +369,15 @@
+@@ -329,6 +370,15 @@
                      android:drawableStart="@drawable/ic_swap_vert"
                      android:nextFocusDown="@+id/grid" />
  
@@ -5399,7 +5393,7 @@ index c5d56e7..65d80ec 100644
                      style="@style/TopButtonIcon"
 diff --git a/launcher/app/src/main/res/values-vi/fonts.xml b/launcher/app/src/main/res/values-vi/fonts.xml
 deleted file mode 100644
-index 9e58a7d..0000000
+index 9e58a7d8..00000000
 --- a/launcher/app/src/main/res/values-vi/fonts.xml
 +++ /dev/null
 @@ -1,9 +0,0 @@
@@ -5413,7 +5407,7 @@ index 9e58a7d..0000000
 -    <string name="font_medium" translatable="false">sans-serif-medium</string>
 -</resources>
 diff --git a/launcher/app/src/main/res/values-vi/strings.xml b/launcher/app/src/main/res/values-vi/strings.xml
-index b6b7970..3eae781 100644
+index b6b79700..3eae781d 100644
 --- a/launcher/app/src/main/res/values-vi/strings.xml
 +++ b/launcher/app/src/main/res/values-vi/strings.xml
 @@ -116,4 +116,20 @@
@@ -5438,10 +5432,10 @@ index b6b7970..3eae781 100644
 +    </string-array>
  </resources>
 diff --git a/launcher/app/src/main/res/values/config.xml b/launcher/app/src/main/res/values/config.xml
-index c38384e..92957bd 100644
+index f600b7d6..9f6e58e0 100644
 --- a/launcher/app/src/main/res/values/config.xml
 +++ b/launcher/app/src/main/res/values/config.xml
-@@ -177,6 +177,8 @@
+@@ -185,6 +185,8 @@
      <!-- Show the Solar Hijri (Shamsi) date used in Iran and Afghanistan, e.g. "27 Mehr 1405", above the
           Gregorian date. -->
      <bool name="shamsi_date">false</bool>
@@ -5451,7 +5445,7 @@ index c38384e..92957bd 100644
      <!-- A name after the greeting: "Mr. Trịnh" shows GOOD MORNING, MR. TRỊNH. Empty: the greeting alone. -->
      <string name="greeting_name" translatable="false"></string>
 diff --git a/launcher/app/src/main/res/values/fonts.xml b/launcher/app/src/main/res/values/fonts.xml
-index adbb30d..91098f5 100644
+index adbb30db..91098f5c 100644
 --- a/launcher/app/src/main/res/values/fonts.xml
 +++ b/launcher/app/src/main/res/values/fonts.xml
 @@ -1,8 +1,8 @@
@@ -5466,7 +5460,7 @@ index adbb30d..91098f5 100644
      <string name="font_light" translatable="false">@font/outfit_light</string>
      <string name="font_extralight" translatable="false">@font/outfit_extralight</string>
 diff --git a/launcher/app/src/main/res/values/strings.xml b/launcher/app/src/main/res/values/strings.xml
-index aa9d3e9..0a74b8c 100644
+index aa9d3e9e..0a74b8c3 100644
 --- a/launcher/app/src/main/res/values/strings.xml
 +++ b/launcher/app/src/main/res/values/strings.xml
 @@ -23,6 +23,18 @@
@@ -5497,7 +5491,7 @@ index aa9d3e9..0a74b8c 100644
  </resources>
 diff --git a/launcher/app/src/test/java/com/gathin/tvhome/LunarTest.java b/launcher/app/src/test/java/com/gathin/tvhome/LunarTest.java
 new file mode 100644
-index 0000000..81e7ff4
+index 00000000..81e7ff45
 --- /dev/null
 +++ b/launcher/app/src/test/java/com/gathin/tvhome/LunarTest.java
 @@ -0,0 +1,41 @@

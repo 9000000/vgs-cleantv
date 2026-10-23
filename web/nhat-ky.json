@@ -1,5 +1,19 @@
 [
  {
+  "ban": "2.6",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Theo CleanYourTV mới nhất: 248 mẫu tivi của 73 hãng, theme Sweden, sửa tivi TCL tự tắt dịch vụ bắt phím sau khi khởi động lại",
+   "Dòng thời tiết chuyển xuống dưới ngày và lịch âm, chữ nhỏ bằng dòng ngày, không còn chiếm đầu màn hình — góp ý nguyenthanhsn88",
+   "An toàn hơn: chốt cuối không bao giờ tắt gói lõi của Android hay gói đang giữ nút Home (giống repo gốc); tivi lưu hai mạng Wi-Fi trùng tên thì giữ trình cài đặt Google để khỏi rớt mạng"
+  ],
+  "en": [
+   "Latest CleanYourTV: 248 TV models from 73 brands, Sweden theme, TCL key helpers survive a reboot",
+   "Weather line moved under the date and lunar date, at the date's size",
+   "Safer: a last check never disables core Android packages or the package holding Home (as the original repo does); two saved Wi-Fi networks with the same name keep the Google setup app"
+  ]
+ },
+ {
   "ban": "2.5.6",
   "ngay": "2026-10-23",
   "vi": [
