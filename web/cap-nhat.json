@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 40,
-  "versionName": "2.5.1",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.5.1.apk",
-  "co": 11534576,
-  "ghiChu": "Hỏi lại khi bạn tự tích gói mà nhiều tivi phải giữ; gửi danh sách kèm chẩn đoán Home.",
-  "ghiChuEn": "Asks again before disabling packages most TVs keep; the list you send includes Home diagnostics.",
+  "versionCode": 41,
+  "versionName": "2.5.2",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.5.2.apk",
+  "co": 11534904,
+  "ghiChu": "Ô app điện thoại (Chrome, Thư viện…) tô màu theo icon, không còn nền xám.",
+  "ghiChuEn": "Phone-app tiles (Chrome, Gallery…) take their icon's colour instead of grey.",
   "ngay": "2026-10-23"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "d78b76ee70af41c3",
+   "phienBan": "c95a2a540514c180",
    "url": "/ota/du-lieu.json",
    "co": 1367068,
-   "tuBan": 40
+   "tuBan": 41
   },
   "tvhome.apk": {
-   "phienBan": "bf674ba3c0446f2c",
+   "phienBan": "95e201fd03484ace",
    "url": "/ota/tvhome.apk",
-   "co": 596831,
-   "tuBan": 40
+   "co": 597011,
+   "tuBan": 41
   }
  }
 }

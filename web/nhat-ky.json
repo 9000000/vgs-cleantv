@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.5.2",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Home sạch: app không có ảnh dành cho tivi (Chrome, Cửa hàng Play, Thư viện, Aptoide…) có ô tô màu theo icon và icon to hơn, không còn ô xám trống — góp ý của toan.arc90; tắt được ở thẻ Tuỳ chỉnh"
+  ],
+  "en": [
+   "Clean Home: apps with no TV banner (Chrome, Play Store, Gallery…) get a tile in their icon's colour with a bigger icon; switch off under Options"
+  ]
+ },
+ {
   "ban": "2.5.1",
   "ngay": "2026-10-23",
   "vi": [

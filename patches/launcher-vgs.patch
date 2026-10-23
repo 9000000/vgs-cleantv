@@ -122,6 +122,48 @@ index 4cee7a6..335d9e1 100644
          <!-- The standard settings handlers, so package visibility doesn't hide them and send the pills to a vendor fallback by mistake. -->
          <intent>
              <action android:name="android.settings.SETTINGS" />
+diff --git a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
+index ea00306..2914407 100644
+--- a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
++++ b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
+@@ -449,6 +449,13 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+             h.icon.setVisibility(View.VISIBLE);
+             h.label.setText(e.label);
+             h.label.setVisibility(View.VISIBLE);
++            // CleanTV/VGS: icon_tile_color (default on) — a phone app with no TV banner gets a tile filled with its
++            // icon's own colour and a bigger icon, instead of a small icon on the grey card.
++            float dp = ctx.getResources().getDisplayMetrics().density;
++            ViewGroup.LayoutParams lp = h.icon.getLayoutParams();
++            int size = Math.round((iconTileColor() ? 60 : 48) * dp);
++            if (lp.width != size) { lp.width = size; lp.height = size; h.icon.setLayoutParams(lp); }
++            if (iconTileColor()) h.card.setBackground(new android.graphics.drawable.ColorDrawable(tileColor(ambientColorAt(position))));
+         }
+         h.card.setOnClickListener(v -> launch(e));
+         h.card.setOnLongClickListener(v -> {
+@@ -623,6 +630,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+         return e.ambient;
+     }
+ 
++    private Boolean iconTileColor;
++
++    /** CleanTV/VGS: config.json icon_tile_color, read once per adapter. */
++    private boolean iconTileColor() {
++        if (iconTileColor == null) iconTileColor = Weather.flag(ctx, "icon_tile_color", true);
++        return iconTileColor;
++    }
++
++    /** The icon's colour, deepened so the white label stays readable on it. */
++    private static int tileColor(int c) {
++        float[] hsv = new float[3];
++        Color.colorToHSV(c, hsv);
++        hsv[1] = Math.min(1f, hsv[1] * 0.9f);
++        hsv[2] = Math.min(hsv[2], 0.62f);
++        return Color.HSVToColor(hsv);
++    }
++
+     private static int vividColor(Drawable live) {
+         if (live == null) return 0xFF444444;
+         // Draw a private copy: changing the bounds of the drawable an ImageView shows would blank the tile.
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Config.java b/launcher/app/src/main/java/com/gathin/tvhome/Config.java
 index 7fbc06a..69dee21 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/Config.java

@@ -110,6 +110,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var tenDuoiApp by mutableStateOf(false)
     /** Tên app to phía trên dock (dock_title, launcher mặc định bật); góp ý 22/10/2026 muốn tắt cho đỡ rối. */
     var tenToTrenDock by mutableStateOf(true)
+    /** Ô app điện thoại (không có ảnh tivi) tô màu theo icon (launcher icon_tile_color, 23/10/2026). */
+    var toMauOApp by mutableStateOf(true)
     var thuVienApp by mutableStateOf(false)
     var dongHoKhiYen by mutableStateOf(0)
     var tiviYeu by mutableStateOf(false)
@@ -581,6 +583,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         amLich = j.optBoolean("lunar_date", amLich)
         tenDuoiApp = j.optBoolean("always_show_names", false)
         tenToTrenDock = j.optBoolean("dock_title", true)
+        toMauOApp = j.optBoolean("icon_tile_color", true)
         thuVienApp = j.optBoolean("app_library", false)
         dongHoKhiYen = j.optInt("home_idle_clock_minutes", 0)
         tiviYeu = j.optBoolean("reduced_motion", false)
@@ -689,6 +692,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (nutInput) put("handle_view_inputs", true)
         if (tenDuoiApp) put("always_show_names", true)
         if (!tenToTrenDock) put("dock_title", false)
+        if (!toMauOApp) put("icon_tile_color", false)
         if (thuVienApp) { put("app_library", true); put("library_button", true) }
         if (dongHoKhiYen > 0) put("home_idle_clock_minutes", dongHoKhiYen)
         if (tiviYeu) put("reduced_motion", true)
