@@ -581,6 +581,17 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         daNapCu = true
         val j = runCatching { io { tv.docCauHinhTv() } }.getOrNull() ?: return
         napTuJson(j)
+        // Ảnh nền riêng đã đặt từ trước: đọc lại từ tivi để Áp dụng lần sau không thay bằng ảnh theme (23/10/2026).
+        // Nhận ra bằng cờ vgs_anh_rieng (từ 2.5.6) hoặc ảnh trên tivi không trùng ảnh của theme nào (bản cũ hơn).
+        if (anhNenRieng == null && j.optBoolean("wallpaper")) {
+            val anh = runCatching { io { tv.docAnhNenTv() } }.getOrNull()
+            if (anh != null) {
+                val laAnhTheme = !j.optBoolean("vgs_anh_rieng") && io {
+                    zone.vgs.tvsach.dulieu.THEMES.mapNotNull { it.anhNen }.any { a -> runCatching { ctx.assets.open(a).readBytes().contentEquals(anh) }.getOrDefault(false) }
+                }
+                if (!laAnhTheme) anhNenRieng = anh
+            }
+        }
     }
 
     /** Đưa một config.json (của tivi hoặc file cấu hình đã lưu) vào các lựa chọn trên màn Home sạch. */
@@ -688,7 +699,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         put("dock_apps", JSONArray(dock.toList()))
         if (tenChao.isNotBlank()) put("greeting_name", tenChao.trim())
         themeChon.ghiVao(this)
-        if (anhNenRieng != null) put("wallpaper", true)
+        if (anhNenRieng != null) { put("wallpaper", true); put("vgs_anh_rieng", true) }
         // Tivi Xiaomi bản Trung Quốc chỉ chuyển nguồn qua trình phát Xiaomi (upstream examples/xiaomi-mitv-astp0): Home sạch
         // (bản vá CleanTV) đổi tên dòng HDMI1-3 / AV ra số cổng 23-25 / 2 khi input_action là EXTSRC_PLAY (23/10/2026).
         if (trangThai?.caiDat?.contains("com.xiaomi.mitv.tvplayer") == true) put("input_action", "com.xiaomi.mitv.tvplayer.EXTSRC_PLAY")

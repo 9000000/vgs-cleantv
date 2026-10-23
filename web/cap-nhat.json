@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 44,
-  "versionName": "2.5.5",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.5.5.apk",
-  "co": 11551288,
-  "ghiChu": "Dùng ảnh riêng làm hình nền thì nền không còn bị ám màu theo app.",
-  "ghiChuEn": "With your own wallpaper, the background no longer takes the focused app's colour.",
+  "versionCode": 45,
+  "versionName": "2.5.6",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.5.6.apk",
+  "co": 11551292,
+  "ghiChu": "Mở lại Đổi giao diện không còn làm mất ảnh nền riêng.",
+  "ghiChuEn": "Reopening the theme screen no longer drops your own wallpaper.",
   "ngay": "2026-10-23"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "c95a2a540514c180",
    "url": "/ota/du-lieu.json",
    "co": 1367068,
-   "tuBan": 44
+   "tuBan": 45
   },
   "tvhome.apk": {
    "phienBan": "95e201fd03484ace",
    "url": "/ota/tvhome.apk",
    "co": 597011,
-   "tuBan": 44
+   "tuBan": 45
   }
  }
 }

@@ -476,6 +476,12 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         sh("rm -f $dir/$ten 2>/dev/null; content write --uri content://$pkgHome.theme/$ten < $tam 2>/dev/null || cp $tam $dir/$ten 2>/dev/null; rm -f $tam")
     }
 
+    /** Ảnh nền đang có trên tivi (wallpaper.jpg của Home sạch), qua base64 trong shell; null nếu không có / lỗi. */
+    fun docAnhNenTv(): ByteArray? = runCatching {
+        val b64 = sh("content read --uri content://$pkgHome.theme/wallpaper.jpg 2>/dev/null | base64 | tr -d '\\n'").trim()
+        if (b64.length < 100) null else java.util.Base64.getDecoder().decode(b64)
+    }.getOrNull()
+
     fun dayCauHinh(json: String, anhNen: ByteArray? = null, boAnh: List<Pair<String, ByteArray>>? = null) {
         val dir = "/sdcard/Android/data/$pkgHome/files"
         val uri = "content://$pkgHome.theme"
