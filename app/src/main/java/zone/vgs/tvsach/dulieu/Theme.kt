@@ -47,6 +47,35 @@ val THEMES = listOf(
 /** Thành phố cho dòng thời tiết trên Home sạch (weather_lat/lon/place của launcher). */
 data class ThanhPho(val ten: String, val lat: Double, val lon: Double)
 
+/**
+ * 3.321 phường/xã sau sáp nhập 2025 kèm toạ độ (assets/xa.json, scripts/lam-xa.py) cho thời tiết theo xã (góp ý
+ * 23/10/2026). [timXa] tìm không dấu: "ben thanh", "cua lo hoi an"…
+ */
+object XaPhuong {
+    data class Xa(val ten: String, val tinh: String, val lat: Double, val lon: Double) {
+        /** Tên ngắn hiện trên tivi: bỏ chữ "Phường"/"Xã"/"Đặc khu". */
+        val tenNgan get() = ten.removePrefix("Phường ").removePrefix("Xã ").removePrefix("Đặc khu ")
+        val khoaTim by lazy { boDau("$ten $tinh") }
+    }
+    @Volatile private var ds: List<Xa>? = null
+    fun nap(ctx: android.content.Context): List<Xa> = ds ?: runCatching {
+        val o = org.json.JSONObject(ctx.assets.open("xa.json").bufferedReader().readText())
+        val t = o.getJSONArray("tinh"); val tinh = (0 until t.length()).map { t.getJSONArray(it).getString(0) }
+        val x = o.getJSONArray("xa")
+        (0 until x.length()).map { i -> x.getJSONArray(i).let { Xa(it.getString(0), tinh[it.getInt(1)], it.getDouble(2), it.getDouble(3)) } }
+    }.getOrDefault(emptyList()).also { ds = it }
+
+    fun boDau(s: String): String = java.text.Normalizer.normalize(s.lowercase(), java.text.Normalizer.Form.NFD)
+        .replace(Regex("\\p{Mn}+"), "").replace('đ', 'd')
+
+    fun timXa(ds: List<Xa>, q: String, toiDa: Int = 8): List<Xa> {
+        val tu = boDau(q).split(' ').filter { it.isNotBlank() }
+        if (tu.isEmpty()) return emptyList()
+        return ds.filter { x -> tu.all { x.khoaTim.contains(it) } }
+            .sortedBy { x -> if (boDau(x.tenNgan).startsWith(tu.joinToString(" "))) 0 else 1 }.take(toiDa)
+    }
+}
+
 val THANH_PHO = listOf(
     ThanhPho("Hà Nội", 21.0285, 105.8542), ThanhPho("TP.HCM", 10.7769, 106.7009), ThanhPho("Đà Nẵng", 16.0544, 108.2022),
     ThanhPho("Hải Phòng", 20.8449, 106.6881), ThanhPho("Cần Thơ", 10.0452, 105.7469), ThanhPho("Vinh", 18.6796, 105.6813),

@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 29,
-  "versionName": "2.1.3",
-  "apk": "https://pub-925dff61607e4e3da7398d3413ccd1da.r2.dev/CleanTV-2.1.3.apk",
-  "co": 11390443,
-  "ghiChu": "An toàn hơn cho cổng HDMI và Cài đặt: app tự giữ lại app tivi dùng để mở HDMI và Cài đặt. Công tắc tắt tên app to phía trên dock. Lời báo Google TV chỉ rõ cách quên Wi-Fi. Âm lịch đúng ngày cả khi tivi để tiếng Anh.",
-  "ghiChuEn": "Safer for HDMI and Settings: the app keeps whatever the TV uses to open inputs and Settings. A switch for the large app name above the dock. Clearer Google TV note (forget the Wi-Fi). Lunar date right even on English-language TVs.",
-  "ngay": "2026-10-22"
+  "versionCode": 30,
+  "versionName": "2.1.4",
+  "apk": "https://pub-925dff61607e4e3da7398d3413ccd1da.r2.dev/CleanTV-2.1.4.apk",
+  "co": 11431751,
+  "ghiChu": "Thời tiết theo phường/xã: gõ tìm trong 3.321 phường/xã sau sáp nhập (không dấu cũng được). Google TV: chỉ xét mạng Wi-Fi đang dùng nên quên rồi vào lại mạng là tắt được setupwraith. Tivi đang không có Home nào cũng cài được Home sạch.",
+  "ghiChuEn": "Weather by ward/commune: search all 3,321 Vietnamese wards. Google TV: only the Wi-Fi in use is checked, so forgetting and re-joining it is enough to disable setupwraith. TVs left without any Home can now get the clean Home.",
+  "ngay": "2026-10-23"
  },
  "duLieu": {
   "du-lieu.json": {
    "phienBan": "61353b367dfc39ef",
    "url": "/ota/du-lieu.json",
    "co": 1267388,
-   "tuBan": 29
+   "tuBan": 30
   },
   "tvhome.apk": {
    "phienBan": "70f0f2ca9475aa76",
    "url": "/ota/tvhome.apk",
    "co": 591967,
-   "tuBan": 29
+   "tuBan": 30
   }
  }
 }

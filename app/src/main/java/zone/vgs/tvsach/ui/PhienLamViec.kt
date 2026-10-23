@@ -161,6 +161,11 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         (mayChieu ?: emptyList()).forEach { append(it).append('\n') }
     }
     var thanhPho by mutableStateOf<zone.vgs.tvsach.dulieu.ThanhPho?>(null)
+    /** Ô tìm phường/xã cho thời tiết (góp ý 23/10/2026). */
+    var timXa by mutableStateOf("")
+    val ketQuaXa: List<zone.vgs.tvsach.dulieu.XaPhuong.Xa>
+        get() = if (timXa.trim().length < 2) emptyList() else zone.vgs.tvsach.dulieu.XaPhuong.timXa(zone.vgs.tvsach.dulieu.XaPhuong.nap(ctx), timXa)
+    fun chonXa(x: zone.vgs.tvsach.dulieu.XaPhuong.Xa) { thanhPho = zone.vgs.tvsach.dulieu.ThanhPho(x.tenNgan, x.lat, x.lon); timXa = "" }
 
     /** Tivi đã có Home sạch: chỉ cần đẩy theme, không cài lại. */
     /** Tên gói Home sạch trên tivi đang nối (Xiaomi bản Trung Quốc: com.ts.launcher), dò lúc kết nối. */
@@ -489,7 +494,10 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         gonNut = j.optBoolean("top_compact", gonNut)
         j.optJSONArray("dock_apps")?.let { a -> val ds = (0 until a.length()).map { a.optString(it) }.filter { it.isNotBlank() }; if (ds.isNotEmpty()) { dock.clear(); dock.addAll(ds.take(DOCK_TOI_DA)) } }
         j.optString("greeting_name").takeIf { it.isNotBlank() }?.let { tenChao = it }
-        j.optString("weather_place").takeIf { it.isNotBlank() }?.let { ten -> THANH_PHO.firstOrNull { it.ten == ten }?.let { thanhPho = it } }
+        j.optString("weather_place").takeIf { it.isNotBlank() }?.let { ten ->
+            thanhPho = THANH_PHO.firstOrNull { it.ten == ten }
+                ?: zone.vgs.tvsach.dulieu.ThanhPho(ten, j.optDouble("weather_lat"), j.optDouble("weather_lon")).takeIf { !it.lat.isNaN() && !it.lon.isNaN() }
+        }
     }
 
     private fun chuanBiDock() {

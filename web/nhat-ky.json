@@ -1,5 +1,19 @@
 [
  {
+  "ban": "2.1.4",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Thời tiết theo phường/xã: ô \"Hoặc tìm phường / xã của bạn\" tìm trong 3.321 phường/xã sau sáp nhập 2025 (gõ không dấu được, vd \"ben thanh\"), tivi hiện tên phường/xã đó.",
+   "Google TV: bước kiểm Wi-Fi chỉ xét mạng đang kết nối (trước xét cả mạng cũ đã lưu, nên quên rồi vào lại mạng nhà vẫn bị chặn). Tivi chạy dây LAN thì không vướng nữa.",
+   "Tivi đang không có Home nào (Home gốc bị tắt từ trước, hiện màn dự phòng của Cài đặt): cài thẳng Home sạch thay vì báo lỗi."
+  ],
+  "en": [
+   "Weather by ward/commune: \"Or find your ward / commune\" searches all 3,321 wards after the 2025 merger (accents optional); the TV shows that name.",
+   "Google TV: the Wi-Fi check now only looks at the network in use (before, an old saved network created by setupwraith still blocked it). On Ethernet it no longer applies.",
+   "TVs left without any Home (stock Home disabled earlier, Settings' fallback screen showing): the clean Home installs instead of an error."
+  ]
+ },
+ {
   "ban": "2.1.3",
   "ngay": "2026-10-22",
   "vi": [

@@ -153,7 +153,16 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         // tivi rớt Wi-Fi, mất luôn kết nối này.
         if (SETUP in ds && !epSetupwraith) {
             bao(t("Kiểm tra ai giữ mạng Wi-Fi đã lưu…", "Checking which app owns the saved Wi-Fi…"))
-            val chu = sh("dumpsys wifi | grep -o 'cname=[^ ]*' | sort -u")
+            // Chỉ xét mạng ĐANG kết nối (23/10/2026, Sony VU3: quên + vào lại mạng nhà rồi mà vẫn bị chặn, vì tivi còn lưu
+            // mạng cũ do setupwraith tạo). Không đọc được mạng đang dùng thì quay về cách cũ: xét mọi mạng đã lưu.
+            val dump = sh("dumpsys wifi")
+            val chuDangDung = chuWifiDangDung(dump)
+            val dayLan = chuDangDung == null && sh("cat /sys/class/net/eth0/operstate 2>/dev/null").trim() == "up"
+            val chu = when {
+                dayLan -> "lan"
+                chuDangDung != null -> chuDangDung.ifBlank { Regex("cname=[^ ]*").findAll(dump).joinToString(" ") { it.value } }
+                else -> Regex("cname=[^ ]*").findAll(dump).joinToString(" ") { it.value }
+            }
             val lyDo = when {
                 chu.isBlank() -> t("Không đọc được mạng Wi-Fi đã lưu thuộc app nào, giữ lại cho chắc.", "Could not tell which app owns the saved Wi-Fi, keeping it to be safe.")
                 chu.contains("setupwraith") -> t("Wi-Fi đang lưu thuộc về nó: tắt là tivi rớt mạng. Vào Cài đặt > Mạng, ", "It owns the saved Wi-Fi: disabling it drops the TV off the network. In Settings > Network, ") +
@@ -281,6 +290,9 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         val home = homeHienTai().substringBefore('/')
         val homeGoc = when {
             home == pkgHome || home in HOME_SACH -> "none"
+            // Tivi đang không có Home nào (Home gốc bị tắt từ trước, Android rơi về FallbackHome của Cài đặt — 23/10/2026,
+            // Xiaomi MiTV-AXSP0): không có gì để tắt, cài Home sạch thẳng.
+            home == "com.android.tv.settings" || home == "com.android.settings" -> "none"
             home in HOME_GOC_BIET -> home
             home == "android" -> {
                 val ung = sh("cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME")
@@ -723,6 +735,19 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
     class TiviKhoiDongLaiException(val goi: String, val daTat: Int) : Exception("khoi-dong-lai")
 
     companion object {
+        /**
+         * App tạo ra mạng Wi-Fi ĐANG kết nối (cname trong khối cấu hình của SSID đó ở `dumpsys wifi`). null = không đang
+         * dùng Wi-Fi hoặc không đọc được SSID; "" = thấy SSID nhưng không thấy khối cấu hình của nó.
+         */
+        fun chuWifiDangDung(dump: String): String? {
+            val ssid = Regex("""mWifiInfo SSID: "([^"]*)"""").find(dump)?.groupValues?.get(1) ?: return null
+            val dau = dump.indexOf("Configured networks Begin"); val cuoi = dump.indexOf("Configured networks End")
+            if (dau < 0 || cuoi < dau) return ""
+            val khoi = dump.substring(dau, cuoi).split(Regex("""\n(?=\s*ID: \d+ )"""))
+            val cua = khoi.firstOrNull { it.contains("SSID: \"$ssid\"") } ?: return ""
+            return Regex("""cname=([^ \n]+)""").find(cua)?.groupValues?.get(1) ?: ""
+        }
+
         /** Lỗi kiểu kết nối ADB đã đứt (libadb: "connect() must be called first", luồng đóng, mạng reset). */
         fun laMatKetNoi(e: Throwable): Boolean {
             val m = listOfNotNull(e.message, e.cause?.message).joinToString(" ")
