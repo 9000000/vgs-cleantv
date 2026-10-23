@@ -593,9 +593,13 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             if (!ganChuyenHomeCu(pkg)) return null
             Thread.sleep(1500)
             sh("cmd package set-home-activity --user 0 $cmpHome")
-            // Hai lần: bộ đếm 2.6.2 (23/10/2026) có ~20 máy lần đầu báo hỏng, thử lại vài phút sau thì chạy —
-            // HomeKeyService vừa bật chưa kịp bind/đọc cấu hình sau 3 giây.
+            // Home cũ đang nằm sẵn trên màn (nhánh setupwraith không tắt gì) thì bấm Home không đổi cửa sổ, HomeKeyService
+            // không có sự kiện để bắt (2.6.2–2.6.3 vì thế báo hỏng trên mọi Google TV; chẩn đoán 23/10/2026 cho thấy
+            // focus đúng là HomeActivity của launcherx). Mở Cài đặt trước rồi mới bấm Home. Hai lần: dịch vụ vừa bật có thể
+            // chưa kịp bind.
             repeat(2) { lan ->
+                sh("am start -a android.settings.SETTINGS >/dev/null 2>&1")
+                Thread.sleep(1500)
                 sh("input keyevent KEYCODE_HOME")
                 Thread.sleep(3000)
                 if (goiDangHien() == pkgHome) return KetQuaPhimHome(true, emptyList(), "", "chuyen", true)

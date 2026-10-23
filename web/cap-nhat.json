@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 49,
-  "versionName": "2.6.3",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.3.apk",
+  "versionCode": 50,
+  "versionName": "2.6.4",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.4.apk",
   "co": 11563924,
-  "ghiChu": "Mở đè Home sạch thử thêm một lần trước khi báo không được",
-  "ghiChuEn": "Opening the clean Home over the stock one now retries once before giving up",
+  "ghiChu": "Sửa: Google TV (TCL, Sony, Xiaomi, ZTE…) giờ mở đè Home sạch được ngay lần đầu",
+  "ghiChuEn": "Fix: on Google TV (TCL, Sony, Xiaomi, ZTE…) the clean Home now opens over Google's Home on the first try",
   "ngay": "2026-10-23"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "f572077f2d80a190",
    "url": "/ota/du-lieu.json",
    "co": 1402074,
-   "tuBan": 49
+   "tuBan": 50
   },
   "tvhome.apk": {
    "phienBan": "414be35d49d85742",
    "url": "/ota/tvhome.apk",
    "co": 598251,
-   "tuBan": 49
+   "tuBan": 50
   }
  }
 }

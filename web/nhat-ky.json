@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.6.4",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Sửa lỗi 2.6.2–2.6.3: trên Google TV, Home sạch giờ mở đè Home Google được ngay khi áp dụng (trước đó app thử lúc Home Google đang nằm sẵn trên màn nên luôn báo không được)."
+  ],
+  "en": [
+   "Fixes 2.6.2–2.6.3: on Google TV the clean Home now opens over Google's Home right when applied (before, the app tested while Google's Home was already on screen, so it always reported failure)."
+  ]
+ },
+ {
   "ban": "2.6.3",
   "ngay": "2026-10-23",
   "vi": [
