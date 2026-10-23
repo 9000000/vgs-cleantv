@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.6.3",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Google TV / tivi không cho tắt Home gốc: cho Home sạch mở đè giờ thử thêm một lần (chờ dịch vụ bắt phím khởi động), nhiều máy lần đầu báo hỏng nay chạy ngay."
+  ],
+  "en": [
+   "Google TV / TVs that won't disable the stock Home: opening the clean Home over it now retries once (waiting for the key helper to start), so sets that failed on the first try work straight away."
+  ]
+ },
+ {
   "ban": "2.6.2",
   "ngay": "2026-10-23",
   "vi": [

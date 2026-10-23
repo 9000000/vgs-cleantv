@@ -593,9 +593,14 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             if (!ganChuyenHomeCu(pkg)) return null
             Thread.sleep(1500)
             sh("cmd package set-home-activity --user 0 $cmpHome")
-            sh("input keyevent KEYCODE_HOME")
-            Thread.sleep(3000)
-            if (goiDangHien() == pkgHome) return KetQuaPhimHome(true, emptyList(), "", "chuyen", true)
+            // Hai lần: bộ đếm 2.6.2 (23/10/2026) có ~20 máy lần đầu báo hỏng, thử lại vài phút sau thì chạy —
+            // HomeKeyService vừa bật chưa kịp bind/đọc cấu hình sau 3 giây.
+            repeat(2) { lan ->
+                sh("input keyevent KEYCODE_HOME")
+                Thread.sleep(3000)
+                if (goiDangHien() == pkgHome) return KetQuaPhimHome(true, emptyList(), "", "chuyen", true)
+                if (lan == 0) { bao(t("Chờ Home sạch nhận lệnh, thử lại…", "Waiting for the clean Home to pick it up, retrying…")); Thread.sleep(3000) }
+            }
             boChuyenHomeCu()
             return null
         }
