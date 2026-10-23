@@ -1,5 +1,19 @@
 [
  {
+  "ban": "2.5.4",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Dock: mục \"Thứ tự trên dock\" có nút ↑ ↓ để đổi thứ tự app, không phải bỏ chọn rồi chọn lại — góp ý daohoangthong1",
+   "Thẻ Tuỳ chỉnh có \"File cấu hình\": Lưu ra file mọi lựa chọn (theme, dock, thời tiết, tuỳ chỉnh, Nâng cao, ảnh nền riêng) và Mở file để dùng lại hoặc mang sang tivi khác — góp ý 9000000",
+   "Cài Home sạch quá 2 phút chưa xong (hay gặp khi chạy CleanTV thẳng trên tivi) thì app dừng và chỉ cách tắt \"Xác minh ứng dụng qua USB\", không xoay mãi — góp ý khanhtoan"
+  ],
+  "en": [
+   "Dock order with ↑ ↓ buttons",
+   "Options → Settings file: save every choice to a file and open it again or on another TV",
+   "Installing the clean Home stops after 2 minutes with a hint to turn off \"Verify apps over USB\""
+  ]
+ },
+ {
   "ban": "2.5.3",
   "ngay": "2026-10-23",
   "vi": [

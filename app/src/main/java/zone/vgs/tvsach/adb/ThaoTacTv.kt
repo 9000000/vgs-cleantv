@@ -325,9 +325,13 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         if (!out.contains("Success")) {
             // Dự phòng: đẩy file rồi pm install (Android 14 đôi khi treo kiểu cài luồng).
             bao(t("Cài kiểu luồng không được, thử đẩy file…", "Streamed install failed, trying a file push…"))
-            adb.ghiFile("/data/local/tmp/tvhome.apk", apk)
-            out = sh("pm install -r /data/local/tmp/tvhome.apk; rm -f /data/local/tmp/tvhome.apk")
+            if (!out.contains("TIMEOUT")) {
+                adb.ghiFile("/data/local/tmp/tvhome.apk", apk)
+                out = voiHan(120) { sh("pm install -r /data/local/tmp/tvhome.apk; rm -f /data/local/tmp/tvhome.apk") }
+            }
         }
+        if (out.contains("TIMEOUT")) return t("Cài Home sạch quá 2 phút chưa xong: Android có thể đang hỏi xác minh ứng dụng (Play Protect) mà màn hỏi bị che. Vào Tuỳ chọn nhà phát triển, tắt \"Xác minh ứng dụng qua USB\" (hoặc tắt quét của Play Protect trong CH Play), rồi thử lại. Home gốc vẫn nguyên.",
+            "Installing the clean Home took over 2 minutes: Android may be showing an app-verification prompt (Play Protect) behind the app. In Developer options turn off \"Verify apps over USB\" (or Play Protect scanning), then retry. The stock Home is untouched.")
         if (!out.contains("Success")) {
             return if (out.contains("UPDATE_INCOMPATIBLE"))
                 t("Tivi đã có Home sạch ký bằng khoá khác (cài từ máy khác). Gỡ bản cũ trước: pm uninstall $pkgHome.", "The TV has a clean Home signed with another key (installed from another computer). Uninstall it first: pm uninstall $pkgHome.")
@@ -401,8 +405,21 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
      * Android chối cài đè → gỡ bản cũ rồi cài lại, trả Home + dịch vụ trợ năng như trước. Cấu hình nằm trong thư mục
      * của app nên mất theo, người gọi tự đẩy lại (21/10/2026, Formovie L206 nhà anh: app báo xong mà Home vẫn bản 2.2).
      */
+    /**
+     * Chạy việc cài với giới hạn thời gian (23/10/2026, hộp RockChip Android 14 chạy CleanTV trên chính nó xoay mãi ở
+     * bước cài: màn hỏi "Xác minh ứng dụng qua USB" bị che). Quá hạn thì nối lại ADB và trả "Failure TIMEOUT".
+     */
+    private fun voiHan(giay: Long, viec: () -> String): String {
+        val ex = java.util.concurrent.Executors.newSingleThreadExecutor()
+        val f = ex.submit<String> { runCatching(viec).getOrElse { "Failure ${it.message}" } }
+        return try { f.get(giay, java.util.concurrent.TimeUnit.SECONDS) }
+        catch (e: java.util.concurrent.TimeoutException) { f.cancel(true); runCatching { adb.ketNoiLai() }; "Failure TIMEOUT" }
+        finally { ex.shutdownNow() }
+    }
+
     private fun caiApkHome(apk: ByteArray, bao: (String) -> Unit = {}): String {
-        val out = runCatching { adb.caiApk(apk) }.getOrElse { "Failure ${it.message}" }
+        val out = voiHan(120) { adb.caiApk(apk) }
+        if (out.contains("TIMEOUT")) return out
         if (!out.contains("UPDATE_INCOMPATIBLE")) return out
         bao(t("Home sạch cũ ký khoá khác, gỡ rồi cài lại…", "The old clean Home has another signature, reinstalling…"))
         val troNang = sh("settings get secure enabled_accessibility_services").trim()

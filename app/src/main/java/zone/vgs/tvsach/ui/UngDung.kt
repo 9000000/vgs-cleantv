@@ -845,7 +845,20 @@ private fun TheGiaoDien(vm: PhienLamViec) {
 
 @Composable
 private fun TheHomeNoiDung(vm: PhienLamViec) {
-    The(t("Dock (tối đa $DOCK_TOI_DA, theo thứ tự chạm)", "Dock (up to $DOCK_TOI_DA, in tap order)"), Icons.Rounded.Apps) {
+    The(t("Dock (tối đa $DOCK_TOI_DA)", "Dock (up to $DOCK_TOI_DA)"), Icons.Rounded.Apps) {
+        // Thứ tự trên dock, dời bằng ↑ ↓ (góp ý daohoangthong1 23/10/2026: không biết cách đổi thứ tự).
+        if (vm.dock.isNotEmpty()) {
+            Text(t("Thứ tự trên dock", "Dock order"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+            vm.dock.toList().forEachIndexed { i, p ->
+                Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Tim.copy(alpha = 0.15f)).padding(start = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("${i + 1}", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Hong, modifier = Modifier.width(22.dp))
+                    Text(tenDep(p), fontSize = 14.sp, modifier = Modifier.weight(1f), maxLines = 1)
+                    IconButton(onClick = { vm.dichDock(p, -1) }, enabled = i > 0) { Icon(Icons.Rounded.KeyboardArrowUp, t("Lên", "Up")) }
+                    IconButton(onClick = { vm.dichDock(p, 1) }, enabled = i < vm.dock.size - 1) { Icon(Icons.Rounded.KeyboardArrowDown, t("Xuống", "Down")) }
+                }
+            }
+            Text(t("Chọn app cho dock", "Pick dock apps"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 6.dp))
+        }
         vm.appChoDock().forEach { p ->
             val viTri = vm.dock.indexOf(p)
             Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(if (viTri >= 0) Tim.copy(alpha = 0.2f) else The2)
@@ -905,6 +918,17 @@ private fun TheTuyChinh(vm: PhienLamViec) {
     The(t("Remote", "Remote"), Icons.Rounded.SettingsRemote) {
         Hang(t("Nút Input trên remote mở bảng chọn HDMI", "Remote Input button opens the input picker"), t("Nên bật cho Google TV", "Recommended on Google TV"), vm.nutInput) { vm.nutInput = it }
         Hang(t("Remote gửi phím Home lạ", "Remote sends an odd Home key"), t("Que Xiaomi, hộp nhà mạng…", "Xiaomi sticks, carrier boxes…"), vm.nutHome) { vm.nutHome = it }
+    }
+    The(t("File cấu hình", "Settings file"), Icons.Rounded.Save) {
+        Phu(t("Lưu mọi lựa chọn (theme, dock, thời tiết, tuỳ chỉnh, Nâng cao, ảnh nền riêng) ra một file để giữ lại hoặc mang sang tivi khác.",
+            "Save every choice (theme, dock, weather, options, Advanced, your wallpaper) to a file to keep or use on another TV."))
+        val luu = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/json")) { uri -> if (uri != null) vm.xuatCauHinh(uri) }
+        val mo = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) vm.nhapCauHinh(uri) }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Box(Modifier.weight(1f)) { NutPhu(t("Lưu ra file", "Save to file"), Icons.Rounded.Save) { luu.launch("cleantv-" + (vm.thongTin?.model ?: "tivi").replace(Regex("[^A-Za-z0-9]+"), "-") + ".json") } }
+            Box(Modifier.weight(1f)) { NutPhu(t("Mở file", "Open file"), Icons.Rounded.FolderOpen) { mo.launch(arrayOf("application/json", "application/octet-stream", "text/plain")) } }
+        }
+        if (vm.cauHinhBao.isNotEmpty()) Phu(vm.cauHinhBao, Xanh)
     }
     The(t("Tivi yếu & mạng", "Slow TVs & network"), Icons.Rounded.Speed) {
         Hang(t("Chế độ tivi yếu", "Slow TV mode"), t("Bớt hiệu ứng chuyển động cho tivi cũ, ít RAM", "Calmer motion for old, low-memory TVs"), vm.tiviYeu) { vm.tiviYeu = it }

@@ -580,6 +580,11 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (daNapCu) return
         daNapCu = true
         val j = runCatching { io { tv.docCauHinhTv() } }.getOrNull() ?: return
+        napTuJson(j)
+    }
+
+    /** Đưa một config.json (của tivi hoặc file cấu hình đã lưu) vào các lựa chọn trên màn Home sạch. */
+    private fun napTuJson(j: JSONObject) {
         amLich = j.optBoolean("lunar_date", amLich)
         tenDuoiApp = j.optBoolean("always_show_names", false)
         tenToTrenDock = j.optBoolean("dock_title", true)
@@ -609,6 +614,13 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     private fun chuanBiDock() {
         if (dock.isNotEmpty()) return
         dock.addAll(appChoDock().filter { it in UU_TIEN_DOCK }.take(4))
+    }
+
+    /** Dời app trong dock lên (-1) / xuống (+1). */
+    fun dichDock(p: String, buoc: Int) {
+        val i = dock.indexOf(p); val j = i + buoc
+        if (i < 0 || j !in dock.indices) return
+        dock[i] = dock[j]; dock[j] = p
     }
 
     fun doiDock(p: String) {
@@ -706,6 +718,33 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val daDat = dsNangCao.mapNotNull { tc -> nangCao[tc.khoa]?.let { chu -> zone.vgs.tvsach.dulieu.NangCao.giaTri(tc, chu)?.let { put(tc.khoa, it); tc.khoa } } }
         if (daDat.isNotEmpty()) put("vgs_nang_cao", JSONArray(daDat))
     }.toString()
+
+    // ---------- Lưu / mở file cấu hình (góp ý 9000000, 23/10/2026) ----------
+    var cauHinhBao by mutableStateOf("")
+
+    /** Ghi mọi lựa chọn Home sạch (config.json + theme, nút Home, DNS, ảnh nền riêng) ra một file JSON người dùng chọn chỗ lưu. */
+    fun xuatCauHinh(uri: android.net.Uri) = chay(t("Đang lưu file cấu hình…", "Saving the settings file…")) {
+        val j = JSONObject(cauHinhHome())
+        j.put("vgs_file", 1).put("vgs_theme", themeChon.id).put("vgs_nut_home", nutHome).put("vgs_dns", dnsChanQc)
+        thongTin?.let { j.put("vgs_tivi", it.tenHienThi) }
+        anhNenRieng?.let { j.put("vgs_anh_nen", android.util.Base64.encodeToString(it, android.util.Base64.NO_WRAP)) }
+        io { ctx.contentResolver.openOutputStream(uri, "wt")?.use { it.write(j.toString(1).toByteArray()) } ?: error("không mở được file") }
+        cauHinhBao = t("Đã lưu file cấu hình.", "Settings file saved.")
+    }
+
+    /** Mở file cấu hình đã lưu: điền lại mọi lựa chọn, bấm Áp dụng mới đưa lên tivi. */
+    fun nhapCauHinh(uri: android.net.Uri) = chay(t("Đang mở file cấu hình…", "Opening the settings file…")) {
+        val chu = io { ctx.contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) } } ?: error(t("Không đọc được file.", "Couldn't read the file."))
+        val j = runCatching { JSONObject(chu) }.getOrNull()?.takeIf { it.has("vgs_file") || it.has("dock_apps") }
+            ?: error(t("File này không phải file cấu hình CleanTV.", "This isn't a CleanTV settings file."))
+        napTuJson(j)
+        zone.vgs.tvsach.dulieu.THEMES.firstOrNull { it.id == j.optString("vgs_theme") }?.let { themeChon = it }
+        if (j.has("vgs_nut_home")) nutHome = j.optBoolean("vgs_nut_home")
+        if (j.has("vgs_dns")) dnsChanQc = j.optBoolean("vgs_dns")
+        anhNenRieng = j.optString("vgs_anh_nen").takeIf { it.isNotBlank() }?.let { runCatching { android.util.Base64.decode(it, android.util.Base64.NO_WRAP) }.getOrNull() }
+        cauHinhBao = t("Đã mở file cấu hình", "Settings file loaded") + (j.optString("vgs_tivi").takeIf { it.isNotBlank() }?.let { t(" (của $it)", " (from $it)") } ?: "") +
+            t(". Bấm \"Áp dụng lên tivi\" để đưa lên tivi.", ". Press \"Apply to the TV\" to send it.")
+    }
 
     private suspend fun anhNenTheme(): ByteArray? = anhNenRieng ?: themeChon.anhNen?.let { a -> io { ctx.assets.open(a).readBytes() } }
 
