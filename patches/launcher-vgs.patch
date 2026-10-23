@@ -320,7 +320,7 @@ index 0000000..4181780
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index e6d030c..d43b91a 100644
+index e6d030c..74ba80e 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -168,13 +168,25 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
@@ -482,7 +482,32 @@ index e6d030c..d43b91a 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2913,10 +2991,77 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2542,6 +2620,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+             if (v.equals("-")) return -1;
+             try { return Integer.parseInt(v); } catch (NumberFormatException e) { return null; }
+         }
++        return xiaomiSource(inputId);
++    }
++
++    /** CleanTV/VGS: Xiaomi China firmware with input_action = tvplayer's EXTSRC_PLAY and no input_sources map
++     *  (Amlogic boards such as MiTV-ASTP0 number their HW inputs differently from the MStar map): take the source
++     *  number from the input's label, HDMI1-3 = 23-25 and AV = 2 (examples/xiaomi-mitv-astp0 notes). */
++    private Integer xiaomiSource(String inputId) {
++        if (!"com.xiaomi.mitv.tvplayer.EXTSRC_PLAY".equals(inputAction)) return null;
++        try {
++            android.media.tv.TvInputInfo info = ((TvInputManager) getSystemService(TV_INPUT_SERVICE)).getTvInputInfo(inputId);
++            if (info == null) return null;
++            String label = String.valueOf(info.loadLabel(this)).toUpperCase(Locale.ROOT).replace(" ", "");
++            java.util.regex.Matcher m = java.util.regex.Pattern.compile("HDMI([1-4])").matcher(label);
++            if (m.find()) return 22 + Integer.parseInt(m.group(1));
++            if (label.contains("AV") || label.contains("CVBS")) return 2;
++        } catch (RuntimeException e) {
++            // no label: the standard way
++        }
+         return null;
+     }
+ 
+@@ -2913,10 +3009,77 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }

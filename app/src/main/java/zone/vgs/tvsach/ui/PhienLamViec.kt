@@ -537,6 +537,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val kq = io { tv.damBaoPhimHome(sl) { s -> ghiTuIo(s) } }
         veApp()
         phimHomeOk = kq.ok
+        if (kq.daBatBatPhim) { nutHome = true; ghi(t("Đã bật \"Remote gửi phím Home lạ\" vì nút Home của tivi bị app khác giành.", "Turned on \"Remote sends an odd Home key\" because another app held the Home button.")) }
         if (kq.gianh.isNotEmpty() || !kq.ok) {
             // ok: đã tắt và chạy; lui: đã tắt nhưng không được nên bật lại; loi: không tắt gì.
             val dau = if (kq.ok) "ok:" else if (kq.gianh.isNotEmpty()) "lui:" else "loi:"
@@ -566,6 +567,10 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         put("dock_apps", JSONArray(dock.toList()))
         if (tenChao.isNotBlank()) put("greeting_name", tenChao.trim())
         themeChon.ghiVao(this)
+        if (anhNenRieng != null) put("wallpaper", true)
+        // Tivi Xiaomi bản Trung Quốc chỉ chuyển nguồn qua trình phát Xiaomi (upstream examples/xiaomi-mitv-astp0): Home sạch
+        // (bản vá CleanTV) đổi tên dòng HDMI1-3 / AV ra số cổng 23-25 / 2 khi input_action là EXTSRC_PLAY (23/10/2026).
+        if (trangThai?.caiDat?.contains("com.xiaomi.mitv.tvplayer") == true) put("input_action", "com.xiaomi.mitv.tvplayer.EXTSRC_PLAY")
         put("dream_button", nutManCho)
         put("top_compact", gonNut)
         thanhPho?.let { put("weather_lat", it.lat); put("weather_lon", it.lon); put("weather_place", it.ten) }
@@ -592,10 +597,17 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (daDat.isNotEmpty()) put("vgs_nang_cao", JSONArray(daDat))
     }.toString()
 
-    private suspend fun anhNenTheme(): ByteArray? = themeChon.anhNen?.let { a -> io { ctx.assets.open(a).readBytes() } }
+    private suspend fun anhNenTheme(): ByteArray? = anhNenRieng ?: themeChon.anhNen?.let { a -> io { ctx.assets.open(a).readBytes() } }
+
+    /** Ảnh nền người dùng chọn từ điện thoại (góp ý 23/10/2026), đã thu về 1920×1080 JPEG; null = theo theme. */
+    var anhNenRieng by mutableStateOf<ByteArray?>(null)
+
+    fun chonAnhNen(uri: android.net.Uri) = chay(t("Đang chuẩn bị ảnh…", "Preparing the picture…")) {
+        anhNenRieng = io { zone.vgs.tvsach.dulieu.AnhNen.chuanBi(ctx, uri) } ?: error(t("Không đọc được ảnh này, thử ảnh khác.", "Couldn't read this picture, try another one."))
+    }
 
     /** Bộ ảnh xoay vòng của theme: mọi file ảnh trong thư mục assets boAnh. */
-    private suspend fun boAnhTheme(): List<Pair<String, ByteArray>>? = themeChon.boAnh?.let { thu ->
+    private suspend fun boAnhTheme(): List<Pair<String, ByteArray>>? = if (anhNenRieng != null) null else themeChon.boAnh?.let { thu ->
         io { (ctx.assets.list(thu) ?: emptyArray()).sorted().map { it to ctx.assets.open("$thu/$it").readBytes() } }
     }
 

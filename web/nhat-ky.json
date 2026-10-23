@@ -1,5 +1,29 @@
 [
  {
+  "ban": "2.1.6",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Sửa 2.1.5: tivi Xiaomi bản Trung Quốc giờ thật sự mở đúng cổng HDMI/AV từ Home sạch (2.1.5 chưa gửi lệnh trình phát Xiaomi lên tivi). Đã cài 2.1.5 thì cập nhật rồi Đổi giao diện → Áp dụng."
+  ],
+  "en": [
+   "Fix for 2.1.5: China-market Xiaomi TVs now really open the right HDMI/AV port from the clean Home (2.1.5 did not send Xiaomi's player action to the TV). On 2.1.5, update and Change theme → Apply."
+  ]
+ },
+ {
+  "ban": "2.1.5",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Ảnh nền riêng: ở mục Giao diện bấm \"Dùng ảnh của bạn làm hình nền\", chọn ảnh trong điện thoại, app tự cắt khung 16:9 và đưa lên tivi; bỏ ảnh riêng là về ảnh của theme.",
+   "Tivi Xiaomi bản Trung Quốc (MiTV-ASTP0…): chọn HDMI1/2/3 hay AV trên Home sạch mở đúng cổng qua trình phát của Xiaomi (trước báo \"TV này không hỗ trợ\").",
+   "Nút Home bị app khác giành mà không phải màn Home (hộp nhà mạng NES như SEI RT-G2): app tự bật \"Remote gửi phím Home lạ\" rồi thử lại."
+  ],
+  "en": [
+   "Your own wallpaper: under Theme press \"Use your own picture as wallpaper\", pick a photo on the phone; the app crops it to 16:9 and sends it to the TV. Removing it goes back to the theme's picture.",
+   "China-market Xiaomi TVs (MiTV-ASTP0…): HDMI1/2/3 and AV rows on the clean Home now switch through Xiaomi's player (before: \"This TV doesn't support it\").",
+   "Home button taken by an app that is not a home screen (NES operator boxes such as SEI RT-G2): the app turns on the Home-key helper and tries again."
+  ]
+ },
+ {
   "ban": "2.1.4",
   "ngay": "2026-10-23",
   "vi": [

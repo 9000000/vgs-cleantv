@@ -475,7 +475,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
      * hộp chọn. App bên thứ ba (launcher người dùng tự cài) thì để nguyên.
      */
     /** Kết quả thử nút Home thật: [gianh] = các gói đã tắt vì giành nút Home, [conLai] = gói vẫn giành (không dám tắt). */
-    data class KetQuaPhimHome(val ok: Boolean, val gianh: List<String>, val conLai: String, val lyDo: String = "")
+    data class KetQuaPhimHome(val ok: Boolean, val gianh: List<String>, val conLai: String, val lyDo: String = "", val daBatBatPhim: Boolean = false)
 
     /** config.json đang có trên tivi (để "Đổi giao diện" mở ra đúng lựa chọn cũ); null nếu chưa có / đọc không được. */
     fun docCauHinhTv(): org.json.JSONObject? {
@@ -498,6 +498,10 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         return ""
     }
 
+    /** Gói có màn HOME đang bật. */
+    private fun coManHome(pkg: String): Boolean =
+        sh("cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME").lines().any { it.trim().startsWith("$pkg/") }
+
     private fun dangBat(pkg: String) = sh("pm list packages -e $pkg").lines().any { it.trim() == "package:$pkg" }
 
     /**
@@ -511,6 +515,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
      */
     fun damBaoPhimHome(sl: BanSaoLuu?, bao: (String) -> Unit = {}): KetQuaPhimHome {
         val gianh = mutableListOf<String>()
+        var daBatBatPhim = false
         var lyDo = ""
         fun tra(pkg: String): KetQuaPhimHome {
             if (gianh.isNotEmpty()) {
@@ -535,7 +540,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             val pkg = goiDangHien()
             // ganChuyenHomeCu (stock_home_redirect) CHƯA bật: thử trên máy ảo Android TV 14 ngày 22/10/2026 chưa thấy chuyển
             // về được — upstream mới thử trên XGIMI thật. Chưa thử chạy được thì không đưa ra cho người dùng.
-            if (pkg == pkgHome) return KetQuaPhimHome(true, gianh, "", "")
+            if (pkg == pkgHome) return KetQuaPhimHome(true, gianh, "", "", daBatBatPhim)
             // Không đọc được màn nào đang hiện mà Google TV còn bật setupwraith: gần như chắc là ca setupwraith giữ Home,
             // báo đúng cách sửa (quên Wi-Fi…) thay vì "không rõ" (Sony 65S30, 22/10/2026).
             if (pkg.isBlank() && dangBat(SETUP)) {
@@ -545,6 +550,21 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             if (KeHoach.laHomeCvte(pkg)) {
                 lyDo = "cvte"
                 return tra(pkg)
+            }
+            // Nút Home mở một app KHÔNG có màn Home (hộp nhà mạng NES: com.nes.recents — 23/10/2026, SEI RT-G2): phần mềm
+            // hãng tự đổi nút Home. Bật dịch vụ bắt phím Home của Home sạch rồi bấm thử lại, không tắt gì. Bo CVTE: không
+            // bật dịch vụ bắt phím cùng lượt (upstream #741).
+            if (!daBatBatPhim && pkg.isNotBlank() && pkg != SETUP && pkg !in KHONG_PHAI_HOME && !coManHome(pkg) && !laBoMachCvte()) {
+                // Tivi chậm có thể còn hiện app cũ ngay sau khi bấm Home: chờ thêm rồi đọc lại, chỉ bật khi vẫn đúng app đó.
+                Thread.sleep(2000)
+                val lai = goiDangHien()
+                if (lai == pkgHome) return KetQuaPhimHome(true, gianh, "", "")
+                if (lai != pkg) return@repeat
+                bao(t("Nút Home đang mở '$pkg' (không phải màn Home): bật bắt phím Home của Home sạch rồi thử lại…", "The Home button opens '$pkg' (not a home screen): turning on the clean Home's Home-key helper and trying again…"))
+                batDichVu("HomeKeyService")
+                daBatBatPhim = true
+                Thread.sleep(1500)
+                return@repeat
             }
             if (lan == 3 || sl == null || pkg == SETUP || !nenTatVuiGianhHome(pkg)) return tra(pkg)
             if (pkg in HOME_GOC_BIET && dangBat(SETUP)) {

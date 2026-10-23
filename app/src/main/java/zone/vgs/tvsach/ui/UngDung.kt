@@ -693,6 +693,18 @@ private fun ManHomeSach(vm: PhienLamViec) = Cuon {
             THEMES.forEach { th -> TheTheme(th, th == vm.themeChon) { vm.themeChon = th } }
         }
         Phu(t(vm.themeChon.moTaVi, vm.themeChon.moTaEn))
+        // Ảnh của chính mình làm hình nền (góp ý 23/10/2026): thay ảnh / bộ ảnh của theme, giữ màu và hiệu ứng theme.
+        val chonAnh = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null) vm.chonAnhNen(uri)
+        }
+        if (vm.anhNenRieng == null)
+            NutPhu(t("Dùng ảnh của bạn làm hình nền", "Use your own picture as wallpaper"), Icons.Rounded.Image) {
+                chonAnh.launch(androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly))
+            }
+        else {
+            Phu(t("Đang dùng ảnh của bạn (${vm.anhNenRieng!!.size / 1024} KB), bấm Áp dụng để đưa lên tivi.", "Using your picture (${vm.anhNenRieng!!.size / 1024} KB); press Apply to send it to the TV."))
+            NutPhu(t("Bỏ ảnh riêng, dùng ảnh của theme", "Remove it, use the theme's picture"), Icons.Rounded.Close) { vm.anhNenRieng = null }
+        }
     }
     The(t("Dock (tối đa $DOCK_TOI_DA, theo thứ tự chạm)", "Dock (up to $DOCK_TOI_DA, in tap order)"), Icons.Rounded.Apps) {
         vm.appChoDock().forEach { p ->
