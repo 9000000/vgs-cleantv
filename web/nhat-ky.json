@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.5.5",
+  "ngay": "2026-10-23",
+  "vi": [
+   "Đặt ảnh của bạn làm hình nền thì app tự tắt \"ánh sáng nền theo màu app\", ảnh không còn bị ám đỏ / vàng / xanh khi đổi ô app (bật lại được trong Nâng cao) — góp ý dangngoctri2010"
+  ],
+  "en": [
+   "With your own wallpaper the focused-app glow is turned off, so the photo no longer tints red / yellow / blue (re-enable in Advanced)"
+  ]
+ },
+ {
   "ban": "2.5.4",
   "ngay": "2026-10-23",
   "vi": [

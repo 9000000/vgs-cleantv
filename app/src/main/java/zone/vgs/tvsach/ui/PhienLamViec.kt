@@ -714,6 +714,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // Giữ OK trên ô app: menu Di chuyển / Thêm vào dock / Bỏ khỏi Home / Thông tin (upstream #464, #746; tắt mặc định
         // ở upstream). CleanTV bật sẵn vì người dùng xin đổi chỗ dock ngay trên tivi (22/10/2026); Nâng cao vẫn tắt được.
         put("tile_menu", true)
+        // Ảnh riêng làm nền: tắt ánh sáng sau dock theo màu app (ambient_glow), không thì ảnh gia đình bị ám đỏ / vàng /
+        // xanh mỗi lần đổi ô (góp ý dangngoctri2010, 23/10/2026). Nâng cao ghi sau nên người dùng vẫn bật lại được.
+        if (anhNenRieng != null) put("ambient_glow", false)
         // Nâng cao ghi sau cùng: người dùng đã chủ động đặt thì đè lên giá trị theme.
         val daDat = dsNangCao.mapNotNull { tc -> nangCao[tc.khoa]?.let { chu -> zone.vgs.tvsach.dulieu.NangCao.giaTri(tc, chu)?.let { put(tc.khoa, it); tc.khoa } } }
         if (daDat.isNotEmpty()) put("vgs_nang_cao", JSONArray(daDat))

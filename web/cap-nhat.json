@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 43,
-  "versionName": "2.5.4",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.5.4.apk",
-  "co": 11551292,
-  "ghiChu": "Đổi thứ tự dock bằng nút ↑ ↓; lưu / mở file cấu hình; cài Home sạch quá 2 phút thì dừng và chỉ cách.",
-  "ghiChuEn": "Reorder the dock with ↑ ↓; save / open a settings file; installing the clean Home stops after 2 minutes with a hint.",
+  "versionCode": 44,
+  "versionName": "2.5.5",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.5.5.apk",
+  "co": 11551288,
+  "ghiChu": "Dùng ảnh riêng làm hình nền thì nền không còn bị ám màu theo app.",
+  "ghiChuEn": "With your own wallpaper, the background no longer takes the focused app's colour.",
   "ngay": "2026-10-23"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "c95a2a540514c180",
    "url": "/ota/du-lieu.json",
    "co": 1367068,
-   "tuBan": 43
+   "tuBan": 44
   },
   "tvhome.apk": {
    "phienBan": "95e201fd03484ace",
    "url": "/ota/tvhome.apk",
    "co": 597011,
-   "tuBan": 43
+   "tuBan": 44
   }
  }
 }
