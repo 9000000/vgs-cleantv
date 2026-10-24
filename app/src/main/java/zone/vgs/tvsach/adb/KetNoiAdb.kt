@@ -112,12 +112,32 @@ class KetNoiAdb private constructor(
         return docToiKhi(stream, 180) { it.contains("Success") || it.contains("Failure") || it.contains("Error") }
     }
 
-    /** Ghi một file nhỏ lên tivi qua base64 (toybox có base64 từ Android 6). */
+    /**
+     * Ghi một file lên tivi. Đường nhanh: đẩy thẳng byte vào `head -c <cỡ>` như caiApk (24/10/2026: đường base64 cũ mỗi
+     * 3000 ký tự một lệnh shell, theme 14 ảnh thành vài trăm lệnh — TCL 65Q646 chạy CleanTV trên chính tivi kẹt ở "Đang
+     * gửi 14 ảnh"). Cỡ file sai thì quay về đường base64 (toybox có base64 từ Android 6).
+     */
     fun ghiFile(duongDan: String, noiDung: ByteArray) {
+        if (runCatching { ghiNhanh(duongDan, noiDung) }.getOrDefault(false)) return
         shell("rm -f $duongDan $duongDan.b64")
         val b64 = android.util.Base64.encodeToString(noiDung, android.util.Base64.NO_WRAP)
         b64.chunked(3000).forEach { manh -> shell("printf '%s' '$manh' >> $duongDan.b64") }
         shell("base64 -d $duongDan.b64 > $duongDan; rm -f $duongDan.b64")
+    }
+
+    private fun ghiNhanh(duongDan: String, noiDung: ByteArray): Boolean {
+        val dau = "__TVS_" + java.lang.Long.toHexString(System.nanoTime()) + "__"
+        val stream = openStream("exec:sh -c 'head -c ${noiDung.size} > $duongDan; echo $dau'")
+        val o = stream.openOutputStream()
+        var i = 0
+        while (i < noiDung.size) {
+            val n = minOf(4000, noiDung.size - i)
+            o.write(noiDung, i, n)
+            i += n
+        }
+        o.flush()
+        docToiKhi(stream, 120) { it.contains(dau) }
+        return shell("wc -c < $duongDan").trim().toIntOrNull() == noiDung.size
     }
 
     companion object {

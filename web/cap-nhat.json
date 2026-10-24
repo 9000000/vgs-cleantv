@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 54,
-  "versionName": "2.6.8",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.8.apk",
+  "versionCode": 55,
+  "versionName": "2.6.9",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.9.apk",
   "co": 11560191,
-  "ghiChu": "Gỡ lỗi không dây: ghép đôi xong mà không tự thấy cổng thì app tự dò cổng của tivi",
-  "ghiChuEn": "Wireless debugging: if the port isn't announced after pairing, the app probes the TV's ports",
+  "ghiChu": "Chạy CleanTV ngay trên tivi: đổi giao diện nhanh hơn, chọn ảnh nền có trên tivi / USB",
+  "ghiChuEn": "Running CleanTV on the TV itself: faster theme changes, pick a wallpaper from the TV / USB",
   "ngay": "2026-10-24"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "f02964345248d09b",
    "url": "/ota/du-lieu.json",
    "co": 1403996,
-   "tuBan": 54
+   "tuBan": 55
   },
   "tvhome.apk": {
    "phienBan": "414be35d49d85742",
    "url": "/ota/tvhome.apk",
    "co": 598251,
-   "tuBan": 54
+   "tuBan": 55
   }
  }
 }

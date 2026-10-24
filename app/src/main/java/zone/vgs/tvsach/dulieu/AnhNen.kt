@@ -13,6 +13,19 @@ object AnhNen {
     private const val RONG = 1920
     private const val CAO = 1080
 
+    /** Như chuanBi, cho ảnh đọc thẳng thành byte (ảnh trên tivi / USB, ThaoTacTv.docFileTv). */
+    fun chuanBiByte(du: ByteArray): ByteArray? = runCatching {
+        val bien = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeByteArray(du, 0, du.size, bien)
+        val chia = maxOf(1, minOf(bien.outWidth / RONG, bien.outHeight / CAO))
+        val goc = BitmapFactory.decodeByteArray(du, 0, du.size, BitmapFactory.Options().apply { inSampleSize = chia }) ?: return null
+        val ty = maxOf(RONG.toFloat() / goc.width, CAO.toFloat() / goc.height)
+        val w = (goc.width * ty).toInt().coerceAtLeast(RONG); val h = (goc.height * ty).toInt().coerceAtLeast(CAO)
+        val phu = Bitmap.createScaledBitmap(goc, w, h, true)
+        val cat = Bitmap.createBitmap(phu, (w - RONG) / 2, (h - CAO) / 2, RONG, CAO)
+        ByteArrayOutputStream().use { o -> cat.compress(Bitmap.CompressFormat.JPEG, 85, o); o.toByteArray() }
+    }.getOrNull()
+
     fun chuanBi(ctx: Context, uri: Uri): ByteArray? = runCatching {
         val goc: Bitmap = if (Build.VERSION.SDK_INT >= 28) {
             ImageDecoder.decodeBitmap(ImageDecoder.createSource(ctx.contentResolver, uri)) { dec, info, _ ->

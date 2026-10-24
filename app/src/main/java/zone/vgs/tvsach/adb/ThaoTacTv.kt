@@ -444,6 +444,11 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
 
     /** Cài đè Home sạch bản đi kèm app; bật lại dịch vụ trợ năng mà Android tắt khi cài lại. */
     fun capNhatLauncher(apk: ByteArray): Boolean {
+        // Trên tivi đã đúng bản đi kèm thì thôi (24/10/2026): cài lại Home đang chạy làm Home bật lên trước, đẩy CleanTV
+        // xuống nền — chạy CleanTV ngay trên TCL 65Q646 kẹt ở "Đang cập nhật Home sạch…" mỗi lần Áp dụng.
+        val bam = java.security.MessageDigest.getInstance("SHA-256").digest(apk).joinToString("") { "%02x".format(it) }
+        val coSan = runCatching { sh("sha256sum \$(pm path $pkgHome | head -n 1 | sed 's/^package://') 2>/dev/null").trim().substringBefore(' ') }.getOrDefault("")
+        if (coSan == bam) return true
         val truoc = sh("settings get secure enabled_accessibility_services").trim()
         val out = caiApkHome(apk)
         if (truoc.contains(pkgHome)) {
@@ -484,6 +489,24 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         if (ten.contains('/')) sh("mkdir -p $dir/${ten.substringBeforeLast('/')} 2>/dev/null; true")
         sh("rm -f $dir/$ten 2>/dev/null; content write --uri content://$pkgHome.theme/$ten < $tam 2>/dev/null || cp $tam $dir/$ten 2>/dev/null; rm -f $tam")
     }
+
+    /**
+     * Ảnh có sẵn trên tivi / USB cắm vào tivi (24/10/2026): tivi không có trình chọn ảnh ("không có ứng dụng phù hợp"),
+     * người dùng iPhone chạy CleanTV ngay trên tivi chỉ chọn ảnh được kiểu này. Tối đa 200 file.
+     */
+    fun timAnhTrenTv(): List<String> = sh(
+        "for d in /sdcard/Download /sdcard/Pictures /sdcard/DCIM /sdcard/Movies /storage/*-*; do [ -d \"\$d\" ] && find \"\$d\" -maxdepth 4 -type f " +
+            "\\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' -o -iname '*.heic' \\) 2>/dev/null; done | head -n 200"
+    ).lines().map { it.trim() }.filter { it.startsWith("/") && !it.contains('\'') }
+
+    /** Đọc một file trên tivi (qua base64); quá 25 MB hoặc lỗi thì null. */
+    fun docFileTv(duongDan: String): ByteArray? = runCatching {
+        if (duongDan.contains('\'')) return null
+        val co = sh("wc -c < '$duongDan'").trim().toLongOrNull() ?: return null
+        if (co <= 0 || co > 25_000_000) return null
+        val b64 = sh("base64 '$duongDan' | tr -d '\\n'").trim()
+        java.util.Base64.getDecoder().decode(b64)
+    }.getOrNull()
 
     /** Ảnh nền đang có trên tivi (wallpaper.jpg của Home sạch), qua base64 trong shell; null nếu không có / lỗi. */
     fun docAnhNenTv(): ByteArray? = runCatching {

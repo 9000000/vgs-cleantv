@@ -874,6 +874,19 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     /** Ảnh nền người dùng chọn từ điện thoại (góp ý 23/10/2026), đã thu về 1920×1080 JPEG; null = theo theme. */
     var anhNenRieng by mutableStateOf<ByteArray?>(null)
 
+    /** Danh sách ảnh trên tivi / USB (null = chưa mở hộp chọn). */
+    var anhTrenTv by mutableStateOf<List<String>?>(null)
+
+    fun moAnhTrenTv() = chay(t("Đang tìm ảnh trên tivi…", "Looking for pictures on the TV…")) {
+        anhTrenTv = io { tv.timAnhTrenTv() }
+    }
+
+    fun chonAnhTrenTv(duongDan: String) = chay(t("Đang đọc ảnh từ tivi…", "Reading the picture from the TV…")) {
+        anhTrenTv = null
+        val du = io { tv.docFileTv(duongDan) } ?: error(t("Không đọc được ảnh này (quá lớn hoặc hỏng), thử ảnh khác.", "Couldn't read this picture (too big or broken), try another one."))
+        anhNenRieng = io { zone.vgs.tvsach.dulieu.AnhNen.chuanBiByte(du) } ?: error(t("Không mở được ảnh này (HEIC thì đổi sang JPG), thử ảnh khác.", "Couldn't open this picture (convert HEIC to JPG), try another one."))
+    }
+
     fun chonAnhNen(uri: android.net.Uri) = chay(t("Đang chuẩn bị ảnh…", "Preparing the picture…")) {
         anhNenRieng = io { zone.vgs.tvsach.dulieu.AnhNen.chuanBi(ctx, uri) } ?: error(t("Không đọc được ảnh này, thử ảnh khác.", "Couldn't read this picture, try another one."))
     }

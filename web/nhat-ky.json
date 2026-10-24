@@ -1,5 +1,17 @@
 [
  {
+  "ban": "2.6.9",
+  "ngay": "2026-10-24",
+  "vi": [
+   "Chạy CleanTV ngay trên tivi (TCL…): Áp dụng không cài lại Home sạch khi đã đúng bản, gửi ảnh nhanh hơn, nên giao diện / lịch âm / thời tiết lên được.",
+   "Nút \"Chọn ảnh có trên tivi / USB\": tivi không có trình chọn ảnh vẫn đặt được ảnh nền riêng (chép ảnh JPG vào USB rồi cắm vào tivi)."
+  ],
+  "en": [
+   "Running CleanTV on the TV (TCL…): Apply no longer reinstalls the clean Home when it is already current, and pictures upload faster, so themes / lunar date / weather take effect.",
+   "\"Pick a picture on the TV / USB\": set your own wallpaper even when the TV has no photo picker (copy a JPG to a USB stick)."
+  ]
+ },
+ {
   "ban": "2.6.8",
   "ngay": "2026-10-24",
   "vi": [

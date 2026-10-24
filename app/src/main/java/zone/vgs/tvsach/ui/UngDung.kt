@@ -825,10 +825,36 @@ private fun TheGiaoDien(vm: PhienLamViec) {
         val chonAnh = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) vm.chonAnhNen(uri)
         }
-        if (vm.anhNenRieng == null)
-            NutPhu(t("Dùng ảnh của bạn làm hình nền", "Use your own picture as wallpaper"), Icons.Rounded.Image) {
-                chonAnh.launch(androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly))
+        // Chạy CleanTV ngay trên tivi: thường không có trình chọn ảnh (TCL báo "không có ứng dụng phù hợp", 24/10/2026)
+        // → chọn ảnh có sẵn trên tivi / USB qua shell.
+        val trenTv = zone.vgs.tvsach.ManHinh.laTv || vm.ip.trim() == "127.0.0.1"
+        if (vm.anhNenRieng == null) {
+            if (!trenTv) NutPhu(t("Dùng ảnh của bạn làm hình nền", "Use your own picture as wallpaper"), Icons.Rounded.Image) {
+                runCatching { chonAnh.launch(androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly)) }
+                    .onFailure { vm.moAnhTrenTv() }
             }
+            NutPhu(t("Chọn ảnh có trên tivi / USB", "Pick a picture on the TV / USB"), Icons.Rounded.Image) { vm.moAnhTrenTv() }
+        }
+        vm.anhTrenTv?.let { ds ->
+            AlertDialog(
+                onDismissRequest = { vm.anhTrenTv = null }, containerColor = The1,
+                title = { Text(t("Ảnh trên tivi / USB", "Pictures on the TV / USB")) },
+                text = {
+                    Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) {
+                        if (ds.isEmpty()) Phu(t("Không thấy ảnh nào trong Download, Pictures, DCIM hay USB. Chép ảnh JPG vào USB rồi cắm vào tivi, hoặc tải ảnh về tivi.",
+                            "No pictures in Download, Pictures, DCIM or on USB. Copy a JPG to a USB stick and plug it into the TV, or download one to the TV."))
+                        ds.forEach { f ->
+                            Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).clickable { vm.chonAnhTrenTv(f) }.padding(vertical = 8.dp, horizontal = 4.dp)) {
+                                Text(f.substringAfterLast('/'), fontSize = 14.sp, maxLines = 1)
+                                Text(f.substringBeforeLast('/'), fontSize = 11.sp, color = ChuPhu, maxLines = 1)
+                            }
+                        }
+                    }
+                },
+                confirmButton = { TextButton(onClick = { vm.anhTrenTv = null }) { Text(t("Đóng", "Close")) } },
+            )
+        }
+        if (vm.anhNenRieng == null) Unit
         else NutPhu(t("Bỏ ảnh riêng (${vm.anhNenRieng!!.size / 1024} KB), dùng ảnh của theme", "Remove your picture (${vm.anhNenRieng!!.size / 1024} KB)"), Icons.Rounded.Close) { vm.anhNenRieng = null }
         Text(t("Làm tối hình nền", "Dim the wallpaper"), fontSize = 14.sp)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
