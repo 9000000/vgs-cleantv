@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 59,
-  "versionName": "2.7",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.7.apk",
-  "co": 11582987,
-  "ghiChu": "260 mẫu tivi (thêm máy chiếu HOTACK, Sharp, Sony, Magcubic…), Home sạch theo CleanYourTV mới nhất",
-  "ghiChuEn": "260 TV models (HOTACK projectors, Sharp, Sony, Magcubic…), clean Home on the latest CleanYourTV",
+  "versionCode": 60,
+  "versionName": "2.7.1",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.7.1.apk",
+  "co": 11583707,
+  "ghiChu": "Dời hàng app lên / xuống; nút Apps trên remote Sony không còn nhảy về Home",
+  "ghiChuEn": "Move the app rows up / down; Sony's Apps key no longer jumps to Home",
   "ngay": "2026-10-24"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "a6c6b72d28ade7aa",
+   "phienBan": "8065da83e338bd42",
    "url": "/ota/du-lieu.json",
    "co": 1479960,
-   "tuBan": 59
+   "tuBan": 60
   },
   "tvhome.apk": {
-   "phienBan": "41c13f7d89db9185",
+   "phienBan": "69bc4175881c4572",
    "url": "/ota/tvhome.apk",
-   "co": 599831,
-   "tuBan": 59
+   "co": 600155,
+   "tuBan": 60
   }
  }
 }

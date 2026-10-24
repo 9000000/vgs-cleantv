@@ -1,5 +1,17 @@
 [
  {
+  "ban": "2.7.1",
+  "ngay": "2026-10-24",
+  "vi": [
+   "Tuỳ chỉnh → \"Vị trí hàng app\": dời dock và các hàng app lên cao hơn hoặc thấp xuống.",
+   "Nút Apps trên remote (Sony…) không còn mở Home sạch như nút Back; que / tivi Xiaomi vẫn dùng nút đó làm Home như cũ."
+  ],
+  "en": [
+   "Customise → \"App rows position\": move the dock and app rows higher or lower.",
+   "The remote's Apps key (Sony…) no longer opens the clean Home like Back; Xiaomi sticks / TVs keep using it as Home."
+  ]
+ },
+ {
   "ban": "2.7",
   "ngay": "2026-10-24",
   "vi": [
