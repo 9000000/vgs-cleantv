@@ -8,6 +8,8 @@ export ANDROID_HOME="${ANDROID_HOME:-/opt/homebrew/share/android-commandlinetool
 [ -d upstream ] || git clone -q https://github.com/Gathin23/cleanyourtv upstream
 # Bản sửa của CleanTV (dòng thời tiết…): áp patch nếu chưa áp.
 if git -C upstream apply --check --binary ../patches/launcher-vgs.patch 2>/dev/null; then git -C upstream apply --binary ../patches/launcher-vgs.patch; fi
+if git -C upstream apply --check --binary ../patches/launcher-media-bar.patch 2>/dev/null; then git -C upstream apply --binary ../patches/launcher-media-bar.patch; fi
+if git -C upstream apply --check --binary ../patches/launcher-defaults.patch 2>/dev/null; then git -C upstream apply --binary ../patches/launcher-defaults.patch; fi
 echo "sdk.dir=$ANDROID_HOME" > upstream/launcher/local.properties
 mkdir -p app/src/main/assets
 # Bản tên gói com.ts.launcher cho tivi Xiaomi bản Trung Quốc: hãng chỉ nhận Home có tên trong danh sách (upstream

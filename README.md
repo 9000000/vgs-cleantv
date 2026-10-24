@@ -27,8 +27,8 @@
 - **Chỉ tắt, không gỡ** quảng cáo, theo dõi, app rác. Không đụng cổng HDMI, remote, bàn phím, CH Play, gói đang giữ Wi-Fi, gói lõi Android và Home đang dùng. Google Home / cast và tìm kiếm giọng nói không bao giờ tích sẵn.
 
 **Home sạch** (launcher CleanYourTV, bản vá VGS)
-- Đồng hồ, lịch âm có can chi, thời tiết theo 3.321 phường/xã, lời chào, dock 8 app, cụm nút Máy chiếu · Mạng · Màn hình chờ · Cài đặt.
-- 10 giao diện (VGS, Cực quang, Bầu trời theo giờ, Điện ảnh, Kính mờ, Thu Phần Lan, Phong cảnh, Thụy Điển, Tối giản, Nhiều app), ảnh nền riêng từ điện thoại hoặc từ tivi / USB, 73 tuỳ chọn Nâng cao.
+- Đồng hồ, lịch âm có can chi, thời tiết theo 3.321 phường/xã, lời chào, dock 8 app, cụm nút Máy chiếu · Mạng · Màn hình chờ · Cài đặt, **thanh Mini Player điều khiển nhạc đang phát ngầm** (MediaSession: Spotify, YouTube Music, Zing MP3...).
+- 26 giao diện biến hóa layout màn Home sâu sắc (VGS, Cực quang, Bầu trời theo giờ, Điện ảnh, Kính mờ, Thu Phần Lan, Phong cảnh, Thụy Điển, Tối giản, Nhiều app, Neon Đêm, Tinh Vân, Thiền Trà, Sa Mạc, Ngọc Bích, Điện Ảnh Noir, Hoàng Hôn Pastel, Đại Dương Sâu, Retro Synthwave, Băng Giá, Điện Ảnh Top Shelf, Lưới Đa Năng 7 cột, Google TV Tinh Gọn, Bầu Trời Hoàng Kim, Trung Tâm Chỉ Huy HUD, Thung Lũng Tĩnh Tại), ảnh nền riêng từ điện thoại hoặc từ tivi / USB, 73 tuỳ chọn Nâng cao.
 - **Nút Home về đúng Home sạch**: app bấm thử nút Home thật. Tivi không cho tắt Home gốc (Google TV còn trình cài đặt, một số box nhà mạng) thì Home sạch tự mở đè lên — không phải quên Wi-Fi.
 - **Nút trên remote vẫn chạy**: YouTube, Netflix, Prime, bánh răng Cài đặt theo bảng phím của từng mẫu tivi; TCL Google TV giữ âm lượng vẫn tăng giảm liên tục.
 - Máy chiếu (Formovie, XGIMI, JMGO…): ghim màn lấy nét / chỉnh hình vào nút Máy chiếu. Xiaomi bản Trung Quốc có Home sạch riêng. Bo mạch CVTE giữ Home hãng.
@@ -73,7 +73,7 @@ Bản dựng tái tạo được: hai lần dựng sạch cùng mã nguồn ra c
 ### Cấu trúc
 | Thư mục | Nội dung |
 |---|---|
-| `app/` | App (Kotlin + Jetpack Compose). Package `zone.vgs.cleantv`, mã ở `zone.vgs.tvsach` (tên biến tiếng Việt) |
+| `app/` | App (Kotlin + Jetpack Compose). Package `zone.vgs.cleantv.manager`, mã ở `zone.vgs.tvsach` (tên biến tiếng Việt) |
 | `app/.../adb/` | Kết nối ADB (libadb-android), các thao tác trên tivi: sao lưu, tắt gói, cài Home sạch, thử nút Home, khôi phục |
 | `app/.../dulieu/` | Danh sách mẫu tivi, luật chọn gói (`KeHoach.kt`), theme, hướng dẫn |
 | `patches/launcher-vgs.patch` | Phần VGS sửa trên launcher CleanYourTV (thời tiết, font Lexend, cụm nút, máy chiếu, màn chờ…) |
@@ -99,8 +99,8 @@ Báo lỗi, xin hỗ trợ tivi mới: [vgs.zone/gop-y](https://vgs.zone/gop-y) 
 - **Disables, never uninstalls** ads, tracking and junk. Leaves HDMI inputs, the remote, keyboards, Play Store, the Wi-Fi owner, core Android packages and the Home in use alone. Google Home / casting and voice search are never pre-ticked.
 
 **Clean Home** (CleanYourTV launcher with VGS patches)
-- Clock, Vietnamese lunar date, ward-level weather, greeting, an 8-app dock, a Projector · Network · Screensaver · Settings cluster.
-- 10 themes (VGS, Aurora, Sky, Cinematic, Glass, Ruska, Scenes, Sweden, Minimal, More apps), your own wallpaper from the phone or the TV / a USB stick, 73 Advanced options.
+- Clock, Vietnamese lunar date, ward-level weather, greeting, an 8-app dock, a Projector · Network · Screensaver · Settings cluster, **Mini Player for background music playback** (MediaSession: Spotify, YouTube Music, Zing MP3...).
+- 26 themes (VGS, Aurora, Sky, Cinematic, Glass, Ruska, Scenes, Sweden, Minimal, More apps, Cyberpunk Neon, Cosmic Nebula, Zen Forest, Desert Sunset, Emerald Matrix, Monochrome Noir, Pastel Twilight, Ocean Abyss, Retro Synthwave, Nordic Winter, Cinematic Top Shelf, Ultra Dashboard 7-Col, Google TV Pure, WidgeTV Sunset Gold, KIDŌ Tactical HUD, Cosy Valley Zen), your own wallpaper from the phone or the TV / a USB stick, 73 Advanced options.
 - **Home lands on the clean Home**: the app tests the real Home key; where the stock Home can't be disabled (Google TV with its setup app, some operator boxes) the clean Home opens over it — no forgetting Wi-Fi.
 - **Remote keys keep working**: YouTube, Netflix, Prime and the Settings gear from each model's key map; holding volume still ramps on TCL Google TV.
 - Projectors get focus / keystone shortcuts; Chinese Xiaomi TVs get an allowed Home build; CVTE boards keep their stock Home.

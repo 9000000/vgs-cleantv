@@ -57,6 +57,21 @@ object NangCao {
     fun docChu(tc: TuyChon, j: JSONObject): String? {
         if (!j.has(tc.khoa)) return null
         val v = j.get(tc.khoa)
-        return if (v is JSONArray) (0 until v.length()).joinToString(", ") { v.get(it).toString() } else v.toString()
+        return chuTuGiaTri(v)
+    }
+
+    /** Chuyển giá trị bất kỳ (Boolean, Int, String, List, Array, JSONArray) thành chuỗi tương thích mục Nâng cao. */
+    fun chuTuGiaTri(v: Any?): String? {
+        if (v == null) return null
+        return when (v) {
+            is Boolean -> v.toString()
+            is Number -> v.toString()
+            is String -> v
+            is JSONArray -> (0 until v.length()).joinToString(", ") { v.get(it).toString() }
+            is Collection<*> -> v.joinToString(", ") { it.toString() }
+            is Array<*> -> v.joinToString(", ") { it.toString() }
+            else -> v.toString()
+        }
     }
 }
+

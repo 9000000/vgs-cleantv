@@ -1,0 +1,502 @@
+diff --git a/launcher/app/src/main/AndroidManifest.xml b/launcher/app/src/main/AndroidManifest.xml
+index 80124b58..8c2fa171 100644
+--- a/launcher/app/src/main/AndroidManifest.xml
++++ b/launcher/app/src/main/AndroidManifest.xml
+@@ -202,5 +202,14 @@
+                 android:name="android.accessibilityservice"
+                 android:resource="@xml/input_key_service" />
+         </service>
++        <service
++            android:name=".MediaNotificationListener"
++            android:label="@string/app_name"
++            android:exported="true"
++            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
++            <intent-filter>
++                <action android:name="android.service.notification.NotificationListenerService" />
++            </intent-filter>
++        </service>
+     </application>
+ </manifest>
+diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Config.java b/launcher/app/src/main/java/com/gathin/tvhome/Config.java
+index 6252d6d4..ecf535af 100644
+--- a/launcher/app/src/main/java/com/gathin/tvhome/Config.java
++++ b/launcher/app/src/main/java/com/gathin/tvhome/Config.java
+@@ -206,6 +206,8 @@ final class Config {
+     final boolean handleViewInputs;
+     /** Hold OK on a tile opens a menu (Move, Remove from Home, App info) instead of App info (config.xml / theme tile_menu). */
+     final boolean tileMenu;
++    /** Show active music playback controls (config.json media_bar). */
++    final boolean mediaBar;
+ 
+     private Config(List<String> dockApps, boolean fillDock, List<String> hiddenApps, List<String> libraryApps, String liveTvPackage,
+                    String liveTvAction, String liveTvInputId, Map<String, String> launchActions, Map<String, String> appLabels,
+@@ -220,7 +222,7 @@ final class Config {
+                    List<RaceWeekend.Race> raceCalendar, boolean cinematicHome, boolean ambientGlow, boolean appGlow, boolean fadeRows, int homeIdleClockMinutes,
+                    boolean keyFilter, boolean dockGlass, String glowStyle, boolean wallpaperCaptions,
+                    boolean handleViewInputs, boolean tileMenu, boolean dockEvenPadding, boolean cinematicDots, boolean cinematicWhiteFocus, boolean wifiStatusColor, int cinematicScrim, int cinematicArt,
+-                   Map<String, Set<String>> wallpaperMoods, boolean gamepadPassthrough) {
++                   Map<String, Set<String>> wallpaperMoods, boolean gamepadPassthrough, boolean mediaBar) {
+         this.handleViewInputs = handleViewInputs;
+         this.tileMenu = tileMenu;
+         this.inputKeycodes = inputKeycodes;
+@@ -302,6 +304,7 @@ final class Config {
+         this.gamepadPassthrough = gamepadPassthrough;
+         this.glowStyle = glowStyle(glowStyle);
+         this.wallpaperCaptions = wallpaperCaptions;
++        this.mediaBar = mediaBar;
+     }
+ 
+     /** A known glow_style, or radial (the default) for anything else. */
+@@ -387,6 +390,7 @@ final class Config {
+         int cinematicScrim = res.getInteger(R.integer.cinematic_scrim);
+         Map<String, Set<String>> wallpaperMoods = moods(res.getString(R.string.wallpaper_moods));
+         String glowStyle = res.getString(R.string.glow_style);
++        boolean mediaBar = true;
+         boolean applied = false;
+ 
+         File dir = dir(ctx);
+@@ -467,6 +471,7 @@ final class Config {
+             JSONObject moods = json.optJSONObject("wallpaper_moods");
+             if (moods != null) wallpaperMoods = moods(moods);
+             glowStyle = string(json, "glow_style", glowStyle);
++            mediaBar = bool(json, "media_bar", mediaBar);
+         }
+         // A theme push or reset invalidates choices made on the TV. On first use, remember the
+         // current theme without clearing choices from an older launcher version.
+@@ -520,7 +525,7 @@ final class Config {
+                 Math.max(0, Math.min(100, skyIntensity)), settingsKeycodes, settingsKeyPanel, restoreKeyServices, wallpaperEnabled, wallpaper,
+                 wallpapers, rotationMinutes, wallpaperDim, dockOpacity, wallpaperOrder, applied,
+                 festival, inputKeycodes, appKeys, stockHomeRedirect, json == null ? Collections.emptyList() : raceCalendar(json), cinematic, ambientGlow, appGlow, fadeRows,
+-                Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding, cinematicDots, cinematicWhiteFocus, wifiStatusColor, cinematicScrim, cinematicArt, wallpaperMoods, gamepadPassthrough);
++                Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding, cinematicDots, cinematicWhiteFocus, wifiStatusColor, cinematicScrim, cinematicArt, wallpaperMoods, gamepadPassthrough, mediaBar);
+     }
+ 
+     /**
+diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
+index dca4f842..bafb4558 100644
+--- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
++++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
+@@ -134,6 +134,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+     private RecyclerView grid;
+     private FrameLayout root;
+     private WallpaperPlayer wallpaperPlayer;
++    private MediaBarManager mediaBarManager;
+     private GlassView glass;
+     private View ambient;
+     private TextView heroName;
+@@ -455,6 +456,16 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+         moduleCards = cfg.moduleCards;
+         hiddenApps = new HashSet<>(cfg.hiddenApps);
+ 
++        View mediaPill = findViewById(R.id.mediaPlayerPill);
++        if (cfg.mediaBar) {
++            TextView mediaTitle = findViewById(R.id.mediaTitle);
++            ImageView mediaPlayPause = findViewById(R.id.mediaPlayPause);
++            mediaBarManager = new MediaBarManager(this, mediaPill, mediaTitle, mediaPlayPause);
++        } else {
++            mediaBarManager = null;
++            if (mediaPill != null) mediaPill.setVisibility(View.GONE);
++        }
++
+         grid = findViewById(R.id.grid);
+         rtlAppGrid = getResources().getBoolean(R.bool.rtl_app_grid);
+         // Mirror only the app grid; the header and other locales keep their own layouts.
+@@ -865,6 +876,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+                 handler.postDelayed(this::playPetalShower, 450);
+             }
+         }
++        if (mediaBarManager != null) mediaBarManager.start();
+     }
+ 
+     /** Launcher settings' change count (Config.SETTINGS_REVISION_KEY); onResume rebuilds Home when it moved. */
+@@ -1037,6 +1049,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+         if (cardPrompt != null) cardPrompt.dismiss();
+         if (appLibrary != null) appLibrary.close();
+         if (openPopup != null) openPopup.dismiss();
++        if (mediaBarManager != null) mediaBarManager.stop();
+     }
+ 
+     @Override
+diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MediaBarManager.java b/launcher/app/src/main/java/com/gathin/tvhome/MediaBarManager.java
+new file mode 100644
+index 00000000..dc521672
+--- /dev/null
++++ b/launcher/app/src/main/java/com/gathin/tvhome/MediaBarManager.java
+@@ -0,0 +1,251 @@
++package com.gathin.tvhome;
++
++import android.content.ComponentName;
++import android.content.Context;
++import android.media.MediaMetadata;
++import android.media.session.MediaController;
++import android.media.session.MediaSessionManager;
++import android.media.session.PlaybackState;
++import android.os.Handler;
++import android.os.Looper;
++import android.text.TextUtils;
++import android.util.Log;
++import android.view.View;
++import android.widget.ImageView;
++import android.widget.TextView;
++
++import java.util.List;
++
++/**
++ * Manages the "Now Playing" Mini Player bar on CleanTV Home screen.
++ * Listens to active MediaSessions from background music apps (Spotify, YouTube, etc.)
++ */
++final class MediaBarManager {
++    private static final String TAG = "TvHome.MediaBar";
++
++    private final Context context;
++    private final View mediaPill;
++    private final TextView textTitle;
++    private final ImageView iconPlayPause;
++    private final Handler mainHandler = new Handler(Looper.getMainLooper());
++
++    private MediaSessionManager sessionManager;
++    private MediaController activeController;
++    private ComponentName listenerComponent;
++
++    private final MediaController.Callback controllerCallback = new MediaController.Callback() {
++        @Override
++        public void onPlaybackStateChanged(PlaybackState state) {
++            mainHandler.post(() -> updateState(state));
++        }
++
++        @Override
++        public void onMetadataChanged(MediaMetadata metadata) {
++            mainHandler.post(() -> updateMetadata(metadata));
++        }
++
++        @Override
++        public void onSessionDestroyed() {
++            mainHandler.post(() -> {
++                activeController = null;
++                refreshSessions();
++            });
++        }
++    };
++
++    private final MediaSessionManager.OnActiveSessionsChangedListener sessionsListener =
++            controllers -> mainHandler.post(this::refreshSessions);
++
++    MediaBarManager(Context context, View mediaPill, TextView textTitle, ImageView iconPlayPause) {
++        this.context = context;
++        this.mediaPill = mediaPill;
++        this.textTitle = textTitle;
++        this.iconPlayPause = iconPlayPause;
++
++        this.listenerComponent = MediaNotificationListener.getComponentName(context);
++        this.sessionManager = (MediaSessionManager) context.getSystemService(Context.MEDIA_SESSION_SERVICE);
++
++        setupControls();
++    }
++
++    private void setupControls() {
++        if (mediaPill == null) return;
++
++        // Click to toggle Play / Pause
++        mediaPill.setOnClickListener(v -> {
++            if (activeController == null) return;
++            PlaybackState state = activeController.getPlaybackState();
++            if (state == null) return;
++            MediaController.TransportControls controls = activeController.getTransportControls();
++            if (controls == null) return;
++
++            if (state.getState() == PlaybackState.STATE_PLAYING) {
++                controls.pause();
++            } else {
++                controls.play();
++            }
++        });
++
++        // Long press to skip to next track
++        mediaPill.setOnLongClickListener(v -> {
++            if (activeController == null) return false;
++            MediaController.TransportControls controls = activeController.getTransportControls();
++            if (controls != null) {
++                controls.skipToNext();
++                return true;
++            }
++            return false;
++        });
++    }
++
++    void start() {
++        if (sessionManager == null) return;
++        try {
++            sessionManager.addOnActiveSessionsChangedListener(sessionsListener, listenerComponent);
++            refreshSessions();
++        } catch (SecurityException e) {
++            // Notification access not yet granted; try with null for system app fallback
++            try {
++                sessionManager.addOnActiveSessionsChangedListener(sessionsListener, null);
++                refreshSessions();
++            } catch (Exception ex) {
++                Log.d(TAG, "MediaSession access requires notification listener or system privileges: " + ex.getMessage());
++            }
++        } catch (Exception e) {
++            Log.w(TAG, "Failed to start MediaBarManager: " + e.getMessage());
++        }
++    }
++
++    void stop() {
++        if (sessionManager != null) {
++            try {
++                sessionManager.removeOnActiveSessionsChangedListener(sessionsListener);
++            } catch (Exception ignored) {}
++        }
++        if (activeController != null) {
++            try {
++                activeController.unregisterCallback(controllerCallback);
++            } catch (Exception ignored) {}
++            activeController = null;
++        }
++    }
++
++    void refreshSessions() {
++        if (sessionManager == null) return;
++
++        List<MediaController> controllers = null;
++        try {
++            controllers = sessionManager.getActiveSessions(listenerComponent);
++        } catch (SecurityException e) {
++            try {
++                controllers = sessionManager.getActiveSessions(null);
++            } catch (Exception ignored) {}
++        } catch (Exception e) {
++            Log.d(TAG, "Error getting active sessions: " + e.getMessage());
++        }
++
++        MediaController bestController = null;
++        if (controllers != null && !controllers.isEmpty()) {
++            // Prefer a playing controller first
++            for (MediaController c : controllers) {
++                PlaybackState s = c.getPlaybackState();
++                if (s != null && s.getState() == PlaybackState.STATE_PLAYING) {
++                    bestController = c;
++                    break;
++                }
++            }
++            if (bestController == null) {
++                // Otherwise take the first controller with valid metadata
++                for (MediaController c : controllers) {
++                    if (c.getMetadata() != null) {
++                        bestController = c;
++                        break;
++                    }
++                }
++            }
++        }
++
++        if (bestController != activeController) {
++            if (activeController != null) {
++                try {
++                    activeController.unregisterCallback(controllerCallback);
++                } catch (Exception ignored) {}
++            }
++            activeController = bestController;
++            if (activeController != null) {
++                activeController.registerCallback(controllerCallback);
++            }
++        }
++
++        if (activeController != null) {
++            updateMetadata(activeController.getMetadata());
++            updateState(activeController.getPlaybackState());
++        } else {
++            hidePill();
++        }
++    }
++
++    private void updateMetadata(MediaMetadata metadata) {
++        if (metadata == null) {
++            if (activeController == null) hidePill();
++            return;
++        }
++
++        String title = metadata.getString(MediaMetadata.METADATA_KEY_TITLE);
++        String artist = metadata.getString(MediaMetadata.METADATA_KEY_ARTIST);
++
++        if (TextUtils.isEmpty(title)) {
++            title = metadata.getString(MediaMetadata.METADATA_KEY_DISPLAY_TITLE);
++        }
++
++        if (TextUtils.isEmpty(title)) {
++            hidePill();
++            return;
++        }
++
++        StringBuilder sb = new StringBuilder(title);
++        if (!TextUtils.isEmpty(artist)) {
++            sb.append(" • ").append(artist);
++        }
++
++        if (textTitle != null) {
++            textTitle.setText(sb.toString());
++            textTitle.setSelected(true); // Enable marquee scrolling if text overflows
++        }
++
++        showPill();
++    }
++
++    private void updateState(PlaybackState state) {
++        if (state == null) return;
++
++        int playState = state.getState();
++        boolean isPlaying = (playState == PlaybackState.STATE_PLAYING || playState == PlaybackState.STATE_BUFFERING);
++
++        if (iconPlayPause != null) {
++            iconPlayPause.setImageResource(isPlaying ? R.drawable.ic_pause : R.drawable.ic_play);
++        }
++
++        if (playState == PlaybackState.STATE_STOPPED || playState == PlaybackState.STATE_NONE) {
++            hidePill();
++        } else {
++            showPill();
++        }
++    }
++
++    private void showPill() {
++        if (mediaPill != null && mediaPill.getVisibility() != View.VISIBLE) {
++            mediaPill.setVisibility(View.VISIBLE);
++            mediaPill.setAlpha(0f);
++            mediaPill.animate().alpha(1f).setDuration(250).start();
++        }
++    }
++
++    private void hidePill() {
++        if (mediaPill != null && mediaPill.getVisibility() == View.VISIBLE) {
++            mediaPill.animate().alpha(0f).setDuration(200).withEndAction(() -> {
++                mediaPill.setVisibility(View.GONE);
++            }).start();
++        }
++    }
++}
+diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MediaNotificationListener.java b/launcher/app/src/main/java/com/gathin/tvhome/MediaNotificationListener.java
+new file mode 100644
+index 00000000..4a89ca44
+--- /dev/null
++++ b/launcher/app/src/main/java/com/gathin/tvhome/MediaNotificationListener.java
+@@ -0,0 +1,14 @@
++package com.gathin.tvhome;
++
++import android.content.ComponentName;
++import android.content.Context;
++import android.service.notification.NotificationListenerService;
++
++/**
++ * Lightweight NotificationListenerService to authorize MediaSessionManager access on Android TV.
++ */
++public final class MediaNotificationListener extends NotificationListenerService {
++    public static ComponentName getComponentName(Context context) {
++        return new ComponentName(context, MediaNotificationListener.class);
++    }
++}
+diff --git a/launcher/app/src/main/res/drawable/ic_music.xml b/launcher/app/src/main/res/drawable/ic_music.xml
+new file mode 100644
+index 00000000..848b9de7
+--- /dev/null
++++ b/launcher/app/src/main/res/drawable/ic_music.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="20dp" android:height="20dp"
++    android:viewportWidth="24" android:viewportHeight="24">
++    <path android:fillColor="#FFFFFFFF"
++        android:pathData="M12,3v10.55c-0.59,-0.34 -1.27,-0.55 -2,-0.55 -2.21,0 -4,1.79 -4,4s1.79,4 4,4 4,-1.79 4,-4V7h4V3h-6z" />
++</vector>
+diff --git a/launcher/app/src/main/res/drawable/ic_pause.xml b/launcher/app/src/main/res/drawable/ic_pause.xml
+new file mode 100644
+index 00000000..badfba6f
+--- /dev/null
++++ b/launcher/app/src/main/res/drawable/ic_pause.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="18dp" android:height="18dp"
++    android:viewportWidth="24" android:viewportHeight="24">
++    <path android:fillColor="#FFFFFFFF"
++        android:pathData="M6,19h4V5H6v14zm8,-14v14h4V5h-4z" />
++</vector>
+diff --git a/launcher/app/src/main/res/drawable/ic_play.xml b/launcher/app/src/main/res/drawable/ic_play.xml
+new file mode 100644
+index 00000000..f167e7b4
+--- /dev/null
++++ b/launcher/app/src/main/res/drawable/ic_play.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="18dp" android:height="18dp"
++    android:viewportWidth="24" android:viewportHeight="24">
++    <path android:fillColor="#FFFFFFFF"
++        android:pathData="M8,5v14l11,-7z" />
++</vector>
+diff --git a/launcher/app/src/main/res/drawable/ic_skip_next.xml b/launcher/app/src/main/res/drawable/ic_skip_next.xml
+new file mode 100644
+index 00000000..524b9460
+--- /dev/null
++++ b/launcher/app/src/main/res/drawable/ic_skip_next.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="18dp" android:height="18dp"
++    android:viewportWidth="24" android:viewportHeight="24">
++    <path android:fillColor="#FFFFFFFF"
++        android:pathData="M6,18l8.5,-6L6,6v12zM16,6v12h2V6h-2z" />
++</vector>
+diff --git a/launcher/app/src/main/res/layout/activity_main.xml b/launcher/app/src/main/res/layout/activity_main.xml
+index c5d56e73..7245e36d 100644
+--- a/launcher/app/src/main/res/layout/activity_main.xml
++++ b/launcher/app/src/main/res/layout/activity_main.xml
+@@ -305,6 +305,49 @@
+                 android:clipToPadding="false"
+                 android:orientation="horizontal">
+ 
++                <!-- Music Mini Player Bar (Now Playing) -->
++                <LinearLayout
++                    android:id="@+id/mediaPlayerPill"
++                    style="@style/TopButton"
++                    android:layout_width="wrap_content"
++                    android:layout_height="wrap_content"
++                    android:layout_marginEnd="8dp"
++                    android:gravity="center_vertical"
++                    android:orientation="horizontal"
++                    android:focusable="true"
++                    android:clickable="true"
++                    android:visibility="gone"
++                    android:nextFocusDown="@+id/grid">
++
++                    <ImageView
++                        android:id="@+id/mediaIcon"
++                        android:layout_width="16dp"
++                        android:layout_height="16dp"
++                        android:src="@drawable/ic_music"
++                        android:layout_marginEnd="6dp"
++                        android:importantForAccessibility="no" />
++
++                    <TextView
++                        android:id="@+id/mediaTitle"
++                        android:layout_width="wrap_content"
++                        android:layout_height="wrap_content"
++                        android:maxWidth="200dp"
++                        android:singleLine="true"
++                        android:ellipsize="marquee"
++                        android:marqueeRepeatLimit="marquee_forever"
++                        android:textColor="#FFFFFFFF"
++                        android:textSize="13sp"
++                        android:fontFamily="@string/font_medium" />
++
++                    <ImageView
++                        android:id="@+id/mediaPlayPause"
++                        android:layout_width="15dp"
++                        android:layout_height="15dp"
++                        android:layout_marginStart="8dp"
++                        android:src="@drawable/ic_play"
++                        android:importantForAccessibility="no" />
++                </LinearLayout>
++
+                 <TextView
+                     android:id="@+id/btnInputs"
+                     style="@style/TopButton"

@@ -1,0 +1,40 @@
+diff --git a/launcher/app/src/main/res/values/config.xml b/launcher/app/src/main/res/values/config.xml
+index f600b7d6..00784905 100644
+--- a/launcher/app/src/main/res/values/config.xml
++++ b/launcher/app/src/main/res/values/config.xml
+@@ -205,7 +205,7 @@
+     <!-- The dock band as light frosted glass, like the Inputs, Wi-Fi and Settings pills, so a sky or wallpaper shows
+          through it. false (the default) keeps the solid near-black band, or the cinematic shelf's dark glass. Can
+          also be set with "dock_glass": true in a theme's config.json. -->
+-    <bool name="dock_glass">false</bool>
++    <bool name="dock_glass">true</bool>
+     <!-- The dock band's padding equals the gap between its tiles on all four sides (as far as the grid's edges leave room),
+          so its corners are concentric with the tiles' and the spacing reads even. false (the default) keeps the fixed
+          14dp above and below, up to 22dp at the sides and 26dp corners. Can also be set with "dock_even_padding": true in a theme's config.json. -->
+@@ -215,7 +215,7 @@
+     <bool name="reorder_button">false</bool>
+     <!-- Wi-Fi and Settings as round icon-only buttons (the network name moves to the talkback description);
+          Inputs keeps its label. -->
+-    <bool name="icon_only_buttons">false</bool>
++    <bool name="icon_only_buttons">true</bool>
+     <!-- The Inputs pill as a round icon button too (the label moves to the talkback description). -->
+     <bool name="icon_only_inputs">false</bool>
+     <!-- true colours the Wi-Fi pill's icon green while the TV is online and leaves it white while it is not (dark on
+@@ -326,7 +326,7 @@
+          colour; the shelf gets a larger name, a "Last opened" line (from the apps Home opened) and dock position
+          dots, the focus glow takes the app's colour and the dock band turns translucent. false keeps the plain
+          shelf. Can also be set with "cinematic_home": true in a theme's config.json. -->
+-    <bool name="cinematic_home">false</bool>
++    <bool name="cinematic_home">true</bool>
+     <!-- With cinematic_home, false leaves out the dock position dots under the app's name, for a quieter shelf. Can
+          also be set with "cinematic_dots": false in a theme's config.json. -->
+     <bool name="cinematic_dots">true</bool>
+@@ -347,7 +347,7 @@
+     <bool name="ambient_glow">true</bool>
+     <!-- The focus highlight glows in the focused app's colour on every tile, as the cinematic shelf does for the
+          dock, without cinematic_home. Can also be set with "app_glow": true in a theme's config.json. -->
+-    <bool name="app_glow">false</bool>
++    <bool name="app_glow">true</bool>
+     <!-- The rows fade out as they scroll up under the clock, instead of being cut off at a hard line (TopFade).
+          The grid then draws into a hardware layer, about 6 MB of graphics memory at 1080p, so it is off by default.
+          Can also be set with "fade_rows": true in a theme's config.json. -->

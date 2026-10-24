@@ -154,7 +154,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var thuVienApp by mutableStateOf(false)
     var dongHoKhiYen by mutableStateOf(0)
     var tiviYeu by mutableStateOf(false)
-    var hieuUngKinh by mutableStateOf(false)
+    var hieuUngKinh by mutableStateOf(true)
     var lamToiNen by mutableStateOf(0)
     var hienThongSo by mutableStateOf(false)
     /** Mục Nâng cao: danh sách tuỳ chọn + giá trị người dùng đặt (khoá → chữ; thiếu = mặc định). */
@@ -166,6 +166,101 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     /** Kết quả bấm thử nút Home lần gần nhất, gửi kèm danh sách gói để chẩn đoán. */
     var phimHomeGhi = ""
     var themeChon by mutableStateOf(zone.vgs.tvsach.dulieu.THEMES.first())
+
+    /** Tùy biến theo từng giao diện: theme.id -> map(khoa -> chu). Khi chọn giao diện nào, nạp từ đây hoặc từ theme.cauHinh. */
+    val tuyBienTheoTheme = mutableMapOf<String, MutableMap<String, String>>()
+
+    /** Đồng bộ các công tắc nhanh (switch) theo cấu hình hiện tại của theme. */
+    fun dongBoCongTacTuTheme(th: zone.vgs.tvsach.dulieu.Theme) {
+        hieuUngKinh = (nangCao["dock_glass"] ?: th.cauHinh["dock_glass"]?.toString())?.toBooleanStrictOrNull() ?: true
+        lamToiNen = (nangCao["wallpaper_dim"] ?: th.cauHinh["wallpaper_dim"]?.toString())?.toIntOrNull() ?: 0
+        hienThongSo = (nangCao["show_stats"] ?: th.cauHinh["show_stats"]?.toString())?.toBooleanStrictOrNull() ?: false
+        tiviYeu = (nangCao["reduced_motion"] ?: th.cauHinh["reduced_motion"]?.toString())?.toBooleanStrictOrNull() ?: false
+        dongHoKhiYen = (nangCao["home_idle_clock_minutes"] ?: th.cauHinh["home_idle_clock_minutes"]?.toString())?.toIntOrNull() ?: 0
+        tenDuoiApp = (nangCao["always_show_names"] ?: th.cauHinh["always_show_names"]?.toString())?.toBooleanStrictOrNull() ?: false
+        tenToTrenDock = (nangCao["dock_title"] ?: th.cauHinh["dock_title"]?.toString())?.toBooleanStrictOrNull() ?: true
+        toMauOApp = (nangCao["icon_tile_color"] ?: th.cauHinh["icon_tile_color"]?.toString())?.toBooleanStrictOrNull() ?: true
+    }
+
+    /** Lưu cấu hình đang chỉnh sửa trong nangCao vào bộ nhớ của theme hiện tại. */
+    fun luuConfigHienTaiChoTheme() {
+        tuyBienTheoTheme[themeChon.id] = nangCao.toMutableMap()
+    }
+
+    /** Nạp cấu hình cho theme: lấy từ tùy biến đã lưu hoặc nạp mặc định từ theme.cauHinh. */
+    fun napConfigChoTheme(th: zone.vgs.tvsach.dulieu.Theme) {
+        nangCao.clear()
+        val daLuu = tuyBienTheoTheme[th.id]
+        if (daLuu != null) {
+            nangCao.putAll(daLuu)
+        } else {
+            th.cauHinh.forEach { (k, v) ->
+                zone.vgs.tvsach.dulieu.NangCao.chuTuGiaTri(v)?.let { nangCao[k] = it }
+            }
+        }
+        dongBoCongTacTuTheme(th)
+    }
+
+    /** Chọn theme mới: lưu lại theme cũ và nạp cấu hình đi theo theme mới. */
+    fun chonTheme(th: zone.vgs.tvsach.dulieu.Theme) {
+        if (th.id == themeChon.id) return
+        luuConfigHienTaiChoTheme()
+        themeChon = th
+        napConfigChoTheme(th)
+    }
+
+    /** Khôi phục cấu hình mặc định ban đầu của theme đang chọn. */
+    fun khoiPhucMacDinhTheme() {
+        tuyBienTheoTheme.remove(themeChon.id)
+        nangCao.clear()
+        themeChon.cauHinh.forEach { (k, v) ->
+            zone.vgs.tvsach.dulieu.NangCao.chuTuGiaTri(v)?.let { nangCao[k] = it }
+        }
+        dongBoCongTacTuTheme(themeChon)
+        cauHinhBao = t("Đã khôi phục cài đặt mặc định của giao diện ${t(themeChon.tenVi, themeChon.tenEn)}.",
+            "Reset default settings for theme ${t(themeChon.tenVi, themeChon.tenEn)}.")
+    }
+
+    fun doiHieuUngKinh(v: Boolean) {
+        hieuUngKinh = v
+        nangCao["dock_glass"] = v.toString()
+        nangCao["app_glow"] = v.toString()
+    }
+
+    fun doiLamToiNen(v: Int) {
+        lamToiNen = v
+        if (v > 0) nangCao["wallpaper_dim"] = v.toString() else nangCao.remove("wallpaper_dim")
+    }
+
+    fun doiTiviYeu(v: Boolean) {
+        tiviYeu = v
+        nangCao["reduced_motion"] = v.toString()
+    }
+
+    fun doiHienThongSo(v: Boolean) {
+        hienThongSo = v
+        nangCao["show_stats"] = v.toString()
+    }
+
+    fun doiDongHoKhiYen(v: Int) {
+        dongHoKhiYen = v
+        if (v > 0) nangCao["home_idle_clock_minutes"] = v.toString() else nangCao.remove("home_idle_clock_minutes")
+    }
+
+    fun doiTenDuoiApp(v: Boolean) {
+        tenDuoiApp = v
+        nangCao["always_show_names"] = v.toString()
+    }
+
+    fun doiTenToTrenDock(v: Boolean) {
+        tenToTrenDock = v
+        nangCao["dock_title"] = v.toString()
+    }
+
+    fun doiToMauOApp(v: Boolean) {
+        toMauOApp = v
+        nangCao["icon_tile_color"] = v.toString()
+    }
 
     // Máy chiếu: màn của hãng dò được + những màn đã ghim vào nút "Máy chiếu" trên Home sạch (comp → nhãn).
     var laMayChieu by mutableStateOf(false)
@@ -231,6 +326,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var hoiCapNhat by mutableStateOf(false)
 
     init {
+        napConfigChoTheme(themeChon)
         viewModelScope.launch {
             val b = runCatching { io { zone.vgs.tvsach.CapNhat.kiemTra(ctx) } }.getOrNull()
             banMoi = b
@@ -649,6 +745,31 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     /** Đưa một config.json (của tivi hoặc file cấu hình đã lưu) vào các lựa chọn trên màn Home sạch. */
     private fun napTuJson(j: JSONObject) {
+        // Nạp toàn bộ tùy biến các theme nếu có trong file cấu hình chung (vgs_theme_configs)
+        val themeConfigsObj = j.optJSONObject("vgs_theme_configs")
+        if (themeConfigsObj != null) {
+            tuyBienTheoTheme.clear()
+            val keys = themeConfigsObj.keys()
+            while (keys.hasNext()) {
+                val thId = keys.next()
+                val o = themeConfigsObj.optJSONObject(thId)
+                if (o != null) {
+                    val map = mutableMapOf<String, String>()
+                    val oKeys = o.keys()
+                    while (oKeys.hasNext()) {
+                        val k = oKeys.next()
+                        map[k] = o.optString(k)
+                    }
+                    tuyBienTheoTheme[thId] = map
+                }
+            }
+        }
+
+        val themeId = j.optString("vgs_theme").takeIf { it.isNotBlank() }
+        if (themeId != null) {
+            zone.vgs.tvsach.dulieu.THEMES.firstOrNull { it.id == themeId }?.let { themeChon = it }
+        }
+
         amLich = j.optBoolean("lunar_date", amLich)
         tenDuoiApp = j.optBoolean("always_show_names", false)
         tenToTrenDock = j.optBoolean("dock_title", true)
@@ -660,11 +781,21 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         lamToiNen = j.optInt("wallpaper_dim", 0)
         hienThongSo = j.optBoolean("show_stats", false)
         if (j.has("handle_view_inputs")) nutInput = j.optBoolean("handle_view_inputs", nutInput)
-        // Chỉ nạp lại khoá NGƯỜI DÙNG đặt ở Nâng cao (ghi trong vgs_nang_cao), không lấy khoá do theme ghi
-        // (background_color, sky_intensity…) — nếu không, đổi theme sau đó sẽ bị kẹt giá trị của theme cũ.
+
+        // Nạp cấu hình Nâng cao của theme được chọn
         nangCao.clear()
-        val daDat = j.optJSONArray("vgs_nang_cao")?.let { a -> (0 until a.length()).map { a.optString(it) }.toSet() } ?: emptySet()
-        dsNangCao.filter { it.khoa in daDat }.forEach { tc -> zone.vgs.tvsach.dulieu.NangCao.docChu(tc, j)?.let { nangCao[tc.khoa] = it } }
+        if (tuyBienTheoTheme.containsKey(themeChon.id)) {
+            nangCao.putAll(tuyBienTheoTheme[themeChon.id]!!)
+        } else {
+            themeChon.cauHinh.forEach { (k, v) ->
+                zone.vgs.tvsach.dulieu.NangCao.chuTuGiaTri(v)?.let { nangCao[k] = it }
+            }
+            val daDat = j.optJSONArray("vgs_nang_cao")?.let { a -> (0 until a.length()).map { a.optString(it) }.toSet() } ?: emptySet()
+            dsNangCao.filter { it.khoa in daDat }.forEach { tc -> zone.vgs.tvsach.dulieu.NangCao.docChu(tc, j)?.let { nangCao[tc.khoa] = it } }
+            luuConfigHienTaiChoTheme()
+        }
+        dongBoCongTacTuTheme(themeChon)
+
         nutManCho = j.optBoolean("dream_button", nutManCho)
         gonNut = j.optBoolean("top_compact", gonNut)
         j.optJSONArray("dock_apps")?.let { a -> val ds = (0 until a.length()).map { a.optString(it) }.filter { it.isNotBlank() }; if (ds.isNotEmpty()) { dock.clear(); dock.addAll(ds.take(DOCK_TOI_DA)) } }
@@ -758,6 +889,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     }
 
     private fun cauHinhHome(): String = JSONObject().apply {
+        luuConfigHienTaiChoTheme()
         put("dock_apps", JSONArray(dock.toList()))
         if (tenChao.isNotBlank()) put("greeting_name", tenChao.trim())
         themeChon.ghiVao(this)
@@ -807,19 +939,42 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             }
         }
         // Nâng cao ghi sau cùng: người dùng đã chủ động đặt thì đè lên giá trị theme.
-        val daDat = dsNangCao.mapNotNull { tc -> nangCao[tc.khoa]?.let { chu -> zone.vgs.tvsach.dulieu.NangCao.giaTri(tc, chu)?.let { put(tc.khoa, it); tc.khoa } } }
+        val daDat = mutableListOf<String>()
+        nangCao.forEach { (k, chu) ->
+            val tc = dsNangCao.firstOrNull { it.khoa == k }
+            val v = if (tc != null) zone.vgs.tvsach.dulieu.NangCao.giaTri(tc, chu)
+                    else when {
+                        chu == "true" -> true
+                        chu == "false" -> false
+                        chu.toIntOrNull() != null -> chu.toInt()
+                        else -> chu
+                    }
+            if (v != null) {
+                put(k, v)
+                daDat.add(k)
+            }
+        }
         if (daDat.isNotEmpty()) put("vgs_nang_cao", JSONArray(daDat))
+        put("vgs_theme", themeChon.id)
     }.toString()
 
     // ---------- Lưu / mở file cấu hình (góp ý 9000000, 23/10/2026) ----------
     var cauHinhBao by mutableStateOf("")
 
-    /** Ghi mọi lựa chọn Home sạch (config.json + theme, nút Home, DNS, ảnh nền riêng) ra một file JSON người dùng chọn chỗ lưu. */
+    /** Ghi mọi lựa chọn Home sạch (config.json + theme, nút Home, DNS, ảnh nền riêng, tùy biến từng theme) ra một file JSON người dùng chọn chỗ lưu. */
     fun xuatCauHinh(uri: android.net.Uri) = chay(t("Đang lưu file cấu hình…", "Saving the settings file…")) {
+        luuConfigHienTaiChoTheme()
         val j = JSONObject(cauHinhHome())
         j.put("vgs_file", 1).put("vgs_theme", themeChon.id).put("vgs_nut_home", nutHome).put("vgs_dns", dnsChanQc)
         thongTin?.let { j.put("vgs_tivi", it.tenHienThi) }
         anhNenRieng?.let { j.put("vgs_anh_nen", android.util.Base64.encodeToString(it, android.util.Base64.NO_WRAP)) }
+        val themeConfigsObj = JSONObject()
+        tuyBienTheoTheme.forEach { (thId, cfgMap) ->
+            val o = JSONObject()
+            cfgMap.forEach { (k, v) -> o.put(k, v) }
+            themeConfigsObj.put(thId, o)
+        }
+        j.put("vgs_theme_configs", themeConfigsObj)
         io { ctx.contentResolver.openOutputStream(uri, "wt")?.use { it.write(j.toString(1).toByteArray()) } ?: error("không mở được file") }
         cauHinhBao = t("Đã lưu file cấu hình.", "Settings file saved.")
     }
@@ -1075,6 +1230,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         laMayChieu = false; mayChieu = null; ghimMayChieu.clear()
         nhatKy.clear(); saoLuu = null; saoLuuTuTv = false; goiTatKhongSaoLuu = null; epSetupwraith = false
         dsTatTv = null; chonBatLai.clear(); batLaiBao = ""
+        tuyBienTheoTheme.clear()
+        themeChon = zone.vgs.tvsach.dulieu.THEMES.first()
+        napConfigChoTheme(themeChon)
         taiLaiSaoLuu()
     }
 

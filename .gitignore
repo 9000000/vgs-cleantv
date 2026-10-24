@@ -19,3 +19,4 @@ launcher-ky.keystore
 .env.cloudflare
 .env*
 .agent/
+*.apk

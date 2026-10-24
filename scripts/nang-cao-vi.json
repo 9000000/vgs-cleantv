@@ -85,7 +85,7 @@
   },
   "icon_only_buttons": {
     "ten": "Nút tròn chỉ có biểu tượng",
-    "moTa": "Nút Wi-Fi và Cài đặt thành nút tròn chỉ có biểu tượng; nút Nguồn vào vẫn giữ chữ (mặc định tắt)."
+    "moTa": "Nút Wi-Fi và Cài đặt thành nút tròn chỉ có biểu tượng; nút Nguồn vào vẫn giữ chữ (mặc định bật)."
   },
   "top_menu": {
     "ten": "Gom nút trên cùng vào một bánh răng",
@@ -213,7 +213,7 @@
   },
   "cinematic_home": {
     "ten": "Home kiểu điện ảnh",
-    "moTa": "Phần trên màn hình hiện ảnh lớn của app đang chọn, tên to hơn, \"Mở lần cuối\", chấm vị trí, viền sáng theo màu app và dock trong suốt (mặc định tắt)."
+    "moTa": "Phần trên màn hình hiện ảnh lớn của app đang chọn, tên to hơn, \"Mở lần cuối\", chấm vị trí, viền sáng theo màu app và dock trong suốt (mặc định bật)."
   },
   "ambient_glow": {
     "ten": "Ánh sáng nền theo màu app",
@@ -277,11 +277,11 @@
   },
   "dock_glass": {
     "ten": "Dock kính mờ",
-    "moTa": "Dải dock dạng kính mờ mờ nhẹ như các nút trên cùng (mặc định tắt). Rất hợp khi dùng kèm ảnh nền."
+    "moTa": "Dải dock dạng kính mờ mờ nhẹ như các nút trên cùng (mặc định bật). Rất hợp khi dùng kèm ảnh nền."
   },
   "app_glow": {
     "ten": "Viền sáng theo màu app",
-    "moTa": "Viền chọn xung quanh mọi ô app phát sáng theo tông màu chính của app đó (mặc định tắt)."
+    "moTa": "Viền chọn xung quanh mọi ô app phát sáng theo tông màu chính của app đó (mặc định bật)."
   },
   "home_idle_clock_minutes": {
     "ten": "Đồng hồ khi để yên (phút)",
@@ -294,6 +294,9 @@
   "reduced_motion": {
     "ten": "Giảm hiệu ứng chuyển động",
     "moTa": "Dành cho tivi yếu: rút ngắn thời gian hiệu ứng, tắt nảy khi lướt và hiệu ứng xuất hiện (mặc định tắt)."
+  },
+  "media_bar": {
+    "ten": "Thanh phát nhạc (Mini Player)",
+    "moTa": "Hiện thanh điều khiển bài hát đang phát (Spotify, YouTube Music...) trên thanh trên cùng (mặc định bật)."
   }
 }
-
