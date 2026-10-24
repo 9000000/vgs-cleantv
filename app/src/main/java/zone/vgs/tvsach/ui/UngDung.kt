@@ -953,6 +953,12 @@ private fun TheTuyChinh(vm: PhienLamViec) {
                 ChonChip(chu, vm.coChuDau == v) { vm.coChuDau = v }
             }
         }
+        Text(t("Số app mỗi hàng", "Apps per row"), fontSize = 14.sp)
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(0 to t("Theo theme", "Theme's"), 4 to "4", 5 to "5", 6 to "6", 7 to "7").forEach { (v, chu) ->
+                ChonChip(chu, vm.soCot == v) { vm.soCot = v }
+            }
+        }
         Text(t("Vị trí hàng app", "App rows position"), fontSize = 14.sp)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(HANG_GIUA to t("Giữa màn hình", "Middle"), -120 to t("Cao hơn nhiều", "Much higher"), -60 to t("Cao hơn", "Higher"), 0 to t("Mặc định", "Default"), 60 to t("Thấp hơn", "Lower"), 300 to t("Thấp nhất", "Lowest")).forEach { (v, chu) ->

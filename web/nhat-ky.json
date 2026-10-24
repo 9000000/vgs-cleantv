@@ -1,5 +1,17 @@
 [
  {
+  "ban": "2.8.2",
+  "ngay": "2026-10-24",
+  "vi": [
+   "• Sửa lỗi kẹt \"Đang gửi ảnh nền\" khi đặt ảnh riêng trên tivi Android 8 (Sony BRAVIA 2015…)",
+   "• Tuỳ chỉnh: thêm \"Số app mỗi hàng\" 4 / 5 / 6 / 7, icon nhỏ lại cho vừa (góp ý của bạn dùng Sony)"
+  ],
+  "en": [
+   "• Fixes \"Sending wallpaper\" hanging with your own photo on Android 8 TVs (Sony BRAVIA 2015…)",
+   "• Options: new \"Apps per row\" 4 / 5 / 6 / 7"
+  ]
+ },
+ {
   "ban": "2.8.1",
   "ngay": "2026-10-24",
   "vi": [

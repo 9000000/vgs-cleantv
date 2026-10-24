@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 64,
-  "versionName": "2.8.1",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.8.1.apk",
+  "versionCode": 65,
+  "versionName": "2.8.2",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.8.2.apk",
   "co": 11638939,
-  "ghiChu": "Vị trí hàng app thêm Giữa màn hình và Thấp nhất; dòng thời tiết có biểu tượng.",
-  "ghiChuEn": "App rows position adds Middle and Lowest; the weather line gets an icon.",
+  "ghiChu": "Sửa kẹt 'Đang gửi ảnh nền' trên tivi Android 8 (Sony 2015…); thêm Số app mỗi hàng 4–7.",
+  "ghiChuEn": "Fixes the wallpaper upload hanging on Android 8 TVs (Sony 2015…); adds Apps per row 4–7.",
   "ngay": "2026-10-24"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "c2e62e1cf17032cb",
    "url": "/ota/du-lieu.json",
    "co": 1479960,
-   "tuBan": 64
+   "tuBan": 65
   },
   "tvhome.apk": {
    "phienBan": "209e50c26568df31",
    "url": "/ota/tvhome.apk",
    "co": 618725,
-   "tuBan": 64
+   "tuBan": 65
   }
  }
 }

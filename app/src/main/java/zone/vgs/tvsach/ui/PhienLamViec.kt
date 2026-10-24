@@ -135,6 +135,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var anLoiChao by mutableStateOf(false)
     /** Ô icon đều nhau kiểu Apple TV: icon trên nền màu của chính nó, không dùng ảnh banner (uniform_tiles). */
     var oDeuNhau by mutableStateOf(false)
+    /** Số app mỗi hàng (columns của launcher, 0 = theo theme), góp ý 24/10/2026: Sony chỉ có 4 app một hàng. */
+    var soCot by mutableStateOf(0)
     /**
      * Nút app / Cài đặt trên remote (24/10/2026, góp ý TCL G09): tắt Home gốc của TCL là nút YouTube, Netflix… chết vì
      * hãng chỉ gửi chúng cho launcherx. null = tự chọn: bật khi mẫu có bảng phím, trừ mẫu trong PHIM_TAT_SAN.
@@ -683,6 +685,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         motHang = j.optBoolean("single_row", false)
         anLoiChao = !j.optBoolean("show_greeting", true)
         oDeuNhau = j.optBoolean("uniform_tiles", false)
+        // Chỉ nạp số cột do người dùng chọn ở đây (vgs_so_cot), không lấy columns của theme.
+        soCot = if (j.optBoolean("vgs_so_cot", false)) j.optInt("columns", 0) else 0
         if (j.has("handle_view_inputs")) nutInput = j.optBoolean("handle_view_inputs", nutInput)
         // Chỉ nạp lại khoá NGƯỜI DÙNG đặt ở Nâng cao (ghi trong vgs_nang_cao), không lấy khoá do theme ghi
         // (background_color, sky_intensity…) — nếu không, đổi theme sau đó sẽ bị kẹt giá trị của theme cũ.
@@ -818,6 +822,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (motHang) { put("dock_row", true); put("single_row", true) }
         if (anLoiChao) put("show_greeting", false)
         if (oDeuNhau) put("uniform_tiles", true)
+        if (soCot > 0) { put("columns", soCot); put("vgs_so_cot", true) }
         // Phím APPS (KEYCODE_ALL_APPS) chỉ là nút Home với que / tivi Xiaomi hoặc khi bật "Remote gửi phím Home lạ";
         // tivi khác (Sony VH2: nút Apps mở Home sạch như Back, abc999roses 24/10/2026) để phím cho tivi.
         put("all_apps_home", nutHome || thongTin?.brand?.equals("Xiaomi", ignoreCase = true) == true)

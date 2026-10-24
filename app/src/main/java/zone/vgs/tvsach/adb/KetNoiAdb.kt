@@ -41,7 +41,7 @@ class KetNoiAdb private constructor(
 
     override fun connect(host: String, port: Int): Boolean {
         val ok = super.connect(host, port)
-        if (ok) diemCuoi = host to port
+        if (ok) { diemCuoi = host to port; coHeadC = null }
         return ok
     }
 
@@ -118,12 +118,21 @@ class KetNoiAdb private constructor(
      * gửi 14 ảnh"). Cỡ file sai thì quay về đường base64 (toybox có base64 từ Android 6).
      */
     fun ghiFile(duongDan: String, noiDung: ByteArray) {
-        if (runCatching { ghiNhanh(duongDan, noiDung) }.getOrDefault(false)) return
+        if (coHeadC() && runCatching { ghiNhanh(duongDan, noiDung) }.getOrDefault(false)) return
         shell("rm -f $duongDan $duongDan.b64")
         val b64 = android.util.Base64.encodeToString(noiDung, android.util.Base64.NO_WRAP)
         b64.chunked(3000).forEach { manh -> shell("printf '%s' '$manh' >> $duongDan.b64") }
         shell("base64 -d $duongDan.b64 > $duongDan; rm -f $duongDan.b64")
     }
+
+    /** Tivi có `head -c` không, hỏi một lần mỗi kết nối. */
+    @Volatile private var coHeadC: Boolean? = null
+
+    /**
+     * toybox của Android 8 chưa có `head -c` (24/10/2026, Sony BRAVIA 2015 Android 8 kẹt ở "Đang gửi ảnh nền"): lệnh
+     * báo lỗi ngay, phía tivi đóng luồng giữa lúc app còn đẩy byte nên kẹt. Không có thì đi thẳng đường base64.
+     */
+    private fun coHeadC(): Boolean = coHeadC ?: (runCatching { shell("echo abc | head -c 2 2>/dev/null").trim() == "ab" }.getOrDefault(false)).also { coHeadC = it }
 
     private fun ghiNhanh(duongDan: String, noiDung: ByteArray): Boolean {
         val dau = "__TVS_" + java.lang.Long.toHexString(System.nanoTime()) + "__"
