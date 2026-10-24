@@ -1,25 +1,25 @@
 {
- "app": {
-  "versionCode": 58,
-  "versionName": "2.6.12",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.12.apk",
-  "co": 11560191,
-  "ghiChu": "TCL Google TV: tắt \"Nút app trên remote\" là giữ âm lượng lặp lại được",
-  "ghiChuEn": "TCL Google TV: turning off remote app buttons restores the volume ramp",
-  "ngay": "2026-10-24"
- },
- "duLieu": {
-  "du-lieu.json": {
-   "phienBan": "f02964345248d09b",
-   "url": "/ota/du-lieu.json",
-   "co": 1403996,
-   "tuBan": 58
+  "app": {
+    "versionCode": 58,
+    "versionName": "2.6.12",
+    "apk": "https://github.com/9000000/vgs-cleantv/releases/download/v2.6.12/CleanTV-v2.6.12.apk",
+    "co": 17133884,
+    "ghiChu": "CleanTV v2.6.12",
+    "ghiChuEn": "CleanTV v2.6.12 release",
+    "ngay": "2026-10-24"
   },
-  "tvhome.apk": {
-   "phienBan": "414be35d49d85742",
-   "url": "/ota/tvhome.apk",
-   "co": 598251,
-   "tuBan": 58
+  "duLieu": {
+    "du-lieu.json": {
+      "phienBan": "f02964345248d09b",
+      "url": "/ota/du-lieu.json",
+      "co": 1403996,
+      "tuBan": 58
+    },
+    "tvhome.apk": {
+      "phienBan": "414be35d49d85742",
+      "url": "/ota/tvhome.apk",
+      "co": 598251,
+      "tuBan": 58
+    }
   }
- }
 }
