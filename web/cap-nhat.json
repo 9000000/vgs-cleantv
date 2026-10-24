@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 60,
-  "versionName": "2.7.1",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.7.1.apk",
-  "co": 11583707,
-  "ghiChu": "Dời hàng app lên / xuống; nút Apps trên remote Sony không còn nhảy về Home",
-  "ghiChuEn": "Move the app rows up / down; Sony's Apps key no longer jumps to Home",
+  "versionCode": 61,
+  "versionName": "2.7.2",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.7.2.apk",
+  "co": 11589547,
+  "ghiChu": "Nút Đang phát trên Home sạch: xem app nào đang phát nhạc / video, tạm dừng hay dừng tất cả",
+  "ghiChuEn": "Now playing on the clean Home: see which apps are playing, pause one or stop them all",
   "ngay": "2026-10-24"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "8065da83e338bd42",
+   "phienBan": "586aa51ab1041537",
    "url": "/ota/du-lieu.json",
    "co": 1479960,
-   "tuBan": 60
+   "tuBan": 61
   },
   "tvhome.apk": {
-   "phienBan": "69bc4175881c4572",
+   "phienBan": "732805754f9fa3f4",
    "url": "/ota/tvhome.apk",
-   "co": 600155,
-   "tuBan": 60
+   "co": 603103,
+   "tuBan": 61
   }
  }
 }
