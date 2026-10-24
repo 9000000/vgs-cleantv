@@ -795,7 +795,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // Input tự bật trên mọi Google TV, nên TCL Google TV mất hẳn nút YouTube (góp ý heavensky95, TCL G10, 24/10/2026).
         // Mở cùng một app hai lần chỉ là đưa nó lên trước.
         // TCL Google TV không dùng nút app remote: thôi lọc phím để giữ âm lượng lặp được (Nâng cao đặt key_filter thì đè sau).
-        if (laTclGoogleTv && !dungPhimRemote) put("key_filter", false)
+        val tclGoogleTv = thongTin?.brand?.equals("TCL", ignoreCase = true) == true && trangThai?.caiDat?.contains("com.google.android.apps.tv.launcherx") == true
+        if (tclGoogleTv && !dungPhimRemote) put("key_filter", false)
         if (dungPhimRemote) phimRemote()?.let { ph ->
             ph.keys().forEach { k -> if (!has(k)) put(k, ph.get(k)) }
             // Nút Web của remote TCL (4159, upstream tcl-g10-google-tv): mở trình duyệt nếu tivi có.

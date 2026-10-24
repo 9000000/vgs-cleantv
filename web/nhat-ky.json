@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.6.12",
+  "ngay": "2026-10-24",
+  "vi": [
+   "TCL Google TV: tắt \"Nút app trên remote\" (Tuỳ chỉnh → Remote) thì giữ âm lượng lại tăng / giảm liên tục, kể cả khi Home Google đã tắt."
+  ],
+  "en": [
+   "TCL Google TV: turning off \"Remote app buttons\" (Customise → Remote) restores the volume ramp, even with Google's Home disabled."
+  ]
+ },
+ {
   "ban": "2.6.11",
   "ngay": "2026-10-24",
   "vi": [
