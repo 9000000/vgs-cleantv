@@ -156,7 +156,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var thuVienApp by mutableStateOf(false)
     var dongHoKhiYen by mutableStateOf(0)
     var tiviYeu by mutableStateOf(false)
-    var hieuUngKinh by mutableStateOf(true)
+    var hieuUngKinh by mutableStateOf(false)
     var lamToiNen by mutableStateOf(0)
     var hienThongSo by mutableStateOf(false)
     /** Mục Nâng cao: danh sách tuỳ chọn + giá trị người dùng đặt (khoá → chữ; thiếu = mặc định). */
@@ -174,7 +174,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     /** Đồng bộ các công tắc nhanh (switch) theo cấu hình hiện tại của theme. */
     fun dongBoCongTacTuTheme(th: zone.vgs.tvsach.dulieu.Theme) {
-        hieuUngKinh = (nangCao["dock_glass"] ?: th.cauHinh["dock_glass"]?.toString())?.toBooleanStrictOrNull() ?: true
+        hieuUngKinh = (nangCao["dock_glass"] ?: th.cauHinh["dock_glass"]?.toString())?.toBooleanStrictOrNull() ?: false
         lamToiNen = (nangCao["wallpaper_dim"] ?: th.cauHinh["wallpaper_dim"]?.toString())?.toIntOrNull() ?: 0
         hienThongSo = (nangCao["show_stats"] ?: th.cauHinh["show_stats"]?.toString())?.toBooleanStrictOrNull() ?: false
         tiviYeu = (nangCao["reduced_motion"] ?: th.cauHinh["reduced_motion"]?.toString())?.toBooleanStrictOrNull() ?: false

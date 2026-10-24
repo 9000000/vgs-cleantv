@@ -81,4 +81,14 @@ class ThemeTest {
         assertEquals("true", minimalLight.optString("dock_glass"))
         assertEquals("cyberpunk-neon", json.optString("vgs_theme"))
     }
+
+    @Test
+    fun kiemTraTatCaThemeKhongCoDockNenVaGiuTinhNangDock() {
+        THEMES.forEach { th ->
+            assertEquals("Theme ${th.id} phải tắt dock_band", false, th.cauHinh["dock_band"])
+            assertEquals("Theme ${th.id} phải có dock_opacity = 0", 0, th.cauHinh["dock_opacity"])
+            assertEquals("Theme ${th.id} phải có dock_glass = false", false, th.cauHinh["dock_glass"])
+            assertTrue("Theme ${th.id} phải giữ nguyên tính năng dock (dock_row != false)", th.cauHinh["dock_row"] != false)
+        }
+    }
 }
