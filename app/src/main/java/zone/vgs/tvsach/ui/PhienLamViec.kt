@@ -56,6 +56,9 @@ private const val PHIM_TCL_CHUNG = """{"app_keys":["4062:com.netflix.ninja","406
  */
 private val PHIM_TAT_SAN = setOf("tcl-g09-google-tv")
 
+/** Trình duyệt cho nút Web của remote TCL, theo thứ tự ưu tiên; tivi không có cái nào thì nút Web để nguyên. */
+private val TRINH_DUYET_TV = listOf("com.android.chrome", "com.tcl.browser", "com.phlox.tvwebbrowser", "com.cloudmosa.puffinTV", "org.mozilla.tv.firefox")
+
 class PhienLamViec(app: Application) : AndroidViewModel(app) {
     private val ctx: Context get() = getApplication()
     private val adb by lazy { KetNoiAdb.lay(ctx) }
@@ -763,10 +766,18 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // Ảnh riêng làm nền: tắt ánh sáng sau dock theo màu app (ambient_glow), không thì ảnh gia đình bị ám đỏ / vàng /
         // xanh mỗi lần đổi ô (góp ý dangngoctri2010, 23/10/2026). Nâng cao ghi sau nên người dùng vẫn bật lại được.
         if (anhNenRieng != null) put("ambient_glow", false)
-        // Phím remote của mẫu (app_keys, settings_key_keycodes…), HomeKeyService đọc. InputKeyService cũng đọc app_keys,
-        // bật cả hai là bấm một nút mở app hai lần (upstream examples/tcl-55c725) nên khi đang bật nút Input thì bỏ app_keys.
+        // Phím remote của mẫu (app_keys, settings_key_keycodes…), HomeKeyService đọc. LUÔN ghi app_keys, kể cả khi bật
+        // nút Input: 2.6.5 bỏ app_keys lúc đó (InputKeyService cũng đọc, sợ mở app hai lần — upstream tcl-55c725) mà nút
+        // Input tự bật trên mọi Google TV, nên TCL Google TV mất hẳn nút YouTube (góp ý heavensky95, TCL G10, 24/10/2026).
+        // Mở cùng một app hai lần chỉ là đưa nó lên trước.
         if (dungPhimRemote) phimRemote()?.let { ph ->
-            ph.keys().forEach { k -> if (!(k == "app_keys" && nutInput) && !has(k)) put(k, ph.get(k)) }
+            ph.keys().forEach { k -> if (!has(k)) put(k, ph.get(k)) }
+            // Nút Web của remote TCL (4159, upstream tcl-g10-google-tv): mở trình duyệt nếu tivi có.
+            if (thongTin?.brand?.equals("TCL", ignoreCase = true) == true) {
+                val web = TRINH_DUYET_TV.firstOrNull { trangThai?.caiDat?.contains(it) == true }
+                val ds = optJSONArray("app_keys")
+                if (web != null && ds != null && (0 until ds.length()).none { ds.optString(it).startsWith("4159:") }) ds.put("4159:$web")
+            }
         }
         // Nâng cao ghi sau cùng: người dùng đã chủ động đặt thì đè lên giá trị theme.
         val daDat = dsNangCao.mapNotNull { tc -> nangCao[tc.khoa]?.let { chu -> zone.vgs.tvsach.dulieu.NangCao.giaTri(tc, chu)?.let { put(tc.khoa, it); tc.khoa } } }

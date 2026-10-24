@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 52,
-  "versionName": "2.6.6",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.6.apk",
-  "co": 11560187,
-  "ghiChu": "An toàn hơn: tivi tự canh gác Home, tự tắt ADB khi xong, lưu kịch bản khôi phục cho máy tính, xem trước lệnh",
-  "ghiChuEn": "Safer: the TV guards its Home, ADB turns off when you're done, a restore script for a computer, command preview",
+  "versionCode": 53,
+  "versionName": "2.6.7",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.7.apk",
+  "co": 11560191,
+  "ghiChu": "Sửa: nút YouTube, Netflix… trên remote TCL Google TV chạy lại sau khi thay Home; thêm nút Web",
+  "ghiChuEn": "Fix: YouTube, Netflix… buttons on TCL Google TV remotes work again after replacing Home; adds the Web button",
   "ngay": "2026-10-24"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "f02964345248d09b",
    "url": "/ota/du-lieu.json",
    "co": 1403996,
-   "tuBan": 52
+   "tuBan": 53
   },
   "tvhome.apk": {
    "phienBan": "414be35d49d85742",
    "url": "/ota/tvhome.apk",
    "co": 598251,
-   "tuBan": 52
+   "tuBan": 53
   }
  }
 }

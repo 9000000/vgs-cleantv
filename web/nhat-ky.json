@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.6.7",
+  "ngay": "2026-10-24",
+  "vi": [
+   "Sửa 2.6.5: trên TCL Google TV, nút YouTube / Netflix / Prime trên remote chạy lại sau khi thay Home (bấm Đổi giao diện → Áp dụng lên tivi một lần). Nút Web mở trình duyệt nếu tivi có."
+  ],
+  "en": [
+   "Fixes 2.6.5: on TCL Google TV the remote's YouTube / Netflix / Prime buttons work again after replacing Home (Change look → Apply once). The Web button opens a browser if the TV has one."
+  ]
+ },
+ {
   "ban": "2.6.6",
   "ngay": "2026-10-24",
   "vi": [
