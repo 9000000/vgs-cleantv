@@ -6,6 +6,9 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 export JAVA_HOME="${JAVA_HOME:-/opt/homebrew/opt/openjdk@17}"
+# Dựng SẠCH: bản dựng tăng dần cho classes.dex khác bản dựng sạch, mà người kiểm tra (scripts/so-ban-dung.sh) dựng
+# từ đầu — phát hành bản tăng dần là không tái tạo được (24/10/2026).
+./gradlew clean -q --console=plain
 scripts/dung-khoa.sh
 ./gradlew assembleRelease -q --console=plain
 APK=app/build/outputs/apk/release/app-release.apk
