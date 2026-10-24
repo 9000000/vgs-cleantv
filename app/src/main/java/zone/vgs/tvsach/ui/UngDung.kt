@@ -944,6 +944,12 @@ private fun TheTuyChinh(vm: PhienLamViec) {
         Hang(t("Hiện tên dưới mọi app", "Names under every app"), t("Ông bà dễ nhận app hơn", "Easier to recognise apps"), vm.tenDuoiApp) { vm.tenDuoiApp = it }
         Hang(t("Tô màu ô app điện thoại", "Colour phone-app tiles"), t("App không có ảnh tivi (Chrome, Thư viện…) có ô màu theo icon thay vì nền xám", "Apps without a TV banner get a tile in their icon's colour"), vm.toMauOApp) { vm.toMauOApp = it }
         Hang(t("Gom nút trên cùng thành icon", "Compact icon buttons"), t("Một cụm gọn, bỏ chữ", "One tidy cluster, no labels"), vm.gonNut) { vm.gonNut = it }
+        Text(t("Cỡ chữ đồng hồ, lịch, thời tiết", "Clock, date and weather size"), fontSize = 14.sp)
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(100 to t("Vừa", "Normal"), 125 to t("Lớn", "Large"), 150 to t("Rất lớn", "Extra large")).forEach { (v, chu) ->
+                ChonChip(chu, vm.coChuDau == v) { vm.coChuDau = v }
+            }
+        }
         Text(t("Vị trí hàng app", "App rows position"), fontSize = 14.sp)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(-120 to t("Cao hơn nhiều", "Much higher"), -60 to t("Cao hơn", "Higher"), 0 to t("Mặc định", "Default"), 60 to t("Thấp hơn", "Lower")).forEach { (v, chu) ->
@@ -977,7 +983,7 @@ private fun TheTuyChinh(vm: PhienLamViec) {
     The(t("Tivi yếu & mạng", "Slow TVs & network"), Icons.Rounded.Speed) {
         Hang(t("Chế độ tivi yếu", "Slow TV mode"), t("Bớt hiệu ứng chuyển động cho tivi cũ, ít RAM", "Calmer motion for old, low-memory TVs"), vm.tiviYeu) { vm.tiviYeu = it }
         Hang(t("Hiệu ứng kính mờ", "Frosted glass effects"), t("Dock kính mờ, ánh sáng theo màu app", "Frosted dock, glow in the app's colour"), vm.hieuUngKinh) { vm.hieuUngKinh = it }
-        Hang(t("DNS chặn quảng cáo (AdGuard)", "Ad-blocking DNS (AdGuard)"), t("Không chặn được quảng cáo YouTube", "Does not block YouTube ads"), vm.dnsChanQc) { vm.dnsChanQc = it }
+        Hang(t("DNS chặn quảng cáo (AdGuard)", "Ad-blocking DNS (AdGuard)"), t("Là cài đặt DNS của tivi, không phải app (xem ở Cài đặt → Mạng → DNS riêng tư). Không chặn được quảng cáo YouTube", "A TV DNS setting, not an app (Settings → Network → Private DNS). Does not block YouTube ads"), vm.dnsChanQc) { vm.dnsChanQc = it }
     }
 }
 

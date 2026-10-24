@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 61,
-  "versionName": "2.7.2",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.7.2.apk",
-  "co": 11589547,
-  "ghiChu": "Nút Đang phát trên Home sạch: xem app nào đang phát nhạc / video, tạm dừng hay dừng tất cả",
-  "ghiChuEn": "Now playing on the clean Home: see which apps are playing, pause one or stop them all",
+  "versionCode": 62,
+  "versionName": "2.7.3",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.7.3.apk",
+  "co": 11589843,
+  "ghiChu": "Cỡ chữ đồng hồ, lịch, thời tiết to hơn; sửa công tắc DNS chặn quảng cáo AdGuard",
+  "ghiChuEn": "Bigger clock, date and weather; AdGuard DNS switch fixed",
   "ngay": "2026-10-24"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "586aa51ab1041537",
+   "phienBan": "7807242fa93f9161",
    "url": "/ota/du-lieu.json",
    "co": 1479960,
-   "tuBan": 61
+   "tuBan": 62
   },
   "tvhome.apk": {
-   "phienBan": "732805754f9fa3f4",
+   "phienBan": "024d74c2da6200a1",
    "url": "/ota/tvhome.apk",
-   "co": 603103,
-   "tuBan": 61
+   "co": 603275,
+   "tuBan": 62
   }
  }
 }

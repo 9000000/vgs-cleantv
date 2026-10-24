@@ -1,5 +1,17 @@
 [
  {
+  "ban": "2.7.3",
+  "ngay": "2026-10-24",
+  "vi": [
+   "Tuỳ chỉnh → \"Cỡ chữ đồng hồ, lịch, thời tiết\": Vừa / Lớn / Rất lớn.",
+   "Sửa DNS chặn quảng cáo AdGuard: bật / tắt có hiệu lực cả khi Đổi giao diện, kết nối lại thì công tắc hiện đúng trạng thái trên tivi. DNS là cài đặt của tivi (Cài đặt → Mạng → DNS riêng tư), không phải app."
+  ],
+  "en": [
+   "Customise → \"Clock, date and weather size\": Normal / Large / Extra large.",
+   "AdGuard DNS fixed: turning it on / off now applies from Change look too, and the switch shows the TV's real state on reconnect. It is a TV DNS setting (Settings → Network → Private DNS), not an app."
+  ]
+ },
+ {
   "ban": "2.7.2",
   "ngay": "2026-10-24",
   "vi": [
