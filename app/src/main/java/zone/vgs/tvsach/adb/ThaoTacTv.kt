@@ -719,6 +719,9 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
      * remote) thì HomeKeyService thấy màn Home cũ hiện lên là mở lại Home sạch. Ghi khoá vào config.json đang có trên
      * tivi + bật HomeKeyService.
      */
+    /** Bật HomeKeyService cho phím remote của mẫu (nút app, Cài đặt). Bo CVTE: không (upstream #741). */
+    fun batBatPhimHome() { if (!laBoMachCvte()) batDichVu("HomeKeyService") }
+
     fun ganChuyenHomeCu(pkg: String): Boolean {
         if (!TEN_GOI.matches(pkg)) return false
         val j = docCauHinhTv() ?: return false

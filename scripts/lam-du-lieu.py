@@ -14,6 +14,7 @@ import sys
 
 PKG_RE = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$')
 TOKEN_PKG = re.compile(r'\b[a-z][a-z0-9_]*(?:\.[A-Za-z0-9_]+){2,}\b')
+PHIM = ('app_keys', 'settings_key_keycodes', 'settings_key_scancodes', 'key_filter', 'handle_view_inputs')
 KEEP_WORDS = re.compile(r"\b(keep|kept|must stay|must remain|stays? enabled|do not disable|don't disable|"
                         r"never disable|leave it|left enabled|needed|needs it|load-bearing)\b", re.I)
 
@@ -69,12 +70,24 @@ def main():
                 giu.update(TOKEN_PKG.findall(cau))
         for p in giu - listed:
             kept.setdefault(p, []).append(name)
-        models.append({
+        m = {
             'id': name,
             'ten': header[0] if header else name,
             'header': '\n'.join(header),
             'goi': entries,
-        })
+        }
+        # Phím remote của mẫu (config.json cạnh debloat.txt): nút app / Cài đặt trên remote, chỉ chạy khi có
+        # HomeKeyService. TCL tắt launcherx là nút YouTube, Netflix… chết (24/10/2026, góp ý TCL G09).
+        cfg = os.path.join(ex_dir, name, 'config.json')
+        if os.path.isfile(cfg):
+            try:
+                j = json.load(open(cfg, encoding='utf-8-sig'))
+            except ValueError:
+                j = {}
+            phim = {k: j[k] for k in PHIM if k in j}
+            if phim:
+                m['phim'] = phim
+        models.append(m)
     goi = {p: {'c': c} for p, c in count.items()}
     for p, names in kept.items():
         goi.setdefault(p, {'c': 0})['giu'] = len(names)

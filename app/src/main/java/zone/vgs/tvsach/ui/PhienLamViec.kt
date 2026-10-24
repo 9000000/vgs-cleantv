@@ -44,6 +44,18 @@ enum class Man { CHINH, KET_NOI, THONG_TIN, CHON_GOI, DANG_TAT, HOME_SACH, XONG,
 /** Số app tối đa trong dock: bằng số cột lớn nhất của Home sạch (columns 1–8); dock dài hơn số cột thì tràn xuống hàng sau (22/10/2026, góp ý muốn hàng đầu nhiều app hơn). */
 const val DOCK_TOI_DA = 8
 
+/**
+ * Bảng phím chung cho TCL không có mẫu riêng: Netflix 4062, YouTube 4065, Prime Video 4099, bánh răng 83 / 4077 — cùng số
+ * trên mọi mẫu TCL có bảng trong upstream (tcl-43c645, tcl-55c725, tcl-65c735, tcl-g10…).
+ */
+private const val PHIM_TCL_CHUNG = """{"app_keys":["4062:com.netflix.ninja","4065:com.google.android.youtube.tv","4099:com.amazon.amazonvideo.livingroom"],"settings_key_keycodes":[83,4077]}"""
+
+/**
+ * Mẫu mà phím remote mặc định TẮT: TCL G09 Android 12 — bật dịch vụ lọc phím là giữ nút âm lượng chỉ nhảy một nấc
+ * (upstream docs/devices/tcl-55p71b-g09-key-repeat.md). Người dùng vẫn tự bật được.
+ */
+private val PHIM_TAT_SAN = setOf("tcl-g09-google-tv")
+
 class PhienLamViec(app: Application) : AndroidViewModel(app) {
     private val ctx: Context get() = getApplication()
     private val adb by lazy { KetNoiAdb.lay(ctx) }
@@ -105,6 +117,19 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var dnsChanQc by mutableStateOf(false)
     var nutManCho by mutableStateOf(true)
     var gonNut by mutableStateOf(true)
+    /**
+     * Nút app / Cài đặt trên remote (24/10/2026, góp ý TCL G09): tắt Home gốc của TCL là nút YouTube, Netflix… chết vì
+     * hãng chỉ gửi chúng cho launcherx. null = tự chọn: bật khi mẫu có bảng phím, trừ mẫu trong PHIM_TAT_SAN.
+     */
+    var nutAppRemoteChon by mutableStateOf<Boolean?>(null)
+    val nutAppRemote get() = nutAppRemoteChon ?: (mauChon?.id !in PHIM_TAT_SAN)
+
+    /** Bảng phím remote dùng cho tivi này: của mẫu đang chọn, không có thì bảng chung của TCL; null nếu không có. */
+    fun phimRemote(): JSONObject? = mauChon?.phim
+        ?: if (thongTin?.brand?.equals("TCL", ignoreCase = true) == true) JSONObject(PHIM_TCL_CHUNG) else null
+
+    /** Có ghép bảng phím vào cấu hình lần này không (cần HomeKeyService). */
+    val dungPhimRemote get() = nutAppRemote && phimRemote() != null
     // Tuỳ chỉnh thêm (1.7, các "switch" của launcher — upstream themes/README.md).
     var amLich by mutableStateOf(true)
     var tenDuoiApp by mutableStateOf(false)
@@ -647,7 +672,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val cauHinh = cauHinhHome()
         val anh = anhNenTheme()
         val bo = boAnhTheme()
-        val loiCai = io { tv.caiLauncher(apk, sl, cauHinh, anh, bo, nutInput, nutHome) { s -> ghiTuIo(s) } }
+        val loiCai = io { tv.caiLauncher(apk, sl, cauHinh, anh, bo, nutInput, nutHome || dungPhimRemote) { s -> ghiTuIo(s) } }
         if (loiCai != null) error(loiCai)
         if (dnsChanQc) io { tv.batDnsChanQc(sl) }
         if (nutManCho) io { tv.chuanBiManCho(sl) }
@@ -733,6 +758,11 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // Ảnh riêng làm nền: tắt ánh sáng sau dock theo màu app (ambient_glow), không thì ảnh gia đình bị ám đỏ / vàng /
         // xanh mỗi lần đổi ô (góp ý dangngoctri2010, 23/10/2026). Nâng cao ghi sau nên người dùng vẫn bật lại được.
         if (anhNenRieng != null) put("ambient_glow", false)
+        // Phím remote của mẫu (app_keys, settings_key_keycodes…), HomeKeyService đọc. InputKeyService cũng đọc app_keys,
+        // bật cả hai là bấm một nút mở app hai lần (upstream examples/tcl-55c725) nên khi đang bật nút Input thì bỏ app_keys.
+        if (dungPhimRemote) phimRemote()?.let { ph ->
+            ph.keys().forEach { k -> if (!(k == "app_keys" && nutInput) && !has(k)) put(k, ph.get(k)) }
+        }
         // Nâng cao ghi sau cùng: người dùng đã chủ động đặt thì đè lên giá trị theme.
         val daDat = dsNangCao.mapNotNull { tc -> nangCao[tc.khoa]?.let { chu -> zone.vgs.tvsach.dulieu.NangCao.giaTri(tc, chu)?.let { put(tc.khoa, it); tc.khoa } } }
         if (daDat.isNotEmpty()) put("vgs_nang_cao", JSONArray(daDat))
@@ -793,6 +823,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val bo = boAnhTheme()
         if (bo != null) thongBao = t("Đang gửi ${bo.size} ảnh phong cảnh…", "Sending ${bo.size} landscape pictures…")
         io { tv.dayCauHinh(json, anh, bo) }
+        if (dungPhimRemote) io { tv.batBatPhimHome() }
         if (nutManCho) io { tv.chuanBiManCho(saoLuu) }
         thongBao = t("Đang thử nút Home trên tivi…", "Testing the TV's Home button…")
         val sl = saoLuu ?: thongTin?.let { tt -> runCatching { io { tv.damBaoSaoLuu(tt, getprop, ip) } }.getOrNull() }?.also { saoLuu = it }

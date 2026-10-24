@@ -6,8 +6,11 @@ import org.json.JSONObject
 /** Một gói trong danh sách mẫu của cleanyourtv. */
 data class GoiMau(val pkg: String, val nhom: String, val ghiChu: String)
 
-/** Một mẫu tivi đã có người thử (examples/<id>/debloat.txt). */
-data class MauTv(val id: String, val ten: String, val header: String, val goi: List<GoiMau>)
+/**
+ * Một mẫu tivi đã có người thử (examples/<id>/debloat.txt). [phim]: phím remote của mẫu lấy từ config.json cạnh đó
+ * (app_keys, settings_key_keycodes…), null nếu mẫu không có.
+ */
+data class MauTv(val id: String, val ten: String, val header: String, val goi: List<GoiMau>, val phim: org.json.JSONObject? = null)
 
 /** Thống kê toàn cục: gói này bị tắt ở bao nhiêu mẫu, bao nhiêu mẫu ghi là phải giữ. */
 data class ThongKeGoi(val soMauTat: Int, val soMauGiu: Int)
@@ -43,6 +46,7 @@ class DuLieu(val mau: List<MauTv>, val thongKe: Map<String, ThongKeGoi>) {
                         val o = g.getJSONObject(j)
                         GoiMau(o.getString("p"), o.optString("g"), o.optString("n"))
                     },
+                    phim = m.optJSONObject("phim"),
                 )
             }
             val goi = root.getJSONObject("goi")

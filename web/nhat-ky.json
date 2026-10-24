@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.6.5",
+  "ngay": "2026-10-24",
+  "vi": [
+   "Nút app trên remote (YouTube, Netflix, Prime, bánh răng Cài đặt) vẫn chạy sau khi thay Home: app tự lấy bảng phím của mẫu tivi (17 mẫu có sẵn, TCL có bảng chung). Bật / tắt ở Đổi giao diện → Tuỳ chỉnh → Remote."
+  ],
+  "en": [
+   "Remote app buttons (YouTube, Netflix, Prime, the Settings gear) keep working after replacing Home: the app applies the model's key map (17 models, plus a shared TCL map). Toggle it under Change look → Customise → Remote."
+  ]
+ },
+ {
   "ban": "2.6.4",
   "ngay": "2026-10-23",
   "vi": [
