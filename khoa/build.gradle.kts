@@ -32,6 +32,8 @@ android {
                 storePassword = ky.getProperty("storePassword")
                 keyAlias = ky.getProperty("keyAlias")
                 keyPassword = ky.getProperty("keyPassword")
+                enableV1Signing = true
+                enableV2Signing = true
             }
         }
     }
