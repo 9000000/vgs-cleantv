@@ -328,6 +328,12 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** Các cổng TCP đang mở trên [host] trong [dai], quét song song (256 luồng, chờ 300 ms mỗi cổng). */
+    private suspend fun quetCongMo(host: String, dai: IntRange, boQua: Set<Int> = emptySet()): List<Int> = withContext(Dispatchers.IO) {
+        val sem = Semaphore(256)
+        dai.filter { it !in boQua }.map { c -> async { sem.withPermit { if (moCong(host, c, 300)) c else null } } }.awaitAll().filterNotNull()
+    }
+
     private fun moCong(host: String, port: Int, ms: Int): Boolean = runCatching {
         Socket().use { it.connect(InetSocketAddress(host, port), ms) }; true
     }.getOrDefault(false)
@@ -369,7 +375,14 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             runCatching { adb.disconnect() }
             runCatching { adb.connectTls(ctx, 15_000) }.getOrDefault(false)
         }
-        if (!ok) {
+        // mDNS không thấy (mạng chặn multicast, Chromecast Android 14 — góp ý buivansaobg 24/10/2026): quét cổng
+        // ngẫu nhiên của Gỡ lỗi không dây (dải cổng tạm 32768–60999 của Linux) rồi thử kết nối từng cổng mở.
+        val ok2 = ok || run {
+            thongBao = t("Chưa thấy cổng qua mạng, đang dò cổng của tivi (khoảng 30 giây)…", "Port not announced, probing the TV's ports (about 30 seconds)…")
+            val mo = quetCongMo(h, 32768..60999, boQua = setOf(p))
+            mo.any { c -> io { runCatching { adb.disconnect() }; runCatching { adb.connect(h, c) }.getOrDefault(false) } }
+        }
+        if (!ok2) {
             ip = h
             error(t("Đã ghép đôi nhưng chưa tự tìm được cổng. Nhập IP và cổng ở dòng \"Địa chỉ IP & cổng\" ", "Paired, but the port was not found automatically. Enter the IP and port from the \"IP address & Port\" line ") +
                 t("trên màn Gỡ lỗi không dây của tivi (không phải cổng ghép đôi) rồi bấm Kết nối.", "on the TV's Wireless debugging screen (not the pairing port) and press Connect."))

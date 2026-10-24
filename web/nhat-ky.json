@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.6.8",
+  "ngay": "2026-10-24",
+  "vi": [
+   "Gỡ lỗi không dây (Chromecast, Google TV đời mới): ghép đôi xong mà mạng không báo cổng kết nối thì app tự dò cổng của tivi (khoảng 30 giây), không phải nhập tay."
+  ],
+  "en": [
+   "Wireless debugging (Chromecast, newer Google TVs): if the network doesn't announce the connect port after pairing, the app probes the TV's ports itself (about 30 seconds)."
+  ]
+ },
+ {
   "ban": "2.6.7",
   "ngay": "2026-10-24",
   "vi": [
