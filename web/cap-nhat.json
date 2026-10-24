@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 65,
-  "versionName": "2.8.2",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.8.2.apk",
-  "co": 11638939,
-  "ghiChu": "Sửa kẹt 'Đang gửi ảnh nền' trên tivi Android 8 (Sony 2015…); thêm Số app mỗi hàng 4–7.",
-  "ghiChuEn": "Fixes the wallpaper upload hanging on Android 8 TVs (Sony 2015…); adds Apps per row 4–7.",
-  "ngay": "2026-10-24"
+  "versionCode": 66,
+  "versionName": "2.8.3",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.8.3.apk",
+  "co": 11672995,
+  "ghiChu": "Thêm 19 mẫu tivi mới (280 mẫu): TCL 75P8K, Sony BRAVIA VU3, Tuvio, Dcolor GD2…",
+  "ghiChuEn": "19 new TV models (280 in all): TCL 75P8K, Sony BRAVIA VU3, Tuvio, Dcolor GD2…",
+  "ngay": "2026-10-25"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "c2e62e1cf17032cb",
+   "phienBan": "95561d79a33fe629",
    "url": "/ota/du-lieu.json",
-   "co": 1479960,
-   "tuBan": 65
+   "co": 1606661,
+   "tuBan": 66
   },
   "tvhome.apk": {
-   "phienBan": "209e50c26568df31",
+   "phienBan": "1d57e30af3099b22",
    "url": "/ota/tvhome.apk",
-   "co": 618725,
-   "tuBan": 65
+   "co": 621597,
+   "tuBan": 66
   }
  }
 }
