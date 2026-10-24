@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 58,
-  "versionName": "2.6.12",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.12.apk",
-  "co": 11560191,
-  "ghiChu": "TCL Google TV: tắt \"Nút app trên remote\" là giữ âm lượng lặp lại được",
-  "ghiChuEn": "TCL Google TV: turning off remote app buttons restores the volume ramp",
+  "versionCode": 59,
+  "versionName": "2.7",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.7.apk",
+  "co": 11582987,
+  "ghiChu": "260 mẫu tivi (thêm máy chiếu HOTACK, Sharp, Sony, Magcubic…), Home sạch theo CleanYourTV mới nhất",
+  "ghiChuEn": "260 TV models (HOTACK projectors, Sharp, Sony, Magcubic…), clean Home on the latest CleanYourTV",
   "ngay": "2026-10-24"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "f02964345248d09b",
+   "phienBan": "a6c6b72d28ade7aa",
    "url": "/ota/du-lieu.json",
-   "co": 1403996,
-   "tuBan": 58
+   "co": 1479960,
+   "tuBan": 59
   },
   "tvhome.apk": {
-   "phienBan": "414be35d49d85742",
+   "phienBan": "41c13f7d89db9185",
    "url": "/ota/tvhome.apk",
-   "co": 598251,
-   "tuBan": 58
+   "co": 599831,
+   "tuBan": 59
   }
  }
 }
