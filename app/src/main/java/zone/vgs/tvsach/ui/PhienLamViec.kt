@@ -125,7 +125,15 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
      * hãng chỉ gửi chúng cho launcherx. null = tự chọn: bật khi mẫu có bảng phím, trừ mẫu trong PHIM_TAT_SAN.
      */
     var nutAppRemoteChon by mutableStateOf<Boolean?>(null)
-    val nutAppRemote get() = nutAppRemoteChon ?: (mauChon?.id !in PHIM_TAT_SAN)
+    val nutAppRemote get() = nutAppRemoteChon ?: (mauChon?.id !in PHIM_TAT_SAN && !laTclGoogleTv)
+
+    /**
+     * TCL Google TV (có Home Google launcherx): dịch vụ trợ năng nào lọc phím cũng làm giữ nút âm lượng chỉ nhảy một nấc
+     * (upstream docs/devices/tcl-55p71b-g09-key-repeat.md; góp ý nda2192 24/10/2026). Mặc định ưu tiên âm lượng: tắt nút
+     * app remote và ghi key_filter=false — dịch vụ vẫn bật để mở đè Home (theo cửa sổ, không cần lọc phím).
+     */
+    val laTclGoogleTv get() = thongTin?.brand?.equals("TCL", ignoreCase = true) == true &&
+        trangThai?.caiDat?.contains("com.google.android.apps.tv.launcherx") == true
 
     /** Bảng phím remote dùng cho tivi này: của mẫu đang chọn, không có thì bảng chung của TCL; null nếu không có. */
     fun phimRemote(): JSONObject? = mauChon?.phim
@@ -783,6 +791,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // nút Input: 2.6.5 bỏ app_keys lúc đó (InputKeyService cũng đọc, sợ mở app hai lần — upstream tcl-55c725) mà nút
         // Input tự bật trên mọi Google TV, nên TCL Google TV mất hẳn nút YouTube (góp ý heavensky95, TCL G10, 24/10/2026).
         // Mở cùng một app hai lần chỉ là đưa nó lên trước.
+        // TCL Google TV không dùng nút app remote: thôi lọc phím để giữ âm lượng lặp được (Nâng cao đặt key_filter thì đè sau).
+        if (laTclGoogleTv && !dungPhimRemote) put("key_filter", false)
         if (dungPhimRemote) phimRemote()?.let { ph ->
             ph.keys().forEach { k -> if (!has(k)) put(k, ph.get(k)) }
             // Nút Web của remote TCL (4159, upstream tcl-g10-google-tv): mở trình duyệt nếu tivi có.

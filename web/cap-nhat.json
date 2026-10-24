@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 55,
-  "versionName": "2.6.9",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.9.apk",
+  "versionCode": 56,
+  "versionName": "2.6.10",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.10.apk",
   "co": 11560191,
-  "ghiChu": "Chạy CleanTV ngay trên tivi: đổi giao diện nhanh hơn, chọn ảnh nền có trên tivi / USB",
-  "ghiChuEn": "Running CleanTV on the TV itself: faster theme changes, pick a wallpaper from the TV / USB",
+  "ghiChu": "TCL Google TV: giữ nút âm lượng lại tăng / giảm liên tục",
+  "ghiChuEn": "TCL Google TV: holding volume ramps again",
   "ngay": "2026-10-24"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "f02964345248d09b",
    "url": "/ota/du-lieu.json",
    "co": 1403996,
-   "tuBan": 55
+   "tuBan": 56
   },
   "tvhome.apk": {
    "phienBan": "414be35d49d85742",
    "url": "/ota/tvhome.apk",
    "co": 598251,
-   "tuBan": 55
+   "tuBan": 56
   }
  }
 }

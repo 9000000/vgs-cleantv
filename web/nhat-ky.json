@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.6.10",
+  "ngay": "2026-10-24",
+  "vi": [
+   "TCL Google TV: giữ nút âm lượng lại tăng / giảm liên tục sau khi thay Home (bấm Đổi giao diện → Áp dụng lên tivi một lần). Muốn nút YouTube / Netflix trên remote chạy cả khi Home Google đã tắt thì bật \"Nút app trên remote\", đổi lại giữ âm lượng chỉ nhảy một nấc."
+  ],
+  "en": [
+   "TCL Google TV: holding volume ramps again after replacing Home (Change look → Apply once). Turn on \"Remote app buttons\" for YouTube / Netflix keys with Google's Home disabled, at the cost of one volume step per press."
+  ]
+ },
+ {
   "ban": "2.6.9",
   "ngay": "2026-10-24",
   "vi": [

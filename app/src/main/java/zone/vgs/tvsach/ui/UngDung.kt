@@ -952,7 +952,7 @@ private fun TheTuyChinh(vm: PhienLamViec) {
         Hang(t("Nút Input trên remote mở bảng chọn HDMI", "Remote Input button opens the input picker"), t("Nên bật cho Google TV", "Recommended on Google TV"), vm.nutInput) { vm.nutInput = it }
         Hang(t("Remote gửi phím Home lạ", "Remote sends an odd Home key"), t("Que Xiaomi, hộp nhà mạng…", "Xiaomi sticks, carrier boxes…"), vm.nutHome) { vm.nutHome = it }
         if (vm.phimRemote() != null) Hang(t("Nút app trên remote", "Remote app buttons"),
-            if (vm.mauChon?.id == "tcl-g09-google-tv") t("YouTube, Netflix, Cài đặt… mở được khi Home gốc tắt. Trên máy này bật thì giữ nút âm lượng chỉ nhảy một nấc", "YouTube, Netflix, Settings… work with the stock Home off. On this set, holding volume then steps only once")
+            if (vm.mauChon?.id == "tcl-g09-google-tv" || vm.laTclGoogleTv) t("YouTube, Netflix, Cài đặt… mở được khi Home gốc tắt. Trên máy này bật thì giữ nút âm lượng chỉ nhảy một nấc", "YouTube, Netflix, Settings… work with the stock Home off. On this set, holding volume then steps only once")
             else t("YouTube, Netflix, Cài đặt… vẫn mở được khi Home gốc tắt", "YouTube, Netflix, Settings… keep working with the stock Home off"),
             vm.nutAppRemote) { vm.nutAppRemoteChon = it }
     }
