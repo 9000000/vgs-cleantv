@@ -126,6 +126,12 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var nutDangPhat by mutableStateOf(true)
     /** Cỡ chữ cụm đồng hồ / ngày / âm lịch / thời tiết (header_scale của bản vá launcher, %), góp ý 24/10/2026. */
     var coChuDau by mutableStateOf(100)
+    /** Mọi app trên một hàng cuộn ngang, không lưới bên dưới (single_row của launcher 2.8, cần dock_row). */
+    var motHang by mutableStateOf(false)
+    /** Ẩn lời chào trên đồng hồ (show_greeting=false). */
+    var anLoiChao by mutableStateOf(false)
+    /** Ô icon đều nhau kiểu Apple TV: icon trên nền màu của chính nó, không dùng ảnh banner (uniform_tiles). */
+    var oDeuNhau by mutableStateOf(false)
     /**
      * Nút app / Cài đặt trên remote (24/10/2026, góp ý TCL G09): tắt Home gốc của TCL là nút YouTube, Netflix… chết vì
      * hãng chỉ gửi chúng cho launcherx. null = tự chọn: bật khi mẫu có bảng phím, trừ mẫu trong PHIM_TAT_SAN.
@@ -438,7 +444,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             b.ip = host; io { tv.luuSaoLuu(b) }
         }
         saoLuuTuTv = slMay == null && saoLuu != null
-        nutInput = tt.homeHienTai == "com.google.android.apps.tv.launcherx"
+        // Xiaomi: sau khi đổi Home, nút INPUT của remote không mở bảng nguồn nữa (upstream #1368) — bật sẵn để Home sạch nhận.
+        nutInput = tt.homeHienTai == "com.google.android.apps.tv.launcherx" || info.brand.equals("Xiaomi", ignoreCase = true)
         laMayChieu = tv.coVeMayChieu(tt, info)
         man = if (dangKhoiPhuc) Man.KHOI_PHUC else Man.THONG_TIN
     }
@@ -670,6 +677,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         doiHang = j.optInt("rows_offset_dp", 0)
         nutDangPhat = j.optBoolean("now_playing", true)
         coChuDau = j.optInt("header_scale", 100)
+        motHang = j.optBoolean("single_row", false)
+        anLoiChao = !j.optBoolean("show_greeting", true)
+        oDeuNhau = j.optBoolean("uniform_tiles", false)
         if (j.has("handle_view_inputs")) nutInput = j.optBoolean("handle_view_inputs", nutInput)
         // Chỉ nạp lại khoá NGƯỜI DÙNG đặt ở Nâng cao (ghi trong vgs_nang_cao), không lấy khoá do theme ghi
         // (background_color, sky_intensity…) — nếu không, đổi theme sau đó sẽ bị kẹt giá trị của theme cũ.
@@ -802,6 +812,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (doiHang != 0) put("rows_offset_dp", doiHang)
         if (!nutDangPhat) put("now_playing", false)
         if (coChuDau != 100) put("header_scale", coChuDau)
+        if (motHang) { put("dock_row", true); put("single_row", true) }
+        if (anLoiChao) put("show_greeting", false)
+        if (oDeuNhau) put("uniform_tiles", true)
         // Phím APPS (KEYCODE_ALL_APPS) chỉ là nút Home với que / tivi Xiaomi hoặc khi bật "Remote gửi phím Home lạ";
         // tivi khác (Sony VH2: nút Apps mở Home sạch như Back, abc999roses 24/10/2026) để phím cho tivi.
         put("all_apps_home", nutHome || thongTin?.brand?.equals("Xiaomi", ignoreCase = true) == true)

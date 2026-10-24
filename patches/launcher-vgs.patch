@@ -98,7 +98,7 @@ index 00000000..b1477aae
 +FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 +OTHER DEALINGS IN THE FONT SOFTWARE.
 diff --git a/launcher/app/src/main/AndroidManifest.xml b/launcher/app/src/main/AndroidManifest.xml
-index 80124b58..62c7f758 100644
+index 5da0f46a..6872943c 100644
 --- a/launcher/app/src/main/AndroidManifest.xml
 +++ b/launcher/app/src/main/AndroidManifest.xml
 @@ -8,6 +8,8 @@
@@ -122,7 +122,7 @@ index 80124b58..62c7f758 100644
          <!-- The standard settings handlers, so package visibility doesn't hide them and send the pills to a vendor fallback by mistake. -->
          <intent>
              <action android:name="android.settings.SETTINGS" />
-@@ -169,6 +176,17 @@
+@@ -190,6 +197,17 @@
  
          <!-- Screensaver: pick it in Settings, or `settings put secure screensaver_components
               com.gathin.tvhome/.ClockDream` over adb. -->
@@ -141,25 +141,25 @@ index 80124b58..62c7f758 100644
              android:name=".ClockDream"
              android:label="@string/dream_name"
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
-index ea003063..29144072 100644
+index e208aa82..3e1ab40d 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
-@@ -449,6 +449,13 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -479,6 +479,13 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
              h.icon.setVisibility(View.VISIBLE);
              h.label.setText(e.label);
-             h.label.setVisibility(View.VISIBLE);
+             h.label.setVisibility(uniformTiles ? View.GONE : View.VISIBLE);
 +            // CleanTV/VGS: icon_tile_color (default on) — a phone app with no TV banner gets a tile filled with its
-+            // icon's own colour and a bigger icon, instead of a small icon on the grey card.
++            // icon's own colour and a bigger icon, instead of a small icon on the grey card. uniform_tiles sizes its own.
 +            float dp = ctx.getResources().getDisplayMetrics().density;
 +            ViewGroup.LayoutParams lp = h.icon.getLayoutParams();
 +            int size = Math.round((iconTileColor() ? 60 : 48) * dp);
-+            if (lp.width != size) { lp.width = size; lp.height = size; h.icon.setLayoutParams(lp); }
-+            if (iconTileColor()) h.card.setBackground(new android.graphics.drawable.ColorDrawable(tileColor(ambientColorAt(position))));
++            if (!uniformTiles && lp.width != size) { lp.width = size; lp.height = size; h.icon.setLayoutParams(lp); }
++            if (!uniformTiles && iconTileColor()) h.card.setBackground(new android.graphics.drawable.ColorDrawable(tileColor(ambientColorAt(position))));
          }
          h.card.setOnClickListener(v -> launch(e));
          h.card.setOnLongClickListener(v -> {
-@@ -623,6 +630,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-         return e.ambient;
+@@ -799,6 +806,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+         return Math.max(0, Math.min(255, Math.round(v)));
      }
  
 +    private Boolean iconTileColor;
@@ -182,70 +182,11 @@ index ea003063..29144072 100644
      private static int vividColor(Drawable live) {
          if (live == null) return 0xFF444444;
          // Draw a private copy: changing the bounds of the drawable an ImageView shows would blank the tile.
-diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Config.java b/launcher/app/src/main/java/com/gathin/tvhome/Config.java
-index 6252d6d4..29676e59 100644
---- a/launcher/app/src/main/java/com/gathin/tvhome/Config.java
-+++ b/launcher/app/src/main/java/com/gathin/tvhome/Config.java
-@@ -85,6 +85,9 @@ final class Config {
-     final boolean advancedEffects;
-     final int rowsBelowDock;
-     final boolean shamsiDate;
-+    /** Lunisolar date under the date (config.json lunar_date), computed for lunarUtcOffset hours east of UTC (-1: by locale). */
-+    final boolean lunarDate;
-+    final int lunarUtcOffset;
-     /** Name after the greeting ("Good morning, Mr. Trịnh"); empty for the greeting alone. */
-     final String greetingName;
-     final boolean moduleCards;
-@@ -220,7 +223,7 @@ final class Config {
-                    List<RaceWeekend.Race> raceCalendar, boolean cinematicHome, boolean ambientGlow, boolean appGlow, boolean fadeRows, int homeIdleClockMinutes,
-                    boolean keyFilter, boolean dockGlass, String glowStyle, boolean wallpaperCaptions,
-                    boolean handleViewInputs, boolean tileMenu, boolean dockEvenPadding, boolean cinematicDots, boolean cinematicWhiteFocus, boolean wifiStatusColor, int cinematicScrim, int cinematicArt,
--                   Map<String, Set<String>> wallpaperMoods, boolean gamepadPassthrough) {
-+                   Map<String, Set<String>> wallpaperMoods, boolean gamepadPassthrough, boolean lunarDate, int lunarUtcOffset) {
-         this.handleViewInputs = handleViewInputs;
-         this.tileMenu = tileMenu;
-         this.inputKeycodes = inputKeycodes;
-@@ -248,6 +251,8 @@ final class Config {
-         this.animations = animations;
-         this.advancedEffects = advancedEffects;
-         this.shamsiDate = shamsiDate;
-+        this.lunarDate = lunarDate;
-+        this.lunarUtcOffset = lunarUtcOffset;
-         this.greetingName = greetingName;
-         this.moduleCards = moduleCards;
-         this.reducedMotion = reducedMotion;
-@@ -337,6 +342,8 @@ final class Config {
-         boolean animations = res.getBoolean(R.bool.animations);
-         boolean advancedEffects = res.getBoolean(R.bool.advanced_effects);
-         boolean shamsi = res.getBoolean(R.bool.shamsi_date);
-+        boolean lunar = res.getBoolean(R.bool.lunar_date);
-+        int lunarOffset = -1;
-         String greetingName = res.getString(R.string.greeting_name).trim();
-         boolean moduleCards = res.getBoolean(R.bool.module_cards);
-         boolean reducedMotion = res.getBoolean(R.bool.reduced_motion);
-@@ -416,6 +423,8 @@ final class Config {
-             animations = bool(json, "animations", animations);
-             advancedEffects = bool(json, "advanced_effects", advancedEffects);
-             shamsi = bool(json, "shamsi_date", shamsi);
-+            lunar = bool(json, "lunar_date", lunar);
-+            lunarOffset = integer(json, "lunar_utc_offset", lunarOffset, -1, 14);
-             greetingName = string(json, "greeting_name", greetingName).trim();
-             moduleCards = bool(json, "module_cards", moduleCards);
-             reducedMotion = bool(json, "reduced_motion", reducedMotion);
-@@ -520,7 +529,7 @@ final class Config {
-                 Math.max(0, Math.min(100, skyIntensity)), settingsKeycodes, settingsKeyPanel, restoreKeyServices, wallpaperEnabled, wallpaper,
-                 wallpapers, rotationMinutes, wallpaperDim, dockOpacity, wallpaperOrder, applied,
-                 festival, inputKeycodes, appKeys, stockHomeRedirect, json == null ? Collections.emptyList() : raceCalendar(json), cinematic, ambientGlow, appGlow, fadeRows,
--                Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding, cinematicDots, cinematicWhiteFocus, wifiStatusColor, cinematicScrim, cinematicArt, wallpaperMoods, gamepadPassthrough);
-+                Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding, cinematicDots, cinematicWhiteFocus, wifiStatusColor, cinematicScrim, cinematicArt, wallpaperMoods, gamepadPassthrough, lunar, lunarOffset);
-     }
- 
-     /**
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java b/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
-index edc3b498..142f6b06 100644
+index f4f1e21c..3567d74b 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
-@@ -99,7 +99,11 @@ public class HomeKeyService extends AccessibilityService {
+@@ -102,7 +102,11 @@ public class HomeKeyService extends AccessibilityService {
          super.onDestroy();
      }
  
@@ -257,7 +198,7 @@ index edc3b498..142f6b06 100644
          // Keycodes and the panel choice can also come from a theme; theme.sh restarts this service.
          Config config = Config.load(this);
          // restore_key_services: note that this helper runs, so Home can put it back after a force stop. Here, not
-@@ -165,7 +169,9 @@ public class HomeKeyService extends AccessibilityService {
+@@ -170,7 +174,9 @@ public class HomeKeyService extends AccessibilityService {
              redirectHomeKey(event);
              return false;
          }
@@ -268,149 +209,11 @@ index edc3b498..142f6b06 100644
          if (event.getAction() == KeyEvent.ACTION_UP && !event.isCanceled()) {
              Intent home = new Intent(Intent.ACTION_MAIN)
                      .addCategory(Intent.CATEGORY_HOME)
-diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Lunar.java b/launcher/app/src/main/java/com/gathin/tvhome/Lunar.java
-new file mode 100644
-index 00000000..41817804
---- /dev/null
-+++ b/launcher/app/src/main/java/com/gathin/tvhome/Lunar.java
-@@ -0,0 +1,132 @@
-+package com.gathin.tvhome;
-+
-+import android.content.res.Resources;
-+
-+import java.util.Calendar;
-+import java.util.Locale;
-+
-+/**
-+ * Lunisolar (Vietnamese / Chinese) date, e.g. "2/9 âm lịch · Bính Ngọ" or "Lunar 2/9 · Year of the Horse", without ICU.
-+ * The astronomy is Hồ Ngọc Đức's public algorithm (new moons and solar terms from Jean Meeus' formulas); the only
-+ * difference between the Vietnamese and the Chinese calendar is the time zone it is computed for (UTC+7 or UTC+8),
-+ * which now and then moves a new moon, and with it the first day of a month, by one day.
-+ */
-+final class Lunar {
-+
-+    private Lunar() {
-+    }
-+
-+    /** Hours east of UTC used for the calendar: lunar_utc_offset, or 7 for Vietnamese and 8 otherwise. */
-+    static int offsetFor(int configured, Locale locale) {
-+        if (configured >= 0) return configured;
-+        return "vi".equals(locale.getLanguage()) ? 7 : 8;
-+    }
-+
-+    /** Today's lunar date, formatted with the locale's strings. */
-+    static String today(Resources res, int utcOffset) {
-+        Calendar c = Calendar.getInstance();
-+        int[] l = fromSolar(c.get(Calendar.DAY_OF_MONTH), c.get(Calendar.MONTH) + 1, c.get(Calendar.YEAR), utcOffset);
-+        String month = l[3] == 1 ? res.getString(R.string.lunar_month_leap, l[1]) : String.valueOf(l[1]);
-+        String[] stems = res.getStringArray(R.array.lunar_stems);
-+        String[] branches = res.getStringArray(R.array.lunar_branches);
-+        String year = res.getString(R.string.lunar_year, stems[Math.floorMod(l[2] + 6, 10)], branches[Math.floorMod(l[2] + 8, 12)]);
-+        return res.getString(R.string.lunar_date_format, l[0], month, year);
-+    }
-+
-+    /** Gregorian date to {day, month, year, leap (1 = leap month)} of the lunar calendar at UTC+tz. */
-+    static int[] fromSolar(int dd, int mm, int yy, double tz) {
-+        long dayNumber = jdFromDate(dd, mm, yy);
-+        int k = (int) Math.floor((dayNumber - 2415021.076998695) / 29.530588853);
-+        long monthStart = newMoonDay(k + 1, tz);
-+        if (monthStart > dayNumber) monthStart = newMoonDay(k, tz);
-+        long a11 = lunarMonth11(yy, tz);
-+        long b11 = a11;
-+        int lunarYear;
-+        if (a11 >= monthStart) {
-+            lunarYear = yy;
-+            a11 = lunarMonth11(yy - 1, tz);
-+        } else {
-+            lunarYear = yy + 1;
-+            b11 = lunarMonth11(yy + 1, tz);
-+        }
-+        int lunarDay = (int) (dayNumber - monthStart + 1);
-+        int diff = (int) Math.floor((monthStart - a11) / 29.0);
-+        int leap = 0;
-+        int lunarMonth = diff + 11;
-+        if (b11 - a11 > 365) {
-+            int leapDiff = leapMonthOffset(a11, tz);
-+            if (diff >= leapDiff) {
-+                lunarMonth = diff + 10;
-+                if (diff == leapDiff) leap = 1;
-+            }
-+        }
-+        if (lunarMonth > 12) lunarMonth -= 12;
-+        if (lunarMonth >= 11 && diff < 4) lunarYear -= 1;
-+        return new int[]{lunarDay, lunarMonth, lunarYear, leap};
-+    }
-+
-+    static long jdFromDate(int dd, int mm, int yy) {
-+        int a = (14 - mm) / 12;
-+        long y = yy + 4800 - a;
-+        int m = mm + 12 * a - 3;
-+        long jd = dd + (153 * m + 2) / 5 + 365 * y + y / 4 - y / 100 + y / 400 - 32045;
-+        if (jd < 2299161) jd = dd + (153 * m + 2) / 5 + 365 * y + y / 4 - 32083;
-+        return jd;
-+    }
-+
-+    /** Day number of the k-th new moon after 1900-01-01, in local time. */
-+    static long newMoonDay(int k, double tz) {
-+        double t = k / 1236.85, t2 = t * t, t3 = t2 * t, dr = Math.PI / 180;
-+        double jd1 = 2415020.75933 + 29.53058868 * k + 0.0001178 * t2 - 0.000000155 * t3;
-+        jd1 += 0.00033 * Math.sin((166.56 + 132.87 * t - 0.009173 * t2) * dr);
-+        double m = 359.2242 + 29.10535608 * k - 0.0000333 * t2 - 0.00000347 * t3;
-+        double mpr = 306.0253 + 385.81691806 * k + 0.0107306 * t2 + 0.00001236 * t3;
-+        double f = 21.2964 + 390.67050646 * k - 0.0016528 * t2 - 0.00000239 * t3;
-+        double c1 = (0.1734 - 0.000393 * t) * Math.sin(m * dr) + 0.0021 * Math.sin(2 * dr * m);
-+        c1 -= 0.4068 * Math.sin(mpr * dr) + 0.0161 * Math.sin(dr * 2 * mpr);
-+        c1 -= 0.0004 * Math.sin(dr * 3 * mpr);
-+        c1 += 0.0104 * Math.sin(dr * 2 * f) - 0.0051 * Math.sin(dr * (m + mpr));
-+        c1 -= 0.0074 * Math.sin(dr * (m - mpr)) + 0.0004 * Math.sin(dr * (2 * f + m));
-+        c1 -= 0.0004 * Math.sin(dr * (2 * f - m)) - 0.0006 * Math.sin(dr * (2 * f + mpr));
-+        c1 += 0.0010 * Math.sin(dr * (2 * f - mpr)) + 0.0005 * Math.sin(dr * (2 * mpr + m));
-+        double deltaT = t < -11
-+                ? 0.001 + 0.000839 * t + 0.0002261 * t2 - 0.00000845 * t3 - 0.000000081 * t * t3
-+                : -0.000278 + 0.000265 * t + 0.000262 * t2;
-+        return (long) Math.floor(jd1 + c1 - deltaT + 0.5 + tz / 24);
-+    }
-+
-+    /** Which of the 12 thirty-degree sectors the sun's longitude is in at the start of the day. */
-+    static int sunLongitude(long jdn, double tz) {
-+        double t = (jdn - 2451545.5 - tz / 24) / 36525, t2 = t * t, dr = Math.PI / 180;
-+        double m = 357.52910 + 35999.05030 * t - 0.0001559 * t2 - 0.00000048 * t * t2;
-+        double l0 = 280.46645 + 36000.76983 * t + 0.0003032 * t2;
-+        double dl = (1.914600 - 0.004817 * t - 0.000014 * t2) * Math.sin(dr * m);
-+        dl += (0.019993 - 0.000101 * t) * Math.sin(dr * 2 * m) + 0.000290 * Math.sin(dr * 3 * m);
-+        double l = (l0 + dl) * dr;
-+        l -= Math.PI * 2 * Math.floor(l / (Math.PI * 2));
-+        return (int) Math.floor(l / Math.PI * 6);
-+    }
-+
-+    /** First day of the 11th lunar month (the one holding the winter solstice) of a Gregorian year. */
-+    static long lunarMonth11(int yy, double tz) {
-+        long off = jdFromDate(31, 12, yy) - 2415021;
-+        int k = (int) Math.floor(off / 29.530588853);
-+        long nm = newMoonDay(k, tz);
-+        if (sunLongitude(nm, tz) >= 9) nm = newMoonDay(k - 1, tz);
-+        return nm;
-+    }
-+
-+    /** Index of the leap month after month 11 in a 13-month year: the first month with no solar term. */
-+    static int leapMonthOffset(long a11, double tz) {
-+        int k = (int) Math.floor((a11 - 2415021.076998695) / 29.530588853 + 0.5);
-+        int i = 1;
-+        int arc = sunLongitude(newMoonDay(k + i, tz), tz);
-+        int last;
-+        do {
-+            last = arc;
-+            i++;
-+            arc = sunLongitude(newMoonDay(k + i, tz), tz);
-+        } while (arc != last && i < 14);
-+        return i - 1;
-+    }
-+}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index dca4f842..316d0150 100644
+index d992768a..e52c96f6 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-@@ -178,13 +178,28 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -178,6 +178,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private int wifiIcon;
      /** The pills have been filled in once; later resumes refresh them after the first frame. */
      private boolean pillsShown;
@@ -420,13 +223,9 @@ index dca4f842..316d0150 100644
 +    private View btnNowPlaying;
 +    private android.media.session.MediaSessionManager.OnActiveSessionsChangedListener nghePhien;
      private TextView shamsiDate;
-+    /** lunar_date: the lunisolar date under the date line, and the time zone it is computed for. */
-+    private TextView lunarDate;
-+    private boolean lunar;
-+    private int lunarOffset;
-     private TextView stats;
-     private List<RaceWeekend.Race> raceCalendar;
-     private View racePanel;
+     /** lunar_date: the lunisolar date under the date line, and the time zone it is computed for. */
+     private TextView lunarDate;
+@@ -189,6 +194,12 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private TextView raceKicker, raceHeadline, raceSessions;
      /** config.xml show_stats, overridable by a theme. Off: the line is gone and nothing is read. */
      private boolean showStats;
@@ -439,7 +238,7 @@ index dca4f842..316d0150 100644
      private boolean shamsi;
      /** greeting_name: said after the greeting, which is shown in capitals. */
      private String greetingName = "";
-@@ -342,6 +357,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -363,6 +374,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // The pill follows the network callbacks and each return to Home; only the diya's flame follows the
              // signal level, so only it needs this minute's binder calls (about 7 ms on the UI thread).
              if (festive) updateWifiLabel();
@@ -447,14 +246,9 @@ index dca4f842..316d0150 100644
              sky.update();
              wallpaperPlayer.update();
              handler.postDelayed(this, MINUTE_MS);
-@@ -444,12 +460,33 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
-         raceSessions = findViewById(R.id.raceSessions);
-         showStats = cfg.showStats;
-         shamsi = cfg.shamsiDate;
-+        lunarDate = findViewById(R.id.lunarDate);
-+        lunar = cfg.lunarDate;
-+        lunarOffset = Lunar.offsetFor(cfg.lunarUtcOffset, Locale.getDefault());
-+        if (lunar) lunarDate.setVisibility(View.VISIBLE);
+@@ -479,6 +491,15 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+         lunarOffset = Lunar.offsetFor(cfg.lunarUtcOffset, Locale.getDefault());
+         if (lunar) lunarDate.setVisibility(View.VISIBLE);
          greetingName = cfg.greetingName;
 +        weatherView = findViewById(R.id.weather);
 +        weatherCfg = Weather.load(this);
@@ -468,30 +262,31 @@ index dca4f842..316d0150 100644
          if (shamsi) {
              shamsiDate.setVisibility(View.VISIBLE);
              TextView date = findViewById(R.id.date);
-             date.setTextSize(11f);
+@@ -486,6 +507,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+             lunarDate.setTextSize(11f);
              date.setPadding(0, (int) (4 * density), 0, 0);
-+            lunarDate.setTextSize(11f);
-+        }
+         }
 +        // CleanTV/VGS: header_scale (percent, 80–180) enlarges the clock block and the stats line (feedback 24/10/2026:
 +        // "phần lịch và dự báo thời tiết cho to thêm"). After the 11 sp date / lunar sizes above, so they scale too.
 +        int coChu = Weather.so(this, "header_scale", 100, 80, 180);
 +        if (coChu != 100) {
 +            phongChu(clockBlock, coChu / 100f);
 +            phongChu(stats, coChu / 100f);
-         }
++        }
          vpnApp = cfg.vpnApp;
          moduleCards = cfg.moduleCards;
-@@ -511,7 +548,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+         hiddenApps = new HashSet<>(cfg.hiddenApps);
+@@ -563,7 +591,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              public void onChildViewDetachedFromWindow(@NonNull View v) {
              }
          });
--        if (dockRow) grid.addItemDecoration(new DockDecoration(COLUMNS, density, cinematic, cfg.alwaysShowNames, cfg.dockOpacity, cfg.dockGlass, cfg.dockEvenPadding));
+-        if (dockRow) grid.addItemDecoration(new DockDecoration(COLUMNS, density, cinematic, cfg.alwaysShowNames, cfg.dockOpacity, cfg.dockGlass, cfg.dockEvenPadding,
 +        // CleanTV/VGS: dock_band false keeps the dock row and its big title but drops the dark band behind it.
-+        if (dockRow && Weather.flag(this, "dock_band", true)) grid.addItemDecoration(new DockDecoration(COLUMNS, density, cinematic, cfg.alwaysShowNames, cfg.dockOpacity, cfg.dockGlass, cfg.dockEvenPadding));
++        if (dockRow && Weather.flag(this, "dock_band", true)) grid.addItemDecoration(new DockDecoration(COLUMNS, density, cinematic, cfg.alwaysShowNames, cfg.dockOpacity, cfg.dockGlass, cfg.dockEvenPadding,
+                 singleRow, cfg.dockBandAll));
          if (cfg.fadeRows) TopFade.attach(grid, 48 * density);
          // Reduced motion: the tiles are simply there, with no entrance (reloadApps skips it there too).
-         if (animations && !reducedMotion) {
-@@ -528,6 +566,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -581,6 +610,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // tvOS layout: push the dock row towards the bottom of the screen, leaving room for
          // rows_below_dock grid rows under it; the rest of the grid stays below until you press Down.
          int rowsBelowDock = cfg.rowsBelowDock;
@@ -501,18 +296,18 @@ index dca4f842..316d0150 100644
          grid.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
              int h = b - t;
              // Item height follows the tile size, which follows the columns and the rows that must fit (AppAdapter.tileWidthPx).
-@@ -545,6 +586,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
-             if (MainActivity.this.dockRow && cfg.dockTitle && rowsBelowDock > 0) want = Math.max(want, (int) (AppAdapter.TITLE_ROOM_DP * density));
-             // No dock to push down: the grid starts at the top, with room for the first row's zoom and glass.
-             if (!MainActivity.this.dockRow) want = (int) (AppAdapter.TOP_ROOM_DP * density);
+@@ -601,6 +633,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+             // A single row never shows the names under its tiles (the title above the row names the app), so the
+             // 7dp gap and 22dp label item_app.xml keeps for them would only lift the row: sit it that much lower.
+             if (singleRow && !cfg.alwaysShowNames) want += (int) (29 * density);
 +            if (doiHang != 0) {
 +                int thapNhat = Math.max((int) (AppAdapter.TOP_ROOM_DP * density), hero.getBottom() + (int) (8 * density));
 +                want = Math.max(thapNhat, Math.min(h - itemH, want + doiHang));
 +            }
              if (grid.getPaddingTop() != want) {
                  grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
-             }
-@@ -673,7 +718,34 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+                 // A vertical grid parks the dock on the new padding line by scrolling (onTileFocused); a sideways
+@@ -767,7 +803,34 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -547,7 +342,7 @@ index dca4f842..316d0150 100644
          btnSettings.setOnKeyListener(pillKeys);
          btnReorder.setOnKeyListener(pillKeys);
          btnLibraryTop.setOnKeyListener(pillKeys);
-@@ -811,6 +883,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -908,6 +971,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onResume() {
          super.onResume();
@@ -555,7 +350,7 @@ index dca4f842..316d0150 100644
          // A festival that started or ended while Home was in the background: rebuild with or without it.
          if (festive != festival.active(LocalDate.now())) {
              recreate();
-@@ -854,6 +927,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -951,6 +1015,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -563,7 +358,7 @@ index dca4f842..316d0150 100644
          sky.update();
          wallpaperPlayer.start();
          handler.postDelayed(minuteTick, MINUTE_MS);
-@@ -1022,6 +1096,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1119,6 +1184,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onPause() {
          super.onPause();
@@ -571,7 +366,7 @@ index dca4f842..316d0150 100644
          root.removeCallbacks(showIdleClock);
          endReorder();   // Home or another app while reordering keeps the order so far
          wallpaperPlayer.stop();
-@@ -1898,6 +1973,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2002,6 +2068,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -602,15 +397,7 @@ index dca4f842..316d0150 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2285,6 +2384,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
-             greeting.setTextColor(greetingColor);
-         }
-         if (shamsi) shamsiDate.setText(Shamsi.today(getResources()));
-+        if (lunar) lunarDate.setText(Lunar.today(getResources(), lunarOffset));
-     }
- 
-     // ---- race-weekend panel (a theme's race_calendar) -----------------------------------------------
-@@ -2430,7 +2530,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2591,7 +2681,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -623,7 +410,7 @@ index dca4f842..316d0150 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2636,6 +2740,29 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2806,6 +2900,29 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              if (v.equals("-")) return -1;
              try { return Integer.parseInt(v); } catch (NumberFormatException e) { return null; }
          }
@@ -653,7 +440,7 @@ index dca4f842..316d0150 100644
          return null;
      }
  
-@@ -3019,10 +3146,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3208,10 +3325,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
@@ -5595,56 +5382,35 @@ index 1550b02e..c7b78eaf 100644
          tools:targetApi="28" />
  </font-family>
 diff --git a/launcher/app/src/main/res/layout-iw/activity_main.xml b/launcher/app/src/main/res/layout-iw/activity_main.xml
-index 313f96a5..320a54d4 100644
+index 6b61aa40..70c21fde 100644
 --- a/launcher/app/src/main/res/layout-iw/activity_main.xml
 +++ b/launcher/app/src/main/res/layout-iw/activity_main.xml
-@@ -215,6 +215,22 @@
-                         android:fontFamily="@string/font_regular"
+@@ -216,7 +216,7 @@
                          android:letterSpacing="0.14"
                          android:textAllCaps="true" />
-+
-+                        <!-- Lunar date, shown when lunar_date is on. -->
-+                        <TextView
-+                            android:id="@+id/lunarDate"
-+                            android:gravity="right"
-+                            android:layout_width="match_parent"
-+                            android:layout_height="wrap_content"
-+                            android:layout_marginTop="4dp"
-+                            android:singleLine="true"
-+                            android:ellipsize="end"
-+                            android:textColor="#80FFFFFF"
-+                            android:textSize="14sp"
-+                            android:fontFamily="@font/outfit_regular"
-+                            android:letterSpacing="0.14"
-+                            android:textAllCaps="true"
-+                            android:visibility="gone" />
-                 </LinearLayout>
  
-                 <View
+-                        <!-- Lunar date ("Lunar 13/9 · Year of the Horse"), shown when lunar_date is on. -->
++                        <!-- Lunar date, shown when lunar_date is on. -->
+                         <TextView
+                             android:id="@+id/lunarDate"
+                             android:gravity="right"
 diff --git a/launcher/app/src/main/res/layout/activity_main.xml b/launcher/app/src/main/res/layout/activity_main.xml
-index c5d56e73..420b116f 100644
+index 39805803..a9bbbce8 100644
 --- a/launcher/app/src/main/res/layout/activity_main.xml
 +++ b/launcher/app/src/main/res/layout/activity_main.xml
-@@ -270,6 +270,38 @@
-                             android:fontFamily="@string/font_regular"
+@@ -272,7 +272,7 @@
                              android:letterSpacing="0.14"
                              android:textAllCaps="true" />
-+
+ 
+-                        <!-- Lunar date ("Lunar 13/9 · Year of the Horse"), shown when lunar_date is on. -->
 +                        <!-- Lunar date ("2/9 âm lịch · Bính Ngọ"), shown when lunar_date is on. -->
-+                        <TextView
-+                            android:id="@+id/lunarDate"
-+                            android:gravity="left"
-+                            android:layout_width="match_parent"
-+                            android:layout_height="wrap_content"
-+                            android:layout_marginTop="4dp"
-+                            android:singleLine="true"
-+                            android:ellipsize="end"
-+                            android:textColor="#80FFFFFF"
-+                            android:textSize="14sp"
-+                            android:fontFamily="@font/outfit_regular"
-+                            android:letterSpacing="0.14"
-+                            android:textAllCaps="true"
-+                            android:visibility="gone" />
+                         <TextView
+                             android:id="@+id/lunarDate"
+                             android:gravity="left"
+@@ -287,6 +287,22 @@
+                             android:letterSpacing="0.14"
+                             android:textAllCaps="true"
+                             android:visibility="gone" />
 +                        <!-- CleanTV/VGS: weather line ("30°C Trời quang · Vinh") under the date and lunar lines, at the date's
 +                             size so a long ward name doesn't take over the header (feedback 23/10/2026). -->
 +                        <TextView
@@ -5664,7 +5430,7 @@ index c5d56e73..420b116f 100644
                      </LinearLayout>
                  </LinearLayout>
  
-@@ -312,6 +344,15 @@
+@@ -329,6 +345,15 @@
                      android:drawableStart="@drawable/ic_input"
                      android:nextFocusDown="@+id/grid" />
  
@@ -5680,7 +5446,7 @@ index c5d56e73..420b116f 100644
                  <TextView
                      android:id="@+id/btnWifi"
                      style="@style/TopButton"
-@@ -329,6 +370,24 @@
+@@ -346,6 +371,24 @@
                      android:drawableStart="@drawable/ic_swap_vert"
                      android:nextFocusDown="@+id/grid" />
  
@@ -5721,10 +5487,10 @@ index 9e58a7d8..00000000
 -    <string name="font_medium" translatable="false">sans-serif-medium</string>
 -</resources>
 diff --git a/launcher/app/src/main/res/values-vi/strings.xml b/launcher/app/src/main/res/values-vi/strings.xml
-index b6b79700..aed31a94 100644
+index 48609291..77e3e027 100644
 --- a/launcher/app/src/main/res/values-vi/strings.xml
 +++ b/launcher/app/src/main/res/values-vi/strings.xml
-@@ -116,4 +116,25 @@
+@@ -119,4 +119,14 @@
      <string name="race_countdown_days">%1$d ngày %2$d giờ</string>
      <string name="last_opened">Mở lần cuối %1$s</string>
      <string name="tile_move">Di chuyển</string>
@@ -5738,31 +5504,7 @@ index b6b79700..aed31a94 100644
 +    <string name="stats_cpu">CPU %1$d%%</string>
 +    <string name="storage_gb_whole">%1$.0f GB</string>
 +    <string name="storage_gb_decimal">%1$.1f GB</string>
-+    <string name="lunar_date_format">%1$d/%2$s âm lịch · %3$s</string>
-+    <string name="lunar_month_leap">%1$d nhuận</string>
-+    <string name="lunar_year">%1$s %2$s</string>
-+    <string-array name="lunar_stems">
-+        <item>Giáp</item><item>Ất</item><item>Bính</item><item>Đinh</item><item>Mậu</item>
-+        <item>Kỷ</item><item>Canh</item><item>Tân</item><item>Nhâm</item><item>Quý</item>
-+    </string-array>
-+    <string-array name="lunar_branches">
-+        <item>Tý</item><item>Sửu</item><item>Dần</item><item>Mão</item><item>Thìn</item><item>Tỵ</item>
-+        <item>Ngọ</item><item>Mùi</item><item>Thân</item><item>Dậu</item><item>Tuất</item><item>Hợi</item>
-+    </string-array>
  </resources>
-diff --git a/launcher/app/src/main/res/values/config.xml b/launcher/app/src/main/res/values/config.xml
-index f600b7d6..9f6e58e0 100644
---- a/launcher/app/src/main/res/values/config.xml
-+++ b/launcher/app/src/main/res/values/config.xml
-@@ -185,6 +185,8 @@
-     <!-- Show the Solar Hijri (Shamsi) date used in Iran and Afghanistan, e.g. "27 Mehr 1405", above the
-          Gregorian date. -->
-     <bool name="shamsi_date">false</bool>
-+    <!-- Lunisolar (Vietnamese / Chinese) date under the date; config.json lunar_date, lunar_utc_offset (7 or 8, default by locale). -->
-+    <bool name="lunar_date">false</bool>
- 
-     <!-- A name after the greeting: "Mr. Trịnh" shows GOOD MORNING, MR. TRỊNH. Empty: the greeting alone. -->
-     <string name="greeting_name" translatable="false"></string>
 diff --git a/launcher/app/src/main/res/values/fonts.xml b/launcher/app/src/main/res/values/fonts.xml
 index adbb30db..91098f5c 100644
 --- a/launcher/app/src/main/res/values/fonts.xml
@@ -5779,29 +5521,10 @@ index adbb30db..91098f5c 100644
      <string name="font_light" translatable="false">@font/outfit_light</string>
      <string name="font_extralight" translatable="false">@font/outfit_extralight</string>
 diff --git a/launcher/app/src/main/res/values/strings.xml b/launcher/app/src/main/res/values/strings.xml
-index aa9d3e9e..5a3b37f6 100644
+index ad90112f..8cee5352 100644
 --- a/launcher/app/src/main/res/values/strings.xml
 +++ b/launcher/app/src/main/res/values/strings.xml
-@@ -23,6 +23,18 @@
-     <string name="date_format">EEEE  d MMMM</string>
-     <!-- Date next to the clock on Home; a locale can split it over two lines with \n. -->
-     <string name="date_format_home" translatable="false">@string/date_format</string>
-+    <!-- Lunar date under the date: day, month, year name. -->
-+    <string name="lunar_date_format">Lunar %1$d/%2$s · %3$s</string>
-+    <string name="lunar_month_leap">%1$d (leap)</string>
-+    <string name="lunar_year">Year of the %2$s</string>
-+    <string-array name="lunar_stems">
-+        <item>Jia</item><item>Yi</item><item>Bing</item><item>Ding</item><item>Wu</item>
-+        <item>Ji</item><item>Geng</item><item>Xin</item><item>Ren</item><item>Gui</item>
-+    </string-array>
-+    <string-array name="lunar_branches">
-+        <item>Rat</item><item>Ox</item><item>Tiger</item><item>Rabbit</item><item>Dragon</item><item>Snake</item>
-+        <item>Horse</item><item>Goat</item><item>Monkey</item><item>Rooster</item><item>Dog</item><item>Pig</item>
-+    </string-array>
-     <string name="shamsi_month_farvardin">Farvardin</string>
-     <string name="shamsi_month_ordibehesht">Ordibehesht</string>
-     <string name="shamsi_month_khordad">Khordad</string>
-@@ -145,4 +157,11 @@
+@@ -148,4 +148,11 @@
      <!-- Cinematic top shelf (cinematic_home): the line under the focused dock app's name; %1$s is when it was
           last opened, e.g. "5 minutes ago" or "yesterday, 9:40 pm". -->
      <string name="last_opened">Last opened %1$s</string>
@@ -5813,50 +5536,3 @@ index aa9d3e9e..5a3b37f6 100644
 +    <string name="now_playing_none">Nothing is playing</string>
 +    <string name="screensaver">Screensaver</string>
  </resources>
-diff --git a/launcher/app/src/test/java/com/gathin/tvhome/LunarTest.java b/launcher/app/src/test/java/com/gathin/tvhome/LunarTest.java
-new file mode 100644
-index 00000000..81e7ff45
---- /dev/null
-+++ b/launcher/app/src/test/java/com/gathin/tvhome/LunarTest.java
-@@ -0,0 +1,41 @@
-+package com.gathin.tvhome;
-+
-+import static org.junit.Assert.assertArrayEquals;
-+
-+import org.junit.Test;
-+
-+/** Known lunar dates (Vietnamese calendar, UTC+7 unless noted). Arrays are {day, month, year, leap}. */
-+public class LunarTest {
-+
-+    @Test
-+    public void lunarNewYear() {
-+        assertArrayEquals(new int[]{1, 1, 2024, 0}, Lunar.fromSolar(10, 2, 2024, 7));
-+        assertArrayEquals(new int[]{1, 1, 2025, 0}, Lunar.fromSolar(29, 1, 2025, 7));
-+        assertArrayEquals(new int[]{1, 1, 2026, 0}, Lunar.fromSolar(17, 2, 2026, 7));
-+        assertArrayEquals(new int[]{1, 1, 2027, 0}, Lunar.fromSolar(6, 2, 2027, 7));
-+    }
-+
-+    @Test
-+    public void dayBeforeNewYearBelongsToTheOldYear() {
-+        assertArrayEquals(new int[]{29, 12, 2025, 0}, Lunar.fromSolar(16, 2, 2026, 7));
-+    }
-+
-+    @Test
-+    public void midAutumn() {
-+        assertArrayEquals(new int[]{15, 8, 2024, 0}, Lunar.fromSolar(17, 9, 2024, 7));
-+        assertArrayEquals(new int[]{15, 8, 2025, 0}, Lunar.fromSolar(6, 10, 2025, 7));
-+    }
-+
-+    @Test
-+    public void leapSixthMonth2025() {
-+        assertArrayEquals(new int[]{1, 6, 2025, 1}, Lunar.fromSolar(25, 7, 2025, 7));
-+        assertArrayEquals(new int[]{1, 6, 2025, 0}, Lunar.fromSolar(25, 6, 2025, 7));
-+    }
-+
-+    @Test
-+    public void vietnamAndChinaDifferIn1985() {
-+        // The 1985 new year: 21 January in Vietnam (UTC+7), 20 February in China (UTC+8).
-+        assertArrayEquals(new int[]{1, 1, 1985, 0}, Lunar.fromSolar(21, 1, 1985, 7));
-+        assertArrayEquals(new int[]{1, 1, 1985, 0}, Lunar.fromSolar(20, 2, 1985, 8));
-+    }
-+}

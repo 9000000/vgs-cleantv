@@ -928,6 +928,7 @@ private fun TheHomeNoiDung(vm: PhienLamViec) {
     The(t("Đồng hồ & lời chào", "Clock & greeting"), Icons.Rounded.Schedule) {
         OutlinedTextField(vm.tenChao, { vm.tenChao = it }, label = { Text(t("Tên chào (vd: Nhà bác Hùng)", "Greeting name (e.g. The Smiths)")) },
             singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
+        Hang(t("Ẩn lời chào", "Hide the greeting"), t("Bỏ dòng \"Chào buổi tối\" phía trên đồng hồ", "Drops the \"Good evening\" line above the clock"), vm.anLoiChao) { vm.anLoiChao = it }
         Hang(t("Âm lịch dưới ngày dương", "Lunar date under the date"), t("Ví dụ: 2/9 âm lịch · Bính Ngọ", "e.g. Lunar 2/9 · Year of the Horse"), vm.amLich) { vm.amLich = it }
         Text(t("Đồng hồ khi để yên", "Clock when idle"), fontSize = 14.sp)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -943,6 +944,8 @@ private fun TheTuyChinh(vm: PhienLamViec) {
         Hang(t("Tên app to phía trên dock", "Large app name above the dock"), t("Tắt để Home gọn hơn, chỉ còn viền sáng", "Turn off for a calmer Home, just the glow"), vm.tenToTrenDock) { vm.tenToTrenDock = it }
         Hang(t("Hiện tên dưới mọi app", "Names under every app"), t("Ông bà dễ nhận app hơn", "Easier to recognise apps"), vm.tenDuoiApp) { vm.tenDuoiApp = it }
         Hang(t("Tô màu ô app điện thoại", "Colour phone-app tiles"), t("App không có ảnh tivi (Chrome, Thư viện…) có ô màu theo icon thay vì nền xám", "Apps without a TV banner get a tile in their icon's colour"), vm.toMauOApp) { vm.toMauOApp = it }
+        Hang(t("Tất cả app một hàng", "Every app in one row"), t("Một hàng cuộn ngang, không còn lưới bên dưới", "One sideways-scrolling row, no grid below"), vm.motHang) { vm.motHang = it }
+        Hang(t("Ô icon đều nhau", "Uniform icon tiles"), t("Kiểu Apple TV: mọi ô là icon trên nền màu của app, bỏ ảnh banner", "Apple TV style: every tile is the icon on its own colour, no banners"), vm.oDeuNhau) { vm.oDeuNhau = it }
         Hang(t("Gom nút trên cùng thành icon", "Compact icon buttons"), t("Một cụm gọn, bỏ chữ", "One tidy cluster, no labels"), vm.gonNut) { vm.gonNut = it }
         Text(t("Cỡ chữ đồng hồ, lịch, thời tiết", "Clock, date and weather size"), fontSize = 14.sp)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -983,7 +986,7 @@ private fun TheTuyChinh(vm: PhienLamViec) {
     The(t("Tivi yếu & mạng", "Slow TVs & network"), Icons.Rounded.Speed) {
         Hang(t("Chế độ tivi yếu", "Slow TV mode"), t("Bớt hiệu ứng chuyển động cho tivi cũ, ít RAM", "Calmer motion for old, low-memory TVs"), vm.tiviYeu) { vm.tiviYeu = it }
         Hang(t("Hiệu ứng kính mờ", "Frosted glass effects"), t("Dock kính mờ, ánh sáng theo màu app", "Frosted dock, glow in the app's colour"), vm.hieuUngKinh) { vm.hieuUngKinh = it }
-        Hang(t("DNS chặn quảng cáo (AdGuard)", "Ad-blocking DNS (AdGuard)"), t("Là cài đặt DNS của tivi, không phải app (xem ở Cài đặt → Mạng → DNS riêng tư). Không chặn được quảng cáo YouTube", "A TV DNS setting, not an app (Settings → Network → Private DNS). Does not block YouTube ads"), vm.dnsChanQc) { vm.dnsChanQc = it }
+        Hang(t("DNS chặn quảng cáo (AdGuard)", "Ad-blocking DNS (AdGuard)"), t("Là cài đặt DNS của tivi, không phải app (xem ở Cài đặt → Mạng → DNS riêng tư). Không chặn được quảng cáo YouTube. Nhà đã chặn ở router (Pi-hole, AdGuard Home, VPN router) thì đừng bật: tivi sẽ đi vòng qua router", "A TV DNS setting, not an app (Settings → Network → Private DNS). Does not block YouTube ads. If your router already filters (Pi-hole, AdGuard Home, router VPN), leave it off: the TV would bypass the router"), vm.dnsChanQc) { vm.dnsChanQc = it }
     }
 }
 

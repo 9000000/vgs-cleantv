@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 62,
-  "versionName": "2.7.3",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.7.3.apk",
-  "co": 11589843,
-  "ghiChu": "Cỡ chữ đồng hồ, lịch, thời tiết to hơn; sửa công tắc DNS chặn quảng cáo AdGuard",
-  "ghiChuEn": "Bigger clock, date and weather; AdGuard DNS switch fixed",
+  "versionCode": 63,
+  "versionName": "2.8.0",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.8.0.apk",
+  "co": 11638631,
+  "ghiChu": "Kéo bản launcher mới nhất: tuỳ chọn Tất cả app một hàng, Ô icon đều nhau, Ẩn lời chào; nút INPUT remote Xiaomi mở bảng nguồn; mở app ổn hơn trên TCL Google TV; 14 tuỳ chọn Nâng cao mới; cảnh báo DNS với router chặn quảng cáo.",
+  "ghiChuEn": "Latest launcher: Every app in one row, Uniform icon tiles, Hide the greeting; Xiaomi INPUT button opens the input picker; steadier app launches on TCL Google TV; 14 new Advanced options; DNS note for routers that already filter.",
   "ngay": "2026-10-24"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "7807242fa93f9161",
+   "phienBan": "3ac2a65e004d3a66",
    "url": "/ota/du-lieu.json",
    "co": 1479960,
-   "tuBan": 62
+   "tuBan": 63
   },
   "tvhome.apk": {
-   "phienBan": "024d74c2da6200a1",
+   "phienBan": "b9c419044f3acd03",
    "url": "/ota/tvhome.apk",
-   "co": 603275,
-   "tuBan": 62
+   "co": 618585,
+   "tuBan": 63
   }
  }
 }

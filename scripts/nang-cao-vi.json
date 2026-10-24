@@ -266,5 +266,61 @@
   "gamepad_passthrough": {
     "ten": "Nhường phím cho tay cầm game",
     "moTa": "Bật thì khi có tay cầm game kết nối, dịch vụ bắt phím của Home sạch ngừng lọc phím để game nhận đủ nút (vd Steam Link với tay Xbox); các nút remote gán sẵn tạm không chạy tới khi rút tay cầm. Cần bật key_filter. Mặc định tắt."
+  },
+  "top_bar_apps": {
+    "ten": "App thành nút tròn trên thanh trên cùng",
+    "moTa": "Các app này hiện thành nút tròn có logo ở thanh trên cùng, bên trái ô mạng, và không còn là ô trong lưới. Ghi tên gói, cách nhau bằng dấu phẩy."
+  },
+  "wifi_status_warnings": {
+    "ten": "Icon mạng đổi màu khi có sự cố",
+    "moTa": "Khi bật tô màu icon mạng: cam khi có Wi-Fi mà không vào được Internet (mạng cần đăng nhập), đỏ khi mất mạng (mặc định tắt)."
+  },
+  "uniform_tiles": {
+    "ten": "Ô icon đều nhau",
+    "moTa": "Mỗi ô app là icon trên nền màu lấy từ icon, tên chỉ hiện dưới ô đang chọn, thay cho ảnh banner của app (mặc định tắt)."
+  },
+  "lunar_utc_offset": {
+    "ten": "Múi giờ tính âm lịch",
+    "moTa": "Số giờ lệch UTC dùng để tính âm lịch: 7 là lịch Việt Nam, 8 là lịch Trung Quốc; thỉnh thoảng lệch nhau một ngày. Để trống: 7 khi tivi tiếng Việt, 8 khi khác."
+  },
+  "show_greeting": {
+    "ten": "Lời chào trên đồng hồ",
+    "moTa": "Dòng \"Chào buổi tối\" phía trên đồng hồ (mặc định bật); tắt để ẩn."
+  },
+  "header_white": {
+    "ten": "Ngày màu trắng",
+    "moTa": "Ngày và vạch giữa đồng hồ với ngày trắng như đồng hồ thay vì mờ (mặc định tắt)."
+  },
+  "open_on_start_choice": {
+    "ten": "Chọn app mở khi bật tivi",
+    "moTa": "Thêm dòng \"Mở khi khởi động\" vào Cài đặt launcher: chọn một app, lần đầu về Home sau mỗi lần bật tivi sẽ mở app đó (mặc định tắt)."
+  },
+  "consume_volume_keys": {
+    "ten": "Sửa nút âm lượng nhảy hai nấc",
+    "moTa": "Dịch vụ phím tự giữ và lặp nút tăng/giảm âm lượng. Dùng khi bấm một lần mà âm lượng nhảy hai nấc (TCL BeyondTV4). Cần bật lọc phím (key_filter). Mặc định tắt."
+  },
+  "clock_wallpaper": {
+    "ten": "Màn chờ đồng hồ trên hình nền",
+    "moTa": "Màn chờ đồng hồ hiện trên hình nền của Home thay vì nền đen có ánh màu; đồng hồ vẫn dịch chỗ mỗi phút (mặc định tắt)."
+  },
+  "clock_wallpaper_dim": {
+    "ten": "Độ tối hình nền sau đồng hồ",
+    "moTa": "Hình nền sau đồng hồ tối bao nhiêu phần trăm (mặc định 50)."
+  },
+  "clock_glow": {
+    "ten": "Ánh màu của màn chờ đồng hồ",
+    "moTa": "Ánh màu quanh đồng hồ ở màn chờ (mặc định bật); tắt để chỉ còn đồng hồ trên nền đen, hợp với tivi OLED."
+  },
+  "glass_style": {
+    "ten": "Kiểu viền ô đang chọn",
+    "moTa": "glass (mặc định: tấm kính mờ có vệt sáng), rim (chỉ viền sắc, dịu nhất) hoặc halo (viền kèm ánh sáng nhẹ bên ngoài)."
+  },
+  "single_row": {
+    "ten": "Tất cả app một hàng",
+    "moTa": "Mọi app nằm trên hàng dock, app dock đứng đầu, cuộn ngang; không còn lưới bên dưới (mặc định tắt; cần dock_row)."
+  },
+  "dock_band_all": {
+    "ten": "Dải nền chạy suốt hàng",
+    "moTa": "Khi bật một hàng: dải nền sau dock chạy sau mọi app trong hàng, không chỉ app dock (mặc định tắt)."
   }
 }

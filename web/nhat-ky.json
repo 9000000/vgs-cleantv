@@ -1,5 +1,23 @@
 [
  {
+  "ban": "2.8.0",
+  "ngay": "2026-10-24",
+  "vi": [
+   "• Tuỳ chỉnh mới: Tất cả app một hàng, Ô icon đều nhau (kiểu Apple TV), Ẩn lời chào",
+   "• Tivi Xiaomi: nút INPUT trên remote mở lại bảng chọn nguồn",
+   "• TCL Google TV: mở app từ remote/Play ổn hơn khi đã tắt Home Google",
+   "• Nâng cao: thêm 14 tuỳ chọn (màn chờ đồng hồ trên hình nền, kiểu viền ô, app thành nút tròn…)",
+   "• DNS chặn quảng cáo: ghi rõ đừng bật nếu router đã chặn (Pi-hole, AdGuard Home, VPN)"
+  ],
+  "en": [
+   "• New options: Every app in one row, Uniform icon tiles (Apple TV style), Hide the greeting",
+   "• Xiaomi TVs: the remote INPUT button opens the input picker again",
+   "• TCL Google TV: steadier app launches with the Google Home off",
+   "• Advanced: 14 new options (clock screensaver over the wallpaper, focus style, apps as round buttons…)",
+   "• Ad-blocking DNS: note to leave it off when the router already filters"
+  ]
+ },
+ {
   "ban": "2.7.3",
   "ngay": "2026-10-24",
   "vi": [
