@@ -27,107 +27,170 @@ data class Theme(
 
 val THEMES = listOf(
     // 1. Thương hiệu CleanTV
-    Theme("vgs", "VGS", "VGS", "Logo VGS tím, nền đổi sắc theo giờ, dock trong suốt", "Violet VGS logo, sky follows the time of day, transparent dock",
+    Theme(
+        "vgs", "VGS", "VGS",
+        "Logo VGS tím, nền đổi sắc theo giờ, dock trong suốt",
+        "Violet VGS logo, sky follows the time of day, transparent dock",
         mapOf("background_color" to "#140A3A", "sky_intensity" to 55, "dock_band" to false, "dock_opacity" to 0, "dock_glass" to false),
-        "theme/vgs.jpg", listOf(0xFF0D0A38, 0xFF22168A, 0xFF4C1FD0)),
+        "theme/vgs.jpg",
+        listOf(0xFF0D0A38, 0xFF22168A, 0xFF4C1FD0)
+    ),
 
-    // 2. Tối giản đen tuyền Apple TV style
-    Theme("toi-gian", "Tối giản", "Minimal", "Nền đen tuyền, kiểu Apple TV, dock trong suốt", "Pure black, Apple TV style, transparent dock",
-        mapOf("background_color" to "#000000", "dock_band" to false, "dock_opacity" to 0, "dock_glass" to false),
-        null, listOf(0xFF000000, 0xFF111111)),
+    // 2. Mặc định (Default)
+    Theme(
+        "default", "Mặc định", "Default",
+        "Giao diện gốc dạng JSON, 4 cột, nền đen tuyền",
+        "The built-in look written out as JSON, 4 columns, pure black background",
+        mapOf(
+            "dock_apps" to listOf("com.netflix.ninja", "com.amazon.amazonvideo.livingroom", "com.google.android.youtube.tv", "in.startv.hotstar"),
+            "hidden_apps" to listOf("com.mediatek.wwtv.tvcenter", "com.mitv.gallery"),
+            "columns" to 4,
+            "rows_below_dock" to 0,
+            "reduced_motion" to false,
+            "background_color" to "#000000",
+            "wallpaper" to false
+        ),
+        null,
+        listOf(0xFF000000, 0xFF1A1A1A)
+    ),
 
-    // 3. 14 tranh phong cảnh code xoay mỗi giờ
-    Theme("phong-canh", "Phong cảnh", "Scenes", "14 tranh phong cảnh, tự đổi mỗi giờ, dock trong suốt", "14 landscapes, a new one every hour, transparent dock",
-        mapOf("wallpaper_rotation_minutes" to 60, "dock_band" to false, "dock_opacity" to 0, "dock_glass" to false, "background_color" to "#05060A"),
-        null, listOf(0xFF1A2236, 0xFF4A3A5A), boAnh = "theme/phong-canh", anhXem = "theme/phong-canh/02-golden-coast.jpg"),
+    // 3. Cực quang (Aurora)
+    Theme(
+        "aurora", "Cực quang", "Aurora",
+        "Hình nền cực quang tối màu (xanh ngọc và tím trên nền navy)",
+        "A dark aurora wallpaper (teal and violet on navy, darker at the bottom) with a matching background colour",
+        mapOf("background_color" to "#070A14", "wallpaper" to true),
+        "theme/aurora.jpg",
+        listOf(0xFF070A14, 0xFF0E4F5C, 0xFF3B1E6E)
+    ),
 
-    // 4. Thụy Điển xoay vòng 6 cột
-    Theme("sweden", "Thụy Điển", "Sweden", "3 ảnh phong cảnh đổi mỗi giờ, dock trong suốt 6 cột", "3 rotating landscapes, transparent 6-column dock",
-        mapOf("columns" to 6, "rows_below_dock" to 1, "background_color" to "#05070C", "wallpaper_rotation_minutes" to 60,
-            "wallpaper_order" to "sequential", "wallpaper_captions" to true, "cinematic_home" to false, "dock_title" to false,
-            "dock_band" to false, "dock_opacity" to 0, "dock_glass" to false, "dock_even_padding" to true, "icon_only_buttons" to true,
-            "icon_only_inputs" to true, "ambient_glow" to false, "app_glow" to false, "fade_rows" to true,
-            "focus_overshoot" to false, "advanced_effects" to true),
-        null, listOf(0xFF05070C, 0xFF142233, 0xFF283E55), boAnh = "theme/sweden", anhXem = "theme/sweden/001.jpg"),
+    // 4. Kính trong suốt (Glass)
+    Theme(
+        "glass", "Kính trong suốt", "Glass",
+        "Nền xanh navy ánh tím ngọc, thanh trên điện ảnh, dock kính mờ, nút tròn icon",
+        "Dark navy wallpaper with soft teal and violet light, cinematic top shelf, frosted-glass dock, icon-only buttons",
+        mapOf(
+            "dock_apps" to listOf(
+                "com.netflix.ninja",
+                "com.google.android.youtube.tv",
+                "com.amazon.amazonvideo.livingroom",
+                "com.disney.disneyplus",
+                "com.wbd.stream",
+                "com.apple.atve.androidtv.appletv"
+            ),
+            "background_color" to "#090C14",
+            "wallpaper" to true,
+            "cinematic_home" to true,
+            "dock_glass" to true,
+            "icon_only_buttons" to true,
+            "app_glow" to true,
+            "glow_style" to "horizon",
+            "focus_overshoot" to false,
+            "advanced_effects" to true
+        ),
+        "theme/glass.jpg",
+        listOf(0xFF090C14, 0xFF141A29, 0xFF2A1C4D)
+    ),
 
-    // 5. Trong suốt nguyên bản
-    Theme("glass", "Kính trong suốt", "Transparent Glass", "Dock trong suốt không dải nền, thanh trên điện ảnh, nút tròn", "Transparent borderless dock, cinematic top shelf, icon-only buttons",
-        mapOf("background_color" to "#090C14", "cinematic_home" to true, "dock_band" to false, "dock_opacity" to 0, "dock_glass" to false, "icon_only_buttons" to true,
-            "app_glow" to true, "glow_style" to "horizon", "focus_overshoot" to false, "advanced_effects" to true),
-        "theme/glass.jpg", listOf(0xFF090C14, 0xFF141A29, 0xFF2A1C4D)),
+    // 5. Thu Phần Lan (Ruska)
+    Theme(
+        "ruska", "Thu Phần Lan", "Ruska",
+        "Hoàng hôn thu Phần Lan bên hồ, dock trong suốt 70%, viền sáng theo màu app",
+        "A Finnish autumn (\"ruska\") dusk over a lake, dock 70% opaque, focus glows in app colour without overshoot",
+        mapOf(
+            "background_color" to "#07080D",
+            "wallpaper" to true,
+            "ambient_glow" to false,
+            "dock_opacity" to 70,
+            "app_glow" to true,
+            "focus_overshoot" to false
+        ),
+        "theme/ruska.jpg",
+        listOf(0xFF07080D, 0xFF2A1A12, 0xFF8B4513)
+    ),
 
-    // 6. Cyberpunk Neon Đêm
-    Theme("neon-cyber", "Neon Đêm", "Cyberpunk Neon", "Thành phố neon tương lai trong mưa, dock trong suốt, viền sáng horizon", "Rainy cyberpunk neon city, transparent dock, horizon glow",
-        mapOf("background_color" to "#080812", "dock_band" to false, "dock_opacity" to 0, "dock_glass" to false, "icon_only_buttons" to true,
-            "app_glow" to true, "glow_style" to "horizon", "advanced_effects" to true, "accent_color" to "#00F0FF", "wallpaper_dim" to 15),
-        "theme/neon-cyber.jpg", listOf(0xFF080812, 0xFF180B28, 0xFF00E5FF)),
+    // 6. Phong cảnh (Scenes)
+    Theme(
+        "scenes", "Phong cảnh", "Scenes",
+        "14 tranh phong cảnh tối vẽ bằng code, tự đổi mỗi giờ",
+        "14 dark illustrated landscapes in wallpapers/, a new one every hour",
+        mapOf("wallpaper" to true, "wallpaper_rotation_minutes" to 60),
+        null,
+        listOf(0xFF1A2236, 0xFF4A3A5A),
+        boAnh = "theme/phong-canh",
+        anhXem = "theme/phong-canh/02-golden-coast.jpg"
+    ),
 
-    // 7. Vũ trụ Tinh Vân tím hồng ambient glow
-    Theme("tinh-van", "Tinh Vân", "Cosmic Nebula", "Vũ trụ sâu thẳm với bụi sao tím hồng, dock trong suốt, viền sáng nổi bật", "Deep cosmic nebula with violet star dust, transparent dock",
-        mapOf("background_color" to "#04030A", "dock_band" to false, "dock_opacity" to 0, "dock_glass" to false, "dock_even_padding" to true,
-            "icon_only_buttons" to true, "ambient_glow" to true, "app_glow" to true, "focus_overshoot" to true, "advanced_effects" to true),
-        "theme/tinh-van.jpg", listOf(0xFF04030A, 0xFF2A0845, 0xFF6441A5)),
+    // 7. 6 cột (Six columns)
+    Theme(
+        "six-columns", "6 cột", "Six columns",
+        "6 ô nhỏ hơn mỗi hàng và thấy thêm 1 hàng app dưới dock",
+        "Six smaller tiles per row and one grid row visible under the dock",
+        mapOf(
+            "columns" to 6,
+            "rows_below_dock" to 1,
+            "background_color" to "#000000",
+            "wallpaper" to false
+        ),
+        null,
+        listOf(0xFF000000, 0xFF111122)
+    ),
 
-    // 8. Ngọc Bích Emerald Matrix xanh lục bảo
-    Theme("ngoc-bich", "Ngọc Bích", "Emerald Matrix", "Kính hình học xanh ngọc lục bảo sang trọng, dock trong suốt, viền sáng horizon", "Luxury emerald geometric dark glass, transparent dock, modern horizon glow",
-        mapOf("background_color" to "#030C07", "dock_band" to false, "dock_opacity" to 0, "dock_glass" to false, "dock_even_padding" to true,
-            "icon_only_buttons" to true, "icon_only_inputs" to true, "app_glow" to true, "glow_style" to "horizon",
-            "accent_color" to "#10B981", "advanced_effects" to true),
-        "theme/ngoc-bich.jpg", listOf(0xFF030C07, 0xFF0B291A, 0xFF10B981)),
+    // 8. Thụy Điển (Sweden)
+    Theme(
+        "sweden", "Thụy Điển", "Sweden",
+        "3 ảnh Thụy Điển đổi mỗi giờ kèm địa danh và tác giả, dock kính mờ 6 cột",
+        "Three photos of Sweden rotating every hour, 6-column frosted-glass dock, round icon-only buttons",
+        mapOf(
+            "dock_apps" to listOf(
+                "com.netflix.ninja",
+                "com.google.android.youtube.tv",
+                "com.amazon.amazonvideo.livingroom",
+                "com.disney.disneyplus",
+                "com.apple.atve.androidtv.appletv",
+                "com.wbd.stream"
+            ),
+            "columns" to 6,
+            "rows_below_dock" to 1,
+            "background_color" to "#05070C",
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 60,
+            "wallpaper_order" to "sequential",
+            "wallpaper_captions" to true,
+            "cinematic_home" to false,
+            "dock_title" to false,
+            "dock_glass" to true,
+            "dock_opacity" to 50,
+            "dock_even_padding" to true,
+            "icon_only_buttons" to true,
+            "icon_only_inputs" to true,
+            "ambient_glow" to false,
+            "app_glow" to false,
+            "fade_rows" to true,
+            "focus_overshoot" to false,
+            "advanced_effects" to true
+        ),
+        null,
+        listOf(0xFF05070C, 0xFF142233, 0xFF283E55),
+        boAnh = "theme/sweden",
+        anhXem = "theme/sweden/001.jpg"
+    ),
 
-    // 9. Điện Ảnh Noir đen trắng tương phản cao
-    Theme("den-trang", "Điện Ảnh Noir", "Monochrome Noir", "Nhiếp ảnh kiến trúc đen trắng tương phản cao, dock trong suốt, phong cách điện ảnh cổ điển", "High-contrast monochrome cityscape, transparent dock, classic cinematic noir style",
-        mapOf("background_color" to "#050505", "cinematic_home" to true, "cinematic_white_focus" to true, "cinematic_scrim" to 80,
-            "dock_title" to false, "dock_band" to false, "dock_opacity" to 0, "dock_glass" to false, "ambient_glow" to false, "app_glow" to false,
-            "fade_rows" to true, "focus_overshoot" to false),
-        "theme/den-trang.jpg", listOf(0xFF050505, 0xFF222222, 0xFF666666)),
-
-    // 10. Băng Giá Bắc Âu 6 cột app
-    Theme("bang-gia", "Băng Giá Bắc Âu", "Nordic Winter", "Vịnh hẹp Na Uy tuyết phủ trong hoàng hôn bắc cực, 6 cột app, dock trong suốt", "Snowy Scandinavian fjord at twilight, crisp glacial blue, transparent 6-column dock",
-        mapOf("columns" to 6, "rows_below_dock" to 1, "background_color" to "#060A12", "dock_band" to false, "dock_opacity" to 0, "dock_glass" to false,
-            "dock_even_padding" to true, "icon_only_buttons" to true, "icon_only_inputs" to true, "fade_rows" to true,
-            "app_glow" to true, "focus_overshoot" to false),
-        "theme/bang-gia.jpg", listOf(0xFF060A12, 0xFF142436, 0xFF4A7090)),
-
-    // 11. Điện Ảnh Top Shelf 5 cột poster app
-    Theme("cinematic-shelf", "Điện Ảnh Top Shelf", "Cinematic Top Shelf", "Poster app lớn làm mờ nửa trên, chấm vị trí dock, dock trong suốt không nền", "Cinematic blurred app artwork shelf, dock position dots, transparent borderless dock",
-        mapOf("columns" to 5, "rows_below_dock" to 1, "cinematic_home" to true, "cinematic_art" to 65, "cinematic_scrim" to 75,
-            "cinematic_dots" to true, "cinematic_white_focus" to true, "dock_band" to false, "dock_opacity" to 0, "dock_glass" to false,
-            "fade_rows" to true, "background_color" to "#060608"),
-        "theme/cinematic-shelf.jpg", listOf(0xFF060608, 0xFF1C1A24, 0xFFE5A93C)),
-
-    // 12. Lưới Đa Năng 7 cột full màn hình
-    Theme("ultra-dashboard", "Lưới Đa Năng", "Ultra Dashboard", "7 cột ứng dụng trải rộng màn hình, dock trong suốt không dải nền, luôn hiện tên app", "7 columns full-screen dashboard, transparent dock, persistent app labels",
-        mapOf("columns" to 7, "rows_below_dock" to 2, "dock_band" to false, "dock_opacity" to 0, "dock_glass" to false, "dock_title" to false, "always_show_names" to true,
-            "reorder_button" to true, "fade_rows" to true, "focus_overshoot" to false, "background_color" to "#0A0D14"),
-        "theme/ultra-dashboard.jpg", listOf(0xFF0A0D14, 0xFF1E2638, 0xFF3B82F6)),
-
-    // 13. Google TV Tinh Gọn 6 cột bánh răng top menu
-    Theme("google-tv-pure", "Google TV Tinh Gọn", "Google TV Pure", "Gom nút đỉnh vào 1 bánh răng, cuộn mờ dần phía trên, dock trong suốt", "Condensed top menu gear, smooth fade-out rows, transparent dock",
-        mapOf("columns" to 6, "rows_below_dock" to 2, "top_menu" to true, "fade_rows" to true, "cinematic_white_focus" to true,
-            "dock_band" to false, "dock_opacity" to 0, "dock_glass" to false, "focus_overshoot" to true, "background_color" to "#0E1116"),
-        "theme/google-tv-pure.jpg", listOf(0xFF0E1116, 0xFF1F2430, 0xFF818CF8)),
-
-    // 14. Bầu Trời Hoàng Kim 4 app trung tâm
-    Theme("widgetv-gold", "Bầu Trời Hoàng Kim", "WidgeTV Sunset Gold", "Bầu trời động chuyển sắc theo giờ, viền chọn vàng kim vương giả, dock trong suốt 4 app", "Dynamic time-of-day sky backdrop, royal gold focus ring, transparent 4-app dock",
-        mapOf("columns" to 4, "rows_below_dock" to 1, "sky_intensity" to 85, "accent_color" to "#E5A93C", "app_glow" to true,
-            "dock_band" to false, "dock_opacity" to 0, "dock_glass" to false, "dock_even_padding" to true, "icon_only_buttons" to true,
-            "icon_only_inputs" to true, "background_color" to "#0B101D"),
-        "theme/widgetv-gold.jpg", listOf(0xFF0B101D, 0xFF2D1F3D, 0xFFE5A93C)),
-
-    // 15. Trung Tâm Chỉ Huy HUD hiện CPU/RAM
-    Theme("kido-tactical", "Trung Tâm Chỉ Huy HUD", "KIDŌ Tactical HUD", "Hiện thông số CPU/RAM/Bộ nhớ dưới đồng hồ, dock trong suốt, viền xanh lục HUD", "Live CPU/RAM/Storage stats under clock, Wi-Fi status color, transparent tactical HUD dock",
-        mapOf("columns" to 5, "rows_below_dock" to 1, "show_stats" to true, "wifi_status_color" to true, "dock_band" to false,
-            "dock_opacity" to 0, "dock_glass" to false, "dock_title" to true, "app_glow" to true, "accent_color" to "#00FF66",
-            "background_color" to "#020406", "wallpaper_dim" to 20),
-        "theme/kido-tactical.jpg", listOf(0xFF020406, 0xFF082618, 0xFF00FF66)),
-
-    // 16. Thung Lũng Tĩnh Tại 1 hàng 6 app OLED
-    Theme("cosy-zen", "Thung Lũng Tĩnh Tại", "Cosy Valley Zen", "1 hàng 6 app dock trong suốt siêu tĩnh, chuyển động êm chậm, màn hình chờ OLED", "Ultra-minimal 1-row 6 apps, transparent dock, peaceful slow motion, OLED burn-in idle clock",
-        mapOf("columns" to 6, "rows_below_dock" to 0, "dock_band" to false, "dock_opacity" to 0, "dock_glass" to false, "dock_even_padding" to true,
-            "dock_title" to false, "ambient_glow" to false, "app_glow" to false, "reduced_motion" to true,
-            "focus_overshoot" to false, "home_idle_clock_minutes" to 5, "media_bar" to false, "background_color" to "#0D131A"),
-        "theme/cosy-zen.jpg", listOf(0xFF0D131A, 0xFF242B28, 0xFFD97706)),
+    // 9. Lễ hội Dussehra (Dussehra)
+    Theme(
+        "dussehra", "Lễ hội Dussehra", "Dussehra",
+        "Giao diện lễ hội Dussehra với vòng hoa cúc vạn thọ và đèn diya vàng",
+        "Festive skin for Dussehra: marigold toran, faint gold rangoli, diya and petal shower",
+        mapOf(
+            "festival" to "dussehra",
+            "festival_until" to "2026-10-21",
+            "accent_color" to "#FFB23C",
+            "background_color" to "#120809",
+            "wallpaper" to true
+        ),
+        "theme/dussehra.jpg",
+        listOf(0xFF120809, 0xFF3D1508, 0xFFFFB23C)
+    ),
 )
 
 

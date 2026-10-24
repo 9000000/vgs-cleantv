@@ -8,7 +8,7 @@ import java.io.File
 class ThemeTest {
     @Test
     fun danhSachThemeHopLe() {
-        assertTrue("Có ít nhất 16 giao diện tinh hoa", THEMES.size >= 16)
+        assertEquals("Có 9 giao diện (VGS + 8 giao diện mặc định CleanYourTV)", 9, THEMES.size)
         val ids = THEMES.map { it.id }
         assertEquals("Không trùng id theme", ids.size, ids.toSet().size)
 
@@ -80,15 +80,5 @@ class ThemeTest {
         assertEquals("#ffffff", minimalLight!!.optString("background_color"))
         assertEquals("true", minimalLight.optString("dock_glass"))
         assertEquals("cyberpunk-neon", json.optString("vgs_theme"))
-    }
-
-    @Test
-    fun kiemTraTatCaThemeKhongCoDockNenVaGiuTinhNangDock() {
-        THEMES.forEach { th ->
-            assertEquals("Theme ${th.id} phải tắt dock_band", false, th.cauHinh["dock_band"])
-            assertEquals("Theme ${th.id} phải có dock_opacity = 0", 0, th.cauHinh["dock_opacity"])
-            assertEquals("Theme ${th.id} phải có dock_glass = false", false, th.cauHinh["dock_glass"])
-            assertTrue("Theme ${th.id} phải giữ nguyên tính năng dock (dock_row != false)", th.cauHinh["dock_row"] != false)
-        }
     }
 }

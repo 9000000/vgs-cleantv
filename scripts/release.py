@@ -296,7 +296,7 @@ def get_default_release_notes(version: str) -> str:
     return f"""## CleanTV v{version}
 
 ### Có gì mới & Cải tiến:
-- 🎨 Hỗ trợ 26 Giao diện (Themes) phong phú với hình nền & màu sắc độc bản.
+- 🎨 Hỗ trợ 9 Giao diện (Themes): VGS cùng 8 theme chuẩn CleanYourTV (Default, Aurora, Glass, Ruska, Scenes, Six columns, Sweden, Dussehra).
 - ⚙️ Tự động nạp cấu hình đi theo từng giao diện; tùy biến riêng lưu độc lập theo từng theme.
 - 🔄 Nút "Khôi phục mặc định giao diện" giúp hoàn tác về cấu hình gốc nguyên bản bất cứ lúc nào.
 - 📁 Xuất / Nhập file cấu hình chung đa theme toàn diện (`vgs_theme_configs`).
