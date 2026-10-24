@@ -1,5 +1,23 @@
 [
  {
+  "ban": "2.6.6",
+  "ngay": "2026-10-24",
+  "vi": [
+   "Tivi tự canh gác: đang thay Home mà rớt kết nối (mất Wi-Fi, hết pin) thì 3 phút sau tivi tự bật lại Home gốc.",
+   "Xong việc rời app quá 1 phút thì tivi tự tắt ADB (bật \"Giữ ADB bật cho lần sau\" nếu muốn giữ).",
+   "Lưu kịch bản khôi phục: một file lệnh adb đưa tivi về như cũ từ máy tính, kể cả khi mất điện thoại.",
+   "Xem trước các lệnh sẽ chạy trên tivi trước khi dọn / cài Home.",
+   "Bản dựng tái tạo được, công bố dấu chữ ký để tự kiểm tra APK."
+  ],
+  "en": [
+   "The TV guards itself: if the connection drops while Home is being replaced, the TV restores its stock Home after 3 minutes.",
+   "Leave the app for over a minute when done and the TV turns ADB off (tick \"Keep ADB on for next time\" to keep it).",
+   "Save a restore script: adb commands that put the TV back from a computer, even without this phone.",
+   "Preview the commands before cleaning / installing Home.",
+   "Reproducible builds and a published signing fingerprint to verify the APK."
+  ]
+ },
+ {
   "ban": "2.6.5",
   "ngay": "2026-10-24",
   "vi": [

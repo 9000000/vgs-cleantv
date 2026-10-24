@@ -11,6 +11,9 @@ val kyFile = rootProject.file("ky.properties")
 val ky = Properties().apply { if (kyFile.exists()) kyFile.inputStream().use { load(it) } }
 
 android {
+    // Bản dựng tái tạo được (24/10/2026): khối "dependency info" AGP nhét vào khối ký được mã hoá bằng khoá của Google,
+    // mỗi lần dựng ra khác nhau. App không lên Play nên bỏ (F-Droid cũng khuyên vậy).
+    dependenciesInfo { includeInApk = false; includeInBundle = false }
     testOptions { unitTests.isReturnDefaultValues = true }
     namespace = "zone.vgs.tvsach"
     compileSdk = 35
@@ -19,8 +22,8 @@ android {
         applicationId = "zone.vgs.cleantv"
         minSdk = 26
         targetSdk = 35
-        versionCode = 51
-        versionName = "2.6.5"
+        versionCode = 52
+        versionName = "2.6.6"
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
     }
 
@@ -37,6 +40,8 @@ android {
 
     buildTypes {
         release {
+            // Không ghi mã commit git vào APK: kho công khai có lịch sử khác kho nội bộ, dựng lại từ đó sẽ lệch.
+            vcsInfo.include = false
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")

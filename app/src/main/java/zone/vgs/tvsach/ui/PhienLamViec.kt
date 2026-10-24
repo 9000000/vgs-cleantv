@@ -337,6 +337,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     fun ketNoi() = chay(t("Đang kết nối… Nếu tivi hiện \"Cho phép gỡ lỗi USB?\" hãy tích \"Luôn cho phép\" rồi bấm Cho phép.", "Connecting… If the TV shows \"Allow USB debugging?\" tick \"Always allow\" and press Allow.")) {
         val host = ip.trim(); val port = cong.trim().toIntOrNull() ?: 5555
+        daTuTatAdb = false
         if (host.isEmpty()) error(t("Nhập địa chỉ IP của tivi.", "Enter the TV's IP address."))
         io {
             runCatching { adb.disconnect() }
@@ -673,7 +674,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val anh = anhNenTheme()
         val bo = boAnhTheme()
         val loiCai = io { tv.caiLauncher(apk, sl, cauHinh, anh, bo, nutInput, nutHome || dungPhimRemote) { s -> ghiTuIo(s) } }
-        if (loiCai != null) error(loiCai)
+        // caiLauncher báo lỗi là đã tự trả Home gốc: huỷ canh gác trên tivi.
+        if (loiCai != null) { io { tv.boGac() }; error(loiCai) }
         if (dnsChanQc) io { tv.batDnsChanQc(sl) }
         if (nutManCho) io { tv.chuanBiManCho(sl) }
         thuPhimHome(sl)
@@ -691,6 +693,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
      */
     private suspend fun thuPhimHome(sl: zone.vgs.tvsach.dulieu.BanSaoLuu?) {
         val kq = io { tv.damBaoPhimHome(sl) { s -> ghiTuIo(s) } }
+        // Đã thử xong (được, hoặc đã tự bật lại Home gốc): tivi thôi canh gác. Rớt kết nối trước dòng này thì
+        // canh gác trên tivi tự trả Home gốc sau ThaoTacTv.GAC_GIAY giây.
+        io { tv.boGac() }
         veApp()
         phimHomeOk = kq.ok
         phimHomeGhi = (if (kq.ok) "ok" else if (kq.gianh.isNotEmpty()) "lui" else "loi") + " gianh=" + kq.gianh.joinToString(",") + " conLai=" + kq.conLai + " lyDo=" + kq.lyDo
@@ -781,6 +786,51 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         cauHinhBao = t("Đã lưu file cấu hình.", "Settings file saved.")
     }
 
+    /**
+     * Xem trước lệnh (24/10/2026, học cleanyourtv-app "Customise shows every command"): các lệnh chính app sẽ gửi lên
+     * tivi, theo thứ tự, trước khi bấm. Dòng "#" là chú thích. Gói lõi Android / Home đang dùng app vẫn tự bỏ qua lúc chạy.
+     */
+    fun lenhDon(): List<String> = buildList {
+        add(t("# 1. Sao lưu (chỉ đọc, không đổi gì)", "# 1. Backup (read-only, changes nothing)"))
+        add("pm list packages -d")
+        add("cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME")
+        add("settings get secure enabled_accessibility_services")
+        add("settings get global private_dns_mode")
+        val ds = muc.filter { chon[it.pkg] == true }.map { it.pkg }
+        add(t("# 2. Tắt ${ds.size} gói (chỉ tắt, không gỡ; Khôi phục bật lại được)", "# 2. Disable ${ds.size} packages (disable only, never uninstall; Restore turns them back on)"))
+        ds.forEach { add("pm disable-user --user 0 $it") }
+    }
+
+    fun lenhHome(): List<String> = buildList {
+        val pk = tv.pkgHome
+        val goc = trangThai?.homeHienTai?.substringBefore('/').orEmpty()
+        if (!daCoHomeSach) {
+            add(t("# Cài Home sạch (APK đi kèm app)", "# Install the clean Home (APK bundled in the app)"))
+            add("pm install -r ${tv.apkHome}")
+            add("cmd package compile -m speed -f $pk")
+        }
+        add(t("# Ghi giao diện", "# Write the look"))
+        add("content write --uri content://$pk.theme/config.json")
+        if (!daCoHomeSach && goc.isNotBlank() && !goc.startsWith(pk)) {
+            add(t("# Tắt Home gốc, đặt Home sạch làm Home (tivi tự canh gác: rớt kết nối là tự bật lại Home gốc)", "# Disable the stock Home and make the clean Home default (the TV watches: if the connection drops it restores the stock Home)"))
+            add("pm disable-user --user 0 $goc")
+        }
+        add("cmd package set-home-activity --user 0 ${tv.cmpHome}")
+        if (nutHome || dungPhimRemote) add("settings put secure enabled_accessibility_services $pk/com.gathin.tvhome.HomeKeyService")
+        if (nutInput) add("settings put secure enabled_accessibility_services $pk/com.gathin.tvhome.InputKeyService")
+        if (dnsChanQc) add("settings put global private_dns_specifier dns.adguard-dns.com")
+        add(t("# Thử nút Home thật", "# Test the real Home button"))
+        add("input keyevent KEYCODE_HOME")
+    }
+
+    /** Lưu kịch bản khôi phục cho máy tính (dulieu/KichBanKhoiPhuc) từ bản sao lưu của tivi đang mở. */
+    fun xuatKichBan(uri: android.net.Uri) = chay(t("Đang lưu kịch bản khôi phục…", "Saving the restore script…")) {
+        val sl = saoLuu ?: error(t("Chưa có bản sao lưu của tivi này.", "No backup for this TV yet."))
+        val chu = zone.vgs.tvsach.dulieu.KichBanKhoiPhuc.tao(sl, zone.vgs.tvsach.NgonNgu.tiengViet)
+        io { ctx.contentResolver.openOutputStream(uri, "wt")?.use { it.write(chu.toByteArray()) } ?: error("không mở được file") }
+        cauHinhBao = t("Đã lưu kịch bản khôi phục.", "Restore script saved.")
+    }
+
     /** Mở file cấu hình đã lưu: điền lại mọi lựa chọn, bấm Áp dụng mới đưa lên tivi. */
     fun nhapCauHinh(uri: android.net.Uri) = chay(t("Đang mở file cấu hình…", "Opening the settings file…")) {
         val chu = io { ctx.contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) } } ?: error(t("Không đọc được file.", "Couldn't read the file."))
@@ -840,6 +890,35 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         thongBao = ""
         loi = t("Tivi đang khởi động lại. Đợi tivi lên rồi bấm Kết nối lại để kiểm tra (gói nào tự bật lại sau khởi động sẽ hiện ra).", "The TV is rebooting. When it is back, press Connect again to check (packages that re-enable at boot will show up).")
         man = Man.KET_NOI
+    }
+
+    /**
+     * Tự tắt ADB khi xong (24/10/2026, học cleanyourtv-app): đang ở màn Xong mà người dùng rời app thì hẹn TIVI tự tắt
+     * ADB sau 60 giây (hẹn giờ phải nằm trên tivi: Android 14 đóng băng app nằm nền). Quay lại trước đó thì huỷ; quá
+     * hạn thì về màn chính, báo đã tự tắt. Bật "Giữ ADB bật cho lần sau" thì không hẹn.
+     */
+    var giuAdb by mutableStateOf(false)
+    var daTuTatAdb by mutableStateOf(false)
+    private var daHenTatAdb = false
+
+    fun henTuTatAdb() {
+        if (giuAdb || man != Man.XONG || dangBan) return
+        daHenTatAdb = true
+        viewModelScope.launch { runCatching { io { tv.henTatAdbTrenTv(60) } }.onFailure { daHenTatAdb = false } }
+    }
+
+    fun huyTuTatAdb() {
+        if (!daHenTatAdb) return
+        daHenTatAdb = false
+        viewModelScope.launch {
+            // Huỷ không được (tivi đã tắt ADB, kết nối mất): coi như đã tự tắt.
+            if (runCatching { io { tv.huyTatAdbTrenTv() } }.isFailure) {
+                runCatching { io { adb.disconnect() } }
+                datLai()
+                daTuTatAdb = true
+                man = Man.CHINH
+            }
+        }
     }
 
     fun tatAdbVaKetThuc() = chay(t("Đang tắt ADB trên tivi…", "Turning ADB off on the TV…")) {

@@ -358,6 +358,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
 
         fun tatHomeGoc() {
             bao(t("Tắt Home gốc ($homeGoc)…", "Disabling the stock Home ($homeGoc)…"))
+            gacThem(homeGoc)
             sh("pm disable-user --user 0 $homeGoc")
             sl.homeGocDaTat = homeGoc
             if (homeGoc !in sl.daTatTruoc) sl.daTatBoiApp += homeGoc
@@ -491,6 +492,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
     }.getOrNull()
 
     fun dayCauHinh(json: String, anhNen: ByteArray? = null, boAnh: List<Pair<String, ByteArray>>? = null) {
+        giaHanGac()
         val dir = "/sdcard/Android/data/$pkgHome/files"
         val uri = "content://$pkgHome.theme"
         sh("mkdir -p $dir 2>/dev/null; true")
@@ -609,6 +611,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             return null
         }
         repeat(4) { lan ->
+            giaHanGac()
             sh("cmd package set-home-activity --user 0 $cmpHome")
             sh("input keyevent KEYCODE_HOME")
             Thread.sleep(2500)
@@ -656,6 +659,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             }
             if (lan == 3 || sl == null || pkg == SETUP || !nenTatVuiGianhHome(pkg)) return tra(pkg)
             bao(t("Nút Home vẫn mở '$pkg', tắt nó…", "The Home button still opens '$pkg', disabling it…"))
+            gacThem(pkg)
             sh("pm disable-user --user 0 $pkg")
             if (pkg !in sl.daTatTruoc && pkg !in sl.daTatBoiApp) sl.daTatBoiApp += pkg
             // Nhớ là Home gốc: lần "Đổi giao diện" sau ghi đè config.json vẫn gắn lại stock_home_redirect cho nó.
@@ -747,6 +751,51 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         sh("pm enable --user 0 $goc")
         sh("cmd package set-home-activity --user 0 \$(cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME $goc | tail -n 1)")
         sl.daTatBoiApp -= goc; sl.homeGocDaTat = ""; luuSaoLuu(sl)
+    }
+
+    // ---------- Canh gác Home trên tivi (24/10/2026) ----------
+
+    /**
+     * Trước khi tắt một Home trên tivi, hẹn giờ NGAY TRÊN TIVI: quá GAC_GIAY giây không được gia hạn (điện thoại rớt
+     * Wi-Fi, hết pin, app bị tắt giữa chừng) thì tivi tự bật lại các Home vừa tắt và đặt lại Home gốc. Sự cố 1.1 (TCL
+     * BeyondTV4 tắt launcherx rồi mất kết nối → đen màn) mà có nó thì tivi đã tự cứu. Học từ cleanyourtv-app
+     * (udhaykumarbala, watchdog 150 giây). Kịch bản chạy bằng setsid nên sống qua lúc phiên adb đóng.
+     */
+    private var gacToken: String? = null
+
+    /** Dời hạn canh gác thêm GAC_GIAY tính từ bây giờ (giờ của tivi); chưa hẹn thì thôi. */
+    fun giaHanGac() {
+        if (gacToken != null) runCatching { sh("echo \$((\$(date +%s) + $GAC_GIAY)) > $GAC-han") }
+    }
+
+    /** Ghi [pkg] vào danh sách tivi sẽ tự bật lại; lần đầu thì đặt kịch bản canh gác. Gói đầu danh sách là Home gốc. */
+    fun gacThem(pkg: String) {
+        if (!TEN_GOI.matches(pkg)) return
+        if (gacToken == null) {
+            val tk = java.util.UUID.randomUUID().toString().replace("-", "").take(12)
+            runCatching {
+                adb.ghiFile("$GAC.sh", KICH_BAN_GAC.toByteArray())
+                sh(": > $GAC-list; echo $tk > $GAC-token")
+                gacToken = tk
+                giaHanGac()
+                // Trong ngoặc: KetNoiAdb.shell nối "; echo <dấu>" vào sau, "… &; echo" là lỗi cú pháp. setsid: tách khỏi
+                // phiên shell của app để sống qua lúc phiên đóng (thử trên máy ảo 24/10/2026).
+                // Đợi 1 giây trong cùng lệnh: app đóng phiên ngay khi thấy dấu kết thúc, đóng sớm quá là tiến trình
+                // con chết trước khi kịp tách. Không thấy chạy thì thử lại một lần.
+                repeat(2) {
+                    if (sh("(setsid sh $GAC.sh $tk </dev/null >/dev/null 2>&1 &); sleep 1; ps -A -o ARGS | grep -c '^sh $GAC.sh $tk'")
+                            .trim().lines().lastOrNull()?.toIntOrNull()?.let { it > 0 } == true) return@runCatching
+                }
+            }
+        }
+        runCatching { sh("grep -qx '$pkg' $GAC-list || echo '$pkg' >> $GAC-list") }
+        giaHanGac()
+    }
+
+    /** Việc với Home đã xong (thành công hay đã tự lui): huỷ canh gác. */
+    fun boGac() {
+        gacToken = null
+        runCatching { sh("rm -f $GAC-token $GAC-list $GAC-han") }
     }
 
     // ---------- DNS chặn quảng cáo ----------
@@ -901,6 +950,16 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
 
     // ---------- Đóng ADB ----------
 
+    /**
+     * Hẹn TIVI tự tắt ADB sau [giay] giây (24/10/2026): hẹn giờ trong app điện thoại không chạy được vì Android 14 đóng
+     * băng app nằm nền, nên để tivi tự đếm. Huỷ bằng huyTatAdbTrenTv (xoá file hẹn).
+     */
+    fun henTatAdbTrenTv(giay: Int = 60) {
+        sh("echo 1 > $HEN_TAT_ADB; (setsid sh -c 'sleep $giay; [ -f $HEN_TAT_ADB ] && { rm -f $HEN_TAT_ADB; settings put global adb_wifi_enabled 0; settings put global adb_enabled 0; }' </dev/null >/dev/null 2>&1 &); sleep 1")
+    }
+
+    fun huyTatAdbTrenTv() { sh("rm -f $HEN_TAT_ADB") }
+
     /** Tắt ADB qua mạng trên tivi. Lệnh cuối làm rớt kết nối này, nên lỗi ở đây là bình thường. */
     fun tatAdb() {
         runCatching { sh("settings put global adb_wifi_enabled 0") }
@@ -948,6 +1007,25 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         const val PKG_KHOA = "zone.vgs.cleantv.khoa"
         /** Bản sao lưu trên tivi: thư mục của shell, còn sau khi gỡ app / Home sạch, chỉ mất khi khôi phục cài đặt gốc. */
         const val TEP_SAO_LUU_TV = "/data/local/tmp/cleantv-sao-luu.json"
+        const val GAC = "/data/local/tmp/cleantv-gac"
+        const val HEN_TAT_ADB = "/data/local/tmp/cleantv-tat-adb"
+        const val GAC_GIAY = 180
+        /** Kịch bản canh gác chạy trên tivi: `sh cleantv-gac.sh <token>`. Token đổi / mất thì tự thoát. */
+        val KICH_BAN_GAC = """
+            |# CleanTV: canh gác Home. Hết hạn mà điện thoại không gia hạn thì bật lại Home vừa tắt.
+            |G=$GAC
+            |while :; do
+            |  sleep 5
+            |  [ "${'$'}(cat ${'$'}G-token 2>/dev/null)" = "${'$'}1" ] || exit 0
+            |  [ "${'$'}(date +%s)" -ge "${'$'}(cat ${'$'}G-han 2>/dev/null || echo 0)" ] && break
+            |done
+            |for p in ${'$'}(cat ${'$'}G-list); do pm enable --user 0 ${'$'}p; done
+            |h=${'$'}(head -n 1 ${'$'}G-list)
+            |[ -n "${'$'}h" ] && cmd package set-home-activity --user 0 ${'$'}(cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME ${'$'}h | tail -n 1)
+            |input keyevent KEYCODE_HOME
+            |echo "${'$'}(date) ${'$'}1 ${'$'}(cat ${'$'}G-list | tr '\n' ' ')" >> ${'$'}G.log
+            |rm -f ${'$'}G-token ${'$'}G-list ${'$'}G-han
+            |""".trimMargin()
         /** Namespace Java của launcher: không đổi theo tên gói. */
         const val NS_HOME = "com.gathin.tvhome"
         val HOME_SACH = setOf(PKG_HOME, PKG_HOME_XIAOMI)

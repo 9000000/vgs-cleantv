@@ -355,6 +355,11 @@ private fun ngay(ms: Long) = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefa
 
 @Composable
 private fun ManChinh(vm: PhienLamViec) = Cuon {
+    if (vm.daTuTatAdb) Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Tim.copy(alpha = 0.12f)).padding(14.dp),
+        verticalAlignment = Alignment.CenterVertically) {
+        Icon(Icons.Rounded.Lock, null, tint = Hong); Spacer(Modifier.width(10.dp))
+        Text(t("Đã tự tắt ADB trên tivi khi bạn rời app. Lần sau dùng lại thì bật Gỡ lỗi USB trên tivi.", "ADB was turned off on the TV when you left the app. Next time, turn USB debugging on again on the TV."), fontSize = 13.sp)
+    }
     vm.banMoi?.let { b ->
         Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Tim.copy(alpha = 0.18f)).padding(14.dp),
             verticalAlignment = Alignment.CenterVertically) {
@@ -635,6 +640,7 @@ private fun ManChonGoi(vm: PhienLamViec) {
         var hoi by remember { mutableStateOf(false) }
         Column(Modifier.background(Nen).padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             NutChinh(t("Sao lưu & dọn $so gói", "Back up & clean $so packages"), enabled = !vm.dangBan && so > 0, icon = Icons.Rounded.CleaningServices) { hoi = true }
+            NutXemLenh { vm.lenhDon() }
             if (!vm.khongCaiHome) NutPhu(if (vm.daCoHomeSach) t("Bỏ qua, chỉ đổi giao diện", "Skip, just change the theme") else t("Bỏ qua, chỉ cài Home sạch", "Skip, just install the clean Home"),
                 Icons.Rounded.Home, enabled = !vm.dangBan) { vm.boQuaDon() }
         }
@@ -776,6 +782,7 @@ private fun ManHomeSach(vm: PhienLamViec) {
             if (vm.daCoHomeSach) NutChinh(if (vm.dangBan) t("Đang áp dụng…", "Applying…") else t("Áp dụng lên tivi", "Apply to the TV"),
                 enabled = !vm.dangBan, icon = Icons.Rounded.Palette) { vm.apDungTheme() }
             else NutChinh(if (vm.dangBan) t("Đang cài…", "Installing…") else t("Cài Home sạch", "Install clean Home"), enabled = !vm.dangBan, icon = Icons.Rounded.Home) { vm.caiHomeSach() }
+            NutXemLenh { vm.lenhHome() }
         }
     }
 }
@@ -1071,6 +1078,16 @@ private fun Hang(chu: String, phu: String, bat: Boolean, doi: (Boolean) -> Unit)
 
 @Composable
 private fun ManXong(vm: PhienLamViec) = Cuon {
+    // Rời app khi đang ở màn này: hẹn tự tắt ADB sau 60 giây; quay lại trước đó thì huỷ.
+    val vongDoi = androidx.compose.ui.platform.LocalLifecycleOwner.current
+    DisposableEffect(vongDoi) {
+        val nghe = androidx.lifecycle.LifecycleEventObserver { _, e ->
+            if (e == androidx.lifecycle.Lifecycle.Event.ON_STOP) vm.henTuTatAdb()
+            if (e == androidx.lifecycle.Lifecycle.Event.ON_START) vm.huyTuTatAdb()
+        }
+        vongDoi.lifecycle.addObserver(nghe)
+        onDispose { vongDoi.lifecycle.removeObserver(nghe) }
+    }
     DauTrang({
         Box(Modifier.size(96.dp).clip(RoundedCornerShape(30.dp)).background(Gradient), contentAlignment = Alignment.Center) {
             Icon(Icons.Rounded.AutoAwesome, null, Modifier.size(52.dp), tint = Color.White)
@@ -1082,7 +1099,8 @@ private fun ManXong(vm: PhienLamViec) = Cuon {
     The(t("Trước khi về", "Before you leave"), Icons.Rounded.Checklist) {
         BuocSo(1, t("Thử lại YouTube, Netflix, HDMI, Cài đặt, remote.", "Try YouTube, Netflix, HDMI, Settings and the remote."))
         BuocSo(2, t("Khởi động lại một lần xem gói nào tự bật lại.", "Reboot once to see if anything re-enables itself."))
-        BuocSo(3, t("Tắt ADB: để mở là ai cùng mạng cũng điều khiển được tivi.", "Turn ADB off: left on, anyone on the network can control the TV."))
+        BuocSo(3, t("Tắt ADB: để mở là ai cùng mạng cũng điều khiển được tivi. Rời app quá 1 phút thì tivi tự tắt.", "Turn ADB off: left on, anyone on the network can control the TV. Leave the app for over a minute and the TV turns ADB off itself."))
+        Hang(t("Giữ ADB bật cho lần sau", "Keep ADB on for next time"), t("Lần sau đổi giao diện / khôi phục không phải bật lại gỡ lỗi trên tivi", "Next time you change the look or restore, no need to turn debugging on again"), vm.giuAdb) { vm.giuAdb = it }
         NutPhu(t("Xem màn hình tivi", "View TV screen"), Icons.Rounded.Screenshot) { vm.chupManHinh() }
         NutPhu(t("Khởi động lại tivi", "Reboot the TV"), Icons.Rounded.RestartAlt) { vm.khoiDongLaiTv() }
     }
@@ -1095,6 +1113,7 @@ private fun ManXong(vm: PhienLamViec) = Cuon {
             runCatching { uri.openUri("https://vgs.zone/dang-ky?tu=cleantv-app&next=/cleantv") }
         }
     }
+    TheKichBan(vm)
     TheGuiDanhSach(vm)
     NutGopY(vm)
     NutChinh(t("Tắt ADB & kết thúc", "Turn off ADB & finish"), enabled = !vm.dangBan, icon = Icons.Rounded.Lock) { vm.tatAdbVaKetThuc() }
@@ -1157,7 +1176,44 @@ private fun ManKhoiPhuc(vm: PhienLamViec) = Cuon {
         vm.chayKhoiPhuc(sl.launcherDaCai && goHome)
     }
     vm.nhatKy.takeLast(4).forEach { Text(it, fontSize = 12.sp, fontFamily = FontFamily.Monospace, color = ChuPhu) }
+    TheKichBan(vm)
     TheBatTungApp(vm)
+}
+
+/** Chữ nhỏ "Xem lệnh sẽ chạy": mở hộp liệt kê các lệnh chính app sắp gửi lên tivi (24/10/2026). */
+@Composable
+private fun NutXemLenh(lenh: () -> List<String>) {
+    var mo by remember { mutableStateOf(false) }
+    Text(t("Xem lệnh sẽ chạy trên tivi", "See the commands it will run"), fontSize = 13.sp, color = ChuPhu,
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).clickable { mo = true }.padding(6.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+    if (mo) AlertDialog(
+        onDismissRequest = { mo = false }, containerColor = The1,
+        title = { Text(t("Lệnh sẽ chạy trên tivi", "Commands for the TV")) },
+        text = {
+            Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) {
+                Phu(t("Các lệnh chính, theo thứ tự. Gói lõi Android và Home đang dùng app vẫn tự bỏ qua khi chạy.", "The main commands, in order. Core Android packages and the Home in use are still skipped when it runs."))
+                lenh().forEach { d ->
+                    Text(d, fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = if (d.startsWith("#")) Hong else ChuPhu, modifier = Modifier.padding(top = if (d.startsWith("#")) 8.dp else 1.dp))
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = { mo = false }) { Text(t("Đóng", "Close")) } },
+    )
+}
+
+/** Lưu kịch bản khôi phục cho máy tính (24/10/2026): mất điện thoại hay gỡ CleanTV vẫn trả tivi về như cũ bằng adb. */
+@Composable
+private fun TheKichBan(vm: PhienLamViec) {
+    val sl = vm.saoLuu ?: return
+    The(t("Kịch bản khôi phục cho máy tính", "Restore script for a computer"), Icons.Rounded.Save) {
+        Phu(t("Lưu một file lệnh adb để đưa tivi về như cũ từ máy tính, kể cả khi mất điện thoại hay đã gỡ CleanTV. Windows bấm đúp file, Mac / Linux chạy sh tên-file.bat.",
+            "Save a file of adb commands that puts the TV back from a computer, even without this phone or CleanTV. Windows: double-click it; Mac / Linux: sh file-name.bat."))
+        val luu = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/octet-stream")) { uri -> uri?.let { vm.xuatKichBan(it) } }
+        NutPhu(t("Lưu kịch bản khôi phục", "Save restore script"), Icons.Rounded.Save) {
+            luu.launch("cleantv-khoi-phuc-" + sl.ten.lowercase().replace(Regex("[^a-z0-9]+"), "-").trim('-').take(30) + ".bat")
+        }
+        if (vm.cauHinhBao.isNotEmpty()) Phu(vm.cauHinhBao, Xanh)
+    }
 }
 
 /** Bật lại từng app (issue vgs-cleantv#3): danh sách gói đang tắt đọc thẳng từ tivi, tích cái nào bật cái đó. */

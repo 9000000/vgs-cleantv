@@ -22,7 +22,7 @@
 
 ### App làm gì
 - **Kết nối tivi qua Wi-Fi** bằng ADB (cần bật Gỡ lỗi USB trên tivi, có hướng dẫn 7 bước có hình trong app).
-- **So với 213 danh sách đã thử** của cộng đồng CleanYourTV (TCL, Sony, Xiaomi, Philips, Hisense, Skyworth, onn, Chromecast, máy chiếu…); tivi lạ dùng luật chung an toàn.
+- **So với 248 danh sách đã thử** của cộng đồng CleanYourTV (TCL, Sony, Xiaomi, Philips, Hisense, Skyworth, onn, Chromecast, máy chiếu…); tivi lạ dùng luật chung an toàn.
 - **Tắt** (không gỡ) quảng cáo, theo dõi, app rác. Không đụng cổng HDMI, remote, bàn phím, CH Play, gói giữ Wi-Fi. Gói Google Home / cast và tìm kiếm giọng nói không bao giờ tích sẵn.
 - **Home sạch**: đồng hồ, thời tiết, dock app hay xem, theme VGS / cực quang / bầu trời theo giờ, cụm nút Máy chiếu · Mạng · Màn hình chờ · Cài đặt. App tự bấm thử nút Home trên tivi; không được thì để tivi như cũ.
 - **Sao lưu trước mọi thay đổi**, Khôi phục một chạm. Tự cập nhật, song ngữ Việt / Anh.
@@ -32,12 +32,27 @@
 Cần JDK 17 và Android SDK (compileSdk 35).
 
 ```bash
-scripts/dung-launcher.sh          # tải CleanYourTV, áp patches/launcher-vgs.patch, dựng Home sạch + dữ liệu 213 mẫu vào assets
+scripts/dung-launcher.sh          # tải CleanYourTV, áp patches/launcher-vgs.patch, dựng Home sạch + dữ liệu 248 mẫu vào assets
 ./gradlew assembleRelease         # thiếu ky.properties thì APK ký bằng khoá debug
 ./gradlew :app:testReleaseUnitTest
 ```
 
 `app/src/main/assets/tvhome.apk` và `du-lieu.json` đã có sẵn trong repo, nên chỉ dựng app thì không cần bước đầu.
+
+### Kiểm tra bản tải về
+Mọi APK trên [Releases](https://github.com/vgscity/vgs-cleantv/releases) và vgs.zone/cleantv đều ký bằng cùng một khoá. Dấu SHA-256 của chứng chỉ:
+
+```
+ab94764d40109789e5448ab6539ed960bafb2e5c51c4a8ebd100e524ad8b3046
+```
+
+```bash
+apksigner verify --print-certs CleanTV-x.y.z.apk     # phải ra đúng dấu trên
+shasum -a 256 CleanTV-x.y.z.apk                       # so với file .sha256 trên Releases
+scripts/so-ban-dung.sh CleanTV-x.y.z.apk              # dựng lại từ mã nguồn ở tag vx.y.z rồi so: mọi file bên trong phải trùng
+```
+
+Bản dựng tái tạo được: hai lần dựng sạch cùng mã nguồn ra cùng một APK. Bạn tự dựng thì ký bằng khoá của bạn, nên `so-ban-dung.sh` so từng file bên trong (kể cả `khoa.apk` lồng trong) và bỏ qua chữ ký.
 
 ### Cấu trúc
 | Thư mục | Nội dung |
@@ -62,7 +77,7 @@ Báo lỗi, xin hỗ trợ tivi mới: [vgs.zone/gop-y](https://vgs.zone/gop-y) 
 
 ### What it does
 - **Connects to the TV over Wi-Fi** with ADB (turn on USB debugging; the app has a 7-step picture guide).
-- **Matches 213 tested lists** from the CleanYourTV community; unknown TVs get safe general rules.
+- **Matches 248 tested lists** from the CleanYourTV community; unknown TVs get safe general rules.
 - **Disables** (never uninstalls) ads, tracking and junk. Leaves HDMI inputs, the remote, keyboards, Play Store and the Wi-Fi owner alone. Google Home / casting and voice search are never pre-ticked.
 - **Clean Home** with clock, weather, a dock, VGS / aurora / time-of-day themes and a Projector · Network · Screensaver · Settings cluster. The app tests the TV's real Home button and puts everything back if it can't take it over.
 - **Backs up before any change**; one-tap Restore. Self-updating, Vietnamese / English.
@@ -70,6 +85,12 @@ Báo lỗi, xin hỗ trợ tivi mới: [vgs.zone/gop-y](https://vgs.zone/gop-y) 
 
 ### Build
 JDK 17 + Android SDK (compileSdk 35): `scripts/dung-launcher.sh`, then `./gradlew assembleRelease`. Without `ky.properties` the release APK is signed with the debug key. Code identifiers are in Vietnamese.
+
+### Verify a download
+Every APK on Releases and vgs.zone/cleantv is signed with the same key, certificate SHA-256
+`ab94764d40109789e5448ab6539ed960bafb2e5c51c4a8ebd100e524ad8b3046` (`apksigner verify --print-certs`). Builds are
+reproducible: `scripts/so-ban-dung.sh CleanTV-x.y.z.apk` rebuilds from the matching tag and checks that every file inside
+(the nested `khoa.apk` too) is identical, ignoring the signature, since yours uses your own key.
 
 ### Privacy
 Anonymous counts only (a random app-generated ID, app version, TV model, number of packages disabled). No email, name, app list, IP or location. See `Dem.kt` and `dem/src/index.js`.
