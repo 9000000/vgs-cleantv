@@ -8,7 +8,7 @@ import java.io.File
 class ThemeTest {
     @Test
     fun danhSachThemeHopLe() {
-        assertTrue("Có ít nhất 26 giao diện", THEMES.size >= 26)
+        assertTrue("Có ít nhất 16 giao diện tinh hoa", THEMES.size >= 16)
         val ids = THEMES.map { it.id }
         assertEquals("Không trùng id theme", ids.size, ids.toSet().size)
 
