@@ -1,5 +1,57 @@
 [
  {
+  "ban": "2.8.1",
+  "ngay": "2026-10-24",
+  "vi": [
+   "• Vị trí hàng app: thêm \"Giữa màn hình\" và \"Thấp nhất\" (góp ý của bạn dùng Xiaomi)",
+   "• Dòng thời tiết có biểu tượng ☀️ ⛅ 🌧️ ở đầu"
+  ],
+  "en": [
+   "• App rows position: new \"Middle\" and \"Lowest\"",
+   "• The weather line starts with an icon ☀️ ⛅ 🌧️"
+  ]
+ },
+ {
+  "ban": "2.8.0",
+  "ngay": "2026-10-24",
+  "vi": [
+   "• Tuỳ chỉnh mới: Tất cả app một hàng, Ô icon đều nhau (kiểu Apple TV), Ẩn lời chào",
+   "• Tivi Xiaomi: nút INPUT trên remote mở lại bảng chọn nguồn",
+   "• TCL Google TV: mở app từ remote/Play ổn hơn khi đã tắt Home Google",
+   "• Nâng cao: thêm 14 tuỳ chọn (màn chờ đồng hồ trên hình nền, kiểu viền ô, app thành nút tròn…)",
+   "• DNS chặn quảng cáo: ghi rõ đừng bật nếu router đã chặn (Pi-hole, AdGuard Home, VPN)"
+  ],
+  "en": [
+   "• New options: Every app in one row, Uniform icon tiles (Apple TV style), Hide the greeting",
+   "• Xiaomi TVs: the remote INPUT button opens the input picker again",
+   "• TCL Google TV: steadier app launches with the Google Home off",
+   "• Advanced: 14 new options (clock screensaver over the wallpaper, focus style, apps as round buttons…)",
+   "• Ad-blocking DNS: note to leave it off when the router already filters"
+  ]
+ },
+ {
+  "ban": "2.7.3",
+  "ngay": "2026-10-24",
+  "vi": [
+   "Tuỳ chỉnh → \"Cỡ chữ đồng hồ, lịch, thời tiết\": Vừa / Lớn / Rất lớn.",
+   "Sửa DNS chặn quảng cáo AdGuard: bật / tắt có hiệu lực cả khi Đổi giao diện, kết nối lại thì công tắc hiện đúng trạng thái trên tivi. DNS là cài đặt của tivi (Cài đặt → Mạng → DNS riêng tư), không phải app."
+  ],
+  "en": [
+   "Customise → \"Clock, date and weather size\": Normal / Large / Extra large.",
+   "AdGuard DNS fixed: turning it on / off now applies from Change look too, and the switch shows the TV's real state on reconnect. It is a TV DNS setting (Settings → Network → Private DNS), not an app."
+  ]
+ },
+ {
+  "ban": "2.7.2",
+  "ngay": "2026-10-24",
+  "vi": [
+   "Nút \"Đang phát\" trên Home sạch: hiện khi có app đang phát nhạc / video, bấm vào thấy từng app để tạm dừng / phát tiếp, hoặc \"Dừng tất cả\" khi nhiều app phát chồng tiếng. Bấm Đổi giao diện → Áp dụng lên tivi một lần để bật."
+  ],
+  "en": [
+   "\"Now playing\" on the clean Home: shows while apps play music / video; pause or resume each, or \"Stop all\" when several play over each other. Change look → Apply once to turn it on."
+  ]
+ },
+ {
   "ban": "2.7.1",
   "ngay": "2026-10-24",
   "vi": [

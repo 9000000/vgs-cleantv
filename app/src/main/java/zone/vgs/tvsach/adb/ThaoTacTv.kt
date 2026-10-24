@@ -746,6 +746,12 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
      * remote) thì HomeKeyService thấy màn Home cũ hiện lên là mở lại Home sạch. Ghi khoá vào config.json đang có trên
      * tivi + bật HomeKeyService.
      */
+    /**
+     * Nút "Đang phát" của Home sạch (24/10/2026, góp ý nhiều app phát chồng tiếng): cho phép NowPlayingListener của
+     * launcher làm trình nghe thông báo, nhờ đó launcher đọc được các phiên phát nhạc / video. Lỗi thì nút không hiện.
+     */
+    fun choPhepDangPhat() { runCatching { sh("cmd notification allow_listener $pkgHome/$NS_HOME.NowPlayingListener 2>/dev/null; true") } }
+
     /** Bật HomeKeyService cho phím remote của mẫu (nút app, Cài đặt). Bo CVTE: không (upstream #741). */
     fun batBatPhimHome() { if (!laBoMachCvte()) batDichVu("HomeKeyService") }
 
@@ -822,6 +828,21 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
     }
 
     // ---------- DNS chặn quảng cáo ----------
+
+    /** Tivi đang dùng DNS chặn quảng cáo của AdGuard (do CleanTV hay người dùng đặt). */
+    fun dnsDangChan(): Boolean = runCatching {
+        sh("settings get global private_dns_specifier").trim() == "dns.adguard-dns.com" &&
+            sh("settings get global private_dns_mode").trim() == "hostname"
+    }.getOrDefault(false)
+
+    /** Tắt DNS AdGuard: trả DNS như trước khi CleanTV đổi (bản sao lưu), không có thì về tự động. */
+    fun tatDnsChanQc(sl: BanSaoLuu?) {
+        val mode = sl?.dnsModeTruoc?.takeIf { it.isNotBlank() && it != "null" && it != "hostname" } ?: "opportunistic"
+        sh("settings put global private_dns_mode $mode")
+        val host = sl?.dnsHostTruoc?.takeIf { it.isNotBlank() && it != "null" && it != "dns.adguard-dns.com" }
+        if (host == null) sh("settings delete global private_dns_specifier") else sh("settings put global private_dns_specifier $host")
+        sl?.let { it.dnsDaDoi = false; luuSaoLuu(it) }
+    }
 
     fun batDnsChanQc(sl: BanSaoLuu) {
         sh("settings put global private_dns_specifier dns.adguard-dns.com")

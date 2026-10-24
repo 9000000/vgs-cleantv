@@ -48,6 +48,9 @@ const val DOCK_TOI_DA = 8
  * Bảng phím chung cho TCL không có mẫu riêng: Netflix 4062, YouTube 4065, Prime Video 4099, bánh răng 83 / 4077 — cùng số
  * trên mọi mẫu TCL có bảng trong upstream (tcl-43c645, tcl-55c725, tcl-65c735, tcl-g10…).
  */
+/** doiHang đặc biệt: hàng dock nằm giữa màn hình (rows_middle của bản vá launcher), góp ý 24/10/2026. */
+const val HANG_GIUA = Int.MIN_VALUE
+
 private const val PHIM_TCL_CHUNG = """{"app_keys":["4062:com.netflix.ninja","4065:com.google.android.youtube.tv","4099:com.amazon.amazonvideo.livingroom"],"settings_key_keycodes":[83,4077]}"""
 
 /**
@@ -122,6 +125,16 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var gonNut by mutableStateOf(true)
     /** Dời khối dock + hàng app lên (âm) / xuống (dương), dp — rows_offset_dp của bản vá launcher (góp ý 24/10/2026). */
     var doiHang by mutableStateOf(0)
+    /** Nút "Đang phát" trên Home sạch (now_playing của bản vá launcher), mặc định bật. */
+    var nutDangPhat by mutableStateOf(true)
+    /** Cỡ chữ cụm đồng hồ / ngày / âm lịch / thời tiết (header_scale của bản vá launcher, %), góp ý 24/10/2026. */
+    var coChuDau by mutableStateOf(100)
+    /** Mọi app trên một hàng cuộn ngang, không lưới bên dưới (single_row của launcher 2.8, cần dock_row). */
+    var motHang by mutableStateOf(false)
+    /** Ẩn lời chào trên đồng hồ (show_greeting=false). */
+    var anLoiChao by mutableStateOf(false)
+    /** Ô icon đều nhau kiểu Apple TV: icon trên nền màu của chính nó, không dùng ảnh banner (uniform_tiles). */
+    var oDeuNhau by mutableStateOf(false)
     /**
      * Nút app / Cài đặt trên remote (24/10/2026, góp ý TCL G09): tắt Home gốc của TCL là nút YouTube, Netflix… chết vì
      * hãng chỉ gửi chúng cho launcherx. null = tự chọn: bật khi mẫu có bảng phím, trừ mẫu trong PHIM_TAT_SAN.
@@ -525,6 +538,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         thongTin = info; getprop = gp
         val tt = io { tv.docTrangThai() }
         trangThai = tt
+        // Công tắc DNS AdGuard theo đúng tivi (24/10/2026, góp ý kimhuenguyen1964: kết nối lại thì công tắc luôn tắt).
+        dnsChanQc = io { tv.dnsDangChan() }
         val du = io { DuLieu.nap(ctx) }
         ungVien = du.khopMau(info)
         mauChon = ungVien.firstOrNull()?.first
@@ -536,7 +551,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             b.ip = host; io { tv.luuSaoLuu(b) }
         }
         saoLuuTuTv = slMay == null && saoLuu != null
-        nutInput = tt.homeHienTai == "com.google.android.apps.tv.launcherx"
+        // Xiaomi: sau khi đổi Home, nút INPUT của remote không mở bảng nguồn nữa (upstream #1368) — bật sẵn để Home sạch nhận.
+        nutInput = tt.homeHienTai == "com.google.android.apps.tv.launcherx" || info.brand.equals("Xiaomi", ignoreCase = true)
         laMayChieu = tv.coVeMayChieu(tt, info)
         man = if (dangKhoiPhuc) Man.KHOI_PHUC else Man.THONG_TIN
     }
@@ -791,7 +807,12 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         hieuUngKinh = j.optBoolean("dock_glass", false)
         lamToiNen = j.optInt("wallpaper_dim", 0)
         hienThongSo = j.optBoolean("show_stats", false)
-        doiHang = j.optInt("rows_offset_dp", 0)
+        doiHang = if (j.optBoolean("rows_middle", false)) HANG_GIUA else j.optInt("rows_offset_dp", 0)
+        nutDangPhat = j.optBoolean("now_playing", true)
+        coChuDau = j.optInt("header_scale", 100)
+        motHang = j.optBoolean("single_row", false)
+        anLoiChao = !j.optBoolean("show_greeting", true)
+        oDeuNhau = j.optBoolean("uniform_tiles", false)
         if (j.has("handle_view_inputs")) nutInput = j.optBoolean("handle_view_inputs", nutInput)
 
         // Nạp cấu hình Nâng cao của theme được chọn
@@ -846,6 +867,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val loiCai = io { tv.caiLauncher(apk, sl, cauHinh, anh, bo, nutInput, nutHome || dungPhimRemote) { s -> ghiTuIo(s) } }
         // caiLauncher báo lỗi là đã tự trả Home gốc: huỷ canh gác trên tivi.
         if (loiCai != null) { io { tv.boGac() }; error(loiCai) }
+        if (nutDangPhat) io { tv.choPhepDangPhat() }
         if (dnsChanQc) io { tv.batDnsChanQc(sl) }
         if (nutManCho) io { tv.chuanBiManCho(sl) }
         thuPhimHome(sl)
@@ -932,7 +954,12 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // Giữ OK trên ô app: menu Di chuyển / Thêm vào dock / Bỏ khỏi Home / Thông tin (upstream #464, #746; tắt mặc định
         // ở upstream). CleanTV bật sẵn vì người dùng xin đổi chỗ dock ngay trên tivi (22/10/2026); Nâng cao vẫn tắt được.
         put("tile_menu", true)
-        if (doiHang != 0) put("rows_offset_dp", doiHang)
+        if (doiHang == HANG_GIUA) put("rows_middle", true) else if (doiHang != 0) put("rows_offset_dp", doiHang)
+        if (!nutDangPhat) put("now_playing", false)
+        if (coChuDau != 100) put("header_scale", coChuDau)
+        if (motHang) { put("dock_row", true); put("single_row", true) }
+        if (anLoiChao) put("show_greeting", false)
+        if (oDeuNhau) put("uniform_tiles", true)
         // Phím APPS (KEYCODE_ALL_APPS) chỉ là nút Home với que / tivi Xiaomi hoặc khi bật "Remote gửi phím Home lạ";
         // tivi khác (Sony VH2: nút Apps mở Home sạch như Back, abc999roses 24/10/2026) để phím cho tivi.
         put("all_apps_home", nutHome || thongTin?.brand?.equals("Xiaomi", ignoreCase = true) == true)
@@ -1097,6 +1124,11 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (bo != null) thongBao = t("Đang gửi ${bo.size} ảnh phong cảnh…", "Sending ${bo.size} landscape pictures…")
         io { tv.dayCauHinh(json, anh, bo) }
         if (dungPhimRemote) io { tv.batBatPhimHome() }
+        // Đổi giao diện cũng bật / tắt DNS AdGuard theo công tắc (trước 2.7.3 chỉ lúc cài Home sạch mới đặt).
+        val dangChan = io { tv.dnsDangChan() }
+        if (dnsChanQc && !dangChan) saoLuu?.let { sl -> io { tv.batDnsChanQc(sl) } }
+        if (!dnsChanQc && dangChan) io { tv.tatDnsChanQc(saoLuu) }
+        if (nutDangPhat) io { tv.choPhepDangPhat() }
         if (nutManCho) io { tv.chuanBiManCho(saoLuu) }
         thongBao = t("Đang thử nút Home trên tivi…", "Testing the TV's Home button…")
         val sl = saoLuu ?: thongTin?.let { tt -> runCatching { io { tv.damBaoSaoLuu(tt, getprop, ip) } }.getOrNull() }?.also { saoLuu = it }

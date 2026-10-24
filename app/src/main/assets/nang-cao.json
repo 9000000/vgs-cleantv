@@ -132,14 +132,6 @@
     "moTaVi": "Số hàng app còn thấy dưới dock. Không đủ chỗ thì ô tự nhỏ lại."
   },
   {
-    "khoa": "dock_title",
-    "kieu": "bool",
-    "moTa": "The focused dock app's name in large type above the dock (true); false keeps only the glow",
-    "canThan": false,
-    "ten": "Tên app to phía trên dock",
-    "moTaVi": "Hiện tên app đang chọn bằng chữ to phía trên dock (mặc định bật). Tắt thì chỉ còn viền sáng quanh app."
-  },
-  {
     "khoa": "dock_row",
     "kieu": "bool",
     "moTa": "The dock as its own row with a band (true); false makes the dock apps the first tiles of one plain grid",
@@ -164,6 +156,14 @@
     "moTaVi": "Nút Wi-Fi/Ethernet trên thanh trên cùng (mặc định bật). Tắt để ẩn."
   },
   {
+    "khoa": "top_bar_apps",
+    "kieu": "ds",
+    "moTa": "Apps shown as round buttons with their own logo in the top bar, left of the network pill; they leave the grid",
+    "canThan": false,
+    "ten": "App thành nút tròn trên thanh trên cùng",
+    "moTaVi": "Các app này hiện thành nút tròn có logo ở thanh trên cùng, bên trái ô mạng, và không còn là ô trong lưới. Ghi tên gói, cách nhau bằng dấu phẩy."
+  },
+  {
     "khoa": "show_inputs_pill",
     "kieu": "bool",
     "moTa": "The Inputs pill in the top bar, shown when the TV has inputs (true by default); false hides it, and with top_menu it also leaves Inputs out of the gear's menu (streamers with no HDMI input, such as the Chromecast with Google TV); what the remote's Input button does is unchanged",
@@ -177,7 +177,7 @@
     "moTa": "Wi-Fi and Settings as round icon buttons; Inputs keeps its label (false by default)",
     "canThan": false,
     "ten": "Nút tròn chỉ có biểu tượng",
-    "moTaVi": "Nút Wi-Fi và Cài đặt thành nút tròn chỉ có biểu tượng; nút Nguồn vào vẫn giữ chữ (mặc định bật)."
+    "moTaVi": "Nút Wi-Fi và Cài đặt thành nút tròn chỉ có biểu tượng; nút Nguồn vào vẫn giữ chữ (mặc định tắt)."
   },
   {
     "khoa": "icon_only_inputs",
@@ -212,6 +212,14 @@
     "moTaVi": "Biểu tượng Wi-Fi xanh lá khi tivi có mạng, trắng khi mất mạng (mặc định tắt)."
   },
   {
+    "khoa": "wifi_status_warnings",
+    "kieu": "bool",
+    "moTa": "With wifi_status_color, the icon orange while connected without internet (a captive portal waiting for its login page) and red while offline, instead of white (false by default)",
+    "canThan": false,
+    "ten": "Icon mạng đổi màu khi có sự cố",
+    "moTaVi": "Khi bật tô màu icon mạng: cam khi có Wi-Fi mà không vào được Internet (mạng cần đăng nhập), đỏ khi mất mạng (mặc định tắt)."
+  },
+  {
     "khoa": "wifi_label_width",
     "kieu": "so",
     "min": 0,
@@ -228,6 +236,14 @@
     "canThan": false,
     "ten": "Ảnh nền màu đầy đủ",
     "moTaVi": "Ảnh nền màu đầy đủ 32-bit, hết bị sọc ở nền tối như bầu trời đêm, nhưng tốn gấp đôi bộ nhớ. Chỉ nên bật cho tivi có từ 2 GB RAM (mặc định tắt)."
+  },
+  {
+    "khoa": "uniform_tiles",
+    "kieu": "bool",
+    "moTa": "Each app tile is its icon on a card tinted from that icon, with the name only under the focused tile, instead of the app's own banner (false by default)",
+    "canThan": false,
+    "ten": "Ô icon đều nhau",
+    "moTaVi": "Mỗi ô app là icon trên nền màu lấy từ icon, tên chỉ hiện dưới ô đang chọn, thay cho ảnh banner của app (mặc định tắt)."
   },
   {
     "khoa": "app_library_selection",
@@ -254,6 +270,32 @@
     "moTaVi": "Hiện ngày theo lịch Ba Tư (dùng ở Iran, Afghanistan) phía trên ngày dương."
   },
   {
+    "khoa": "lunar_utc_offset",
+    "kieu": "so",
+    "min": 0,
+    "max": 14,
+    "moTa": "Hours east of UTC the lunar calendar is computed for: 7 is the Vietnamese calendar, 8 the Chinese one; they differ by a day now and then (and by a month in 1985). Unset: 7 when the TV is in Vietnamese, 8 otherwise",
+    "canThan": false,
+    "ten": "Múi giờ tính âm lịch",
+    "moTaVi": "Số giờ lệch UTC dùng để tính âm lịch: 7 là lịch Việt Nam, 8 là lịch Trung Quốc; thỉnh thoảng lệch nhau một ngày. Để trống: 7 khi tivi tiếng Việt, 8 khi khác."
+  },
+  {
+    "khoa": "show_greeting",
+    "kieu": "bool",
+    "moTa": "The greeting above the clock (true by default); false hides it",
+    "canThan": false,
+    "ten": "Lời chào trên đồng hồ",
+    "moTaVi": "Dòng \"Chào buổi tối\" phía trên đồng hồ (mặc định bật); tắt để ẩn."
+  },
+  {
+    "khoa": "header_white",
+    "kieu": "bool",
+    "moTa": "The date and the line between the clock and the date in the clock's full white instead of dimmed (false by default)",
+    "canThan": false,
+    "ten": "Ngày màu trắng",
+    "moTaVi": "Ngày và vạch giữa đồng hồ với ngày trắng như đồng hồ thay vì mờ (mặc định tắt)."
+  },
+  {
     "khoa": "module_cards",
     "kieu": "bool",
     "moTa": "Look for module cards and ask about them (true); false turns the feature off",
@@ -262,20 +304,20 @@
     "moTaVi": "Tìm các thẻ mở rộng cài thêm và hỏi có hiện không (mặc định bật). Tắt để bỏ hẳn tính năng này."
   },
   {
-    "khoa": "reduced_motion",
-    "kieu": "bool",
-    "moTa": "Calmer motion for weak GPUs: the highlight slides without bouncing and settles within 5 frames, every animation lasts 90 ms or less, names, the top shelf, the glow and the highlight appear instead of fading, and there is no tile entrance (false by default)",
-    "canThan": false,
-    "ten": "Giảm hiệu ứng chuyển động",
-    "moTaVi": "Dành cho tivi yếu: rút ngắn thời gian hiệu ứng, tắt nảy khi lướt và hiệu ứng xuất hiện (mặc định tắt)."
-  },
-  {
     "khoa": "boot_to_live_tv",
     "kieu": "bool",
     "moTa": "Open the Live TV app (live_tv_package) on the first Home after the TV starts, once per boot",
     "canThan": true,
     "ten": "Bật tivi là vào truyền hình",
     "moTaVi": "Lần đầu về Home sau khi bật tivi thì mở app truyền hình (đặt ở App xem truyền hình), mỗi lần bật tivi một lần."
+  },
+  {
+    "khoa": "open_on_start_choice",
+    "kieu": "bool",
+    "moTa": "true adds an **Open on start** row to Launcher settings: pick an app on the TV, and the first Home after each boot opens it instead (once per boot; boot_to_live_tv wins when both are set; an app that is gone or disabled leaves Home on screen). Off by default",
+    "canThan": false,
+    "ten": "Chọn app mở khi bật tivi",
+    "moTaVi": "Thêm dòng \"Mở khi khởi động\" vào Cài đặt launcher: chọn một app, lần đầu về Home sau mỗi lần bật tivi sẽ mở app đó (mặc định tắt)."
   },
   {
     "khoa": "focus_overshoot",
@@ -318,14 +360,6 @@
     "moTaVi": "Giữ ô \"Home mặc định\" trên Home khi tivi có bảng chọn Home (mặc định tắt)."
   },
   {
-    "khoa": "show_stats",
-    "kieu": "bool",
-    "moTa": "One line under the clock with CPU, free memory and free storage. Off unless set",
-    "canThan": false,
-    "ten": "Hiện thông số CPU / bộ nhớ",
-    "moTaVi": "Một dòng chữ nhỏ dưới đồng hồ báo phần trăm CPU, dung lượng RAM và bộ nhớ trống (mặc định tắt)."
-  },
-  {
     "khoa": "background_color",
     "kieu": "chu",
     "moTa": "Colour behind everything; black by default",
@@ -344,16 +378,6 @@
     "moTaVi": "Nền chuyển màu tối theo giờ trong ngày, từ 0 đến 100. 0 là tắt (mặc định)."
   },
   {
-    "khoa": "wallpaper_rotation_minutes",
-    "kieu": "so",
-    "min": 0,
-    "max": 1440,
-    "moTa": "Rotate images in the theme's wallpapers/ folder at this interval; 0 keeps the single-image behaviour. A negative or non-numeric value is ignored, and 0 means \"no rotation\", not \"every minute\"",
-    "canThan": false,
-    "ten": "Thời gian đổi ảnh nền (phút)",
-    "moTaVi": "Tự động đổi ảnh trong thư mục wallpapers/ sau số phút này (ví dụ 60). Đặt 0 để không tự đổi."
-  },
-  {
     "khoa": "wallpaper_order",
     "kieu": "chon",
     "chon": [
@@ -368,16 +392,6 @@
       "shuffle": "Ngẫu nhiên",
       "sequential": "Lần lượt"
     }
-  },
-  {
-    "khoa": "wallpaper_dim",
-    "kieu": "so",
-    "min": 0,
-    "max": 90,
-    "moTa": "Black overlay over wallpaper images, in percent; 0 by default and no shade view at all",
-    "canThan": false,
-    "ten": "Độ tối hình nền (%)",
-    "moTaVi": "Lớp phủ màu đen che bớt độ sáng ảnh nền (từ 0 đến 90%). 0 là giữ nguyên ảnh gốc."
   },
   {
     "khoa": "dock_opacity",
@@ -502,6 +516,14 @@
     "moTaVi": "Bật thì khi có tay cầm game kết nối, dịch vụ bắt phím của Home sạch ngừng lọc phím để game nhận đủ nút (vd Steam Link với tay Xbox); các nút remote gán sẵn tạm không chạy tới khi rút tay cầm. Cần bật key_filter. Mặc định tắt."
   },
   {
+    "khoa": "consume_volume_keys",
+    "kieu": "bool",
+    "moTa": "true makes the key helpers swallow Volume Up/Down and repeat a held one themselves (after 500 ms, every 60 ms). Use it on firmware that applies a volume key both before the helper and when the helper hands it back, so one tap moves two steps (TCL G03 / BeyondTV4, Android 11, #1100). Needs key_filter on. Off by default",
+    "canThan": false,
+    "ten": "Sửa nút âm lượng nhảy hai nấc",
+    "moTaVi": "Dịch vụ phím tự giữ và lặp nút tăng/giảm âm lượng. Dùng khi bấm một lần mà âm lượng nhảy hai nấc (TCL BeyondTV4). Cần bật lọc phím (key_filter). Mặc định tắt."
+  },
+  {
     "khoa": "stock_home_redirect",
     "kieu": "chu",
     "moTa": "Stock launcher package; if the firmware turns it back on (XGIMI), its home screen is sent straight back here (HOME_KEY_SERVICE=1)",
@@ -510,14 +532,30 @@
     "moTaVi": "Tên gói Home gốc của hãng. Nếu phần mềm tivi tự bật lại Home gốc (như XGIMI), màn đó bị chuyển ngay về Home sạch."
   },
   {
-    "khoa": "home_idle_clock_minutes",
+    "khoa": "clock_wallpaper",
+    "kieu": "bool",
+    "moTa": "The clock screensaver over Home's wallpaper instead of black with a coloured glow; the clock still moves every minute (false by default)",
+    "canThan": false,
+    "ten": "Màn chờ đồng hồ trên hình nền",
+    "moTaVi": "Màn chờ đồng hồ hiện trên hình nền của Home thay vì nền đen có ánh màu; đồng hồ vẫn dịch chỗ mỗi phút (mặc định tắt)."
+  },
+  {
+    "khoa": "clock_wallpaper_dim",
     "kieu": "so",
     "min": 0,
-    "max": 1440,
-    "moTa": "Minutes Home may sit untouched before it shows the clock screensaver (a thin clock and date drifting over a slow glow, as the system \"Clock\" screensaver does). Any key returns to Home. It starts only from Home, never over Live TV or an app; 0 is off (default)",
+    "max": 90,
+    "moTa": "How dark that wallpaper is behind the clock, in percent (50 by default)",
     "canThan": false,
-    "ten": "Đồng hồ khi để yên (phút)",
-    "moTaVi": "Số phút để yên trên Home trước khi hiện màn hình chờ đồng hồ (từ 0 đến 1440). Đặt 0 để tắt."
+    "ten": "Độ tối hình nền sau đồng hồ",
+    "moTaVi": "Hình nền sau đồng hồ tối bao nhiêu phần trăm (mặc định 50)."
+  },
+  {
+    "khoa": "clock_glow",
+    "kieu": "bool",
+    "moTa": "The clock screensaver's coloured glow (true by default); false leaves the moving clock on plain black, e.g. for an OLED",
+    "canThan": false,
+    "ten": "Ánh màu của màn chờ đồng hồ",
+    "moTaVi": "Ánh màu quanh đồng hồ ở màn chờ (mặc định bật); tắt để chỉ còn đồng hồ trên nền đen, hợp với tivi OLED."
   },
   {
     "khoa": "glow_style",
@@ -528,12 +566,20 @@
     "moTaVi": "Kiểu ánh sáng theo màu app phía sau app đang chọn: radial (toả tròn, mặc định) hoặc horizon (màu loang từ mép trên xuống)."
   },
   {
+    "khoa": "glass_style",
+    "kieu": "chu",
+    "moTa": "Look of the focus highlight: glass (default: a translucent slab with a bright top sheen, a crisp rim and a faint outer glow), rim (the crisp rim alone, no sheen, fill or glow, for a quiet focus over a wallpaper) or halo (the rim with a lighter outer glow)",
+    "canThan": false,
+    "ten": "Kiểu viền ô đang chọn",
+    "moTaVi": "glass (mặc định: tấm kính mờ có vệt sáng), rim (chỉ viền sắc, dịu nhất) hoặc halo (viền kèm ánh sáng nhẹ bên ngoài)."
+  },
+  {
     "khoa": "cinematic_home",
     "kieu": "bool",
     "moTa": "Cinematic top shelf: the focused dock app's artwork, softened, fills the top of the screen in its colour, with a larger name, \"Last opened\" (apps opened from Home), dock position dots, a focus glow in the app's colour and a translucent dock band; off by default",
     "canThan": false,
     "ten": "Home kiểu điện ảnh",
-    "moTaVi": "Phần trên màn hình hiện ảnh lớn của app đang chọn, tên to hơn, \"Mở lần cuối\", chấm vị trí, viền sáng theo màu app và dock trong suốt (mặc định bật)."
+    "moTaVi": "Phần trên màn hình hiện ảnh lớn của app đang chọn, tên to hơn, \"Mở lần cuối\", chấm vị trí, viền sáng theo màu app và dock trong suốt (mặc định tắt)."
   },
   {
     "khoa": "cinematic_dots",
@@ -578,6 +624,92 @@
     "canThan": false,
     "ten": "Viền dải dock đều",
     "moTaVi": "Khoảng cách từ mép dải dock tới các ô bằng khoảng cách giữa các ô, đều cả bốn phía (mặc định tắt)."
+  },
+  {
+    "khoa": "single_row",
+    "kieu": "bool",
+    "moTa": "Every app in the dock's row, the dock apps first, scrolling sideways; no grid below (false by default; needs dock_row)",
+    "canThan": false,
+    "ten": "Tất cả app một hàng",
+    "moTaVi": "Mọi app nằm trên hàng dock, app dock đứng đầu, cuộn ngang; không còn lưới bên dưới (mặc định tắt; cần dock_row)."
+  },
+  {
+    "khoa": "dock_band_all",
+    "kieu": "bool",
+    "moTa": "With single_row, the band runs behind every app in the row, not only the dock apps (false by default)",
+    "canThan": false,
+    "ten": "Dải nền chạy suốt hàng",
+    "moTaVi": "Khi bật một hàng: dải nền sau dock chạy sau mọi app trong hàng, không chỉ app dock (mặc định tắt)."
+  },
+  {
+    "khoa": "ambient_glow",
+    "kieu": "bool",
+    "moTa": "The glow behind the dock in the focused app's colour (true by default); false keeps only background_color or the wallpaper, e.g. for a calm photo background",
+    "canThan": false,
+    "ten": "Ánh sáng nền theo màu app",
+    "moTaVi": "Ánh sáng phía sau dock theo màu app đang chọn (mặc định bật). Tắt để nền chỉ là màu nền hoặc ảnh nền, hợp với ảnh chụp tĩnh."
+  },
+  {
+    "khoa": "fade_rows",
+    "kieu": "bool",
+    "moTa": "The rows fade out as they scroll up under the clock instead of being cut off at a hard line; the wallpaper or sky shows through. The grid then draws into a hardware layer (about 6 MB of graphics memory at 1080p) (false by default)",
+    "canThan": false,
+    "ten": "Hàng app mờ dần khi cuộn",
+    "moTaVi": "Hàng app mờ dần khi cuộn lên dưới đồng hồ thay vì bị cắt thẳng. Tốn thêm khoảng 6 MB bộ nhớ đồ hoạ ở 1080p (mặc định tắt)."
+  },
+  {
+    "khoa": "dock_title",
+    "kieu": "bool",
+    "moTa": "The focused dock app's name in large type above the dock (true); false keeps only the glow",
+    "canThan": false,
+    "ten": "Tên app to phía trên dock",
+    "moTaVi": "Hiện tên app đang chọn bằng chữ to phía trên dock (mặc định bật). Tắt thì chỉ còn viền sáng quanh app."
+  },
+  {
+    "khoa": "reduced_motion",
+    "kieu": "bool",
+    "moTa": "Calmer motion for weak GPUs: the highlight slides without bouncing and settles within 5 frames, every animation lasts 90 ms or less, names, the top shelf, the glow and the highlight appear instead of fading, and there is no tile entrance (false by default)",
+    "canThan": false,
+    "ten": "Giảm hiệu ứng chuyển động",
+    "moTaVi": "Dành cho tivi yếu: rút ngắn thời gian hiệu ứng, tắt nảy khi lướt và hiệu ứng xuất hiện (mặc định tắt)."
+  },
+  {
+    "khoa": "show_stats",
+    "kieu": "bool",
+    "moTa": "One line under the clock with CPU, free memory and free storage. Off unless set",
+    "canThan": false,
+    "ten": "Hiện thông số CPU / bộ nhớ",
+    "moTaVi": "Một dòng chữ nhỏ dưới đồng hồ báo phần trăm CPU, dung lượng RAM và bộ nhớ trống (mặc định tắt)."
+  },
+  {
+    "khoa": "wallpaper_rotation_minutes",
+    "kieu": "so",
+    "min": 0,
+    "max": 1440,
+    "moTa": "Rotate images in the theme's wallpapers/ folder at this interval; 0 keeps the single-image behaviour. A negative or non-numeric value is ignored, and 0 means \"no rotation\", not \"every minute\"",
+    "canThan": false,
+    "ten": "Thời gian đổi ảnh nền (phút)",
+    "moTaVi": "Tự động đổi ảnh trong thư mục wallpapers/ sau số phút này (ví dụ 60). Đặt 0 để không tự đổi."
+  },
+  {
+    "khoa": "wallpaper_dim",
+    "kieu": "so",
+    "min": 0,
+    "max": 90,
+    "moTa": "Black overlay over wallpaper images, in percent; 0 by default and no shade view at all",
+    "canThan": false,
+    "ten": "Độ tối hình nền (%)",
+    "moTaVi": "Lớp phủ màu đen che bớt độ sáng ảnh nền (từ 0 đến 90%). 0 là giữ nguyên ảnh gốc."
+  },
+  {
+    "khoa": "home_idle_clock_minutes",
+    "kieu": "so",
+    "min": 0,
+    "max": 1440,
+    "moTa": "Minutes Home may sit untouched before it shows the clock screensaver (a thin clock and date drifting over a slow glow, as the system \"Clock\" screensaver does). Any key returns to Home. It starts only from Home, never over Live TV or an app; 0 is off (default)",
+    "canThan": false,
+    "ten": "Đồng hồ khi để yên (phút)",
+    "moTaVi": "Số phút để yên trên Home trước khi hiện màn hình chờ đồng hồ (từ 0 đến 1440). Đặt 0 để tắt."
   },
   {
     "khoa": "dock_glass",
@@ -630,28 +762,12 @@
     "moTaVi": "Gom các nút trên thanh đỉnh thành một cụm icon tròn gọn gàng, bỏ chữ (mặc định tắt)."
   },
   {
-    "khoa": "ambient_glow",
-    "kieu": "bool",
-    "moTa": "The glow behind the dock in the focused app's colour (true by default); false keeps only background_color or the wallpaper, e.g. for a calm photo background",
-    "canThan": false,
-    "ten": "Ánh sáng nền theo màu app",
-    "moTaVi": "Ánh sáng phía sau dock theo màu app đang chọn (mặc định bật). Tắt để nền chỉ là màu nền hoặc ảnh nền, hợp với ảnh chụp tĩnh."
-  },
-  {
     "khoa": "app_glow",
     "kieu": "bool",
     "moTa": "The focus highlight glows in the focused app's colour on every tile, as cinematic_home does for the dock (false by default)",
     "canThan": false,
     "ten": "Viền sáng theo màu app",
     "moTaVi": "Viền chọn xung quanh mọi ô app phát sáng theo tông màu chính của app đó (mặc định bật)."
-  },
-  {
-    "khoa": "fade_rows",
-    "kieu": "bool",
-    "moTa": "The rows fade out as they scroll up under the clock instead of being cut off at a hard line; the wallpaper or sky shows through. The grid then draws into a hardware layer (about 6 MB of graphics memory at 1080p) (false by default)",
-    "canThan": false,
-    "ten": "Hàng app mờ dần khi cuộn",
-    "moTaVi": "Hàng app mờ dần khi cuộn lên dưới đồng hồ thay vì bị cắt thẳng. Tốn thêm khoảng 6 MB bộ nhớ đồ hoạ ở 1080p (mặc định tắt)."
   },
   {
     "khoa": "media_bar",

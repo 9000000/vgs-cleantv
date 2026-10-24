@@ -1,25 +1,25 @@
 {
   "app": {
     "versionCode": 64,
-    "versionName": "2.7.5",
-    "apk": "https://github.com/9000000/vgs-cleantv/releases/download/v2.7.5/CleanTV-v2.7.5.apk",
-    "co": 12616087,
-    "ghiChu": "CleanTV v2.7.5",
-    "ghiChuEn": "CleanTV v2.7.5 release",
+    "versionName": "2.8.1",
+    "apk": "https://github.com/9000000/vgs-cleantv/releases/download/v2.8.1/CleanTV-v2.8.1.apk",
+    "co": 12632421,
+    "ghiChu": "Vị trí hàng app thêm Giữa màn hình và Thấp nhất; dòng thời tiết có biểu tượng.",
+    "ghiChuEn": "App rows position adds Middle and Lowest; the weather line gets an icon.",
     "ngay": "2026-10-24"
   },
   "duLieu": {
     "du-lieu.json": {
-      "phienBan": "8065da83e338bd42",
+      "phienBan": "c2e62e1cf17032cb",
       "url": "/ota/du-lieu.json",
       "co": 1479960,
-      "tuBan": 60
+      "tuBan": 64
     },
     "tvhome.apk": {
-      "phienBan": "69bc4175881c4572",
+      "phienBan": "209e50c26568df31",
       "url": "/ota/tvhome.apk",
-      "co": 600155,
-      "tuBan": 60
+      "co": 618725,
+      "tuBan": 64
     }
   }
 }
