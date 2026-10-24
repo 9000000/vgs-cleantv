@@ -976,12 +976,13 @@ private fun TheTuyChinh(vm: PhienLamViec) {
 
 /** Nhóm của một khoá Nâng cao, theo thứ tự hiện. */
 private val NHOM_NANG_CAO = listOf(
-    Triple("hinh-nen", "Hình nền & màu" to "Wallpaper & colour", Regex("^(background_color|sky_intensity|wallpaper_.*|accent_color|festival.*|glow_style|ambient_glow)$")),
-    Triple("dock", "Dock & lưới app" to "Dock & app grid", Regex("^(fill_dock|hidden_apps|columns|rows_below_dock|dock_.*|library_apps|app_library_selection|app_labels|app_banners|module_cards|reorder_button|tile_menu|fade_rows|focus_overshoot)$")),
-    Triple("thanh-tren", "Thanh trên & lời chào" to "Top bar & greeting", Regex("^(show_.*|icon_only_.*|top_menu|launcher_settings_button|wifi_.*|greeting|shamsi_date|vpn_app)$")),
+    Triple("hinh-nen", "Hình nền & màu" to "Wallpaper & colour", Regex("^(background_color|sky_intensity|wallpaper_.*|accent_color|festival.*|glow_style|ambient_glow|app_glow)$")),
+    Triple("dock", "Dock & lưới app" to "Dock & app grid", Regex("^(fill_dock|hidden_apps|columns|rows_below_dock|dock_.*|library_apps|app_library_selection|app_labels|app_banners|module_cards|reorder_button|tile_menu|fade_rows|focus_overshoot|animations|advanced_effects|reduced_motion)$")),
+    Triple("thanh-tren", "Thanh trên & lời chào" to "Top bar & greeting", Regex("^(show_.*|icon_only_.*|top_menu|launcher_settings_button|wifi_.*|greeting|shamsi_date|vpn_app|home_idle_clock_minutes)$")),
     Triple("dien-anh", "Home điện ảnh" to "Cinematic Home", Regex("^cinematic_.*$")),
-    Triple("remote", "Remote, HDMI & app hãng" to "Remote, HDMI & maker apps", Regex("^(live_tv_.*|source_panel_.*|coocaa_sources|launch_actions|input_.*|settings_key_.*|restore_key_services|app_keys|key_filter|stock_home_redirect|boot_to_live_tv)$")),
+    Triple("remote", "Remote, HDMI & app hãng" to "Remote, HDMI & maker apps", Regex("^(live_tv_.*|source_panel_.*|coocaa_sources|launch_actions|input_.*|settings_key_.*|restore_key_services|app_keys|key_filter|stock_home_redirect|boot_to_live_tv|gamepad_passthrough)$")),
 )
+
 
 /** Màn Nâng cao riêng: tìm, lọc Đã đổi / Cẩn thận, chia nhóm, chấm tím ở mục đã đổi. */
 @Composable

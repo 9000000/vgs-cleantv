@@ -34,15 +34,33 @@ val THEMES = listOf(
         mapOf("sky_intensity" to 70, "dock_band" to false), null, listOf(0xFF1B2B5A, 0xFF5A3A4A)),
     Theme("dien-anh", "Điện ảnh", "Cinematic", "Ảnh app đang chọn phủ kín nửa trên", "The focused app's artwork fills the top",
         mapOf("cinematic_home" to true, "sky_intensity" to 35), null, listOf(0xFF4A0A0A, 0xFF101010)),
+    // Glass của CleanYourTV (matheus-caldeira): dock kính mờ, thanh trên điện ảnh, nút tròn, viền sáng lướt êm.
+    Theme("glass", "Kính mờ", "Glass", "Dock kính mờ, thanh trên điện ảnh, nút tròn", "Frosted glass dock, cinematic top shelf, icon-only buttons",
+        mapOf("background_color" to "#090C14", "cinematic_home" to true, "dock_glass" to true, "icon_only_buttons" to true,
+            "app_glow" to true, "glow_style" to "horizon", "focus_overshoot" to false, "advanced_effects" to true),
+        "theme/glass.jpg", listOf(0xFF090C14, 0xFF141A29, 0xFF2A1C4D)),
+    // Ruska của CleanYourTV (priku): hoàng hôn mùa thu Phần Lan bên hồ, dock trong 70%.
+    Theme("ruska", "Thu Phần Lan", "Ruska", "Hoàng hôn mùa thu bên hồ, dock trong 70%", "Finnish autumn dusk over a lake, 70% dock opacity",
+        mapOf("background_color" to "#07080D", "ambient_glow" to false, "dock_opacity" to 70, "app_glow" to true, "focus_overshoot" to false),
+        "theme/ruska.jpg", listOf(0xFF07080D, 0xFF2A1A10, 0xFF522812)),
     // Scenes của CleanYourTV (manas-04): 14 tranh phong cảnh tối vẽ bằng code, tự đổi mỗi giờ (22/10/2026).
     Theme("phong-canh", "Phong cảnh", "Scenes", "14 tranh phong cảnh, tự đổi mỗi giờ", "14 landscapes, a new one every hour",
         mapOf("wallpaper_rotation_minutes" to 60, "dock_band" to false, "background_color" to "#05060A"), null,
         listOf(0xFF1A2236, 0xFF4A3A5A), boAnh = "theme/phong-canh", anhXem = "theme/phong-canh/02-golden-coast.jpg"),
+    // Sweden của CleanYourTV (KhoeLe): 3 ảnh Wikimedia Commons đổi mỗi giờ, dock kính mờ 6 cột, nút tròn.
+    Theme("sweden", "Thụy Điển", "Sweden", "3 ảnh phong cảnh đổi mỗi giờ, dock kính 6 cột", "3 rotating landscapes, frosted-glass 6-column dock",
+        mapOf("columns" to 6, "rows_below_dock" to 1, "background_color" to "#05070C", "wallpaper_rotation_minutes" to 60,
+            "wallpaper_order" to "sequential", "wallpaper_captions" to true, "cinematic_home" to false, "dock_title" to false,
+            "dock_glass" to true, "dock_opacity" to 50, "dock_even_padding" to true, "icon_only_buttons" to true,
+            "icon_only_inputs" to true, "ambient_glow" to false, "app_glow" to false, "fade_rows" to true,
+            "focus_overshoot" to false, "advanced_effects" to true),
+        null, listOf(0xFF05070C, 0xFF142233, 0xFF283E55), boAnh = "theme/sweden", anhXem = "theme/sweden/001.jpg"),
     Theme("toi-gian", "Tối giản", "Minimal", "Nền đen tuyền, kiểu Apple TV", "Pure black, Apple TV style",
         mapOf("background_color" to "#000000"), null, listOf(0xFF000000, 0xFF111111)),
     Theme("sau-cot", "Nhiều app", "More apps", "6 cột, thấy thêm một hàng app", "6 columns, one more row visible",
         mapOf("columns" to 6, "rows_below_dock" to 1, "background_color" to "#000000"), null, listOf(0xFF111111, 0xFF222233)),
 )
+
 
 /** Thành phố cho dòng thời tiết trên Home sạch (weather_lat/lon/place của launcher). */
 data class ThanhPho(val ten: String, val lat: Double, val lon: Double)

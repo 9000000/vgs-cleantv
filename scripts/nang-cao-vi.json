@@ -266,5 +266,34 @@
   "gamepad_passthrough": {
     "ten": "Nhường phím cho tay cầm game",
     "moTa": "Bật thì khi có tay cầm game kết nối, dịch vụ bắt phím của Home sạch ngừng lọc phím để game nhận đủ nút (vd Steam Link với tay Xbox); các nút remote gán sẵn tạm không chạy tới khi rút tay cầm. Cần bật key_filter. Mặc định tắt."
+  },
+  "wallpaper_rotation_minutes": {
+    "ten": "Thời gian đổi ảnh nền (phút)",
+    "moTa": "Tự động đổi ảnh trong thư mục wallpapers/ sau số phút này (ví dụ 60). Đặt 0 để không tự đổi."
+  },
+  "wallpaper_dim": {
+    "ten": "Độ tối hình nền (%)",
+    "moTa": "Lớp phủ màu đen che bớt độ sáng ảnh nền (từ 0 đến 90%). 0 là giữ nguyên ảnh gốc."
+  },
+  "dock_glass": {
+    "ten": "Dock kính mờ",
+    "moTa": "Dải dock dạng kính mờ mờ nhẹ như các nút trên cùng (mặc định tắt). Rất hợp khi dùng kèm ảnh nền."
+  },
+  "app_glow": {
+    "ten": "Viền sáng theo màu app",
+    "moTa": "Viền chọn xung quanh mọi ô app phát sáng theo tông màu chính của app đó (mặc định tắt)."
+  },
+  "home_idle_clock_minutes": {
+    "ten": "Đồng hồ khi để yên (phút)",
+    "moTa": "Số phút để yên trên Home trước khi hiện màn hình chờ đồng hồ (từ 0 đến 1440). Đặt 0 để tắt."
+  },
+  "show_stats": {
+    "ten": "Hiện thông số CPU / bộ nhớ",
+    "moTa": "Một dòng chữ nhỏ dưới đồng hồ báo phần trăm CPU, dung lượng RAM và bộ nhớ trống (mặc định tắt)."
+  },
+  "reduced_motion": {
+    "ten": "Giảm hiệu ứng chuyển động",
+    "moTa": "Dành cho tivi yếu: rút ngắn thời gian hiệu ứng, tắt nảy khi lướt và hiệu ứng xuất hiện (mặc định tắt)."
   }
 }
+

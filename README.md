@@ -28,7 +28,7 @@
 
 **Home sạch** (launcher CleanYourTV, bản vá VGS)
 - Đồng hồ, lịch âm có can chi, thời tiết theo 3.321 phường/xã, lời chào, dock 8 app, cụm nút Máy chiếu · Mạng · Màn hình chờ · Cài đặt.
-- 7 giao diện (VGS, Phong cảnh, Điện ảnh, Cực quang, Bầu trời theo giờ, Tối giản, Nhiều app), ảnh nền riêng từ điện thoại hoặc từ tivi / USB, 65 tuỳ chọn Nâng cao.
+- 10 giao diện (VGS, Cực quang, Bầu trời theo giờ, Điện ảnh, Kính mờ, Thu Phần Lan, Phong cảnh, Thụy Điển, Tối giản, Nhiều app), ảnh nền riêng từ điện thoại hoặc từ tivi / USB, 73 tuỳ chọn Nâng cao.
 - **Nút Home về đúng Home sạch**: app bấm thử nút Home thật. Tivi không cho tắt Home gốc (Google TV còn trình cài đặt, một số box nhà mạng) thì Home sạch tự mở đè lên — không phải quên Wi-Fi.
 - **Nút trên remote vẫn chạy**: YouTube, Netflix, Prime, bánh răng Cài đặt theo bảng phím của từng mẫu tivi; TCL Google TV giữ âm lượng vẫn tăng giảm liên tục.
 - Máy chiếu (Formovie, XGIMI, JMGO…): ghim màn lấy nét / chỉnh hình vào nút Máy chiếu. Xiaomi bản Trung Quốc có Home sạch riêng. Bo mạch CVTE giữ Home hãng.
@@ -100,7 +100,7 @@ Báo lỗi, xin hỗ trợ tivi mới: [vgs.zone/gop-y](https://vgs.zone/gop-y) 
 
 **Clean Home** (CleanYourTV launcher with VGS patches)
 - Clock, Vietnamese lunar date, ward-level weather, greeting, an 8-app dock, a Projector · Network · Screensaver · Settings cluster.
-- 7 themes, your own wallpaper from the phone or the TV / a USB stick, 65 Advanced options.
+- 10 themes (VGS, Aurora, Sky, Cinematic, Glass, Ruska, Scenes, Sweden, Minimal, More apps), your own wallpaper from the phone or the TV / a USB stick, 73 Advanced options.
 - **Home lands on the clean Home**: the app tests the real Home key; where the stock Home can't be disabled (Google TV with its setup app, some operator boxes) the clean Home opens over it — no forgetting Wi-Fi.
 - **Remote keys keep working**: YouTube, Netflix, Prime and the Settings gear from each model's key map; holding volume still ramps on TCL Google TV.
 - Projectors get focus / keystone shortcuts; Chinese Xiaomi TVs get an allowed Home build; CVTE boards keep their stock Home.

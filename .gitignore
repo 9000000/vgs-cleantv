@@ -18,3 +18,4 @@ og/tv-sau.png
 launcher-ky.keystore
 .env.cloudflare
 .env*
+.agent/
