@@ -588,6 +588,48 @@
     "moTaVi": "Dải dock dạng kính mờ mờ nhẹ như các nút trên cùng (mặc định bật). Rất hợp khi dùng kèm ảnh nền."
   },
   {
+    "khoa": "dock_band",
+    "kieu": "bool",
+    "moTa": "The dark background band behind the dock row (false by default); false keeps the dock row and its big title but drops the dark band behind it",
+    "canThan": false,
+    "ten": "Dải nền thanh dock",
+    "moTaVi": "Hiện dải màu nền đen phía sau thanh dock (mặc định tắt). Bật để hiện dải màu đen, tắt để dock trong suốt hoàn toàn giữ nguyên hàng app dock."
+  },
+  {
+    "khoa": "rows_offset_dp",
+    "kieu": "so",
+    "min": -300,
+    "max": 300,
+    "moTa": "Offset the dock and grid rows up (negative) or down (positive) in dp within the screen (0 by default)",
+    "canThan": false,
+    "ten": "Vị trí hàng app (dp)",
+    "moTaVi": "Dịch toàn bộ hàng app và dock lên trên (số âm) hoặc xuống dưới (số dương) theo đơn vị dp (từ -300 đến 300). Mặc định 0."
+  },
+  {
+    "khoa": "icon_tile_color",
+    "kieu": "bool",
+    "moTa": "Phone apps without a TV banner get a tile filled with their icon's colour and a larger icon instead of a grey card (true by default)",
+    "canThan": false,
+    "ten": "Tô màu ô app điện thoại",
+    "moTaVi": "App không có ảnh tivi (Chrome, Thư viện…) có ô màu theo icon và icon to hơn thay vì nền xám (mặc định bật)."
+  },
+  {
+    "khoa": "dream_button",
+    "kieu": "bool",
+    "moTa": "Screensaver button in the top bar to quickly launch the screensaver/clock (false by default)",
+    "canThan": false,
+    "ten": "Nút màn hình chờ",
+    "moTaVi": "Hiện nút màn hình chờ trên thanh đỉnh để bấm bật ngay ảnh nền hoặc đồng hồ (mặc định tắt)."
+  },
+  {
+    "khoa": "top_compact",
+    "kieu": "bool",
+    "moTa": "Compact icon-only cluster for top header buttons, dropping text labels (false by default)",
+    "canThan": false,
+    "ten": "Gom nút đỉnh thành icon",
+    "moTaVi": "Gom các nút trên thanh đỉnh thành một cụm icon tròn gọn gàng, bỏ chữ (mặc định tắt)."
+  },
+  {
     "khoa": "ambient_glow",
     "kieu": "bool",
     "moTa": "The glow behind the dock in the focused app's colour (true by default); false keeps only background_color or the wallpaper, e.g. for a calm photo background",

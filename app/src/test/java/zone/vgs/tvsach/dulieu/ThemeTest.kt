@@ -81,4 +81,26 @@ class ThemeTest {
         assertEquals("true", minimalLight.optString("dock_glass"))
         assertEquals("cyberpunk-neon", json.optString("vgs_theme"))
     }
+
+    @Test
+    fun kiemTraDockBandTrongNangCao() {
+        val assetFile = File("src/main/assets/nang-cao.json")
+        assertTrue("File nang-cao.json phải tồn tại", assetFile.exists())
+        val content = assetFile.readText()
+        val array = org.json.JSONArray(content)
+        val cacKhoa = (0 until array.length()).map { array.getJSONObject(it).getString("khoa") }.toSet()
+        
+        // dock_band
+        assertTrue("nang-cao.json phải chứa tuỳ chọn dock_band", cacKhoa.contains("dock_band"))
+        val dockBandObj = (0 until array.length()).map { array.getJSONObject(it) }.first { it.getString("khoa") == "dock_band" }
+        assertEquals("kieu của dock_band phải là bool", "bool", dockBandObj.getString("kieu"))
+        assertEquals("Dải nền thanh dock", dockBandObj.getString("ten"))
+        assertTrue("dock_band phải nêu rõ mặc định tắt", dockBandObj.getString("moTaVi").contains("mặc định tắt"))
+
+        // Các biến tinh chỉnh giao diện bổ sung
+        assertTrue("phải có rows_offset_dp", cacKhoa.contains("rows_offset_dp"))
+        assertTrue("phải có icon_tile_color", cacKhoa.contains("icon_tile_color"))
+        assertTrue("phải có dream_button", cacKhoa.contains("dream_button"))
+        assertTrue("phải có top_compact", cacKhoa.contains("top_compact"))
+    }
 }

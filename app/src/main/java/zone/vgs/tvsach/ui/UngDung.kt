@@ -971,6 +971,7 @@ private fun TheHomeNoiDung(vm: PhienLamViec) {
 private fun TheTuyChinh(vm: PhienLamViec) {
     The(t("Hiển thị", "Display"), Icons.Rounded.Visibility) {
         Hang(t("Tên app to phía trên dock", "Large app name above the dock"), t("Tắt để Home gọn hơn, chỉ còn viền sáng", "Turn off for a calmer Home, just the glow"), vm.tenToTrenDock) { vm.doiTenToTrenDock(it) }
+        Hang(t("Dải nền thanh dock", "Dock background band"), t("Tắt để dock trong suốt không che hình nền, vẫn giữ nguyên hàng app", "Turn off to drop the dark band, keeping all dock apps"), vm.daiNenDock) { vm.doiDaiNenDock(it) }
         Hang(t("Hiện tên dưới mọi app", "Names under every app"), t("Ông bà dễ nhận app hơn", "Easier to recognise apps"), vm.tenDuoiApp) { vm.doiTenDuoiApp(it) }
         Hang(t("Tô màu ô app điện thoại", "Colour phone-app tiles"), t("App không có ảnh tivi (Chrome, Thư viện…) có ô màu theo icon thay vì nền xám", "Apps without a TV banner get a tile in their icon's colour"), vm.toMauOApp) { vm.doiToMauOApp(it) }
         Hang(t("Gom nút trên cùng thành icon", "Compact icon buttons"), t("Một cụm gọn, bỏ chữ", "One tidy cluster, no labels"), vm.gonNut) { vm.gonNut = it }
@@ -1029,12 +1030,12 @@ private val NHOM_NANG_CAO = listOf(
     NhomNangCao(
         "dock", "Dock & ứng dụng", "Dock & apps",
         "Dải dock, lưới app và thư viện ứng dụng", "The dock, the grid of tiles and the App library",
-        Regex("^(fill_dock|hidden_apps|columns|rows_below_dock|dock_.*|app_labels|app_banners|launch_actions|app_library_selection|library_apps|tile_menu|module_cards|show_home_settings_shortcut)$")
+        Regex("^(fill_dock|hidden_apps|columns|rows_below_dock|rows_offset_dp|dock_.*|icon_tile_color|always_show_names|app_labels|app_banners|launch_actions|app_library_selection|library_apps|tile_menu|module_cards|show_home_settings_shortcut)$")
     ),
     NhomNangCao(
         "remote", "Remote & phím bấm", "Remote & buttons",
         "Nút thanh trên cùng và phím remote", "The top bar's pills and what the remote's keys open",
-        Regex("^(show_.*_pill|icon_only_.*|top_menu|launcher_settings_button|reorder_button|wifi_.*|vpn_app|settings_key_.*|input_key_keycodes|app_keys|key_filter|restore_key_services|gamepad_passthrough|media_bar)$")
+        Regex("^(show_.*_pill|icon_only_.*|top_menu|top_compact|dream_button|launcher_settings_button|reorder_button|wifi_.*|vpn_app|settings_key_.*|input_key_keycodes|app_keys|key_filter|restore_key_services|gamepad_passthrough|media_bar)$")
     ),
     NhomNangCao(
         "clock", "Đồng hồ & thông tin", "Clock & info",

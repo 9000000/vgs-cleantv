@@ -153,6 +153,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var tenToTrenDock by mutableStateOf(true)
     /** Ô app điện thoại (không có ảnh tivi) tô màu theo icon (launcher icon_tile_color, 23/10/2026). */
     var toMauOApp by mutableStateOf(true)
+    /** Dải nền thanh dock (dock_band, mặc định tắt): tắt để dock trong suốt không dải đen nhưng vẫn giữ dock row. */
+    var daiNenDock by mutableStateOf(false)
     var thuVienApp by mutableStateOf(false)
     var dongHoKhiYen by mutableStateOf(0)
     var tiviYeu by mutableStateOf(false)
@@ -182,6 +184,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         tenDuoiApp = (nangCao["always_show_names"] ?: th.cauHinh["always_show_names"]?.toString())?.toBooleanStrictOrNull() ?: false
         tenToTrenDock = (nangCao["dock_title"] ?: th.cauHinh["dock_title"]?.toString())?.toBooleanStrictOrNull() ?: true
         toMauOApp = (nangCao["icon_tile_color"] ?: th.cauHinh["icon_tile_color"]?.toString())?.toBooleanStrictOrNull() ?: true
+        daiNenDock = (nangCao["dock_band"] ?: th.cauHinh["dock_band"]?.toString())?.toBooleanStrictOrNull() ?: false
     }
 
     /** Lưu cấu hình đang chỉnh sửa trong nangCao vào bộ nhớ của theme hiện tại. */
@@ -262,6 +265,11 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     fun doiToMauOApp(v: Boolean) {
         toMauOApp = v
         nangCao["icon_tile_color"] = v.toString()
+    }
+
+    fun doiDaiNenDock(v: Boolean) {
+        daiNenDock = v
+        nangCao["dock_band"] = v.toString()
     }
 
     // Máy chiếu: màn của hãng dò được + những màn đã ghim vào nút "Máy chiếu" trên Home sạch (comp → nhãn).
@@ -776,6 +784,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         tenDuoiApp = j.optBoolean("always_show_names", false)
         tenToTrenDock = j.optBoolean("dock_title", true)
         toMauOApp = j.optBoolean("icon_tile_color", true)
+        daiNenDock = j.optBoolean("dock_band", false)
         thuVienApp = j.optBoolean("app_library", false)
         dongHoKhiYen = j.optInt("home_idle_clock_minutes", 0)
         tiviYeu = j.optBoolean("reduced_motion", false)
@@ -913,6 +922,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (tenDuoiApp) put("always_show_names", true)
         if (!tenToTrenDock) put("dock_title", false)
         if (!toMauOApp) put("icon_tile_color", false)
+        put("dock_band", daiNenDock)
         if (thuVienApp) { put("app_library", true); put("library_button", true) }
         if (dongHoKhiYen > 0) put("home_idle_clock_minutes", dongHoKhiYen)
         if (tiviYeu) put("reduced_motion", true)

@@ -279,6 +279,30 @@
     "ten": "Dock kính mờ",
     "moTa": "Dải dock dạng kính mờ mờ nhẹ như các nút trên cùng (mặc định bật). Rất hợp khi dùng kèm ảnh nền."
   },
+  "dock_band": {
+    "ten": "Dải nền thanh dock",
+    "moTa": "Hiện dải màu nền đen phía sau thanh dock (mặc định tắt). Bật để hiện dải màu đen, tắt để dock trong suốt hoàn toàn giữ nguyên hàng app dock."
+  },
+  "rows_offset_dp": {
+    "ten": "Vị trí hàng app (dp)",
+    "moTa": "Dịch toàn bộ hàng app và dock lên trên (số âm) hoặc xuống dưới (số dương) theo đơn vị dp (từ -300 đến 300). Mặc định 0."
+  },
+  "icon_tile_color": {
+    "ten": "Tô màu ô app điện thoại",
+    "moTa": "App không có ảnh tivi (Chrome, Thư viện…) có ô màu theo icon và icon to hơn thay vì nền xám (mặc định bật)."
+  },
+  "dream_button": {
+    "ten": "Nút màn hình chờ",
+    "moTa": "Hiện nút màn hình chờ trên thanh đỉnh để bấm bật ngay ảnh nền hoặc đồng hồ (mặc định tắt)."
+  },
+  "top_compact": {
+    "ten": "Gom nút đỉnh thành icon",
+    "moTa": "Gom các nút trên thanh đỉnh thành một cụm icon tròn gọn gàng, bỏ chữ (mặc định tắt)."
+  },
+  "always_show_names": {
+    "ten": "Hiện tên dưới mọi app",
+    "moTa": "Luôn hiện tên dưới tất cả các ô app kể cả dock (mờ khi chưa chọn, sáng khi chọn). Mặc định tắt."
+  },
   "app_glow": {
     "ten": "Viền sáng theo màu app",
     "moTa": "Viền chọn xung quanh mọi ô app phát sáng theo tông màu chính của app đó (mặc định bật)."
