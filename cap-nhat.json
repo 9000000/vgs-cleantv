@@ -1,11 +1,11 @@
 {
   "app": {
-    "versionCode": 60,
-    "versionName": "2.7.1",
-    "apk": "https://github.com/9000000/vgs-cleantv/releases/download/v2.7.1/CleanTV-v2.7.1.apk",
-    "co": 17133884,
-    "ghiChu": "CleanTV v2.7.1: Dời hàng app lên / xuống; nút Apps trên remote Sony không còn nhảy về Home",
-    "ghiChuEn": "CleanTV v2.7.1: Move the app rows up / down; Sony's Apps key no longer jumps to Home",
+    "versionCode": 61,
+    "versionName": "2.7.2",
+    "apk": "https://github.com/9000000/vgs-cleantv/releases/download/v2.7.2/CleanTV-v2.7.2.apk",
+    "co": 15496029,
+    "ghiChu": "CleanTV v2.7.2",
+    "ghiChuEn": "CleanTV v2.7.2 release",
     "ngay": "2026-10-24"
   },
   "duLieu": {
