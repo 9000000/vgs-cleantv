@@ -955,7 +955,7 @@ private fun TheTuyChinh(vm: PhienLamViec) {
         }
         Text(t("Vị trí hàng app", "App rows position"), fontSize = 14.sp)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(-120 to t("Cao hơn nhiều", "Much higher"), -60 to t("Cao hơn", "Higher"), 0 to t("Mặc định", "Default"), 60 to t("Thấp hơn", "Lower")).forEach { (v, chu) ->
+            listOf(HANG_GIUA to t("Giữa màn hình", "Middle"), -120 to t("Cao hơn nhiều", "Much higher"), -60 to t("Cao hơn", "Higher"), 0 to t("Mặc định", "Default"), 60 to t("Thấp hơn", "Lower"), 300 to t("Thấp nhất", "Lowest")).forEach { (v, chu) ->
                 ChonChip(chu, vm.doiHang == v) { vm.doiHang = v }
             }
         }

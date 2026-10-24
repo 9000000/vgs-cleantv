@@ -210,7 +210,7 @@ index f4f1e21c..3567d74b 100644
              Intent home = new Intent(Intent.ACTION_MAIN)
                      .addCategory(Intent.CATEGORY_HOME)
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index d992768a..e52c96f6 100644
+index d992768a..c87f1906 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -178,6 +178,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
@@ -286,28 +286,31 @@ index d992768a..e52c96f6 100644
                  singleRow, cfg.dockBandAll));
          if (cfg.fadeRows) TopFade.attach(grid, 48 * density);
          // Reduced motion: the tiles are simply there, with no entrance (reloadApps skips it there too).
-@@ -581,6 +610,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -581,6 +610,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // tvOS layout: push the dock row towards the bottom of the screen, leaving room for
          // rows_below_dock grid rows under it; the rest of the grid stays below until you press Down.
          int rowsBelowDock = cfg.rowsBelowDock;
 +        // CleanTV/VGS: rows_offset_dp moves the dock and the rows up (negative) or down (positive), within the screen
 +        // and never over the clock (feedback 24/10/2026: "dịch hàng lên trên hoặc xuống").
 +        int doiHang = (int) (Weather.so(this, "rows_offset_dp", 0, -300, 300) * density);
++        // rows_middle: the dock row centred on the screen (feedback 24/10/2026: "chỉnh nằm phía dưới, giữa màn hình").
++        boolean hangGiua = Weather.flag(this, "rows_middle", false);
          grid.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
              int h = b - t;
              // Item height follows the tile size, which follows the columns and the rows that must fit (AppAdapter.tileWidthPx).
-@@ -601,6 +633,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -601,6 +635,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // A single row never shows the names under its tiles (the title above the row names the app), so the
              // 7dp gap and 22dp label item_app.xml keeps for them would only lift the row: sit it that much lower.
              if (singleRow && !cfg.alwaysShowNames) want += (int) (29 * density);
-+            if (doiHang != 0) {
++            if (hangGiua) want = (h - dockRow) / 2;
++            if (doiHang != 0 || hangGiua) {
 +                int thapNhat = Math.max((int) (AppAdapter.TOP_ROOM_DP * density), hero.getBottom() + (int) (8 * density));
 +                want = Math.max(thapNhat, Math.min(h - itemH, want + doiHang));
 +            }
              if (grid.getPaddingTop() != want) {
                  grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
                  // A vertical grid parks the dock on the new padding line by scrolling (onTileFocused); a sideways
-@@ -767,7 +803,34 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -767,7 +806,34 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -342,7 +345,7 @@ index d992768a..e52c96f6 100644
          btnSettings.setOnKeyListener(pillKeys);
          btnReorder.setOnKeyListener(pillKeys);
          btnLibraryTop.setOnKeyListener(pillKeys);
-@@ -908,6 +971,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -908,6 +974,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onResume() {
          super.onResume();
@@ -350,7 +353,7 @@ index d992768a..e52c96f6 100644
          // A festival that started or ended while Home was in the background: rebuild with or without it.
          if (festive != festival.active(LocalDate.now())) {
              recreate();
-@@ -951,6 +1015,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -951,6 +1018,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -358,7 +361,7 @@ index d992768a..e52c96f6 100644
          sky.update();
          wallpaperPlayer.start();
          handler.postDelayed(minuteTick, MINUTE_MS);
-@@ -1119,6 +1184,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1119,6 +1187,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onPause() {
          super.onPause();
@@ -366,7 +369,7 @@ index d992768a..e52c96f6 100644
          root.removeCallbacks(showIdleClock);
          endReorder();   // Home or another app while reordering keeps the order so far
          wallpaperPlayer.stop();
-@@ -2002,6 +2068,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2002,6 +2071,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -397,7 +400,7 @@ index d992768a..e52c96f6 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2591,7 +2681,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2591,7 +2684,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -410,7 +413,7 @@ index d992768a..e52c96f6 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2806,6 +2900,29 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2806,6 +2903,29 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              if (v.equals("-")) return -1;
              try { return Integer.parseInt(v); } catch (NumberFormatException e) { return null; }
          }
@@ -440,7 +443,7 @@ index d992768a..e52c96f6 100644
          return null;
      }
  
-@@ -3208,10 +3325,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3208,10 +3328,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
@@ -699,10 +702,10 @@ index 00000000..37668a0f
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Weather.java b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
 new file mode 100644
-index 00000000..303bb03b
+index 00000000..632e128c
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
-@@ -0,0 +1,144 @@
+@@ -0,0 +1,157 @@
 +package com.gathin.tvhome;
 +
 +import android.content.Context;
@@ -813,13 +816,26 @@ index 00000000..303bb03b
 +            if (c.getResponseCode() != 200) return null;
 +            JSONObject cur = new JSONObject(new String(readAll(c.getInputStream()), "UTF-8")).getJSONObject("current");
 +            long temp = Math.round(cur.getDouble("temperature_2m"));
-+            String text = temp + "°C " + label(cur.getInt("weather_code"));
++            int code = cur.getInt("weather_code");
++            String text = icon(code) + " " + temp + "°C " + label(code);
 +            return place.isEmpty() ? text : text + " · " + place;
 +        } catch (Exception e) {
 +            return null;
 +        } finally {
 +            if (c != null) c.disconnect();
 +        }
++    }
++
++    /** WMO weather code → an emoji before the temperature (feedback 24/10/2026: "có thêm hình biểu tượng thời tiết"). */
++    static String icon(int code) {
++        if (code == 0) return "\u2600\uFE0F";
++        if (code == 1 || code == 2) return "\u26C5";
++        if (code == 3) return "\u2601\uFE0F";
++        if (code == 45 || code == 48) return "\uD83C\uDF2B\uFE0F";
++        if (code >= 71 && code <= 77) return "\u2744\uFE0F";
++        if (code >= 95) return "\u26C8\uFE0F";
++        if (code >= 51) return "\uD83C\uDF27\uFE0F";
++        return "\uD83C\uDF21\uFE0F";
 +    }
 +
 +    /** WMO weather code → a short label in Vietnamese or English, by the TV's language. */

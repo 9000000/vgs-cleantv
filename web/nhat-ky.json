@@ -1,5 +1,17 @@
 [
  {
+  "ban": "2.8.1",
+  "ngay": "2026-10-24",
+  "vi": [
+   "• Vị trí hàng app: thêm \"Giữa màn hình\" và \"Thấp nhất\" (góp ý của bạn dùng Xiaomi)",
+   "• Dòng thời tiết có biểu tượng ☀️ ⛅ 🌧️ ở đầu"
+  ],
+  "en": [
+   "• App rows position: new \"Middle\" and \"Lowest\"",
+   "• The weather line starts with an icon ☀️ ⛅ 🌧️"
+  ]
+ },
+ {
   "ban": "2.8.0",
   "ngay": "2026-10-24",
   "vi": [

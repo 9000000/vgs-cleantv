@@ -48,6 +48,9 @@ const val DOCK_TOI_DA = 8
  * Bảng phím chung cho TCL không có mẫu riêng: Netflix 4062, YouTube 4065, Prime Video 4099, bánh răng 83 / 4077 — cùng số
  * trên mọi mẫu TCL có bảng trong upstream (tcl-43c645, tcl-55c725, tcl-65c735, tcl-g10…).
  */
+/** doiHang đặc biệt: hàng dock nằm giữa màn hình (rows_middle của bản vá launcher), góp ý 24/10/2026. */
+const val HANG_GIUA = Int.MIN_VALUE
+
 private const val PHIM_TCL_CHUNG = """{"app_keys":["4062:com.netflix.ninja","4065:com.google.android.youtube.tv","4099:com.amazon.amazonvideo.livingroom"],"settings_key_keycodes":[83,4077]}"""
 
 /**
@@ -674,7 +677,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         hieuUngKinh = j.optBoolean("dock_glass", false)
         lamToiNen = j.optInt("wallpaper_dim", 0)
         hienThongSo = j.optBoolean("show_stats", false)
-        doiHang = j.optInt("rows_offset_dp", 0)
+        doiHang = if (j.optBoolean("rows_middle", false)) HANG_GIUA else j.optInt("rows_offset_dp", 0)
         nutDangPhat = j.optBoolean("now_playing", true)
         coChuDau = j.optInt("header_scale", 100)
         motHang = j.optBoolean("single_row", false)
@@ -809,7 +812,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // Giữ OK trên ô app: menu Di chuyển / Thêm vào dock / Bỏ khỏi Home / Thông tin (upstream #464, #746; tắt mặc định
         // ở upstream). CleanTV bật sẵn vì người dùng xin đổi chỗ dock ngay trên tivi (22/10/2026); Nâng cao vẫn tắt được.
         put("tile_menu", true)
-        if (doiHang != 0) put("rows_offset_dp", doiHang)
+        if (doiHang == HANG_GIUA) put("rows_middle", true) else if (doiHang != 0) put("rows_offset_dp", doiHang)
         if (!nutDangPhat) put("now_playing", false)
         if (coChuDau != 100) put("header_scale", coChuDau)
         if (motHang) { put("dock_row", true); put("single_row", true) }
