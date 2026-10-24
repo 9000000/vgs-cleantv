@@ -974,6 +974,12 @@ private fun TheTuyChinh(vm: PhienLamViec) {
         Hang(t("Hiện tên dưới mọi app", "Names under every app"), t("Ông bà dễ nhận app hơn", "Easier to recognise apps"), vm.tenDuoiApp) { vm.doiTenDuoiApp(it) }
         Hang(t("Tô màu ô app điện thoại", "Colour phone-app tiles"), t("App không có ảnh tivi (Chrome, Thư viện…) có ô màu theo icon thay vì nền xám", "Apps without a TV banner get a tile in their icon's colour"), vm.toMauOApp) { vm.doiToMauOApp(it) }
         Hang(t("Gom nút trên cùng thành icon", "Compact icon buttons"), t("Một cụm gọn, bỏ chữ", "One tidy cluster, no labels"), vm.gonNut) { vm.gonNut = it }
+        Text(t("Vị trí hàng app", "App rows position"), fontSize = 14.sp)
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(-120 to t("Cao hơn nhiều", "Much higher"), -60 to t("Cao hơn", "Higher"), 0 to t("Mặc định", "Default"), 60 to t("Thấp hơn", "Lower")).forEach { (v, chu) ->
+                ChonChip(chu, vm.doiHang == v) { vm.doiHang = v }
+            }
+        }
         Hang(t("Nút màn hình chờ", "Screensaver button"), t("Bấm là bật ảnh / đồng hồ, tiện khi nghe nhạc", "Starts the photo / clock screensaver, handy with music"), vm.nutManCho) { vm.nutManCho = it }
         Hang(t("Thư viện app", "App library"), t("Nút xem mọi app trên tivi, thêm / bớt khỏi Home", "A button listing every app; add or remove from Home"), vm.thuVienApp) { vm.thuVienApp = it }
         Hang(t("Hiện CPU / bộ nhớ", "Show CPU / memory"), t("Một dòng nhỏ dưới đồng hồ", "One small line under the clock"), vm.hienThongSo) { vm.doiHienThongSo(it) }

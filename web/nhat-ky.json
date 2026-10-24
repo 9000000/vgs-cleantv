@@ -1,5 +1,29 @@
 [
  {
+  "ban": "2.7.1",
+  "ngay": "2026-10-24",
+  "vi": [
+   "Tuỳ chỉnh → \"Vị trí hàng app\": dời dock và các hàng app lên cao hơn hoặc thấp xuống.",
+   "Nút Apps trên remote (Sony…) không còn mở Home sạch như nút Back; que / tivi Xiaomi vẫn dùng nút đó làm Home như cũ."
+  ],
+  "en": [
+   "Customise → \"App rows position\": move the dock and app rows higher or lower.",
+   "The remote's Apps key (Sony…) no longer opens the clean Home like Back; Xiaomi sticks / TVs keep using it as Home."
+  ]
+ },
+ {
+  "ban": "2.7",
+  "ngay": "2026-10-24",
+  "vi": [
+   "260 mẫu tivi của 78 hãng: thêm máy chiếu HOTACK, Magcubic HY300 Pro, Sharp Google TV, Sony KD-55X8000C, Sber… cùng 18 mẫu có sẵn bảng phím remote.",
+   "Home sạch theo CleanYourTV mới nhất."
+  ],
+  "en": [
+   "260 TV models from 78 brands: HOTACK and Magcubic HY300 Pro projectors, Sharp Google TV, Sony KD-55X8000C, Sber… and 18 models with a remote key map.",
+   "Clean Home on the latest CleanYourTV."
+  ]
+ },
+ {
   "ban": "2.6.12",
   "ngay": "2026-10-24",
   "vi": [

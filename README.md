@@ -23,7 +23,7 @@
 ### App làm gì
 **Dọn tivi**
 - **Kết nối tivi qua Wi-Fi** bằng ADB: quét mạng hoặc gõ IP; Google TV đời mới ghép bằng mã 6 số (Gỡ lỗi không dây), app tự dò cổng. Hướng dẫn 7 bước có hình trong app.
-- **So với 248 danh sách đã thử** của cộng đồng CleanYourTV (74 hãng: TCL, Sony, Xiaomi, Philips, Hisense, Skyworth, onn, Chromecast, máy chiếu…). Chưa khớp mẫu thì gợi ý mẫu gần giống; tivi lạ dùng luật chung an toàn.
+- **So với 260 danh sách đã thử** của cộng đồng CleanYourTV (78 hãng: TCL, Sony, Xiaomi, Philips, Hisense, Skyworth, onn, Chromecast, máy chiếu…). Chưa khớp mẫu thì gợi ý mẫu gần giống; tivi lạ dùng luật chung an toàn.
 - **Chỉ tắt, không gỡ** quảng cáo, theo dõi, app rác. Không đụng cổng HDMI, remote, bàn phím, CH Play, gói đang giữ Wi-Fi, gói lõi Android và Home đang dùng. Google Home / cast và tìm kiếm giọng nói không bao giờ tích sẵn.
 
 **Home sạch** (launcher CleanYourTV, bản vá VGS)
@@ -48,7 +48,7 @@
 Cần JDK 17 và Android SDK (compileSdk 35).
 
 ```bash
-scripts/dung-launcher.sh          # tải CleanYourTV, áp patches/launcher-vgs.patch, dựng Home sạch + dữ liệu 248 mẫu vào assets
+scripts/dung-launcher.sh          # tải CleanYourTV, áp patches/launcher-vgs.patch, dựng Home sạch + dữ liệu 260 mẫu vào assets
 ./gradlew assembleRelease         # thiếu ky.properties thì APK ký bằng khoá debug
 ./gradlew :app:testReleaseUnitTest
 ```
@@ -95,7 +95,7 @@ Báo lỗi, xin hỗ trợ tivi mới: [vgs.zone/gop-y](https://vgs.zone/gop-y) 
 ### What it does
 **Cleaning**
 - **Connects over Wi-Fi** with ADB: scan or type the IP; newer Google TVs pair with a 6-digit code and the app finds the port. A 7-step picture guide is built in.
-- **Matches 248 tested lists** from the CleanYourTV community (74 brands); suggests close models; unknown TVs get safe general rules.
+- **Matches 260 tested lists** from the CleanYourTV community (78 brands); suggests close models; unknown TVs get safe general rules.
 - **Disables, never uninstalls** ads, tracking and junk. Leaves HDMI inputs, the remote, keyboards, Play Store, the Wi-Fi owner, core Android packages and the Home in use alone. Google Home / casting and voice search are never pre-ticked.
 
 **Clean Home** (CleanYourTV launcher with VGS patches)

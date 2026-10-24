@@ -120,6 +120,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var dnsChanQc by mutableStateOf(false)
     var nutManCho by mutableStateOf(true)
     var gonNut by mutableStateOf(true)
+    /** Dời khối dock + hàng app lên (âm) / xuống (dương), dp — rows_offset_dp của bản vá launcher (góp ý 24/10/2026). */
+    var doiHang by mutableStateOf(0)
     /**
      * Nút app / Cài đặt trên remote (24/10/2026, góp ý TCL G09): tắt Home gốc của TCL là nút YouTube, Netflix… chết vì
      * hãng chỉ gửi chúng cho launcherx. null = tự chọn: bật khi mẫu có bảng phím, trừ mẫu trong PHIM_TAT_SAN.
@@ -780,6 +782,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         hieuUngKinh = j.optBoolean("dock_glass", false)
         lamToiNen = j.optInt("wallpaper_dim", 0)
         hienThongSo = j.optBoolean("show_stats", false)
+        doiHang = j.optInt("rows_offset_dp", 0)
         if (j.has("handle_view_inputs")) nutInput = j.optBoolean("handle_view_inputs", nutInput)
 
         // Nạp cấu hình Nâng cao của theme được chọn
@@ -919,6 +922,10 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // Giữ OK trên ô app: menu Di chuyển / Thêm vào dock / Bỏ khỏi Home / Thông tin (upstream #464, #746; tắt mặc định
         // ở upstream). CleanTV bật sẵn vì người dùng xin đổi chỗ dock ngay trên tivi (22/10/2026); Nâng cao vẫn tắt được.
         put("tile_menu", true)
+        if (doiHang != 0) put("rows_offset_dp", doiHang)
+        // Phím APPS (KEYCODE_ALL_APPS) chỉ là nút Home với que / tivi Xiaomi hoặc khi bật "Remote gửi phím Home lạ";
+        // tivi khác (Sony VH2: nút Apps mở Home sạch như Back, abc999roses 24/10/2026) để phím cho tivi.
+        put("all_apps_home", nutHome || thongTin?.brand?.equals("Xiaomi", ignoreCase = true) == true)
         // Ảnh riêng làm nền: tắt ánh sáng sau dock theo màu app (ambient_glow), không thì ảnh gia đình bị ám đỏ / vàng /
         // xanh mỗi lần đổi ô (góp ý dangngoctri2010, 23/10/2026). Nâng cao ghi sau nên người dùng vẫn bật lại được.
         if (anhNenRieng != null) put("ambient_glow", false)
