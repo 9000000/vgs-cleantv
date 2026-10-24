@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 56,
-  "versionName": "2.6.10",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.10.apk",
+  "versionCode": 57,
+  "versionName": "2.6.11",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.6.11.apk",
   "co": 11560191,
-  "ghiChu": "TCL Google TV: giữ nút âm lượng lại tăng / giảm liên tục",
-  "ghiChuEn": "TCL Google TV: holding volume ramps again",
+  "ghiChu": "TCL Google TV: giữ âm lượng lặp lại được mà nút YouTube vẫn chạy",
+  "ghiChuEn": "TCL Google TV: volume ramps and the YouTube key still works",
   "ngay": "2026-10-24"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "f02964345248d09b",
    "url": "/ota/du-lieu.json",
    "co": 1403996,
-   "tuBan": 56
+   "tuBan": 57
   },
   "tvhome.apk": {
    "phienBan": "414be35d49d85742",
    "url": "/ota/tvhome.apk",
    "co": 598251,
-   "tuBan": 56
+   "tuBan": 57
   }
  }
 }

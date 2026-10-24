@@ -132,8 +132,11 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
      * (upstream docs/devices/tcl-55p71b-g09-key-repeat.md; góp ý nda2192 24/10/2026). Mặc định ưu tiên âm lượng: tắt nút
      * app remote và ghi key_filter=false — dịch vụ vẫn bật để mở đè Home (theo cửa sổ, không cần lọc phím).
      */
+    // Chỉ khi launcherx CÒN BẬT (đường mở đè): nút app remote tự chạy qua nó, thôi lọc phím không mất gì. Đã tắt
+    // launcherx thì nút app chỉ chạy nhờ app_keys → giữ như 2.6.7 (heavensky95, TCL G10 đã tắt launcherx).
     val laTclGoogleTv get() = thongTin?.brand?.equals("TCL", ignoreCase = true) == true &&
-        trangThai?.caiDat?.contains("com.google.android.apps.tv.launcherx") == true
+        trangThai?.caiDat?.contains("com.google.android.apps.tv.launcherx") == true &&
+        trangThai?.daTat?.contains("com.google.android.apps.tv.launcherx") != true
 
     /** Bảng phím remote dùng cho tivi này: của mẫu đang chọn, không có thì bảng chung của TCL; null nếu không có. */
     fun phimRemote(): JSONObject? = mauChon?.phim

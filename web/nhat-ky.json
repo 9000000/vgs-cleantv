@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.6.11",
+  "ngay": "2026-10-24",
+  "vi": [
+   "TCL Google TV: ưu tiên giữ âm lượng chỉ khi Home Google còn bật (nút YouTube / Netflix tự chạy qua nó). Tivi đã tắt Home Google thì vẫn giữ nút app trên remote như bản 2.6.7."
+  ],
+  "en": [
+   "TCL Google TV: the volume-ramp default applies only while Google's Home is still on (its own app keys keep working). With Google's Home disabled the remote app-button map stays on, as in 2.6.7."
+  ]
+ },
+ {
   "ban": "2.6.10",
   "ngay": "2026-10-24",
   "vi": [
