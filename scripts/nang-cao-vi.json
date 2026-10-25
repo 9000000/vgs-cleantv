@@ -394,5 +394,37 @@
   "power_on_home": {
     "ten": "Về Home khi bật tivi",
     "moTa": "Tivi tự mở Live TV / kênh truyền hình mỗi khi bật nguồn thì Home sạch đưa về màn Home (mặc định tắt)."
+  },
+  "dock_apps": {
+    "ten": "Danh sách app thanh dock",
+    "moTa": "Thứ tự các app hiển thị trên hàng dock. Các app chưa cài đặt sẽ tự động được bỏ qua."
+  },
+  "library_button": {
+    "ten": "Nút thư viện app trên thanh đỉnh",
+    "moTa": "Hiện nút Thư viện ứng dụng dạng icon tròn trên thanh trên cùng, bên cạnh nút Cài đặt. Cần bật Thư viện app."
+  },
+  "app_library": {
+    "ten": "Viên Thư viện ứng dụng",
+    "moTa": "Hiện viên Thư viện ứng dụng sau hàng app cuối trên Home: xem mọi app đã cài đặt, thêm hoặc bớt khỏi Home."
+  },
+  "lunar_date": {
+    "ten": "Ngày âm lịch",
+    "moTa": "Hiện ngày âm lịch và can chi năm dưới ngày dương lịch (ví dụ: 13/9 ÂM LỊCH · BÍNH NGỌ). Mặc định tắt."
+  },
+  "greeting_name": {
+    "ten": "Tên trong lời chào",
+    "moTa": "Tên hiển thị sau câu chào trên màn hình chính (ví dụ \"Anh Tuấn\" để hiện CHÀO BUỔI SÁNG, ANH TUẤN). Để trống nếu chỉ muốn hiện lời chào."
+  },
+  "handle_view_inputs": {
+    "ten": "Bắt nút chọn nguồn vào (Input)",
+    "moTa": "Xử lý nút Input trên remote để mở menu chọn cổng HDMI / AV của Home sạch (mặc định tắt)."
+  },
+  "wallpaper": {
+    "ten": "Bật hình nền",
+    "moTa": "Hiển thị hình nền của theme (wallpaper.jpg hoặc bộ ảnh xoay vòng trong wallpapers/). Tắt để dùng nền màu đen."
+  },
+  "race_calendar": {
+    "ten": "Lịch đua xe F1",
+    "moTa": "Chế độ cuối tuần đua xe F1: từ 12 tiếng trước phiên chạy đầu tiên đến 4 tiếng sau cuộc đua chính, bảng thông tin dưới đồng hồ sẽ đếm ngược và hiện lịch đua theo giờ tivi."
   }
 }

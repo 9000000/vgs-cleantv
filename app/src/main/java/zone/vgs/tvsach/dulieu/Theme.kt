@@ -20,7 +20,9 @@ data class Theme(
     val anhXem: String? = null,
 ) {
     fun ghiVao(o: JSONObject) {
-        cauHinh.forEach { (k, v) -> o.put(k, v) }
+        cauHinh.forEach { (k, v) ->
+            if (v is Map<*, *>) o.put(k, JSONObject(v)) else o.put(k, v)
+        }
         o.put("wallpaper", anhNen != null || boAnh != null)
         // Lần sau kết nối lại: mở đúng theme này, và biết khoá nào do theme ghi chứ không phải người dùng bật.
         o.put("vgs_theme", id)
@@ -163,7 +165,45 @@ val THEMES = listOf(
         listOf(0xFF000000, 0xFF111122)
     ),
 
-    // 9. Thụy Điển (Sweden)
+    // 9. Cổ điển (Retro - CleanYourTV Addons)
+    Theme(
+        "retro", "Cổ điển", "Retro",
+        "Nền đen tuyền, dock không viền dải nền, viền chọn sắc mảnh (rim), 3 ảnh nền đổi theo sáng/chiều/tối",
+        "Pure black, a dock with no band or border, rim-only focus highlight, 3 time-of-day wallpapers",
+        mapOf(
+            "background_color" to "#000000",
+            "dock_glass" to false,
+            "dock_band" to false,
+            "glass_style" to "rim",
+            "dock_title" to false,
+            "dock_opacity" to 100,
+            "fill_dock" to true,
+            "columns" to 5,
+            "ambient_glow" to false,
+            "app_glow" to false,
+            "icon_only_buttons" to true,
+            "icon_only_inputs" to true,
+            "wifi_status_color" to true,
+            "tile_menu" to true,
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 60,
+            "wallpaper_moods" to mapOf(
+                "morning" to listOf("6am_4pm.jpg"),
+                "evening" to listOf("4pm_9pm.jpg"),
+                "night" to listOf("9pm_6am.jpg")
+            ),
+            "wallpaper_dim" to 10,
+            "wallpaper_order" to "sequential",
+            "reduced_motion" to true,
+            "sky_intensity" to 0
+        ),
+        null,
+        listOf(0xFF000000, 0xFF1C1C1E, 0xFF3A3A3C),
+        boAnh = "theme/retro",
+        anhXem = "theme/retro/screenshot.jpg"
+    ),
+
+    // 10. Thụy Điển (Sweden)
     Theme(
         "sweden", "Thụy Điển", "Sweden",
         "3 ảnh Thụy Điển đổi mỗi giờ kèm địa danh và tác giả, dock kính mờ 6 cột",
@@ -203,7 +243,7 @@ val THEMES = listOf(
         anhXem = "theme/sweden/001.jpg"
     ),
 
-    // 10. Lễ hội Dussehra (Dussehra)
+    // 11. Lễ hội Dussehra (Dussehra)
     Theme(
         "dussehra", "Lễ hội Dussehra", "Dussehra",
         "Giao diện lễ hội Dussehra với vòng hoa cúc vạn thọ và đèn diya vàng",
