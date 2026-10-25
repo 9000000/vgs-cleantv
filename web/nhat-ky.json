@@ -1,5 +1,17 @@
 [
  {
+  "ban": "2.10.11",
+  "ngay": "2026-10-25",
+  "vi": [
+   "- Danh sách mẫu tivi lên 300 mẫu, 86 hãng (thêm Sony KD-55X75K có phím app trên remote, Philips, TCL, Skyworth, máy chiếu HY320…).",
+   "- Home sạch dựa trên bản gốc CleanYourTV 3.0."
+  ],
+  "en": [
+   "- TV list now has 300 models from 86 brands (adds Sony KD-55X75K remote app keys, Philips, TCL, Skyworth, HY320 projectors…).",
+   "- Home sạch is based on CleanYourTV 3.0."
+  ]
+ },
+ {
   "ban": "2.10.10",
   "ngay": "2026-10-25",
   "vi": [

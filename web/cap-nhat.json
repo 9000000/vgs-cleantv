@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 78,
-  "versionName": "2.10.10",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.10.apk",
-  "co": 11980053,
-  "ghiChu": "Thêm công tắc giữ nút âm lượng để tăng/giảm liên tục (Sony, Xiaomi, Hisense).",
-  "ghiChuEn": "New switch: hold volume to keep raising/lowering (Sony, Xiaomi, Hisense).",
+  "versionCode": 79,
+  "versionName": "2.10.11",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.11.apk",
+  "co": 11992385,
+  "ghiChu": "Danh sách lên 300 mẫu tivi; Home sạch theo bản gốc CleanYourTV 3.0.",
+  "ghiChuEn": "300 TV models; Home sạch now on CleanYourTV 3.0.",
   "ngay": "2026-10-25"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "54f00bfcd0441cc7",
+   "phienBan": "a577a678e1e1b308",
    "url": "/ota/du-lieu.json",
-   "co": 1682380,
-   "tuBan": 78
+   "co": 1725134,
+   "tuBan": 79
   },
   "tvhome.apk": {
-   "phienBan": "87e58c21171ddde8",
+   "phienBan": "7e6596d3a226140e",
    "url": "/ota/tvhome.apk",
-   "co": 640841,
-   "tuBan": 78
+   "co": 641645,
+   "tuBan": 79
   }
  }
 }
