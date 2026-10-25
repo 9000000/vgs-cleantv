@@ -11,3 +11,6 @@ CREATE TABLE IF NOT EXISTS su_kien (
 );
 CREATE INDEX IF NOT EXISTS su_kien_loai_luc ON su_kien (loai, luc);
 CREATE INDEX IF NOT EXISTS su_kien_may ON su_kien (may);
+
+-- Bộ đếm sẵn cho /so-nguoi (25/10/2026), ghi() cộng khi có sự kiện home mới.
+CREATE TABLE IF NOT EXISTS dem_so (khoa TEXT PRIMARY KEY, n INTEGER NOT NULL DEFAULT 0);
