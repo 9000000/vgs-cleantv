@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.10.1",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Ô kênh VTV trên màn chính hiện logo kênh thay cho chữ (Áp dụng lên tivi một lần để cập nhật)"
+  ],
+  "en": [
+   "• VTV channel tiles show the channel logo (apply to the TV once to update)"
+  ]
+ },
+ {
   "ban": "2.10.0",
   "ngay": "2026-10-25",
   "vi": [

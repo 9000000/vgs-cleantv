@@ -751,6 +751,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val cauHinh = cauHinhHome()
         val anh = anhNenTheme()
         val bo = boAnhTheme()
+        napAnhKenh()
         val loiCai = io { tv.caiLauncher(apk, sl, cauHinh, anh, bo, nutInput, nutHome || dungPhimRemote) { s -> ghiTuIo(s) } }
         // caiLauncher báo lỗi là đã tự trả Home gốc: huỷ canh gác trên tivi.
         if (loiCai != null) { io { tv.boGac() }; error(loiCai) }
@@ -949,6 +950,14 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             t(". Bấm \"Áp dụng lên tivi\" để đưa lên tivi.", ". Press \"Apply to the TV\" to send it.")
     }
 
+    /** Ảnh logo kênh (assets/kenh, ảnh nhỏ của VTVgo) cho các kênh đang chọn; launcher không có mạng nên gửi kèm. */
+    private suspend fun napAnhKenh() {
+        tv.anhKenh = if (!coVtvGo) emptyList() else kenhVtv.mapNotNull { ten ->
+            val f = ten.lowercase() + ".jpg"
+            runCatching { f to io { ctx.assets.open("kenh/$f").readBytes() } }.getOrNull()
+        }
+    }
+
     private suspend fun anhNenTheme(): ByteArray? = anhNenRieng ?: themeChon.anhNen?.let { a -> io { ctx.assets.open(a).readBytes() } }
 
     /** Ảnh nền người dùng chọn từ điện thoại (góp ý 23/10/2026), đã thu về 1920×1080 JPEG; null = theo theme. */
@@ -980,6 +989,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     fun apDungTheme() = chay(t("Đang đổi giao diện…", "Applying the theme…")) {
         val json = cauHinhHome()
         val anh = anhNenTheme()
+        napAnhKenh()
         // Cài đè launcher đi kèm app (bản mới có dòng thời tiết…), giữ dữ liệu và dịch vụ trợ năng.
         thongBao = t("Đang cập nhật Home sạch…", "Updating the clean Home…")
         if (!io { tv.capNhatLauncher(zone.vgs.tvsach.CapNhat.moAsset(ctx, tv.apkHome).readBytes()) }) {

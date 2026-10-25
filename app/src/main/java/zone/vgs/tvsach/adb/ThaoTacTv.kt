@@ -514,6 +514,9 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         if (b64.length < 100) null else java.util.Base64.getDecoder().decode(b64)
     }.getOrNull()
 
+    /** Ảnh ô kênh (kenh-vtv1.jpg…) cho link_tiles của bản vá launcher; PhienLamViec đặt trước khi đẩy cấu hình. */
+    var anhKenh: List<Pair<String, ByteArray>> = emptyList()
+
     fun dayCauHinh(json: String, anhNen: ByteArray? = null, boAnh: List<Pair<String, ByteArray>>? = null) {
         giaHanGac()
         val dir = "/sdcard/Android/data/$pkgHome/files"
@@ -534,6 +537,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         // Bộ ảnh xoay vòng (wallpapers/): xoá bộ cũ trước, theme không có bộ ảnh thì chỉ xoá.
         sh("rm -rf $dir/wallpapers 2>/dev/null; content delete --uri $uri/wallpapers 2>/dev/null; true")
         boAnh?.forEach { (ten, du) -> ghiFileTheme("wallpapers/$ten", du) }
+        anhKenh.forEach { (ten, du) -> ghiFileTheme("kenh-$ten", du) }
         ghiFileTheme("theme_revision", java.util.UUID.randomUUID().toString().replace("-", "").toByteArray())
         sh(KHOI_DONG_LAI_HOME)
     }

@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 68,
-  "versionName": "2.10.0",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.0.apk",
-  "co": 11675731,
-  "ghiChu": "Kênh VTV trên màn chính: chọn VTV1–VTV9, mỗi kênh thành một ô ở đầu dock, bấm là xem luôn trên VTVgo. Sửa lại câu chữ trong app cho dễ đọc.",
-  "ghiChuEn": "VTV channels on Home: pick VTV1–VTV9, each becomes a dock tile that opens the channel straight in VTVgo. Clearer wording in the app.",
+  "versionCode": 69,
+  "versionName": "2.10.1",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.1.apk",
+  "co": 11924605,
+  "ghiChu": "Ô kênh VTV dùng logo kênh thay cho chữ.",
+  "ghiChuEn": "VTV channel tiles now show the channel logo.",
   "ngay": "2026-10-25"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "54d1b6e349a10d8b",
+   "phienBan": "ad572cf6981ace86",
    "url": "/ota/du-lieu.json",
    "co": 1606661,
-   "tuBan": 68
+   "tuBan": 69
   },
   "tvhome.apk": {
-   "phienBan": "e33f4fa6ebce933a",
+   "phienBan": "fe2ce4fe72c8a6a6",
    "url": "/ota/tvhome.apk",
-   "co": 622961,
-   "tuBan": 68
+   "co": 623177,
+   "tuBan": 69
   }
  }
 }

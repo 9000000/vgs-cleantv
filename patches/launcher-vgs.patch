@@ -141,7 +141,7 @@ index 5da0f46a..6872943c 100644
              android:name=".ClockDream"
              android:label="@string/dream_name"
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
-index e208aa82..edea90e2 100644
+index e208aa82..b02ebaff 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 @@ -64,7 +64,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -169,7 +169,7 @@ index e208aa82..edea90e2 100644
 +        // CleanTV/VGS: link tiles (a TV channel straight in VTVgo…), placed by dock_apps like any app.
 +        for (LinkTiles.Link l : LinkTiles.load(ctx)) {
 +            if (hidden.contains(l.pkg) || removed.contains(l.pkg)) continue;
-+            Entry link = new Entry(Entry.LINK, l.label, new ComponentName(l.pkg, "link"), new LinkTiles.Face(l.label, l.color),
++            Entry link = new Entry(Entry.LINK, l.label, new ComponentName(l.pkg, "link"), l.picture != null ? l.picture : new LinkTiles.Face(l.label, l.color),
 +                    null, null, l.color);
 +            link.uri = l.uri;
 +            link.target = l.target;
@@ -287,10 +287,10 @@ index f4f1e21c..3567d74b 100644
                      .addCategory(Intent.CATEGORY_HOME)
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/LinkTiles.java b/launcher/app/src/main/java/com/gathin/tvhome/LinkTiles.java
 new file mode 100644
-index 00000000..3cc1afae
+index 00000000..9b2fd8e3
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/LinkTiles.java
-@@ -0,0 +1,143 @@
+@@ -0,0 +1,152 @@
 +package com.gathin.tvhome;
 +
 +import android.content.Context;
@@ -316,7 +316,8 @@ index 00000000..3cc1afae
 + * CleanTV/VGS: tiles that open a link in another app instead of the app's start screen, e.g. a TV channel straight
 + * in VTVgo (feedback 23/10/2026: "lôi các kênh VTV1, VTV2, VTV3 ra màn chính" for parents). config.json
 + * link_tiles holds "Label|package|uri|#colour" entries. Each tile behaves as an app whose package is
-+ * {@link #PREFIX} plus the label in lower case, so dock_apps, the saved order and Remove from Home all work on it.
++ * {@link #PREFIX} plus the label in lower case, so dock_apps, the saved order and Remove from Home all work on it. A
++ * kenh-<that suffix>.jpg beside config.json (the channel's logo card) replaces the drawn label.
 + */
 +final class LinkTiles {
 +    static final String PREFIX = "vgs.kenh.";
@@ -325,6 +326,8 @@ index 00000000..3cc1afae
 +    static final class Link {
 +        final String label, target, uri, pkg;
 +        final int color;
++        /** The tile's picture (kenh-<label>.jpg beside config.json, sent by CleanTV), or null to draw the label. */
++        Drawable picture;
 +
 +        Link(String label, String target, String uri, int color) {
 +            this.label = label;
@@ -364,7 +367,13 @@ index 00000000..3cc1afae
 +                } catch (Exception notInstalled) {
 +                    continue;
 +                }
-+                out.add(new Link(label, target, uri, color | 0xFF000000));
++                Link l = new Link(label, target, uri, color | 0xFF000000);
++                File pic = new File(dir, "kenh-" + l.pkg.substring(PREFIX.length()) + ".jpg");
++                if (pic.isFile() && pic.length() < 512 * 1024) {
++                    android.graphics.Bitmap b = android.graphics.BitmapFactory.decodeFile(pic.getPath());
++                    if (b != null) l.picture = new android.graphics.drawable.BitmapDrawable(ctx.getResources(), b);
++                }
++                out.add(l);
 +            }
 +        } catch (Exception ignored) {
 +        }
@@ -937,6 +946,21 @@ index 20eb8e01..0d63d82f 100644
          Intent info = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkg));
          return context.getPackageManager().resolveActivity(info, PackageManager.MATCH_DEFAULT_ONLY) != null ? info : null;
      }
+diff --git a/launcher/app/src/main/java/com/gathin/tvhome/ThemeFiles.java b/launcher/app/src/main/java/com/gathin/tvhome/ThemeFiles.java
+index 18fded94..f6798ffb 100644
+--- a/launcher/app/src/main/java/com/gathin/tvhome/ThemeFiles.java
++++ b/launcher/app/src/main/java/com/gathin/tvhome/ThemeFiles.java
+@@ -17,8 +17,9 @@ final class ThemeFiles {
+         if (segments == null) return null;
+         if (segments.size() == 1) {
+             String name = segments.get(0);
++            // CleanTV/VGS: kenh-<channel>.jpg, the picture of a link tile (LinkTiles).
+             return Config.FILE_NAME.equals(name) || "wallpaper.jpg".equals(name) || "theme_revision".equals(name)
+-                    ? name : null;
++                    || name.matches("kenh-[a-z0-9]{1,24}\\.jpg") ? name : null;
+         }
+         if (segments.size() == 2 && WALLPAPERS.equals(segments.get(0))
+                 && (collectionImage(segments.get(1)) || WallpaperCaptions.FILE_NAME.equals(segments.get(1)))) {
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Weather.java b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
 new file mode 100644
 index 00000000..30a276fe
