@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 67,
-  "versionName": "2.9.0",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.9.0.apk",
-  "co": 11672995,
-  "ghiChu": "Giao diện mới Kiểu Apple TV: nền theo màu app đang chọn, tên app lớn, dock kính mờ, ô icon đều. Kết nối lại thì app nhớ theme đang dùng.",
-  "ghiChuEn": "New Apple TV style theme: backdrop in the focused app's colour, large app name, frosted dock, even icon tiles. Reconnecting remembers the theme in use.",
+  "versionCode": 68,
+  "versionName": "2.10.0",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.0.apk",
+  "co": 11675731,
+  "ghiChu": "Kênh VTV trên màn chính: chọn VTV1–VTV9, mỗi kênh thành một ô ở đầu dock, bấm là xem luôn trên VTVgo. Sửa lại câu chữ trong app cho dễ đọc.",
+  "ghiChuEn": "VTV channels on Home: pick VTV1–VTV9, each becomes a dock tile that opens the channel straight in VTVgo. Clearer wording in the app.",
   "ngay": "2026-10-25"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "95561d79a33fe629",
+   "phienBan": "54d1b6e349a10d8b",
    "url": "/ota/du-lieu.json",
    "co": 1606661,
-   "tuBan": 67
+   "tuBan": 68
   },
   "tvhome.apk": {
-   "phienBan": "1d57e30af3099b22",
+   "phienBan": "e33f4fa6ebce933a",
    "url": "/ota/tvhome.apk",
-   "co": 621597,
-   "tuBan": 67
+   "co": 622961,
+   "tuBan": 68
   }
  }
 }

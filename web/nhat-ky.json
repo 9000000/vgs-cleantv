@@ -1,5 +1,17 @@
 [
  {
+  "ban": "2.10.0",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Kênh VTV trên màn chính: Đổi giao diện → thẻ Home → chọn VTV1…VTV9. Mỗi kênh thành một ô ở đầu dock, bấm là xem luôn trên VTVgo (cần cài VTVgo trên tivi). Góp ý của khoald92vn, trananhht9",
+   "• Sửa lại câu chữ tiếng Việt trong app cho dễ đọc"
+  ],
+  "en": [
+   "• VTV channels on Home: Change look → Home tab → pick VTV1…VTV9. Each becomes a dock tile that opens the channel straight in VTVgo (needs VTVgo on the TV)",
+   "• Clearer Vietnamese wording"
+  ]
+ },
+ {
   "ban": "2.9.0",
   "ngay": "2026-10-25",
   "vi": [

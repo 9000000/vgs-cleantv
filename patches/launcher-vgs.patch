@@ -141,10 +141,44 @@ index 5da0f46a..6872943c 100644
              android:name=".ClockDream"
              android:label="@string/dream_name"
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
-index e208aa82..3e1ab40d 100644
+index e208aa82..edea90e2 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
-@@ -479,6 +479,13 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -64,7 +64,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+     }
+ 
+     static final class Entry {
+-        static final int APP = 0, HOME_SETTINGS = 1, CARD = 2, EMPTY = 3;
++        static final int APP = 0, HOME_SETTINGS = 1, CARD = 2, EMPTY = 3, LINK = 4;
+ 
+         final int kind;
+         final String label;
+@@ -78,6 +78,8 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+         int ambient;
+         /** uniform_tiles card fill, top and bottom colour; null until sampled from the icon. */
+         int[] backdrop;
++        /** CleanTV/VGS: for a LINK tile, the link and the app that opens it (LinkTiles). */
++        String uri, target;
+ 
+         Entry(String label, ComponentName component, Drawable banner, Drawable icon) {
+             this(APP, label, component, banner, icon, null, 0);
+@@ -306,6 +308,15 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+                 fresh.add(new Entry(label, component, banner, icon));
+             }
+         }
++        // CleanTV/VGS: link tiles (a TV channel straight in VTVgo…), placed by dock_apps like any app.
++        for (LinkTiles.Link l : LinkTiles.load(ctx)) {
++            if (hidden.contains(l.pkg) || removed.contains(l.pkg)) continue;
++            Entry link = new Entry(Entry.LINK, l.label, new ComponentName(l.pkg, "link"), new LinkTiles.Face(l.label, l.color),
++                    null, null, l.color);
++            link.uri = l.uri;
++            link.target = l.target;
++            fresh.add(link);
++        }
+         Collections.sort(fresh, (a, b) -> {
+             // The owner's own order first; tiles it does not know (new installs) follow by the rule below.
+             int saved = Order.compare(savedRanks, a.component.flattenToShortString(), b.component.flattenToShortString());
+@@ -479,6 +490,13 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
              h.icon.setVisibility(View.VISIBLE);
              h.label.setText(e.label);
              h.label.setVisibility(uniformTiles ? View.GONE : View.VISIBLE);
@@ -158,7 +192,49 @@ index e208aa82..3e1ab40d 100644
          }
          h.card.setOnClickListener(v -> launch(e));
          h.card.setOnLongClickListener(v -> {
-@@ -799,6 +806,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -487,7 +505,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+                 if (pos != RecyclerView.NO_POSITION) listener.onTileLongPress(pos, v);
+                 return true;
+             }
+-            Intent i = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + e.pkg));
++            Intent i = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + (e.target != null ? e.target : e.pkg)));
+             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+             try {
+                 ctx.startActivity(i);
+@@ -499,6 +517,10 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+ 
+     /** Opens the tile's activity by explicit component, with no extras: a card can name nothing else. */
+     private void launch(Entry e) {
++        if (e.kind == Entry.LINK) {
++            launchLink(e);
++            return;
++        }
+         if (e.kind == Entry.HOME_SETTINGS) {
+             ctx.startActivity(new Intent(ctx, HomeSettingsActivity.class)
+                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+@@ -528,6 +550,21 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+         }
+     }
+ 
++    /** CleanTV/VGS: open a link tile in its app; if the app no longer takes the link, open the app itself. */
++    private void launchLink(Entry e) {
++        Intent view = new Intent(Intent.ACTION_VIEW, Uri.parse(e.uri)).setPackage(e.target)
++                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
++        PackageManager pm = ctx.getPackageManager();
++        Intent open = pm.resolveActivity(view, 0) != null ? view : pm.getLeanbackLaunchIntentForPackage(e.target);
++        if (open == null) open = pm.getLaunchIntentForPackage(e.target);
++        try {
++            if (open == null) throw new ActivityNotFoundException();
++            ctx.startActivity(open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
++        } catch (Exception ex) {
++            Toast.makeText(ctx, ctx.getString(R.string.cant_open, e.label), Toast.LENGTH_SHORT).show();
++        }
++    }
++
+     @Override
+     public int getItemCount() {
+         return items.size() + (showLibrary ? 1 : 0);
+@@ -799,6 +836,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
          return Math.max(0, Math.min(255, Math.round(v)));
      }
  
@@ -209,6 +285,155 @@ index f4f1e21c..3567d74b 100644
          if (event.getAction() == KeyEvent.ACTION_UP && !event.isCanceled()) {
              Intent home = new Intent(Intent.ACTION_MAIN)
                      .addCategory(Intent.CATEGORY_HOME)
+diff --git a/launcher/app/src/main/java/com/gathin/tvhome/LinkTiles.java b/launcher/app/src/main/java/com/gathin/tvhome/LinkTiles.java
+new file mode 100644
+index 00000000..3cc1afae
+--- /dev/null
++++ b/launcher/app/src/main/java/com/gathin/tvhome/LinkTiles.java
+@@ -0,0 +1,143 @@
++package com.gathin.tvhome;
++
++import android.content.Context;
++import android.graphics.Canvas;
++import android.graphics.Color;
++import android.graphics.ColorFilter;
++import android.graphics.LinearGradient;
++import android.graphics.Paint;
++import android.graphics.PixelFormat;
++import android.graphics.Rect;
++import android.graphics.Shader;
++import android.graphics.Typeface;
++import android.graphics.drawable.Drawable;
++import java.io.File;
++import java.io.FileInputStream;
++import java.io.InputStream;
++import java.util.ArrayList;
++import java.util.List;
++import org.json.JSONArray;
++import org.json.JSONObject;
++
++/**
++ * CleanTV/VGS: tiles that open a link in another app instead of the app's start screen, e.g. a TV channel straight
++ * in VTVgo (feedback 23/10/2026: "lôi các kênh VTV1, VTV2, VTV3 ra màn chính" for parents). config.json
++ * link_tiles holds "Label|package|uri|#colour" entries. Each tile behaves as an app whose package is
++ * {@link #PREFIX} plus the label in lower case, so dock_apps, the saved order and Remove from Home all work on it.
++ */
++final class LinkTiles {
++    static final String PREFIX = "vgs.kenh.";
++    private static final int MAX = 12;
++
++    static final class Link {
++        final String label, target, uri, pkg;
++        final int color;
++
++        Link(String label, String target, String uri, int color) {
++            this.label = label;
++            this.target = target;
++            this.uri = uri;
++            this.color = color;
++            this.pkg = PREFIX + label.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z0-9]", "");
++        }
++    }
++
++    private LinkTiles() {
++    }
++
++    /** The link_tiles entries whose target app is installed; bad entries are skipped. */
++    static List<Link> load(Context ctx) {
++        List<Link> out = new ArrayList<>();
++        File dir = Config.dir(ctx);
++        File f = dir != null ? new File(dir, Config.FILE_NAME) : null;
++        if (f == null || !f.isFile() || f.length() > 64 * 1024) return out;
++        try (InputStream in = new FileInputStream(f)) {
++            JSONArray a = new JSONObject(new String(Weather.readAll(in), "UTF-8")).optJSONArray("link_tiles");
++            if (a == null) return out;
++            for (int i = 0; i < a.length() && out.size() < MAX; i++) {
++                String[] p = a.optString(i, "").split("\\|", -1);
++                if (p.length < 3) continue;
++                String label = p[0].trim(), target = p[1].trim(), uri = p[2].trim();
++                if (label.isEmpty() || label.length() > 24 || target.isEmpty() || !uri.contains(":")) continue;
++                int color = 0xFF3A3A44;
++                if (p.length > 3) {
++                    try {
++                        color = Color.parseColor(p[3].trim());
++                    } catch (IllegalArgumentException ignored) {
++                    }
++                }
++                try {
++                    ctx.getPackageManager().getPackageInfo(target, 0);
++                } catch (Exception notInstalled) {
++                    continue;
++                }
++                out.add(new Link(label, target, uri, color | 0xFF000000));
++            }
++        } catch (Exception ignored) {
++        }
++        return out;
++    }
++
++    /** The tile face: the label in large bold type on a gradient of the link's colour, filling the whole card. */
++    static final class Face extends Drawable {
++        private final String text;
++        private final int color;
++        private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
++        private final Paint type = new Paint(Paint.ANTI_ALIAS_FLAG);
++
++        Face(String text, int color) {
++            this.text = text;
++            this.color = color;
++            type.setColor(Color.WHITE);
++            type.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
++            type.setTextAlign(Paint.Align.CENTER);
++        }
++
++        @Override
++        protected void onBoundsChange(Rect b) {
++            float[] hsv = new float[3];
++            Color.colorToHSV(color, hsv);
++            hsv[2] *= 0.62f;
++            fill.setShader(new LinearGradient(0, b.top, 0, b.bottom, color, Color.HSVToColor(hsv), Shader.TileMode.CLAMP));
++            float size = b.height() * 0.38f;
++            type.setTextSize(size);
++            // Long labels shrink to fit the card's width with a margin either side.
++            float w = type.measureText(text);
++            if (w > b.width() * 0.84f) type.setTextSize(size * b.width() * 0.84f / w);
++        }
++
++        @Override
++        public void draw(Canvas c) {
++            Rect b = getBounds();
++            c.drawRect(b, fill);
++            Paint.FontMetrics m = type.getFontMetrics();
++            c.drawText(text, b.exactCenterX(), b.exactCenterY() - (m.ascent + m.descent) / 2f, type);
++        }
++
++        @Override
++        public void setAlpha(int alpha) {
++            fill.setAlpha(alpha);
++            type.setAlpha(alpha);
++        }
++
++        @Override
++        public void setColorFilter(ColorFilter cf) {
++            fill.setColorFilter(cf);
++        }
++
++        @Override
++        public int getOpacity() {
++            return PixelFormat.OPAQUE;
++        }
++
++        @Override
++        public int getIntrinsicWidth() {
++            return 320;
++        }
++
++        @Override
++        public int getIntrinsicHeight() {
++            return 180;
++        }
++    }
++}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 index d992768a..c87f1906 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
@@ -700,9 +925,21 @@ index 00000000..37668a0f
 + */
 +public class NowPlayingListener extends NotificationListenerService {
 +}
+diff --git a/launcher/app/src/main/java/com/gathin/tvhome/SystemSettings.java b/launcher/app/src/main/java/com/gathin/tvhome/SystemSettings.java
+index 20eb8e01..0d63d82f 100644
+--- a/launcher/app/src/main/java/com/gathin/tvhome/SystemSettings.java
++++ b/launcher/app/src/main/java/com/gathin/tvhome/SystemSettings.java
+@@ -46,6 +46,7 @@ final class SystemSettings {
+ 
+     /** The TV's App info page for pkg, or null where the firmware has none (CVTE's settings app, #1202). */
+     static Intent appInfo(Context context, String pkg) {
++        if (pkg.startsWith(LinkTiles.PREFIX)) return null;   // CleanTV/VGS: a link tile is not an installed app
+         Intent info = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkg));
+         return context.getPackageManager().resolveActivity(info, PackageManager.MATCH_DEFAULT_ONLY) != null ? info : null;
+     }
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Weather.java b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
 new file mode 100644
-index 00000000..632e128c
+index 00000000..30a276fe
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
 @@ -0,0 +1,157 @@
@@ -855,7 +1092,7 @@ index 00000000..632e128c
 +        return "";
 +    }
 +
-+    private static byte[] readAll(InputStream in) throws java.io.IOException {
++    static byte[] readAll(InputStream in) throws java.io.IOException {
 +        ByteArrayOutputStream out = new ByteArrayOutputStream();
 +        byte[] buf = new byte[8192];
 +        int n;

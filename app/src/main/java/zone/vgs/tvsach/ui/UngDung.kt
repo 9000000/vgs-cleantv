@@ -403,7 +403,7 @@ private fun ManChinh(vm: PhienLamViec) = Cuon {
     }
     NutGopY(vm)
     TextButton(onClick = { vm.moGiayPhep() }) { Icon(Icons.Rounded.Gavel, null, Modifier.size(16.dp)); Spacer(Modifier.width(6.dp)); Text(t("Giấy phép mã nguồn mở", "Open-source licenses")) }
-    Phu(t("Dựa trên CleanYourTV (github.com/Gathin23/cleanyourtv, MIT) của Gathin và cộng đồng: 213 danh sách tivi và màn Home sạch là của dự án đó.",
+    Phu(t("Dựa trên CleanYourTV (github.com/Gathin23/cleanyourtv, MIT) của Gathin và cộng đồng. Danh sách tivi và màn Home sạch là của dự án đó.",
         "Built on CleanYourTV (github.com/Gathin23/cleanyourtv, MIT) by Gathin and contributors: the 213 TV lists and the clean Home come from that project.") +
         "\nCleanTV ${BuildConfig.VERSION_NAME} · AlexVGS")
 }
@@ -653,7 +653,7 @@ private fun ManChonGoi(vm: PhienLamViec) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(t("Bạn tự tích các gói dưới đây, nhưng nhiều danh sách đã thử ghi là PHẢI GIỮ (tắt có thể mất nút Input, HDMI, remote, Cài đặt…):",
                         "You ticked these, but many tested lists say KEEP them (disabling can break the Input key, HDMI, the remote, Settings…):"))
-                    nenGiu.take(8).forEach { Text("• ${tenDep(it.pkg)} (${it.pkg}) — " + t("${it.soMauGiu} danh sách giữ", "kept by ${it.soMauGiu} lists"), fontSize = 13.sp, color = ChuPhu) }
+                    nenGiu.take(8).forEach { Text("• ${tenDep(it.pkg)} (${it.pkg}): " + t("${it.soMauGiu} danh sách giữ", "kept by ${it.soMauGiu} lists"), fontSize = 13.sp, color = ChuPhu) }
                     if (nenGiu.size > 8) Text(t("… và ${nenGiu.size - 8} gói nữa", "… and ${nenGiu.size - 8} more"), fontSize = 13.sp, color = ChuPhu)
                 }
             },
@@ -869,7 +869,7 @@ private fun TheGiaoDien(vm: PhienLamViec) {
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
                 Text(t("Nâng cao · ${vm.dsNangCao.size} tuỳ chọn", "Advanced · ${vm.dsNangCao.size} options"), fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                Phu(if (daDat > 0) t("$daDat mục đã đổi", "$daDat changed") else t("Cho người thích tỉ mỉ: hiệu ứng, lưới app, remote…", "For tinkerers: effects, grid, remote…"))
+                Phu(if (daDat > 0) t("$daDat mục đã đổi", "$daDat changed") else t("Chỉnh sâu hơn: hiệu ứng, lưới app, remote…", "For tinkerers: effects, grid, remote…"))
             }
             Icon(Icons.AutoMirrored.Rounded.ArrowForward, null, Modifier.size(18.dp), tint = ChuPhu)
         }
@@ -908,6 +908,21 @@ private fun TheHomeNoiDung(vm: PhienLamViec) {
                 }
             }
         }
+    }
+    The(t("Kênh VTV trên màn chính", "VTV channels on Home"), Icons.Rounded.LiveTv) {
+        if (vm.coVtvGo) {
+            Phu(t("Chọn kênh nào thì kênh đó thành một ô ở đầu dock. Bấm vào là xem luôn kênh đó trên VTVgo, ông bà khỏi phải tìm.",
+                "Pick channels: each becomes a tile at the start of the dock that opens the channel straight in VTVgo."))
+            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                KENH_VTV.forEach { (ten, _, _) ->
+                    ChonChip(ten, ten in vm.kenhVtv) {
+                        if (ten in vm.kenhVtv) vm.kenhVtv.remove(ten)
+                        else { vm.kenhVtv.add(ten); vm.kenhVtv.sortBy { k -> KENH_VTV.indexOfFirst { it.first == k } } }
+                    }
+                }
+            }
+        } else Phu(t("Cần app VTVgo trên tivi: vào Google Play trên tivi tìm \"VTVgo\", cài và mở một lần, rồi kết nối lại CleanTV.",
+            "Needs the VTVgo app on the TV: install it from Google Play on the TV, open it once, then reconnect CleanTV."))
     }
     The(t("Thời tiết", "Weather"), Icons.Rounded.WbSunny) {
         OutlinedTextField(vm.timXa, { vm.timXa = it }, label = { Text(t("Tìm phường / xã của bạn", "Find your ward / commune")) },
@@ -1023,7 +1038,7 @@ private fun ManNangCao(vm: PhienLamViec) {
                 Text(t("Nâng cao", "Advanced"), fontWeight = FontWeight.Black, fontSize = 22.sp, modifier = Modifier.weight(1f))
                 if (daDat > 0) TextButton(onClick = { vm.nangCao.clear() }) { Text(t("Trả mặc định", "Reset all")) }
             }
-            Phu(t("Để \"Mặc định\" là Home sạch tự quyết. Mục \"Cẩn thận\" đụng tới remote, HDMI, app của hãng: đặt sai có thể làm remote hoặc nguồn vào không chạy — bấm Khôi phục là về như cũ.",
+            Phu(t("Để \"Mặc định\" là Home sạch tự quyết. Mục \"Cẩn thận\" đụng tới remote, HDMI, app của hãng: đặt sai có thể làm remote hoặc nguồn vào không chạy. Lỡ sai thì bấm Khôi phục là về như cũ.",
                 "\"Default\" lets the clean Home decide. \"Careful\" items touch the remote, HDMI and the maker's apps: a wrong value can break them — Restore puts everything back."))
             OutlinedTextField(tim, { tim = it }, label = { Text(t("Tìm: tên app, đồng hồ, hình nền…", "Search: app name, clock, wallpaper…")) }, singleLine = true,
                 leadingIcon = { Icon(Icons.Rounded.Search, null) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(50))
@@ -1141,7 +1156,7 @@ private fun ManXong(vm: PhienLamViec) = Cuon {
             Icon(Icons.Rounded.AutoAwesome, null, Modifier.size(52.dp), tint = Color.White)
         }
     }, t("Tivi đã sạch!", "The TV is clean!"),
-        if (vm.homeXong && vm.phimHomeOk) t("Home sạch đang chạy — bấm Home trên remote để xem.", "The clean Home is running — press Home on the remote.")
+        if (vm.homeXong && vm.phimHomeOk) t("Home sạch đang chạy. Bấm Home trên remote để xem.", "The clean Home is running — press Home on the remote.")
         else if (vm.homeXong) t("Home sạch đã cài nhưng nút Home trên remote vẫn mở Home cũ (xem lời báo bên dưới).", "The clean Home is installed, but the remote's Home button still opens the old Home (see the note below).")
         else null)
     The(t("Trước khi về", "Before you leave"), Icons.Rounded.Checklist) {
@@ -1324,7 +1339,7 @@ private fun ManHuongDan(vm: PhienLamViec) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(t("Bật chế độ nhà phát triển", "Turn on developer mode"), fontWeight = FontWeight.Black, fontSize = 24.sp)
-                Phu(t("Cầm remote, làm lần lượt 7 bước. Ảnh chụp từ Android TV — tên mục có thể khác chút tuỳ hãng (Hệ thống / Giới thiệu / Thông tin…).",
+                Phu(t("Cầm remote, làm lần lượt 7 bước. Ảnh chụp từ Android TV, tên mục có thể khác chút tuỳ hãng (Hệ thống / Giới thiệu / Thông tin…).",
                     "Grab the remote and follow the 7 steps. Pictures are from Android TV — names may differ slightly by brand (System / About / Information…)."))
             }
         }
@@ -1366,7 +1381,7 @@ private fun ManHuongDan(vm: PhienLamViec) {
             }
         }
         item {
-            NutChinh(t("Đã bật xong — kết nối tivi", "Done — connect to the TV"), icon = Icons.Rounded.WifiFind) { vm.man = Man.KET_NOI }
+            NutChinh(t("Bật xong rồi, kết nối tivi", "Done — connect to the TV"), icon = Icons.Rounded.WifiFind) { vm.man = Man.KET_NOI }
         }
     }
 }
@@ -1427,7 +1442,7 @@ private fun TheMayChieu(vm: PhienLamViec) {
             val tu = "CleanTV máy chiếu · " + (vm.thongTin?.tenHienThi ?: "")
             uri.openUri("https://vgs.zone/gop-y?tu=" + java.net.URLEncoder.encode(tu, "UTF-8"))
         }
-        Phu(t("Danh sách đã chép sẵn — dán vào ô nội dung trong hộp góp ý.", "The list is copied — paste it into the feedback box."))
+        Phu(t("Đã chép sẵn danh sách, dán vào ô nội dung trong hộp góp ý.", "The list is copied — paste it into the feedback box."))
     }
 }
 
@@ -1468,7 +1483,7 @@ private fun TheGuiDanhSach(vm: PhienLamViec) {
             Phu(t("Đã gửi, cảm ơn bạn! VGS sẽ xem và thêm tivi này vào danh sách.", "Sent, thank you! VGS will review it and add this TV to the lists."), Xanh)
             return@The
         }
-        Phu(t("Gửi cho VGS model tivi và danh sách gói đang tắt, để làm mẫu cho người dùng cùng dòng tivi. Không gửi tên, email hay danh sách app bạn cài — trừ khi bạn tự ghi chỗ liên hệ.",
+        Phu(t("Gửi cho VGS model tivi và danh sách gói đang tắt, để làm mẫu cho người dùng cùng dòng tivi. Không gửi tên, email hay danh sách app bạn cài, trừ khi bạn tự ghi chỗ liên hệ.",
             "Send VGS this TV's model and the packages that are off, to build a list for owners of the same TV. No name, email or app list — unless you add a contact."))
         Text(t("Dùng thử rồi, tivi chạy:", "After trying it, the TV:"), fontSize = 14.sp)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

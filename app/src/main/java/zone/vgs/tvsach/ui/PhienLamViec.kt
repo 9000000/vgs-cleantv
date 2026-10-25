@@ -51,6 +51,19 @@ const val DOCK_TOI_DA = 8
 /** doiHang đặc biệt: hàng dock nằm giữa màn hình (rows_middle của bản vá launcher), góp ý 24/10/2026. */
 const val HANG_GIUA = Int.MIN_VALUE
 
+/**
+ * Ô kênh VTV trên Home sạch (góp ý khoald92vn, trananhht9 23/10/2026: bố mẹ bấm thẳng vào kênh). Mỗi ô mở thẳng kênh
+ * trong VTVgo bằng vtvgo://play?mediaType=CHANNEL&contentId=<mã> (mã kênh từ API công khai display/v21.0/catalogs/
+ * with-channels của VTVgo, thử trên VTVgo TV 12.10.23, 25/10/2026). Launcher: link_tiles + gói giả vgs.kenh.* trong dock_apps.
+ */
+const val GOI_VTVGO = "vn.vtv.vtvgotv"
+val KENH_VTV = listOf(
+    Triple("VTV1", 1, "#D71920"), Triple("VTV2", 2, "#2E7D32"), Triple("VTV3", 3, "#E8590C"),
+    Triple("VTV4", 4, "#1565C0"), Triple("VTV5", 5, "#6A1B9A"), Triple("VTV6", 13, "#00897B"),
+    Triple("VTV7", 27, "#F9A825"), Triple("VTV8", 36, "#AD1457"), Triple("VTV9", 39, "#283593"),
+)
+private const val GOI_KENH = "vgs.kenh."
+
 private const val PHIM_TCL_CHUNG = """{"app_keys":["4062:com.netflix.ninja","4065:com.google.android.youtube.tv","4099:com.amazon.amazonvideo.livingroom"],"settings_key_keycodes":[83,4077]}"""
 
 /**
@@ -137,6 +150,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var oDeuNhau by mutableStateOf(false)
     /** Số app mỗi hàng (columns của launcher, 0 = theo theme), góp ý 24/10/2026: Sony chỉ có 4 app một hàng. */
     var soCot by mutableStateOf(0)
+    /** Kênh VTV đặt ở đầu dock (tên VTV1…), theo thứ tự KENH_VTV. */
+    val kenhVtv = mutableStateListOf<String>()
+    val coVtvGo get() = trangThai?.caiDat?.contains(GOI_VTVGO) == true
     /**
      * Nút app / Cài đặt trên remote (24/10/2026, góp ý TCL G09): tắt Home gốc của TCL là nút YouTube, Netflix… chết vì
      * hãng chỉ gửi chúng cho launcherx. null = tự chọn: bật khi mẫu có bảng phím, trừ mẫu trong PHIM_TAT_SAN.
@@ -325,7 +341,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         e.message?.contains("EHOSTUNREACH") == true || e.message?.contains("No route") == true ->
             t("Không tới được tivi. Điện thoại và tivi phải chung một mạng Wi-Fi.", "Cannot reach the TV. The phone and TV must be on the same Wi-Fi.")
         e is java.net.SocketTimeoutException || e.message?.contains("timed out") == true ->
-            t("Hết thời gian chờ. Có thể tivi đang hiện hộp \"Cho phép gỡ lỗi?\" — bấm Cho phép rồi thử lại.", "Timed out. The TV may be showing \"Allow debugging?\" — press Allow and try again.")
+            t("Hết thời gian chờ. Có thể tivi đang hiện hộp \"Cho phép gỡ lỗi?\", bấm Cho phép rồi thử lại.", "Timed out. The TV may be showing \"Allow debugging?\" — press Allow and try again.")
         else -> listOfNotNull(e.message, e.cause?.message).firstOrNull()
             ?: t("Lỗi kết nối (${e.javaClass.simpleName}). Kiểm tra IP, cổng và tivi còn bật.", "Connection error (${e.javaClass.simpleName}). Check the IP, port and that the TV is on.")
     }
@@ -372,7 +388,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         return lp.linkAddresses.map { it.address }.filterIsInstance<Inet4Address>().firstOrNull()?.hostAddress
     }
 
-    fun ketNoi() = chay(t("Đang kết nối… Nếu tivi hiện \"Cho phép gỡ lỗi USB?\" hãy tích \"Luôn cho phép\" rồi bấm Cho phép.", "Connecting… If the TV shows \"Allow USB debugging?\" tick \"Always allow\" and press Allow.")) {
+    fun ketNoi() = chay(t("Đang kết nối… Tivi hiện \"Cho phép gỡ lỗi USB?\" thì tích \"Luôn cho phép\" rồi bấm Cho phép.", "Connecting… If the TV shows \"Allow USB debugging?\" tick \"Always allow\" and press Allow.")) {
         val host = ip.trim(); val port = cong.trim().toIntOrNull() ?: 5555
         daTuTatAdb = false
         if (host.isEmpty()) error(t("Nhập địa chỉ IP của tivi.", "Enter the TV's IP address."))
@@ -460,7 +476,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     // ---------- Lập kế hoạch ----------
 
-    fun lapKeHoach() = chay(t("Đang so với 213 mẫu tivi…", "Comparing with 213 TV models…")) {
+    fun lapKeHoach() = chay(t("Đang so với ${tatCaMau.size.takeIf { it > 0 } ?: "các"} mẫu tivi…", "Comparing with ${tatCaMau.size.takeIf { it > 0 } ?: "the"} TV models…")) {
         val tt = trangThai ?: return@chay
         val du = io { DuLieu.nap(ctx) }
         val ds = io { KeHoach.lap(du, mauChon, tt) }
@@ -626,7 +642,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     fun chupManHinh() = chay(t("Đang chụp màn hình tivi…", "Taking a TV screenshot…")) {
         val bytes = io { tv.chupManHinh() }
         anhTv = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-            ?: error(t("Không chụp được (một số tivi cấm chụp khi đang xem HDMI — bấm Home trên remote rồi thử lại).", "Could not capture (some TVs block it on an HDMI input — press Home on the remote and retry)."))
+            ?: error(t("Không chụp được (một số tivi cấm chụp khi đang xem HDMI, bấm Home trên remote rồi thử lại).", "Could not capture (some TVs block it on an HDMI input — press Home on the remote and retry)."))
     }
 
     // ---------- Home sạch ----------
@@ -700,7 +716,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         dsNangCao.filter { it.khoa in daDat }.forEach { tc -> zone.vgs.tvsach.dulieu.NangCao.docChu(tc, j)?.let { nangCao[tc.khoa] = it } }
         nutManCho = j.optBoolean("dream_button", nutManCho)
         gonNut = j.optBoolean("top_compact", gonNut)
-        j.optJSONArray("dock_apps")?.let { a -> val ds = (0 until a.length()).map { a.optString(it) }.filter { it.isNotBlank() }; if (ds.isNotEmpty()) { dock.clear(); dock.addAll(ds.take(DOCK_TOI_DA)) } }
+        j.optJSONArray("dock_apps")?.let { a -> val ds = (0 until a.length()).map { a.optString(it) }.filter { it.isNotBlank() && !it.startsWith(GOI_KENH) }; if (ds.isNotEmpty()) { dock.clear(); dock.addAll(ds.take(DOCK_TOI_DA)) } }
+        kenhVtv.clear()
+        j.optJSONArray("link_tiles")?.let { a -> (0 until a.length()).map { a.optString(it).substringBefore('|') }.filter { k -> KENH_VTV.any { it.first == k } }.forEach { kenhVtv.add(it) } }
         j.optString("greeting_name").takeIf { it.isNotBlank() }?.let { tenChao = it }
         j.optString("weather_place").takeIf { it.isNotBlank() }?.let { ten ->
             thanhPho = THANH_PHO.firstOrNull { it.ten == ten }
@@ -792,7 +810,10 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     }
 
     private fun cauHinhHome(): String = JSONObject().apply {
-        put("dock_apps", JSONArray(dock.toList()))
+        // Ô kênh VTV đứng đầu dock, rồi tới app người dùng chọn.
+        val kenh = if (coVtvGo) KENH_VTV.filter { it.first in kenhVtv } else emptyList()
+        if (kenh.isNotEmpty()) put("link_tiles", JSONArray(kenh.map { (ten, ma, mau) -> "$ten|$GOI_VTVGO|vtvgo://play?mediaType=CHANNEL&contentId=$ma|$mau" }))
+        put("dock_apps", JSONArray(kenh.map { GOI_KENH + it.first.lowercase() } + dock.toList()))
         if (tenChao.isNotBlank()) put("greeting_name", tenChao.trim())
         themeChon.ghiVao(this)
         if (anhNenRieng != null) { put("wallpaper", true); put("vgs_anh_rieng", true) }

@@ -149,6 +149,7 @@ data class ThongTinTv(
 /** Tên dễ đọc cho các app hay gặp (shell không lấy được nhãn app). */
 val TEN_APP = mapOf(
     "com.netflix.ninja" to "Netflix",
+    "vn.vtv.vtvgotv" to "VTVgo",
     "com.netflix.mediaclient" to "Netflix",
     "com.google.android.youtube.tv" to "YouTube",
     "com.google.android.youtube.tvkids" to "YouTube Kids",

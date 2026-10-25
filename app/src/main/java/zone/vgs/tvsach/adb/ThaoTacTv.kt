@@ -319,7 +319,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             // Launcher CÀI THÊM (Dangbei trên tivi nội địa Trung, Projectivy, ATV Launcher…): không thuộc phần mềm gốc,
             // thay được — giữ nó bật, đặt Home sạch làm mặc định; nút Home vẫn về nó thì mới tắt (ghi sao lưu). 22/10/2026.
             laLauncherCaiThem(home) -> home
-            else -> return t("Home hiện là '$home', không phải Home gốc app biết. Để an toàn app không đổi.", "Home is '$home', not a stock launcher this app knows. Leaving it alone to be safe.")
+            else -> return t("Home hiện là '$home', không phải Home gốc app biết, nên app để nguyên cho chắc.", "Home is '$home', not a stock launcher this app knows. Leaving it alone to be safe.")
         }
         // Home của hãng lạ (Fengmi, máy chiếu, tivi nội địa…): thử giữ nó bật, chỉ đặt Home mặc định + bắt nút Home trên
         // remote; không được mới tắt (21/10/2026, Formovie Nemo: com.tvfengmi.launcher).
