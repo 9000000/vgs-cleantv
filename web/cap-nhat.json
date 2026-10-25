@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 76,
-  "versionName": "2.10.8",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.8.apk",
-  "co": 11979285,
-  "ghiChu": "Đổi giao diện chắc ăn hơn trên tivi Android đời cũ; 293 mẫu tivi; Home sạch mới từ dự án gốc.",
-  "ghiChuEn": "Theme changes more reliable on older Android TVs; 293 TV models; newer clean Home from upstream.",
+  "versionCode": 77,
+  "versionName": "2.10.9",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.9.apk",
+  "co": 11980057,
+  "ghiChu": "Ảnh nền riêng nét hơn, không bị phủ màu; tivi Xiaomi bản Trung Quốc hiện Home sạch tiếng Việt.",
+  "ghiChuEn": "Sharper own wallpapers without the colour overlay; China Xiaomi TVs get the clean Home in Vietnamese.",
   "ngay": "2026-10-25"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "23031886d1a43662",
+   "phienBan": "54f00bfcd0441cc7",
    "url": "/ota/du-lieu.json",
    "co": 1682380,
-   "tuBan": 76
+   "tuBan": 77
   },
   "tvhome.apk": {
-   "phienBan": "f9c568d97ae77d74",
+   "phienBan": "87e58c21171ddde8",
    "url": "/ota/tvhome.apk",
-   "co": 640453,
-   "tuBan": 76
+   "co": 640841,
+   "tuBan": 77
   }
  }
 }

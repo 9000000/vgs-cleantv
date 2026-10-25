@@ -10,7 +10,20 @@ async function bam(chu) {
 
 // Ghi một sự kiện, bỏ bản trùng: cùng máy + loại + tivi + ghi chú trong [trongGiay] giây gần nhất (lượt tải: cả ngày,
 // vì mã máy của lượt tải đã là băm IP+ngày). Một câu lệnh, nên vòng lặp gửi lại y hệt không tốn thêm dòng ghi D1.
+// Loại chỉ ghi một dòng cho mỗi máy mỗi ngày giờ VN (25/10/2026, D1 miễn phí chạm 76% trần 100.000 dòng ghi/ngày:
+// "đổi giao diện" một máy bấm cả chục lần). Lượt sau trong ngày không thêm dòng, "home" vẫn cộng vào dem_so cho landing.
+const MOT_LAN_NGAY = new Set(["home", "mo"]);
+const dauNgayVN = () => { const d = new Date(Date.now() + 7 * 3600e3); d.setUTCHours(0, 0, 0, 0); return new Date(d.getTime() - 7 * 3600e3).toISOString(); };
+
 async function ghi(env, r, trongGiay = 600) {
+  if (MOT_LAN_NGAY.has(r.loai) && r.may) {
+    const daCo = await env.DB.prepare("SELECT 1 FROM su_kien WHERE loai = ?1 AND may = ?2 AND luc >= ?3 LIMIT 1")
+      .bind(r.loai, r.may, dauNgayVN()).first();
+    if (daCo) {
+      if (r.loai === "home") await env.DB.prepare("UPDATE dem_so SET n = n + 1 WHERE khoa = 'home'").run();
+      return;
+    }
+  }
   const kq = await env.DB.prepare(`INSERT INTO su_kien (luc, loai, may, ban, tivi, so, them, quoc_gia)
       SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8 WHERE NOT EXISTS (
         SELECT 1 FROM su_kien WHERE loai = ?2 AND may = ?3 AND tivi = ?5 AND them = ?7 AND luc >= ?9)`)

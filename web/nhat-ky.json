@@ -1,5 +1,17 @@
 [
  {
+  "ban": "2.10.9",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Ảnh nền riêng nét hơn: nén chất lượng cao, màu 32-bit, không còn lớp phủ màu của theme (góp ý của caothanhlhp3)",
+   "• Tivi Xiaomi bản Trung Quốc: Home sạch hiện tiếng Việt dù tivi để tiếng Trung"
+  ],
+  "en": [
+   "• Sharper own wallpapers: higher quality, 32-bit colour, no theme overlay",
+   "• China Xiaomi TVs: the clean Home shows Vietnamese even with the TV in Chinese"
+  ]
+ },
+ {
   "ban": "2.10.8",
   "ngay": "2026-10-25",
   "vi": [
