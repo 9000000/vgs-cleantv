@@ -1,5 +1,19 @@
 [
  {
+  "ban": "2.10.8",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Đổi giao diện: kiểm file đã tới tivi, tivi Android đời cũ (Sony 2015…) không còn đổi theme mà không ăn",
+   "• Thêm mẫu tivi, tổng 293 mẫu có danh sách dọn sẵn",
+   "• Home sạch mới: Nâng cao thêm \"Về Home khi bật tivi\" cho tivi tự mở Live TV lúc bật nguồn"
+  ],
+  "en": [
+   "• Theme changes: the app checks the files reached the TV (older Android TVs)",
+   "• 293 TV models with a ready list",
+   "• Newer clean Home: Advanced adds \"Back to Home at power-on\""
+  ]
+ },
+ {
   "ban": "2.10.7",
   "ngay": "2026-10-25",
   "vi": [

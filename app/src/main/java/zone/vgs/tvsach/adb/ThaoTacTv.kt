@@ -506,7 +506,12 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         val tam = "/data/local/tmp/cyt-${ten.replace('/', '-')}"
         adb.ghiFile(tam, du)
         if (ten.contains('/')) sh("mkdir -p $dir/${ten.substringBeforeLast('/')} 2>/dev/null; true")
-        sh("rm -f $dir/$ten 2>/dev/null; content write --uri content://$pkgHome.theme/$ten < $tam 2>/dev/null || cp $tam $dir/$ten 2>/dev/null; rm -f $tam")
+        sh("rm -f $dir/$ten 2>/dev/null; content write --uri content://$pkgHome.theme/$ten < $tam 2>/dev/null || cp $tam $dir/$ten 2>/dev/null")
+        // Kiểm file thật sự tới nơi (25/10/2026, Sony 2015 Android 8: đổi theme không ăn — `content write` có thể chưa có
+        // mà vẫn trả mã 0, file cũ đã xoá). Sai cỡ thì chép thẳng và mở quyền đọc cho Home sạch.
+        val co = sh("wc -c < $dir/$ten 2>/dev/null").trim().toIntOrNull()
+        if (co != du.size) sh("cp $tam $dir/$ten 2>/dev/null; chmod 666 $dir/$ten 2>/dev/null; true")
+        sh("rm -f $tam")
     }
 
     /**

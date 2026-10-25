@@ -338,5 +338,9 @@
   "dock_band": {
     "ten": "Dải nền sau dock",
     "moTa": "Vẽ dải nền và viền sau hàng dock (mặc định bật). Tắt thì ô app nằm thẳng trên hình nền."
+  },
+  "power_on_home": {
+    "ten": "Về Home khi bật tivi",
+    "moTa": "Tivi tự mở Live TV / kênh truyền hình mỗi khi bật nguồn thì Home sạch đưa về màn Home (mặc định tắt)."
   }
 }

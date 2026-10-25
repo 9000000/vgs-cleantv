@@ -98,7 +98,7 @@ index 00000000..b1477aae
 +FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 +OTHER DEALINGS IN THE FONT SOFTWARE.
 diff --git a/launcher/app/src/main/AndroidManifest.xml b/launcher/app/src/main/AndroidManifest.xml
-index 5da0f46a..6872943c 100644
+index 701b5feb..05be9b5e 100644
 --- a/launcher/app/src/main/AndroidManifest.xml
 +++ b/launcher/app/src/main/AndroidManifest.xml
 @@ -8,6 +8,8 @@
@@ -259,11 +259,11 @@ index eb56debc..ae7e77b8 100644
          if (live == null) return 0xFF444444;
          // Draw a private copy: changing the bounds of the drawable an ImageView shows would blank the tile.
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java b/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
-index e4db724f..78c3cd30 100644
+index 016d41d4..3e57a1e5 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
-@@ -105,7 +105,11 @@ public class HomeKeyService extends AccessibilityService {
-         super.onDestroy();
+@@ -167,7 +167,11 @@ public class HomeKeyService extends AccessibilityService {
+         GuardKeep.stepOut(this);
      }
  
 +    /** CleanTV/VGS: config.json all_apps_home (true by default, the stock behaviour). */
@@ -274,7 +274,7 @@ index e4db724f..78c3cd30 100644
          // Keycodes and the panel choice can also come from a theme; theme.sh restarts this service.
          Config config = Config.load(this);
          // restore_key_services: note that this helper runs, so Home can put it back after a force stop. Here, not
-@@ -174,7 +178,9 @@ public class HomeKeyService extends AccessibilityService {
+@@ -255,7 +259,9 @@ public class HomeKeyService extends AccessibilityService {
              redirectHomeKey(event);
              return false;
          }
