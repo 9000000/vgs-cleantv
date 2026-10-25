@@ -146,6 +146,12 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var motHang by mutableStateOf(false)
     /** Ẩn lời chào trên đồng hồ (show_greeting=false). */
     var anLoiChao by mutableStateOf(false)
+    /**
+     * Giữ nút âm lượng để tăng/giảm liên tục (key_filter=false): dịch vụ bắt phím của Home sạch làm Android thôi tự lặp
+     * phím giữ trên Sony, Xiaomi, Hisense (upstream #1680, #944, #1326; góp ý meorudo, Sony, 25/10/2026). Bật thì dịch vụ
+     * vẫn chạy để mở đè Home cũ, chỉ thôi lọc phím: nút app / Input / Apps trên remote không còn do Home sạch lo.
+     */
+    var giuAmLuong by mutableStateOf(false)
     /** Ô icon đều nhau kiểu Apple TV: icon trên nền màu của chính nó, không dùng ảnh banner (uniform_tiles). */
     var oDeuNhau by mutableStateOf(false)
     /** Số app mỗi hàng (columns của launcher, 0 = theo theme), góp ý 24/10/2026: Sony chỉ có 4 app một hàng. */
@@ -738,6 +744,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         coChuDau = j.optInt("header_scale", 100)
         motHang = j.optBoolean("single_row", false)
         anLoiChao = !cuaTheme("show_greeting") && !j.optBoolean("show_greeting", true)
+        giuAmLuong = !cuaTheme("key_filter") && !j.optBoolean("key_filter", true) && !laTclGoogleTv
         oDeuNhau = !cuaTheme("uniform_tiles") && j.optBoolean("uniform_tiles", false)
         moKhiBat = j.optBoolean("open_on_start_choice", false)
         // Chỉ nạp số cột do người dùng chọn ở đây (vgs_so_cot), không lấy columns của theme.
@@ -906,7 +913,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // Mở cùng một app hai lần chỉ là đưa nó lên trước.
         // TCL Google TV không dùng nút app remote: thôi lọc phím để giữ âm lượng lặp được (Nâng cao đặt key_filter thì đè sau).
         val tclGoogleTv = thongTin?.brand?.equals("TCL", ignoreCase = true) == true && trangThai?.caiDat?.contains("com.google.android.apps.tv.launcherx") == true
-        if (tclGoogleTv && !dungPhimRemote) put("key_filter", false)
+        if ((tclGoogleTv && !dungPhimRemote) || giuAmLuong) put("key_filter", false)
         if (dungPhimRemote) phimRemote()?.let { ph ->
             ph.keys().forEach { k -> if (!has(k)) put(k, ph.get(k)) }
             // Nút Web của remote TCL (4159, upstream tcl-g10-google-tv): mở trình duyệt nếu tivi có.

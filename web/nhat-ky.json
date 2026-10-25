@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.10.10",
+  "ngay": "2026-10-25",
+  "vi": [
+   "- Thêm công tắc \"Giữ nút âm lượng để tăng / giảm liên tục\" ở Đổi giao diện → Tuỳ chỉnh → Remote: dành cho tivi giữ nút chỉ nhảy một nấc sau khi cài Home sạch (hay gặp trên Sony). Đổi lại, nút Input / Apps / nút app trên remote về như tivi gốc."
+  ],
+  "en": [
+   "- New \"Hold volume to keep raising / lowering\" switch under Change Home look → Customize → Remote, for TVs where holding volume moves only one step after Home sạch (common on Sony). In return the remote's Input / Apps / app buttons work as the TV's own."
+  ]
+ },
+ {
   "ban": "2.10.9",
   "ngay": "2026-10-25",
   "vi": [

@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 77,
-  "versionName": "2.10.9",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.9.apk",
-  "co": 11980057,
-  "ghiChu": "Ảnh nền riêng nét hơn, không bị phủ màu; tivi Xiaomi bản Trung Quốc hiện Home sạch tiếng Việt.",
-  "ghiChuEn": "Sharper own wallpapers without the colour overlay; China Xiaomi TVs get the clean Home in Vietnamese.",
+  "versionCode": 78,
+  "versionName": "2.10.10",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.10.apk",
+  "co": 11980053,
+  "ghiChu": "Thêm công tắc giữ nút âm lượng để tăng/giảm liên tục (Sony, Xiaomi, Hisense).",
+  "ghiChuEn": "New switch: hold volume to keep raising/lowering (Sony, Xiaomi, Hisense).",
   "ngay": "2026-10-25"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "54f00bfcd0441cc7",
    "url": "/ota/du-lieu.json",
    "co": 1682380,
-   "tuBan": 77
+   "tuBan": 78
   },
   "tvhome.apk": {
    "phienBan": "87e58c21171ddde8",
    "url": "/ota/tvhome.apk",
    "co": 640841,
-   "tuBan": 77
+   "tuBan": 78
   }
  }
 }

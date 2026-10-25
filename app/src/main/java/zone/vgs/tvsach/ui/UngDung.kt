@@ -995,6 +995,10 @@ private fun TheTuyChinh(vm: PhienLamViec) {
             if (vm.mauChon?.id == "tcl-g09-google-tv" || vm.laTclGoogleTv) t("YouTube, Netflix, Cài đặt… mở được khi Home gốc tắt. Trên máy này bật thì giữ nút âm lượng chỉ nhảy một nấc", "YouTube, Netflix, Settings… work with the stock Home off. On this set, holding volume then steps only once")
             else t("YouTube, Netflix, Cài đặt… vẫn mở được khi Home gốc tắt", "YouTube, Netflix, Settings… keep working with the stock Home off"),
             vm.nutAppRemote) { vm.nutAppRemoteChon = it }
+        Hang(t("Giữ nút âm lượng để tăng / giảm liên tục", "Hold volume to keep raising / lowering"),
+            t("Bật nếu giữ nút chỉ nhảy một nấc (hay gặp trên Sony). Đổi lại, nút Input / Apps / nút app trên remote về như tivi gốc",
+                "Turn on if holding volume only moves one step (common on Sony). In return the remote's Input / Apps / app buttons work as the TV's own"),
+            vm.giuAmLuong) { vm.giuAmLuong = it }
     }
     The(t("File cấu hình", "Settings file"), Icons.Rounded.Save) {
         Phu(t("Lưu mọi lựa chọn (theme, dock, thời tiết, tuỳ chỉnh, Nâng cao, ảnh nền riêng) ra một file để giữ lại hoặc mang sang tivi khác.",
