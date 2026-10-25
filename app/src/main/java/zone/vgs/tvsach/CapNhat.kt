@@ -15,10 +15,10 @@ import java.net.URL
  */
 object CapNhat {
     const val GITHUB_REPO = "9000000/vgs-cleantv"
+    const val BRANCH = "tet"
     val URL_CAP_NHAT = listOf(
-        "https://raw.githubusercontent.com/$GITHUB_REPO/tet/cap-nhat.json",
-        "https://raw.githubusercontent.com/$GITHUB_REPO/main/cap-nhat.json",
-        "https://raw.githubusercontent.com/$GITHUB_REPO/HEAD/cap-nhat.json"
+        "https://raw.githubusercontent.com/$GITHUB_REPO/$BRANCH/cap-nhat.json",
+        "https://raw.githubusercontent.com/$GITHUB_REPO/$BRANCH/web/cap-nhat.json"
     )
 
     data class BanMoi(val versionCode: Int, val versionName: String, val apk: String, val ghiChu: String)
@@ -97,7 +97,7 @@ object CapNhat {
                 if (prefs.getString(ten, "") == phienBan && fileDuLieu(ctx, ten).isFile) continue
                 runCatching {
                     val path = o.getString("url")
-                    val otaUrl = if (path.startsWith("http")) path else "https://raw.githubusercontent.com/$GITHUB_REPO/tet/web$path"
+                    val otaUrl = if (path.startsWith("http")) path else "https://raw.githubusercontent.com/$GITHUB_REPO/$BRANCH/web$path"
                     val bytes = tai(otaUrl, 60)
                     if (bytes.size.toLong() != o.optLong("co", bytes.size.toLong())) error("Sai cỡ $ten")
                     val f = fileDuLieu(ctx, ten).apply { parentFile?.mkdirs() }
@@ -120,9 +120,13 @@ object CapNhat {
         val apkRaw = app.optString("apk")
         val apkUrl = when {
             apkRaw.startsWith("http://") || apkRaw.startsWith("https://") -> apkRaw
-            apkRaw.startsWith("/") -> "https://raw.githubusercontent.com/$GITHUB_REPO/tet/web$apkRaw"
-            else -> "https://raw.githubusercontent.com/$GITHUB_REPO/tet/web/$apkRaw"
+            apkRaw.startsWith("/") -> "https://raw.githubusercontent.com/$GITHUB_REPO/$BRANCH/web$apkRaw"
+            else -> "https://raw.githubusercontent.com/$GITHUB_REPO/$BRANCH/web/$apkRaw"
         }
+        // Bảo vệ độc quyền: Chỉ chấp nhận APK phát hành từ repo của dự án này, chặn hoàn toàn link từ repo gốc
+        val tuNguonHopLe = apkUrl.contains("github.com/$GITHUB_REPO/") || apkUrl.contains("raw.githubusercontent.com/$GITHUB_REPO/")
+        if (!tuNguonHopLe) return null
+
         return if (code > BuildConfig.VERSION_CODE)
             BanMoi(code, app.optString("versionName"), apkUrl,
                 t(app.optString("ghiChu"), app.optString("ghiChuEn").ifBlank { app.optString("ghiChu") }))

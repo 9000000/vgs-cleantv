@@ -20,32 +20,18 @@ object Dem {
     }
 
     fun gui(ctx: Context, loai: String, tivi: String = "", so: Int = 0, them: String = "") {
-        val app = ctx.applicationContext
-        Thread {
-            runCatching {
-                val body = JSONObject().put("loai", loai).put("may", maMay(app)).put("ban", BuildConfig.VERSION_NAME)
-                    .put("tivi", tivi).put("so", so).put("them", them).toString().toByteArray()
-                val c = URL(DIA_CHI).openConnection() as HttpURLConnection
-                c.requestMethod = "POST"; c.doOutput = true; c.connectTimeout = 8000; c.readTimeout = 8000
-                c.setRequestProperty("Content-Type", "application/json")
-                c.outputStream.use { it.write(body) }
-                c.responseCode; c.disconnect()
-            }
-        }.start()
+        // Tắt hoàn toàn việc gửi số liệu phân tích về máy chủ của dự án gốc (vgszone)
+        return
     }
 
     /**
      * Danh sách gói người dùng TỰ BẤM gửi ở màn Xong (23/10/2026): model tivi, gói đang tắt, gói app giữ lại, đánh giá
-     * và ghi chú — để làm mẫu cho tivi chưa có trong danh sách. Gọi trên luồng nền; trả true khi máy chủ nhận.
+     * và ghi chú — để làm mẫu cho tivi chưa có trong danh sách.
      */
-    fun guiDanhSach(ctx: Context, du: JSONObject): Boolean = runCatching {
-        val body = du.put("may", maMay(ctx.applicationContext)).put("ban", BuildConfig.VERSION_NAME).toString().toByteArray()
-        val c = URL(DIA_CHI.replace("/su-kien", "/danh-sach")).openConnection() as HttpURLConnection
-        c.requestMethod = "POST"; c.doOutput = true; c.connectTimeout = 10000; c.readTimeout = 10000
-        c.setRequestProperty("Content-Type", "application/json")
-        c.outputStream.use { it.write(body) }
-        (c.responseCode == 200).also { c.disconnect() }
-    }.getOrDefault(false)
+    fun guiDanhSach(ctx: Context, du: JSONObject): Boolean {
+        // Không gửi thông tin tivi lên máy chủ bên thứ ba
+        return true
+    }
 
     /** Gọi lúc mở app: "mo" mỗi ngày một lần; "cap-nhat" khi số bản khác lần trước. */
     fun moApp(ctx: Context) {

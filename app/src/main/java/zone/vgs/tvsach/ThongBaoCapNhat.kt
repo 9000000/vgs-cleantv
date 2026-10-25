@@ -32,7 +32,7 @@ object ThongBaoCapNhat {
             .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
             .setInitialDelay(1, TimeUnit.HOURS)
             .build()
-        WorkManager.getInstance(ctx).enqueueUniquePeriodicWork("kiem-tra-ban-moi", ExistingPeriodicWorkPolicy.KEEP, viec)
+        WorkManager.getInstance(ctx).enqueueUniquePeriodicWork("kiem-tra-ban-moi", ExistingPeriodicWorkPolicy.UPDATE, viec)
     }
 
     fun bao(ctx: Context, b: CapNhat.BanMoi) {
@@ -42,14 +42,14 @@ object ThongBaoCapNhat {
             ctx.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return
         val nm = ctx.getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= 26) {
-            nm.createNotificationChannel(NotificationChannel(KENH, t("Bản mới của app", "App updates"), NotificationManager.IMPORTANCE_DEFAULT))
+            nm.createNotificationChannel(NotificationChannel(KENH, t("Bản mới của app CleanTV", "CleanTV app updates"), NotificationManager.IMPORTANCE_DEFAULT))
         }
         val mo = PendingIntent.getActivity(ctx, 1,
             Intent(ctx, MainActivity::class.java).putExtra(MO_CAP_NHAT, true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         val tb = NotificationCompat.Builder(ctx, KENH)
             .setSmallIcon(R.drawable.ic_thong_bao)
-            .setContentTitle(t("CleanTV ${b.versionName} đã có", "CleanTV ${b.versionName} is out"))
+            .setContentTitle(t("CleanTV (Bản riêng) ${b.versionName} đã có", "CleanTV (Custom) ${b.versionName} is out"))
             .setContentText(b.ghiChu.ifBlank { t("Chạm để cập nhật.", "Tap to update.") })
             .setStyle(NotificationCompat.BigTextStyle().bigText(
                 (if (b.ghiChu.isNotBlank()) b.ghiChu + "\n" else "") + t("Chạm để cập nhật.", "Tap to update.")))
