@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 69,
-  "versionName": "2.10.1",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.1.apk",
-  "co": 11924605,
-  "ghiChu": "Ô kênh VTV dùng logo kênh thay cho chữ.",
-  "ghiChuEn": "VTV channel tiles now show the channel logo.",
+  "versionCode": 70,
+  "versionName": "2.10.2",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.2.apk",
+  "co": 11924385,
+  "ghiChu": "Sửa: Sony 2015 bấm Cài đặt không vào được, ảnh nền không đổi trên tivi Android 8, ô tìm phường giật khi chạy trên tivi. Thêm: dòng RAM/ROM theo GB, công tắc mở một app khi bật tivi.",
+  "ghiChuEn": "Fixes: Settings on 2015 Sony sets, wallpaper not changing on Android 8, laggy ward search on the TV. New: RAM/ROM line in GB, open an app at power-on.",
   "ngay": "2026-10-25"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "ad572cf6981ace86",
+   "phienBan": "ecbbb424ced684ff",
    "url": "/ota/du-lieu.json",
    "co": 1606661,
-   "tuBan": 69
+   "tuBan": 70
   },
   "tvhome.apk": {
-   "phienBan": "fe2ce4fe72c8a6a6",
+   "phienBan": "52287f5129f50252",
    "url": "/ota/tvhome.apk",
-   "co": 623177,
-   "tuBan": 69
+   "co": 623069,
+   "tuBan": 70
   }
  }
 }

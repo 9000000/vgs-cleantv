@@ -150,6 +150,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var oDeuNhau by mutableStateOf(false)
     /** Số app mỗi hàng (columns của launcher, 0 = theo theme), góp ý 24/10/2026: Sony chỉ có 4 app một hàng. */
     var soCot by mutableStateOf(0)
+    /** Cho chọn app tự mở khi bật tivi (open_on_start_choice của launcher; góp ý dmenh568, quan1sd1998 24/10/2026). */
+    var moKhiBat by mutableStateOf(false)
     /** Kênh VTV đặt ở đầu dock (tên VTV1…), theo thứ tự KENH_VTV. */
     val kenhVtv = mutableStateListOf<String>()
     val coVtvGo get() = trangThai?.caiDat?.contains(GOI_VTVGO) == true
@@ -247,9 +249,24 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var thanhPho by mutableStateOf<zone.vgs.tvsach.dulieu.ThanhPho?>(null)
     /** Ô tìm phường/xã cho thời tiết (góp ý 23/10/2026). */
     var timXa by mutableStateOf("")
-    val ketQuaXa: List<zone.vgs.tvsach.dulieu.XaPhuong.Xa>
-        get() = if (timXa.trim().length < 2) emptyList() else zone.vgs.tvsach.dulieu.XaPhuong.timXa(zone.vgs.tvsach.dulieu.XaPhuong.nap(ctx), timXa)
-    fun chonXa(x: zone.vgs.tvsach.dulieu.XaPhuong.Xa) { thanhPho = zone.vgs.tvsach.dulieu.ThanhPho(x.tenNgan, x.lat, x.lon); timXa = "" }
+        private set
+    /**
+     * Kết quả tìm phường/xã: lọc 3.321 xã sau khi ngừng gõ 0,35 giây, ở luồng phụ (25/10/2026, TCL chạy CleanTV ngay
+     * trên tivi: lọc lại mỗi lần vẽ màn hình làm ô gõ giật, không chọn được).
+     */
+    var ketQuaXa by mutableStateOf<List<zone.vgs.tvsach.dulieu.XaPhuong.Xa>>(emptyList())
+        private set
+    private var viecTimXa: kotlinx.coroutines.Job? = null
+    fun doiTimXa(q: String) {
+        timXa = q
+        viecTimXa?.cancel()
+        if (q.trim().length < 2) { ketQuaXa = emptyList(); return }
+        viecTimXa = viewModelScope.launch {
+            kotlinx.coroutines.delay(350)
+            ketQuaXa = withContext(Dispatchers.Default) { zone.vgs.tvsach.dulieu.XaPhuong.timXa(zone.vgs.tvsach.dulieu.XaPhuong.nap(ctx), q) }
+        }
+    }
+    fun chonXa(x: zone.vgs.tvsach.dulieu.XaPhuong.Xa) { thanhPho = zone.vgs.tvsach.dulieu.ThanhPho(x.tenNgan, x.lat, x.lon); doiTimXa("") }
 
     /** Tivi đã có Home sạch: chỉ cần đẩy theme, không cài lại. */
     /** Tên gói Home sạch trên tivi đang nối (Xiaomi bản Trung Quốc: com.ts.launcher), dò lúc kết nối. */
@@ -706,6 +723,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         motHang = j.optBoolean("single_row", false)
         anLoiChao = !cuaTheme("show_greeting") && !j.optBoolean("show_greeting", true)
         oDeuNhau = !cuaTheme("uniform_tiles") && j.optBoolean("uniform_tiles", false)
+        moKhiBat = j.optBoolean("open_on_start_choice", false)
         // Chỉ nạp số cột do người dùng chọn ở đây (vgs_so_cot), không lấy columns của theme.
         soCot = if (j.optBoolean("vgs_so_cot", false)) j.optInt("columns", 0) else 0
         if (j.has("handle_view_inputs")) nutInput = j.optBoolean("handle_view_inputs", nutInput)
@@ -850,6 +868,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (motHang) { put("dock_row", true); put("single_row", true) }
         if (anLoiChao) put("show_greeting", false)
         if (oDeuNhau) put("uniform_tiles", true)
+        if (moKhiBat) put("open_on_start_choice", true)
         if (soCot > 0) { put("columns", soCot); put("vgs_so_cot", true) }
         // Phím APPS (KEYCODE_ALL_APPS) chỉ là nút Home với que / tivi Xiaomi hoặc khi bật "Remote gửi phím Home lạ";
         // tivi khác (Sony VH2: nút Apps mở Home sạch như Back, abc999roses 24/10/2026) để phím cho tivi.

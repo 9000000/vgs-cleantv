@@ -100,7 +100,9 @@ object KeHoach {
      */
     private val THEO_Y_RIENG = Regex("""(by|owner'?s?|personal)\s+choice|\boptional\b(?! (vendor|home-automation))|not used|does not use|keep what you use|comment out what you use|if you (don't|do not) use""", RegexOption.IGNORE_CASE)
 
-    private val KHONG_TU_TICH = setOf("com.google.android.backdrop", "com.google.android.apps.tv.dreamx")
+    // Sony bo SVP-DTV15 (BRAVIA 2015, Android 8): Cài đặt đọc provider hotelsettings của b2b.hotelmode, tắt là Cài đặt
+    // mở ra màn trống (upstream examples/sony-kdl-43w950d; góp ý 25/10/2026). Đời Sony mới tắt được, nên chỉ không tự tích.
+    private val KHONG_TU_TICH = setOf("com.google.android.backdrop", "com.google.android.apps.tv.dreamx", "com.sony.dtv.b2b.hotelmode")
 
     /** Máy chiếu: gói lo lấy nét, chỉnh hình, motor — không bao giờ tắt (21/10/2026). */
     private val GIU_MAY_CHIEU = Regex("focus|keystone|trapez|tixing|jiaozheng|duijiao|motor|calibr|projector|projection", RegexOption.IGNORE_CASE)

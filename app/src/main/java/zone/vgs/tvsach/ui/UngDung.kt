@@ -925,7 +925,7 @@ private fun TheHomeNoiDung(vm: PhienLamViec) {
             "Needs the VTVgo app on the TV: install it from Google Play on the TV, open it once, then reconnect CleanTV."))
     }
     The(t("Thời tiết", "Weather"), Icons.Rounded.WbSunny) {
-        OutlinedTextField(vm.timXa, { vm.timXa = it }, label = { Text(t("Tìm phường / xã của bạn", "Find your ward / commune")) },
+        OutlinedTextField(vm.timXa, { vm.doiTimXa(it) }, label = { Text(t("Tìm phường / xã của bạn", "Find your ward / commune")) },
             placeholder = { Text(t("vd: Bến Thành, Cửa Lò", "e.g. Ben Thanh, Cua Lo")) },
             singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
         vm.ketQuaXa.forEach { x ->
@@ -980,6 +980,7 @@ private fun TheTuyChinh(vm: PhienLamViec) {
                 ChonChip(chu, vm.doiHang == v) { vm.doiHang = v }
             }
         }
+        Hang(t("Mở một app khi bật tivi", "Open an app at power-on"), t("Bật lên rồi trên tivi vào Cài đặt của Home sạch → Cài đặt launcher → Mở khi khởi động, chọn app", "Then on the TV: Home settings → Launcher settings → Open on start, pick the app"), vm.moKhiBat) { vm.moKhiBat = it }
         Hang(t("Nút Đang phát", "Now playing button"), t("Hiện khi có app đang phát nhạc / video: tạm dừng từng app hay dừng tất cả", "Shows while apps play: pause each or stop them all"), vm.nutDangPhat) { vm.nutDangPhat = it }
         Hang(t("Nút màn hình chờ", "Screensaver button"), t("Bấm là bật ảnh / đồng hồ, tiện khi nghe nhạc", "Starts the photo / clock screensaver, handy with music"), vm.nutManCho) { vm.nutManCho = it }
         Hang(t("Thư viện app", "App library"), t("Nút xem mọi app trên tivi, thêm / bớt khỏi Home", "A button listing every app; add or remove from Home"), vm.thuVienApp) { vm.thuVienApp = it }

@@ -1,5 +1,23 @@
 [
  {
+  "ban": "2.10.2",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Sony BRAVIA 2015: không còn tự tắt gói làm Cài đặt mở ra màn trống. Đã dính thì vào \"Bật lại app đã tắt\", tích com.sony.dtv.b2b.hotelmode",
+   "• Tivi Android 8: sửa lỗi gửi ảnh nền xong mà hình nền không đổi",
+   "• Ô tìm phường/xã không còn giật khi chạy CleanTV ngay trên tivi",
+   "• Dòng thông số đổi thành \"RAM 0,8/1,4 GB · ROM 2,6/8 GB\" (góp ý của khangnck)",
+   "• Tuỳ chỉnh: thêm \"Mở một app khi bật tivi\""
+  ],
+  "en": [
+   "• 2015 Sony BRAVIA: no longer disables the package Settings needs",
+   "• Android 8 TVs: wallpaper now changes after sending",
+   "• Ward search no longer lags when CleanTV runs on the TV",
+   "• Stats line reads \"RAM 0.8/1.4 GB · ROM 2.6/8 GB\"",
+   "• Options: \"Open an app at power-on\""
+  ]
+ },
+ {
   "ban": "2.10.1",
   "ngay": "2026-10-25",
   "vi": [
