@@ -1495,9 +1495,12 @@ private fun TheGuiDanhSach(vm: PhienLamViec) {
         }
         OutlinedTextField(vm.dsGhiChu, { if (it.length <= 1000) vm.dsGhiChu = it }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp),
             label = { Text(if (vm.dsDanhGia == "on") t("Ghi chú (không bắt buộc)", "Note (optional)") else t("Chưa ổn ở đâu? (HDMI, remote, giọng nói…)", "What's wrong? (HDMI, remote, voice…)")) })
-        OutlinedTextField(vm.dsLienHe, { if (it.length <= 120) vm.dsLienHe = it }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp),
-            label = { Text(t("Email / Zalo để VGS hỏi lại (không bắt buộc)", "Email to reach you (optional)")) })
-        NutPhu(t("Gửi danh sách gói cho VGS", "Send the package list to VGS"), Icons.Rounded.Share) { if (!vm.dangBan) vm.guiDanhSach() }
+        // Chỉ nhận email (anh Alex 25/10/2026): VGS trả lời bằng thư từ cleantv@, không nhắn số điện thoại.
+        OutlinedTextField(vm.dsLienHe, { if (it.length <= 120) vm.dsLienHe = it.trim() }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp),
+            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Email),
+            isError = vm.dsLienHe.isNotEmpty() && !laEmail(vm.dsLienHe),
+            label = { Text(t("Email để VGS hỏi lại (không bắt buộc)", "Email to reach you (optional)")) })
+        NutPhu(t("Gửi danh sách gói cho VGS", "Send the package list to VGS"), Icons.Rounded.Share, enabled = vm.dsLienHe.isEmpty() || laEmail(vm.dsLienHe)) { if (!vm.dangBan) vm.guiDanhSach() }
     }
 }
 
@@ -1578,3 +1581,6 @@ private fun ManKhoaTre(vm: PhienLamViec) = Cuon {
     Phu(t("Lưu ý: khoá không chống được khôi phục cài đặt gốc hay đổi sang thiết bị khác cắm HDMI. Với hộp Android cắm vào tivi, trẻ vẫn đổi nguồn tivi được. Bấm Khôi phục tivi này cũng gỡ khoá.",
         "Note: it can't stop a factory reset or another device on HDMI; with a box plugged into a TV, the TV's own input switch still works. Restore this TV also removes the lock."))
 }
+
+/** Ô liên hệ chỉ nhận email (góp ý trả lời qua thư). */
+private fun laEmail(s: String) = Regex("""^[^\s@]+@[^\s@]+\.[^\s@]{2,}$""").matches(s.trim())

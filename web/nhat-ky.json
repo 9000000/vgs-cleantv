@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.10.6",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Gửi danh sách / góp ý: ô liên hệ chỉ nhận email, VGS trả lời qua thư"
+  ],
+  "en": [
+   "• Sending feedback: the contact field takes an email; VGS replies by email"
+  ]
+ },
+ {
   "ban": "2.10.5",
   "ngay": "2026-10-25",
   "vi": [

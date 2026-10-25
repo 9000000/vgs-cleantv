@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 73,
-  "versionName": "2.10.5",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.5.apk",
+  "versionCode": 74,
+  "versionName": "2.10.6",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.6.apk",
   "co": 11974625,
-  "ghiChu": "Sửa: tivi có nhiều launcher (Xiaomi nội địa…) hiện hộp chọn Home làm app trả về Home gốc; giờ app tự đóng hộp và đặt Home sạch.",
-  "ghiChuEn": "Fix: on TVs with several launchers (China Xiaomi…) the Home chooser made the app roll back; it now closes it and sets the clean Home.",
+  "ghiChu": "Ô liên hệ khi gửi danh sách / góp ý chỉ nhận email.",
+  "ghiChuEn": "The contact field when sending feedback takes an email only.",
   "ngay": "2026-10-25"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "3512520cb314a9d9",
    "url": "/ota/du-lieu.json",
    "co": 1676606,
-   "tuBan": 73
+   "tuBan": 74
   },
   "tvhome.apk": {
    "phienBan": "91daa975448e7e1b",
    "url": "/ota/tvhome.apk",
    "co": 638717,
-   "tuBan": 73
+   "tuBan": 74
   }
  }
 }
