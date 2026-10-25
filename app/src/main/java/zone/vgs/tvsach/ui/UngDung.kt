@@ -925,8 +925,8 @@ private fun TheHomeNoiDung(vm: PhienLamViec) {
             "Needs the VTVgo app on the TV: install it from Google Play on the TV, open it once, then reconnect CleanTV."))
     }
     The(t("Thời tiết", "Weather"), Icons.Rounded.WbSunny) {
-        OutlinedTextField(vm.timXa, { vm.doiTimXa(it) }, label = { Text(t("Tìm phường / xã của bạn", "Find your ward / commune")) },
-            placeholder = { Text(t("vd: Bến Thành, Cửa Lò", "e.g. Ben Thanh, Cua Lo")) },
+        OutlinedTextField(vm.timXa, { vm.doiTimXa(it) }, label = { Text(t("Tìm phường / xã hoặc thành phố", "Find your ward or city")) },
+            placeholder = { Text(t("vd: Bến Thành, Cửa Lò, Bali, Osaka", "e.g. Ben Thanh, Bali, Osaka")) },
             singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
         vm.ketQuaXa.forEach { x ->
             Text("${x.ten} · ${x.tinh}", fontSize = 14.sp, modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp))

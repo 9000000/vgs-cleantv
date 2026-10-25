@@ -376,7 +376,26 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             }
         }
 
-        val bayGio = homeHienTai()
+        var bayGio = homeHienTai()
+        // Hộp "chọn Home" (android/ResolverActivity): tivi còn launcher người dùng tự cài (Launchpad TV, Home TV…) tranh Home,
+        // set-home-activity không thắng được (25/10/2026, Xiaomi ASTR0 nội địa: app trả Home gốc mỗi lần cài). Tắt các
+        // launcher tự cài đó (ghi vào sao lưu, Khôi phục bật lại) rồi đặt lại Home sạch.
+        if (bayGio.startsWith("android/") && !giuHomeGoc) {
+            val khac = sh("cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME")
+                .lines().map { it.trim().substringBefore('/') }.filter { it.isNotBlank() && it != pkgHome }.distinct().filter { laLauncherCaiThem(it) }
+            if (khac.isNotEmpty()) {
+                bao(t("Tivi có launcher khác tranh Home (${khac.joinToString()}), tắt để Home sạch làm Home…", "Other launchers compete for Home (${khac.joinToString()}), disabling them…"))
+                khac.forEach { p ->
+                    gacThem(p)
+                    sh("pm disable-user --user 0 $p")
+                    if (p !in sl.daTatTruoc && p !in sl.daTatBoiApp) sl.daTatBoiApp += p
+                }
+                luuSaoLuu(sl)
+                sh("cmd package set-home-activity --user 0 $cmpHome")
+                Thread.sleep(800)
+                bayGio = homeHienTai()
+            }
+        }
         if (!bayGio.startsWith("$pkgHome/") && giuHomeGoc) {
             traHomeGoc(sl)
             return t("Tivi bo mạch CVTE ('${bayGio.ifBlank { "không rõ" }}' vẫn nhận Home). Với loại bo này app không tắt Home gốc vì đã có tivi treo ở màn khởi động sau khi tắt. Tivi vẫn như cũ; Home sạch vẫn mở được từ danh sách ứng dụng.",

@@ -444,7 +444,7 @@ index 00000000..9b2fd8e3
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 880d15fc..24ed8f63 100644
+index 880d15fc..868253fd 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -178,6 +178,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
@@ -652,7 +652,18 @@ index 880d15fc..24ed8f63 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2629,7 +2732,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2275,6 +2378,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+             ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
+         }
+         clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
++        // CleanTV/VGS: the weather line is match_parent with an ellipsis; in this wrap_content column it was cut to the
++        // date's width and the ward name vanished (feedback 25/10/2026). Let it size to its own text.
++        View weather = findViewById(R.id.weather);
++        if (weather != null) weather.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
+     }
+ 
+     /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
+@@ -2629,7 +2736,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -665,7 +676,7 @@ index 880d15fc..24ed8f63 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2844,6 +2951,29 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2844,6 +2955,29 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              if (v.equals("-")) return -1;
              try { return Integer.parseInt(v); } catch (NumberFormatException e) { return null; }
          }
@@ -695,7 +706,7 @@ index 880d15fc..24ed8f63 100644
          return null;
      }
  
-@@ -3246,10 +3376,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3246,10 +3380,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }

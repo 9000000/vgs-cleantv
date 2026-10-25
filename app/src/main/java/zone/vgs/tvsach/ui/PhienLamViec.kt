@@ -270,7 +270,13 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (q.trim().length < 2) { ketQuaXa = emptyList(); return }
         viecTimXa = viewModelScope.launch {
             kotlinx.coroutines.delay(350)
-            ketQuaXa = withContext(Dispatchers.Default) { zone.vgs.tvsach.dulieu.XaPhuong.timXa(zone.vgs.tvsach.dulieu.XaPhuong.nap(ctx), q) }
+            val vn = withContext(Dispatchers.Default) { zone.vgs.tvsach.dulieu.XaPhuong.timXa(zone.vgs.tvsach.dulieu.XaPhuong.nap(ctx), q) }
+            ketQuaXa = vn
+            // Ít kết quả trong nước thì tìm thêm thành phố khắp thế giới (người dùng ở Bali, Osaka…).
+            if (vn.size < 3 && q.trim().length >= 3) {
+                val theGioi = withContext(Dispatchers.IO) { zone.vgs.tvsach.dulieu.XaPhuong.timTheGioi(q, zone.vgs.tvsach.NgonNgu.tiengViet) }
+                if (timXa == q) ketQuaXa = vn + theGioi.take(8 - vn.size)
+            }
         }
     }
     fun chonXa(x: zone.vgs.tvsach.dulieu.XaPhuong.Xa) { thanhPho = zone.vgs.tvsach.dulieu.ThanhPho(x.tenNgan, x.lat, x.lon); doiTimXa("") }

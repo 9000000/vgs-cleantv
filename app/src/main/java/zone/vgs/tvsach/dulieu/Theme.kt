@@ -78,6 +78,23 @@ object XaPhuong {
     fun boDau(s: String): String = java.text.Normalizer.normalize(s.lowercase(), java.text.Normalizer.Form.NFD)
         .replace(Regex("\\p{Mn}+"), "").replace('đ', 'd')
 
+    /**
+     * Thành phố ngoài Việt Nam (25/10/2026, người dùng ở Indonesia, Nhật xin thời tiết nơi mình ở): hỏi dịch vụ tìm địa
+     * danh của Open-Meteo, cùng nơi cấp số thời tiết. Bỏ kết quả ở Việt Nam (đã có danh sách xã). Lỗi mạng thì rỗng.
+     */
+    fun timTheGioi(q: String, tiengViet: Boolean, toiDa: Int = 6): List<Xa> = runCatching {
+        val url = java.net.URL("https://geocoding-api.open-meteo.com/v1/search?count=$toiDa&format=json&language=${if (tiengViet) "vi" else "en"}&name=" +
+            java.net.URLEncoder.encode(q.trim(), "UTF-8"))
+        val c = url.openConnection() as java.net.HttpURLConnection
+        c.connectTimeout = 5000; c.readTimeout = 5000
+        val j = c.inputStream.bufferedReader().use { org.json.JSONObject(it.readText()) }
+        val ds = j.optJSONArray("results") ?: return@runCatching emptyList()
+        (0 until ds.length()).map { ds.getJSONObject(it) }.filter { it.optString("country_code") != "VN" }.map { r ->
+            Xa(r.optString("name"), listOf(r.optString("admin1"), r.optString("country")).filter { it.isNotBlank() }.joinToString(", "),
+                r.optDouble("latitude"), r.optDouble("longitude"))
+        }
+    }.getOrDefault(emptyList())
+
     fun timXa(ds: List<Xa>, q: String, toiDa: Int = 8): List<Xa> {
         val tu = boDau(q).split(' ').filter { it.isNotBlank() }
         if (tu.isEmpty()) return emptyList()

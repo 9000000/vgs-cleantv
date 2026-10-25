@@ -1,5 +1,19 @@
 [
  {
+  "ban": "2.10.7",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Thời tiết: ô tìm nhận cả thành phố nước ngoài (Bali, Osaka…) cho người ở xa (góp ý từ Indonesia, Nhật)",
+   "• Tivi có cài launcher khác (Launchpad TV…): bước cài Home sạch không còn bị hộp \"chọn Home\" làm hỏng",
+   "• Để ngày dưới đồng hồ không còn mất tên phường/xã ở dòng thời tiết"
+  ],
+  "en": [
+   "• Weather: the search finds cities abroad (Bali, Osaka…)",
+   "• TVs with other launchers installed: the Home chooser no longer breaks the install",
+   "• Date under the clock no longer cuts the place name"
+  ]
+ },
+ {
   "ban": "2.10.6",
   "ngay": "2026-10-25",
   "vi": [

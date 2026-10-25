@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 74,
-  "versionName": "2.10.6",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.6.apk",
-  "co": 11974625,
-  "ghiChu": "Ô liên hệ khi gửi danh sách / góp ý chỉ nhận email.",
-  "ghiChuEn": "The contact field when sending feedback takes an email only.",
+  "versionCode": 75,
+  "versionName": "2.10.7",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.7.apk",
+  "co": 11974681,
+  "ghiChu": "Thời tiết tìm được thành phố khắp thế giới (Bali, Osaka…). Sửa: tivi có launcher khác làm hỏng bước cài Home sạch; mất tên xã khi để ngày dưới đồng hồ.",
+  "ghiChuEn": "Weather now finds cities worldwide (Bali, Osaka…). Fixes: other launchers breaking the clean Home install; the place name lost with the date under the clock.",
   "ngay": "2026-10-25"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "3512520cb314a9d9",
+   "phienBan": "9e09adb0b17bcb94",
    "url": "/ota/du-lieu.json",
    "co": 1676606,
-   "tuBan": 74
+   "tuBan": 75
   },
   "tvhome.apk": {
-   "phienBan": "91daa975448e7e1b",
+   "phienBan": "fe88f9a19d53db91",
    "url": "/ota/tvhome.apk",
-   "co": 638717,
-   "tuBan": 74
+   "co": 638741,
+   "tuBan": 75
   }
  }
 }
