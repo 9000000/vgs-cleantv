@@ -364,8 +364,8 @@
     "moTa": "Viền chọn xung quanh mọi ô app phát sáng theo tông màu chính của app đó (mặc định bật)."
   },
   "home_idle_clock_minutes": {
-    "ten": "Đồng hồ khi để yên (phút)",
-    "moTa": "Số phút để yên trên Home trước khi hiện màn hình chờ đồng hồ (từ 0 đến 1440). Đặt 0 để tắt."
+    "ten": "Màn hình chờ sau ... phút không bấm gì",
+    "moTa": "Số phút để yên trên Home trước khi hiện màn hình chờ gia đình: ảnh chuyển mờ dần xen ảnh gia đình, đồng hồ, âm lịch, thời tiết, đếm ngược sự kiện và danh ngôn. Đặt 0 để tắt."
   },
   "show_stats": {
     "ten": "Hiện thông số CPU / bộ nhớ",
@@ -426,5 +426,13 @@
   "race_calendar": {
     "ten": "Lịch đua xe F1",
     "moTa": "Chế độ cuối tuần đua xe F1: từ 12 tiếng trước phiên chạy đầu tiên đến 4 tiếng sau cuộc đua chính, bảng thông tin dưới đồng hồ sẽ đếm ngược và hiện lịch đua theo giờ tivi."
+  },
+  "today_carousel": {
+    "ten": "Khối Hôm nay (Danh ngôn & Ngày này năm xưa)",
+    "moTa": "Hiện dải thông tin Hôm nay trên Home xoay vòng giữa Câu nói hay / Danh ngôn cuộc sống và sự kiện Ngày này năm xưa từ Wikipedia tiếng Việt (đã lọc an toàn, bỏ tin tức)."
+  },
+  "countdown_events": {
+    "ten": "Đếm ngược ngày (Tết, Rằm, Mùng 1, Lễ)",
+    "moTa": "Tự động tính và đếm ngược số ngày đến Tết Nguyên Đán, ngày Rằm, Mùng 1 và các ngày lễ truyền thống Việt Nam."
   }
 }
