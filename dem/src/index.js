@@ -10,12 +10,27 @@ async function bam(chu) {
 
 // Ghi một sự kiện, bỏ bản trùng: cùng máy + loại + tivi + ghi chú trong [trongGiay] giây gần nhất (lượt tải: cả ngày,
 // vì mã máy của lượt tải đã là băm IP+ngày). Một câu lệnh, nên vòng lặp gửi lại y hệt không tốn thêm dòng ghi D1.
+// Loại chỉ ghi một dòng cho mỗi máy mỗi ngày giờ VN (25/10/2026, D1 miễn phí chạm 76% trần 100.000 dòng ghi/ngày:
+// "đổi giao diện" một máy bấm cả chục lần). Lượt sau trong ngày không thêm dòng, "home" vẫn cộng vào dem_so cho landing.
+const MOT_LAN_NGAY = new Set(["home", "mo"]);
+const dauNgayVN = () => { const d = new Date(Date.now() + 7 * 3600e3); d.setUTCHours(0, 0, 0, 0); return new Date(d.getTime() - 7 * 3600e3).toISOString(); };
+
 async function ghi(env, r, trongGiay = 600) {
-  await env.DB.prepare(`INSERT INTO su_kien (luc, loai, may, ban, tivi, so, them, quoc_gia)
+  if (MOT_LAN_NGAY.has(r.loai) && r.may) {
+    const daCo = await env.DB.prepare("SELECT 1 FROM su_kien WHERE loai = ?1 AND may = ?2 AND luc >= ?3 LIMIT 1")
+      .bind(r.loai, r.may, dauNgayVN()).first();
+    if (daCo) {
+      if (r.loai === "home") await env.DB.prepare("UPDATE dem_so SET n = n + 1 WHERE khoa = 'home'").run();
+      return;
+    }
+  }
+  const kq = await env.DB.prepare(`INSERT INTO su_kien (luc, loai, may, ban, tivi, so, them, quoc_gia)
       SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8 WHERE NOT EXISTS (
         SELECT 1 FROM su_kien WHERE loai = ?2 AND may = ?3 AND tivi = ?5 AND them = ?7 AND luc >= ?9)`)
     .bind(new Date().toISOString(), r.loai, r.may || "", r.ban || "", r.tivi || "", r.so || 0, r.them || "", r.quoc_gia || "",
       new Date(Date.now() - trongGiay * 1000).toISOString()).run();
+  // Bộ đếm sẵn cho /so-nguoi (25/10/2026): đọc 1 dòng thay vì COUNT(*) quét cả bảng mỗi lần landing hỏi.
+  if (r.loai === "home" && kq.meta?.changes) await env.DB.prepare("UPDATE dem_so SET n = n + 1 WHERE khoa = 'home'").run();
 }
 
 /** Hạn mức theo IP (binding Rate Limiting của Workers, 23/10/2026): quá hạn thì vẫn trả lời bình thường nhưng không ghi. */
@@ -110,6 +125,19 @@ export default {
     }
 
     // Số liệu dạng JSON cho admin vgs.zone (tab CleanTV) — khoá đi bằng header, không nằm trong URL.
+    // Con số công khai cho landing (vgs.zone/cleantv, /en): Alex chốt 25/10/2026 dùng số lượt cài / đổi Home sạch, ghi nhãn
+    // "người đã dùng app".
+    if (url.pathname === "/so-nguoi") {
+      // Landing hỏi lại 30 giây một lần khi tab đang mở (số nhảy gần thời gian thực): mỗi lần đọc 1 dòng, cache biên 15 giây.
+      const khoa = new Request("https://cleantv-dem/so-nguoi");
+      const daCo = await caches.default.match(khoa);
+      if (daCo) return daCo;
+      const r = await env.DB.prepare("SELECT n FROM dem_so WHERE khoa = 'home'").first();
+      const tl = Response.json({ n: r?.n ?? 0 }, { headers: { "cache-control": "public, max-age=15", "access-control-allow-origin": "*" } });
+      ctx.waitUntil(caches.default.put(khoa, tl.clone()));
+      return tl;
+    }
+
     if (url.pathname === "/so-lieu") {
       if (!env.XEM_KHOA || req.headers.get("x-khoa") !== env.XEM_KHOA) return new Response("Không có quyền", { status: 403 });
       const n = [7, 14, 30, 90].includes(Number(url.searchParams.get("ngay"))) ? Number(url.searchParams.get("ngay")) : 14;

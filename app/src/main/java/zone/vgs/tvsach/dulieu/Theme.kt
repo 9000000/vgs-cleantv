@@ -22,6 +22,8 @@ data class Theme(
     fun ghiVao(o: JSONObject) {
         cauHinh.forEach { (k, v) -> o.put(k, v) }
         o.put("wallpaper", anhNen != null || boAnh != null)
+        // Lần sau kết nối lại: mở đúng theme này, và biết khoá nào do theme ghi chứ không phải người dùng bật.
+        o.put("vgs_theme", id)
     }
 }
 
@@ -36,7 +38,32 @@ val THEMES = listOf(
         listOf(0xFF0D0A38, 0xFF22168A, 0xFF4C1FD0)
     ),
 
-    // 2. Mặc định (Default)
+    // 2. Kiểu Apple TV (CleanTV 2.9.0)
+    Theme(
+        "apple-tv", "Kiểu Apple TV", "Apple TV style",
+        "Nền theo màu app đang chọn, dock kính mờ, ô icon đều",
+        "Backdrop in the focused app's colour, frosted dock, even icon tiles",
+        mapOf(
+            "background_color" to "#000000",
+            "cinematic_home" to true,
+            "cinematic_dots" to false,
+            "cinematic_art" to 70,
+            "cinematic_scrim" to 60,
+            "cinematic_white_focus" to true,
+            "uniform_tiles" to true,
+            "dock_glass" to true,
+            "show_greeting" to false,
+            "header_white" to true,
+            "fade_rows" to true,
+            "rows_below_dock" to 1,
+            "columns" to 5,
+            "rows_offset_dp" to 90
+        ),
+        null,
+        listOf(0xFF7A0A14, 0xFF0B3A6E, 0xFF050505)
+    ),
+
+    // 3. Mặc định (Default)
     Theme(
         "default", "Mặc định", "Default",
         "Giao diện gốc dạng JSON, 4 cột, nền đen tuyền",
@@ -54,7 +81,7 @@ val THEMES = listOf(
         listOf(0xFF000000, 0xFF1A1A1A)
     ),
 
-    // 3. Cực quang (Aurora)
+    // 4. Cực quang (Aurora)
     Theme(
         "aurora", "Cực quang", "Aurora",
         "Hình nền cực quang tối màu (xanh ngọc và tím trên nền navy)",
@@ -64,7 +91,7 @@ val THEMES = listOf(
         listOf(0xFF070A14, 0xFF0E4F5C, 0xFF3B1E6E)
     ),
 
-    // 4. Kính trong suốt (Glass)
+    // 5. Kính trong suốt (Glass)
     Theme(
         "glass", "Kính trong suốt", "Glass",
         "Nền xanh navy ánh tím ngọc, thanh trên điện ảnh, dock kính mờ, nút tròn icon",
@@ -92,7 +119,7 @@ val THEMES = listOf(
         listOf(0xFF090C14, 0xFF141A29, 0xFF2A1C4D)
     ),
 
-    // 5. Thu Phần Lan (Ruska)
+    // 6. Thu Phần Lan (Ruska)
     Theme(
         "ruska", "Thu Phần Lan", "Ruska",
         "Hoàng hôn thu Phần Lan bên hồ, dock trong suốt 70%, viền sáng theo màu app",
@@ -109,7 +136,7 @@ val THEMES = listOf(
         listOf(0xFF07080D, 0xFF2A1A12, 0xFF8B4513)
     ),
 
-    // 6. Phong cảnh (Scenes)
+    // 7. Phong cảnh (Scenes)
     Theme(
         "scenes", "Phong cảnh", "Scenes",
         "14 tranh phong cảnh tối vẽ bằng code, tự đổi mỗi giờ",
@@ -121,7 +148,7 @@ val THEMES = listOf(
         anhXem = "theme/phong-canh/02-golden-coast.jpg"
     ),
 
-    // 7. 6 cột (Six columns)
+    // 8. 6 cột (Six columns)
     Theme(
         "six-columns", "6 cột", "Six columns",
         "6 ô nhỏ hơn mỗi hàng và thấy thêm 1 hàng app dưới dock",
@@ -136,7 +163,7 @@ val THEMES = listOf(
         listOf(0xFF000000, 0xFF111122)
     ),
 
-    // 8. Thụy Điển (Sweden)
+    // 9. Thụy Điển (Sweden)
     Theme(
         "sweden", "Thụy Điển", "Sweden",
         "3 ảnh Thụy Điển đổi mỗi giờ kèm địa danh và tác giả, dock kính mờ 6 cột",
@@ -176,7 +203,7 @@ val THEMES = listOf(
         anhXem = "theme/sweden/001.jpg"
     ),
 
-    // 9. Lễ hội Dussehra (Dussehra)
+    // 10. Lễ hội Dussehra (Dussehra)
     Theme(
         "dussehra", "Lễ hội Dussehra", "Dussehra",
         "Giao diện lễ hội Dussehra với vòng hoa cúc vạn thọ và đèn diya vàng",
@@ -218,6 +245,23 @@ object XaPhuong {
 
     fun boDau(s: String): String = java.text.Normalizer.normalize(s.lowercase(), java.text.Normalizer.Form.NFD)
         .replace(Regex("\\p{Mn}+"), "").replace('đ', 'd')
+
+    /**
+     * Thành phố ngoài Việt Nam (25/10/2026, người dùng ở Indonesia, Nhật xin thời tiết nơi mình ở): hỏi dịch vụ tìm địa
+     * danh của Open-Meteo, cùng nơi cấp số thời tiết. Bỏ kết quả ở Việt Nam (đã có danh sách xã). Lỗi mạng thì rỗng.
+     */
+    fun timTheGioi(q: String, tiengViet: Boolean, toiDa: Int = 6): List<Xa> = runCatching {
+        val url = java.net.URL("https://geocoding-api.open-meteo.com/v1/search?count=$toiDa&format=json&language=${if (tiengViet) "vi" else "en"}&name=" +
+            java.net.URLEncoder.encode(q.trim(), "UTF-8"))
+        val c = url.openConnection() as java.net.HttpURLConnection
+        c.connectTimeout = 5000; c.readTimeout = 5000
+        val j = c.inputStream.bufferedReader().use { org.json.JSONObject(it.readText()) }
+        val ds = j.optJSONArray("results") ?: return@runCatching emptyList()
+        (0 until ds.length()).map { ds.getJSONObject(it) }.filter { it.optString("country_code") != "VN" }.map { r ->
+            Xa(r.optString("name"), listOf(r.optString("admin1"), r.optString("country")).filter { it.isNotBlank() }.joinToString(", "),
+                r.optDouble("latitude"), r.optDouble("longitude"))
+        }
+    }.getOrDefault(emptyList())
 
     fun timXa(ds: List<Xa>, q: String, toiDa: Int = 8): List<Xa> {
         val tu = boDau(q).split(' ').filter { it.isNotBlank() }

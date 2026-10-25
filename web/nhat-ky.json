@@ -1,5 +1,165 @@
 [
  {
+  "ban": "2.10.9",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Ảnh nền riêng nét hơn: nén chất lượng cao, màu 32-bit, không còn lớp phủ màu của theme (góp ý của caothanhlhp3)",
+   "• Tivi Xiaomi bản Trung Quốc: Home sạch hiện tiếng Việt dù tivi để tiếng Trung"
+  ],
+  "en": [
+   "• Sharper own wallpapers: higher quality, 32-bit colour, no theme overlay",
+   "• China Xiaomi TVs: the clean Home shows Vietnamese even with the TV in Chinese"
+  ]
+ },
+ {
+  "ban": "2.10.8",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Đổi giao diện: kiểm file đã tới tivi, tivi Android đời cũ (Sony 2015…) không còn đổi theme mà không ăn",
+   "• Thêm mẫu tivi, tổng 293 mẫu có danh sách dọn sẵn",
+   "• Home sạch mới: Nâng cao thêm \"Về Home khi bật tivi\" cho tivi tự mở Live TV lúc bật nguồn"
+  ],
+  "en": [
+   "• Theme changes: the app checks the files reached the TV (older Android TVs)",
+   "• 293 TV models with a ready list",
+   "• Newer clean Home: Advanced adds \"Back to Home at power-on\""
+  ]
+ },
+ {
+  "ban": "2.10.7",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Thời tiết: ô tìm nhận cả thành phố nước ngoài (Bali, Osaka…) cho người ở xa (góp ý từ Indonesia, Nhật)",
+   "• Tivi có cài launcher khác (Launchpad TV…): bước cài Home sạch không còn bị hộp \"chọn Home\" làm hỏng",
+   "• Để ngày dưới đồng hồ không còn mất tên phường/xã ở dòng thời tiết"
+  ],
+  "en": [
+   "• Weather: the search finds cities abroad (Bali, Osaka…)",
+   "• TVs with other launchers installed: the Home chooser no longer breaks the install",
+   "• Date under the clock no longer cuts the place name"
+  ]
+ },
+ {
+  "ban": "2.10.6",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Gửi danh sách / góp ý: ô liên hệ chỉ nhận email, VGS trả lời qua thư"
+  ],
+  "en": [
+   "• Sending feedback: the contact field takes an email; VGS replies by email"
+  ]
+ },
+ {
+  "ban": "2.10.5",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Tivi cài nhiều launcher (Xiaomi nội địa Redmi A Pro…): hộp \"chọn Home\" không còn làm app trả về Home gốc mỗi lần đổi giao diện, app tự đóng hộp và đặt Home sạch"
+  ],
+  "en": [
+   "• TVs with several launchers (China Xiaomi…): the Home chooser no longer makes the app roll back; it closes it and sets the clean Home"
+  ]
+ },
+ {
+  "ban": "2.10.4",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Sony BRAVIA 2015: không còn tắt các gói màn Cài đặt cần; tivi này mặc định giữ ADB bật để không bị khoá ngoài",
+   "• \"Mở một app khi bật tivi\": thêm nút \"Mở màn chọn app trên tivi\", bấm là tivi mở đúng chỗ chọn (góp ý của dmenh568)",
+   "• Tất cả app một hàng: viên Thư viện ứng dụng không còn chen vào hàng app (góp ý của Giun2911)",
+   "• Home sạch mới: nút YouTube/Netflix trên remote TCL vẫn mở đúng app khi Home sạch mở đè Home gốc; Nâng cao thêm \"Ngày nằm dưới đồng hồ\", \"Bấm OK trong thư viện là mở app\""
+  ],
+  "en": [
+   "• 2015 Sony BRAVIA: Settings-related packages are kept; ADB stays on by default there",
+   "• \"Open an app at power-on\": a button opens the picker on the TV",
+   "• Single row: the App library pill no longer sits in the row",
+   "• Newer clean Home: TCL remote app buttons keep working; Advanced adds date under the clock and OK-opens in the library"
+  ]
+ },
+ {
+  "ban": "2.10.3",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Sửa lỗi cài Home sạch xong app báo nhầm \"Nút Home vẫn mở com.android.tv.settings / app khác\" rồi trả tivi như cũ (Sony VH21, VU1, BF1, Xiaomi, onn…). Giờ app chờ và bấm Home thử lại"
+  ],
+  "en": [
+   "• Fixed a false \"Home still opens Settings / another app\" after installing the clean Home; the app now waits and retries"
+  ]
+ },
+ {
+  "ban": "2.10.2",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Sony BRAVIA 2015: không còn tự tắt gói làm Cài đặt mở ra màn trống. Đã dính thì vào \"Bật lại app đã tắt\", tích com.sony.dtv.b2b.hotelmode",
+   "• Tivi Android 8: sửa lỗi gửi ảnh nền xong mà hình nền không đổi",
+   "• Ô tìm phường/xã không còn giật khi chạy CleanTV ngay trên tivi",
+   "• Dòng thông số đổi thành \"RAM 0,8/1,4 GB · ROM 2,6/8 GB\" (góp ý của khangnck)",
+   "• Tuỳ chỉnh: thêm \"Mở một app khi bật tivi\""
+  ],
+  "en": [
+   "• 2015 Sony BRAVIA: no longer disables the package Settings needs",
+   "• Android 8 TVs: wallpaper now changes after sending",
+   "• Ward search no longer lags when CleanTV runs on the TV",
+   "• Stats line reads \"RAM 0.8/1.4 GB · ROM 2.6/8 GB\"",
+   "• Options: \"Open an app at power-on\""
+  ]
+ },
+ {
+  "ban": "2.10.1",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Ô kênh VTV trên màn chính hiện logo kênh thay cho chữ (Áp dụng lên tivi một lần để cập nhật)"
+  ],
+  "en": [
+   "• VTV channel tiles show the channel logo (apply to the TV once to update)"
+  ]
+ },
+ {
+  "ban": "2.10.0",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Kênh VTV trên màn chính: Đổi giao diện → thẻ Home → chọn VTV1…VTV9. Mỗi kênh thành một ô ở đầu dock, bấm là xem luôn trên VTVgo (cần cài VTVgo trên tivi). Góp ý của khoald92vn, trananhht9",
+   "• Sửa lại câu chữ tiếng Việt trong app cho dễ đọc"
+  ],
+  "en": [
+   "• VTV channels on Home: Change look → Home tab → pick VTV1…VTV9. Each becomes a dock tile that opens the channel straight in VTVgo (needs VTVgo on the TV)",
+   "• Clearer Vietnamese wording"
+  ]
+ },
+ {
+  "ban": "2.9.0",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Giao diện mới \"Kiểu Apple TV\": nửa trên đổi màu theo app đang chọn, tên app lớn, dock kính mờ, ô icon đều, viền chọn trắng",
+   "• Kết nối lại tivi thì app tự chọn đúng giao diện đang dùng"
+  ],
+  "en": [
+   "• New \"Apple TV style\" theme: the top follows the focused app's colour, large app name, frosted dock, even icon tiles, white focus",
+   "• Reconnecting picks the theme the TV is using"
+  ]
+ },
+ {
+  "ban": "2.8.3",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Thêm 19 mẫu tivi có danh sách dọn sẵn, tổng 280 mẫu (TCL 75P8K, Sony BRAVIA VU3, Tuvio, Dcolor GD2, Acer…)"
+  ],
+  "en": [
+   "• 19 more TV models with a ready list, 280 in all (TCL 75P8K, Sony BRAVIA VU3, Tuvio, Dcolor GD2, Acer…)"
+  ]
+ },
+ {
+  "ban": "2.8.2",
+  "ngay": "2026-10-24",
+  "vi": [
+   "• Sửa lỗi kẹt \"Đang gửi ảnh nền\" khi đặt ảnh riêng trên tivi Android 8 (Sony BRAVIA 2015…)",
+   "• Tuỳ chỉnh: thêm \"Số app mỗi hàng\" 4 / 5 / 6 / 7, icon nhỏ lại cho vừa (góp ý của bạn dùng Sony)"
+  ],
+  "en": [
+   "• Fixes \"Sending wallpaper\" hanging with your own photo on Android 8 TVs (Sony BRAVIA 2015…)",
+   "• Options: new \"Apps per row\" 4 / 5 / 6 / 7"
+  ]
+ },
+ {
   "ban": "2.8.1",
   "ngay": "2026-10-24",
   "vi": [

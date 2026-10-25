@@ -319,7 +319,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             // Launcher CÀI THÊM (Dangbei trên tivi nội địa Trung, Projectivy, ATV Launcher…): không thuộc phần mềm gốc,
             // thay được — giữ nó bật, đặt Home sạch làm mặc định; nút Home vẫn về nó thì mới tắt (ghi sao lưu). 22/10/2026.
             laLauncherCaiThem(home) -> home
-            else -> return t("Home hiện là '$home', không phải Home gốc app biết. Để an toàn app không đổi.", "Home is '$home', not a stock launcher this app knows. Leaving it alone to be safe.")
+            else -> return t("Home hiện là '$home', không phải Home gốc app biết, nên app để nguyên cho chắc.", "Home is '$home', not a stock launcher this app knows. Leaving it alone to be safe.")
         }
         // Home của hãng lạ (Fengmi, máy chiếu, tivi nội địa…): thử giữ nó bật, chỉ đặt Home mặc định + bắt nút Home trên
         // remote; không được mới tắt (21/10/2026, Formovie Nemo: com.tvfengmi.launcher).
@@ -376,7 +376,26 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             }
         }
 
-        val bayGio = homeHienTai()
+        var bayGio = homeHienTai()
+        // Hộp "chọn Home" (android/ResolverActivity): tivi còn launcher người dùng tự cài (Launchpad TV, Home TV…) tranh Home,
+        // set-home-activity không thắng được (25/10/2026, Xiaomi ASTR0 nội địa: app trả Home gốc mỗi lần cài). Tắt các
+        // launcher tự cài đó (ghi vào sao lưu, Khôi phục bật lại) rồi đặt lại Home sạch.
+        if (bayGio.startsWith("android/") && !giuHomeGoc) {
+            val khac = sh("cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME")
+                .lines().map { it.trim().substringBefore('/') }.filter { it.isNotBlank() && it != pkgHome }.distinct().filter { laLauncherCaiThem(it) }
+            if (khac.isNotEmpty()) {
+                bao(t("Tivi có launcher khác tranh Home (${khac.joinToString()}), tắt để Home sạch làm Home…", "Other launchers compete for Home (${khac.joinToString()}), disabling them…"))
+                khac.forEach { p ->
+                    gacThem(p)
+                    sh("pm disable-user --user 0 $p")
+                    if (p !in sl.daTatTruoc && p !in sl.daTatBoiApp) sl.daTatBoiApp += p
+                }
+                luuSaoLuu(sl)
+                sh("cmd package set-home-activity --user 0 $cmpHome")
+                Thread.sleep(800)
+                bayGio = homeHienTai()
+            }
+        }
         if (!bayGio.startsWith("$pkgHome/") && giuHomeGoc) {
             traHomeGoc(sl)
             return t("Tivi bo mạch CVTE ('${bayGio.ifBlank { "không rõ" }}' vẫn nhận Home). Với loại bo này app không tắt Home gốc vì đã có tivi treo ở màn khởi động sau khi tắt. Tivi vẫn như cũ; Home sạch vẫn mở được từ danh sách ứng dụng.",
@@ -487,7 +506,12 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         val tam = "/data/local/tmp/cyt-${ten.replace('/', '-')}"
         adb.ghiFile(tam, du)
         if (ten.contains('/')) sh("mkdir -p $dir/${ten.substringBeforeLast('/')} 2>/dev/null; true")
-        sh("rm -f $dir/$ten 2>/dev/null; content write --uri content://$pkgHome.theme/$ten < $tam 2>/dev/null || cp $tam $dir/$ten 2>/dev/null; rm -f $tam")
+        sh("rm -f $dir/$ten 2>/dev/null; content write --uri content://$pkgHome.theme/$ten < $tam 2>/dev/null || cp $tam $dir/$ten 2>/dev/null")
+        // Kiểm file thật sự tới nơi (25/10/2026, Sony 2015 Android 8: đổi theme không ăn — `content write` có thể chưa có
+        // mà vẫn trả mã 0, file cũ đã xoá). Sai cỡ thì chép thẳng và mở quyền đọc cho Home sạch.
+        val co = sh("wc -c < $dir/$ten 2>/dev/null").trim().toIntOrNull()
+        if (co != du.size) sh("cp $tam $dir/$ten 2>/dev/null; chmod 666 $dir/$ten 2>/dev/null; true")
+        sh("rm -f $tam")
     }
 
     /**
@@ -514,6 +538,9 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         if (b64.length < 100) null else java.util.Base64.getDecoder().decode(b64)
     }.getOrNull()
 
+    /** Ảnh ô kênh (kenh-vtv1.jpg…) cho link_tiles của bản vá launcher; PhienLamViec đặt trước khi đẩy cấu hình. */
+    var anhKenh: List<Pair<String, ByteArray>> = emptyList()
+
     fun dayCauHinh(json: String, anhNen: ByteArray? = null, boAnh: List<Pair<String, ByteArray>>? = null) {
         giaHanGac()
         val dir = "/sdcard/Android/data/$pkgHome/files"
@@ -534,6 +561,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         // Bộ ảnh xoay vòng (wallpapers/): xoá bộ cũ trước, theme không có bộ ảnh thì chỉ xoá.
         sh("rm -rf $dir/wallpapers 2>/dev/null; content delete --uri $uri/wallpapers 2>/dev/null; true")
         boAnh?.forEach { (ten, du) -> ghiFileTheme("wallpapers/$ten", du) }
+        anhKenh.forEach { (ten, du) -> ghiFileTheme("kenh-$ten", du) }
         ghiFileTheme("theme_revision", java.util.UUID.randomUUID().toString().replace("-", "").toByteArray())
         sh(KHOI_DONG_LAI_HOME)
     }
@@ -680,6 +708,22 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
                 chuyenDe(pkg)?.let { return it }
                 return tra(pkg)
             }
+            // Hộp "chọn Home" của hệ thống (gói android, ResolverActivity): tivi có nhiều launcher (Launchpad TV, Home TV…) mà
+            // chưa có Home mặc định. Đóng hộp rồi lượt sau đặt lại Home sạch và bấm Home (25/10/2026, Xiaomi ASTR0 nội địa:
+            // mỗi lần đổi giao diện app lại trả Home gốc vì coi hộp này là hỏng).
+            if (pkg == "android" && lan < 3) {
+                bao(t("Tivi đang hỏi chọn Home: đóng hộp, đặt Home sạch làm mặc định rồi thử lại…", "The TV is asking which Home to use: closing it, setting the clean Home as default and retrying…"))
+                sh("input keyevent KEYCODE_BACK")
+                Thread.sleep(1000)
+                return@repeat
+            }
+            // Trên màn vẫn là một app chứ chưa phải Home nào (Cài đặt app vừa mở để thử, hộp cài đặt, app người dùng đang
+            // xem): phím Home chưa ăn, chưa phải Home cũ giành nút. Chờ rồi bấm lại thay vì báo hỏng ngay lượt đầu (25/10/2026:
+            // Sony VH21 / BF1, Xiaomi MOOR2, onn 4K… báo "Nút Home vẫn mở com.android.tv.settings"; Sony VU1 "com.goodtoolapps.zeus").
+            if (lan < 3 && pkg.isNotBlank() && pkg != SETUP && (pkg in KHONG_PHAI_HOME || pkg.contains("packageinstaller") || !coManHome(pkg))) {
+                Thread.sleep(2000)
+                return@repeat
+            }
             if (lan == 3 || sl == null || pkg == SETUP || !nenTatVuiGianhHome(pkg)) return tra(pkg)
             bao(t("Nút Home vẫn mở '$pkg', tắt nó…", "The Home button still opens '$pkg', disabling it…"))
             gacThem(pkg)
@@ -750,6 +794,9 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
      * Nút "Đang phát" của Home sạch (24/10/2026, góp ý nhiều app phát chồng tiếng): cho phép NowPlayingListener của
      * launcher làm trình nghe thông báo, nhờ đó launcher đọc được các phiên phát nhạc / video. Lỗi thì nút không hiện.
      */
+    /** Mở màn Cài đặt launcher của Home sạch trên tivi (chỗ chọn "Mở khi khởi động"). Bấm nút Cài đặt thì ra Cài đặt hệ thống. */
+    fun moCaiDatLauncher() { sh("am start -a com.gathin.tvhome.action.LAUNCHER_SETTINGS -n $cmpHome >/dev/null 2>&1; true") }
+
     fun choPhepDangPhat() { runCatching { sh("cmd notification allow_listener $pkgHome/$NS_HOME.NowPlayingListener 2>/dev/null; true") } }
 
     /** Bật HomeKeyService cho phím remote của mẫu (nút app, Cài đặt). Bo CVTE: không (upstream #741). */

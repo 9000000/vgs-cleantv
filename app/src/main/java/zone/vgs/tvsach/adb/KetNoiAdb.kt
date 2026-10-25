@@ -41,7 +41,7 @@ class KetNoiAdb private constructor(
 
     override fun connect(host: String, port: Int): Boolean {
         val ok = super.connect(host, port)
-        if (ok) diemCuoi = host to port
+        if (ok) { diemCuoi = host to port; coHeadC = null; coDd = null }
         return ok
     }
 
@@ -118,16 +118,33 @@ class KetNoiAdb private constructor(
      * gửi 14 ảnh"). Cỡ file sai thì quay về đường base64 (toybox có base64 từ Android 6).
      */
     fun ghiFile(duongDan: String, noiDung: ByteArray) {
-        if (runCatching { ghiNhanh(duongDan, noiDung) }.getOrDefault(false)) return
+        if (coHeadC() && runCatching { ghiNhanh(duongDan, noiDung, "head -c ${noiDung.size}") }.getOrDefault(false)) return
+        // Android 8 không có head -c; dd đọc từng byte thì chậm hơn nhưng có sẵn từ rất lâu (25/10/2026, Sony KDL-43W800C:
+        // gửi ảnh nền "xong" mà hình nền không đổi — file trên tivi rỗng).
+        if (coDd() && runCatching { ghiNhanh(duongDan, noiDung, "dd bs=1 count=${noiDung.size} 2>/dev/null") }.getOrDefault(false)) return
         shell("rm -f $duongDan $duongDan.b64")
         val b64 = android.util.Base64.encodeToString(noiDung, android.util.Base64.NO_WRAP)
         b64.chunked(3000).forEach { manh -> shell("printf '%s' '$manh' >> $duongDan.b64") }
         shell("base64 -d $duongDan.b64 > $duongDan; rm -f $duongDan.b64")
+        if (shell("wc -c < $duongDan").trim().toIntOrNull() != noiDung.size) throw java.io.IOException("Tivi không nhận file ${duongDan.substringAfterLast('/')}")
     }
 
-    private fun ghiNhanh(duongDan: String, noiDung: ByteArray): Boolean {
+    /** Tivi có `head -c` không, hỏi một lần mỗi kết nối. */
+    @Volatile private var coHeadC: Boolean? = null
+
+    /**
+     * toybox của Android 8 chưa có `head -c` (24/10/2026, Sony BRAVIA 2015 Android 8 kẹt ở "Đang gửi ảnh nền"): lệnh
+     * báo lỗi ngay, phía tivi đóng luồng giữa lúc app còn đẩy byte nên kẹt. Không có thì thử dd, rồi mới tới base64.
+     */
+    private fun coHeadC(): Boolean = coHeadC ?: (runCatching { shell("echo abc | head -c 2 2>/dev/null").trim() == "ab" }.getOrDefault(false)).also { coHeadC = it }
+
+    @Volatile private var coDd: Boolean? = null
+    private fun coDd(): Boolean = coDd ?: (runCatching { shell("echo abc | dd bs=1 count=2 2>/dev/null").trim() == "ab" }.getOrDefault(false)).also { coDd = it }
+
+    /** Đẩy byte vào [lenh] (đọc đúng cỡ file từ stdin) rồi ghi ra [duongDan]; đúng cỡ thì true. */
+    private fun ghiNhanh(duongDan: String, noiDung: ByteArray, lenh: String): Boolean {
         val dau = "__TVS_" + java.lang.Long.toHexString(System.nanoTime()) + "__"
-        val stream = openStream("exec:sh -c 'head -c ${noiDung.size} > $duongDan; echo $dau'")
+        val stream = openStream("exec:sh -c '$lenh > $duongDan; echo $dau'")
         val o = stream.openOutputStream()
         var i = 0
         while (i < noiDung.size) {

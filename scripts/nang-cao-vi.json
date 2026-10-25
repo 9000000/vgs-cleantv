@@ -378,5 +378,21 @@
   "media_bar": {
     "ten": "Thanh phát nhạc (Mini Player)",
     "moTa": "Hiện thanh điều khiển bài hát đang phát (Spotify, YouTube Music...) trên thanh trên cùng (mặc định bật)."
+  },
+  "show_library_pill": {
+    "ten": "Viên Thư viện cuối hàng app",
+    "moTa": "Viên \"Thư viện ứng dụng\" sau hàng app cuối (mặc định bật). Tắt thì chỉ còn nút thư viện trên thanh trên cùng (cần bật nút đó)."
+  },
+  "library_ok_opens": {
+    "ten": "Bấm OK trong thư viện là mở app",
+    "moTa": "Trong Thư viện ứng dụng, bấm OK là mở luôn app thay vì đánh dấu thêm / bớt khỏi Home (mặc định tắt)."
+  },
+  "date_below_clock": {
+    "ten": "Ngày nằm dưới đồng hồ",
+    "moTa": "Ngày (kèm âm lịch) xuống dòng riêng dưới đồng hồ thay vì đứng bên cạnh, hợp khi thanh trên cùng có nhiều nút (mặc định tắt)."
+  },
+  "power_on_home": {
+    "ten": "Về Home khi bật tivi",
+    "moTa": "Tivi tự mở Live TV / kênh truyền hình mỗi khi bật nguồn thì Home sạch đưa về màn Home (mặc định tắt)."
   }
 }

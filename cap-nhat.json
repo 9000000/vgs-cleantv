@@ -1,25 +1,25 @@
 {
   "app": {
-    "versionCode": 64,
-    "versionName": "2.8.1",
-    "apk": "https://github.com/9000000/vgs-cleantv/releases/download/v2.8.1/CleanTV-v2.8.1.apk",
-    "co": 12671235,
-    "ghiChu": "CleanTV v2.8.1",
-    "ghiChuEn": "CleanTV v2.8.1 release",
-    "ngay": "2026-10-24"
+    "versionCode": 77,
+    "versionName": "2.10.9",
+    "apk": "https://github.com/9000000/vgs-cleantv/releases/download/v2.10.9/CleanTV-v2.10.9.apk",
+    "co": 11980057,
+    "ghiChu": "CleanTV v2.10.9: Thêm giao diện Kiểu Apple TV, logo kênh VTV, ảnh nền sắc nét hơn, tìm thời tiết toàn cầu và ghi nhớ cấu hình theme.",
+    "ghiChuEn": "CleanTV v2.10.9: Apple TV style theme, VTV channel logos, sharper wallpapers, worldwide weather and per-theme custom configs.",
+    "ngay": "2026-10-25"
   },
   "duLieu": {
     "du-lieu.json": {
-      "phienBan": "c2e62e1cf17032cb",
+      "phienBan": "54f00bfcd0441cc7",
       "url": "/ota/du-lieu.json",
-      "co": 1479960,
-      "tuBan": 64
+      "co": 1682380,
+      "tuBan": 77
     },
     "tvhome.apk": {
-      "phienBan": "209e50c26568df31",
+      "phienBan": "87e58c21171ddde8",
       "url": "/ota/tvhome.apk",
-      "co": 618725,
-      "tuBan": 64
+      "co": 640841,
+      "tuBan": 77
     }
   }
 }
