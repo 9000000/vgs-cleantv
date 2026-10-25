@@ -1,5 +1,15 @@
 [
  {
+  "ban": "2.10.3",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Sửa lỗi cài Home sạch xong app báo nhầm \"Nút Home vẫn mở com.android.tv.settings / app khác\" rồi trả tivi như cũ (Sony VH21, VU1, BF1, Xiaomi, onn…). Giờ app chờ và bấm Home thử lại"
+  ],
+  "en": [
+   "• Fixed a false \"Home still opens Settings / another app\" after installing the clean Home; the app now waits and retries"
+  ]
+ },
+ {
   "ban": "2.10.2",
   "ngay": "2026-10-25",
   "vi": [

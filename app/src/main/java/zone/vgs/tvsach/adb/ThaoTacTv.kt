@@ -684,6 +684,13 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
                 chuyenDe(pkg)?.let { return it }
                 return tra(pkg)
             }
+            // Trên màn vẫn là một app chứ chưa phải Home nào (Cài đặt app vừa mở để thử, hộp cài đặt, app người dùng đang
+            // xem): phím Home chưa ăn, chưa phải Home cũ giành nút. Chờ rồi bấm lại thay vì báo hỏng ngay lượt đầu (25/10/2026:
+            // Sony VH21 / BF1, Xiaomi MOOR2, onn 4K… báo "Nút Home vẫn mở com.android.tv.settings"; Sony VU1 "com.goodtoolapps.zeus").
+            if (lan < 3 && pkg.isNotBlank() && pkg != SETUP && (pkg in KHONG_PHAI_HOME || pkg.contains("packageinstaller") || !coManHome(pkg))) {
+                Thread.sleep(2000)
+                return@repeat
+            }
             if (lan == 3 || sl == null || pkg == SETUP || !nenTatVuiGianhHome(pkg)) return tra(pkg)
             bao(t("Nút Home vẫn mở '$pkg', tắt nó…", "The Home button still opens '$pkg', disabling it…"))
             gacThem(pkg)

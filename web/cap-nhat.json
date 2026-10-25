@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 70,
-  "versionName": "2.10.2",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.2.apk",
-  "co": 11924385,
-  "ghiChu": "Sửa: Sony 2015 bấm Cài đặt không vào được, ảnh nền không đổi trên tivi Android 8, ô tìm phường giật khi chạy trên tivi. Thêm: dòng RAM/ROM theo GB, công tắc mở một app khi bật tivi.",
-  "ghiChuEn": "Fixes: Settings on 2015 Sony sets, wallpaper not changing on Android 8, laggy ward search on the TV. New: RAM/ROM line in GB, open an app at power-on.",
+  "versionCode": 71,
+  "versionName": "2.10.3",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.3.apk",
+  "co": 11924389,
+  "ghiChu": "Sửa: cài Home sạch xong app báo nhầm 'nút Home vẫn mở Cài đặt / app khác' và trả tivi như cũ.",
+  "ghiChuEn": "Fix: after installing the clean Home, the app no longer wrongly reports 'Home still opens Settings / another app' and rolls back.",
   "ngay": "2026-10-25"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "ecbbb424ced684ff",
    "url": "/ota/du-lieu.json",
    "co": 1606661,
-   "tuBan": 70
+   "tuBan": 71
   },
   "tvhome.apk": {
    "phienBan": "52287f5129f50252",
    "url": "/ota/tvhome.apk",
    "co": 623069,
-   "tuBan": 70
+   "tuBan": 71
   }
  }
 }
