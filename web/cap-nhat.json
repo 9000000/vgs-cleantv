@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 72,
-  "versionName": "2.10.4",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.4.apk",
+  "versionCode": 73,
+  "versionName": "2.10.5",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.5.apk",
   "co": 11974625,
-  "ghiChu": "Sửa: Sony 2015 Cài đặt mở ra trống. Nút mở thẳng màn chọn app khi bật tivi. Một hàng app không còn viên Thư viện chen giữa. Kéo launcher mới: nút YouTube/Netflix trên remote TCL ổn hơn, ngày dưới đồng hồ.",
-  "ghiChuEn": "Fixes: blank Settings on 2015 Sony sets. A button opens the power-on app picker on the TV. Single row no longer shows the Library pill. Newer launcher: steadier TCL remote app buttons, date under the clock.",
+  "ghiChu": "Sửa: tivi có nhiều launcher (Xiaomi nội địa…) hiện hộp chọn Home làm app trả về Home gốc; giờ app tự đóng hộp và đặt Home sạch.",
+  "ghiChuEn": "Fix: on TVs with several launchers (China Xiaomi…) the Home chooser made the app roll back; it now closes it and sets the clean Home.",
   "ngay": "2026-10-25"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "3512520cb314a9d9",
    "url": "/ota/du-lieu.json",
    "co": 1676606,
-   "tuBan": 72
+   "tuBan": 73
   },
   "tvhome.apk": {
    "phienBan": "91daa975448e7e1b",
    "url": "/ota/tvhome.apk",
    "co": 638717,
-   "tuBan": 72
+   "tuBan": 73
   }
  }
 }

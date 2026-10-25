@@ -684,6 +684,15 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
                 chuyenDe(pkg)?.let { return it }
                 return tra(pkg)
             }
+            // Hộp "chọn Home" của hệ thống (gói android, ResolverActivity): tivi có nhiều launcher (Launchpad TV, Home TV…) mà
+            // chưa có Home mặc định. Đóng hộp rồi lượt sau đặt lại Home sạch và bấm Home (25/10/2026, Xiaomi ASTR0 nội địa:
+            // mỗi lần đổi giao diện app lại trả Home gốc vì coi hộp này là hỏng).
+            if (pkg == "android" && lan < 3) {
+                bao(t("Tivi đang hỏi chọn Home: đóng hộp, đặt Home sạch làm mặc định rồi thử lại…", "The TV is asking which Home to use: closing it, setting the clean Home as default and retrying…"))
+                sh("input keyevent KEYCODE_BACK")
+                Thread.sleep(1000)
+                return@repeat
+            }
             // Trên màn vẫn là một app chứ chưa phải Home nào (Cài đặt app vừa mở để thử, hộp cài đặt, app người dùng đang
             // xem): phím Home chưa ăn, chưa phải Home cũ giành nút. Chờ rồi bấm lại thay vì báo hỏng ngay lượt đầu (25/10/2026:
             // Sony VH21 / BF1, Xiaomi MOOR2, onn 4K… báo "Nút Home vẫn mở com.android.tv.settings"; Sony VU1 "com.goodtoolapps.zeus").
