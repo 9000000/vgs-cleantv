@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 66,
-  "versionName": "2.8.3",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.8.3.apk",
+  "versionCode": 67,
+  "versionName": "2.9.0",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.9.0.apk",
   "co": 11672995,
-  "ghiChu": "Thêm 19 mẫu tivi mới (280 mẫu): TCL 75P8K, Sony BRAVIA VU3, Tuvio, Dcolor GD2…",
-  "ghiChuEn": "19 new TV models (280 in all): TCL 75P8K, Sony BRAVIA VU3, Tuvio, Dcolor GD2…",
+  "ghiChu": "Giao diện mới Kiểu Apple TV: nền theo màu app đang chọn, tên app lớn, dock kính mờ, ô icon đều. Kết nối lại thì app nhớ theme đang dùng.",
+  "ghiChuEn": "New Apple TV style theme: backdrop in the focused app's colour, large app name, frosted dock, even icon tiles. Reconnecting remembers the theme in use.",
   "ngay": "2026-10-25"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "95561d79a33fe629",
    "url": "/ota/du-lieu.json",
    "co": 1606661,
-   "tuBan": 66
+   "tuBan": 67
   },
   "tvhome.apk": {
    "phienBan": "1d57e30af3099b22",
    "url": "/ota/tvhome.apk",
    "co": 621597,
-   "tuBan": 66
+   "tuBan": 67
   }
  }
 }

@@ -1,5 +1,17 @@
 [
  {
+  "ban": "2.9.0",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Giao diện mới \"Kiểu Apple TV\": nửa trên đổi màu theo app đang chọn, tên app lớn, dock kính mờ, ô icon đều, viền chọn trắng",
+   "• Kết nối lại tivi thì app tự chọn đúng giao diện đang dùng"
+  ],
+  "en": [
+   "• New \"Apple TV style\" theme: the top follows the focused app's colour, large app name, frosted dock, even icon tiles, white focus",
+   "• Reconnecting picks the theme the TV is using"
+  ]
+ },
+ {
   "ban": "2.8.3",
   "ngay": "2026-10-25",
   "vi": [

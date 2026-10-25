@@ -22,12 +22,22 @@ data class Theme(
     fun ghiVao(o: JSONObject) {
         cauHinh.forEach { (k, v) -> o.put(k, v) }
         o.put("wallpaper", anhNen != null || boAnh != null)
+        // Lần sau kết nối lại: mở đúng theme này, và biết khoá nào do theme ghi chứ không phải người dùng bật.
+        o.put("vgs_theme", id)
     }
 }
 
 val THEMES = listOf(
     Theme("vgs", "VGS", "VGS", "Logo VGS tím, nền đổi sắc theo giờ", "Violet VGS logo, sky follows the time of day",
         mapOf("background_color" to "#140A3A", "sky_intensity" to 55, "dock_band" to false), "theme/vgs.jpg", listOf(0xFF0D0A38, 0xFF22168A, 0xFF4C1FD0)),
+    // Kiểu Apple TV (góp ý kimhuenguyen1964 24/10/2026, Alex 25/10): nửa trên phủ màu + ảnh của app đang chọn như top
+    // shelf của tvOS, tên app lớn, dock kính mờ, ô icon đều, viền chọn trắng, không lời chào, các hàng mờ dần dưới đồng hồ.
+    Theme("apple-tv", "Kiểu Apple TV", "Apple TV style", "Nền theo màu app đang chọn, dock kính mờ, ô icon đều", "Backdrop in the focused app's colour, frosted dock, even icon tiles",
+        mapOf("background_color" to "#000000", "cinematic_home" to true, "cinematic_dots" to false, "cinematic_art" to 70,
+            "cinematic_scrim" to 60, "cinematic_white_focus" to true, "uniform_tiles" to true, "dock_glass" to true,
+            "show_greeting" to false, "header_white" to true, "fade_rows" to true, "rows_below_dock" to 1, "columns" to 5,
+            "rows_offset_dp" to 90),
+        null, listOf(0xFF7A0A14, 0xFF0B3A6E, 0xFF050505)),
     Theme("aurora", "Cực quang", "Aurora", "Dải xanh ngọc và tím trên nền navy", "Teal and violet bands on navy",
         mapOf("background_color" to "#070A14", "dock_band" to false), "theme/aurora.jpg", listOf(0xFF0E4F5C, 0xFF3B1E6E)),
     Theme("bau-troi", "Bầu trời theo giờ", "Time-of-day sky", "Nền đổi màu theo giờ trong ngày", "Background follows the time of day",
@@ -38,7 +48,7 @@ val THEMES = listOf(
     Theme("phong-canh", "Phong cảnh", "Scenes", "14 tranh phong cảnh, tự đổi mỗi giờ", "14 landscapes, a new one every hour",
         mapOf("wallpaper_rotation_minutes" to 60, "dock_band" to false, "background_color" to "#05060A"), null,
         listOf(0xFF1A2236, 0xFF4A3A5A), boAnh = "theme/phong-canh", anhXem = "theme/phong-canh/02-golden-coast.jpg"),
-    Theme("toi-gian", "Tối giản", "Minimal", "Nền đen tuyền, kiểu Apple TV", "Pure black, Apple TV style",
+    Theme("toi-gian", "Tối giản", "Minimal", "Nền đen tuyền, gọn nhất", "Pure black, the plainest",
         mapOf("background_color" to "#000000"), null, listOf(0xFF000000, 0xFF111111)),
     Theme("sau-cot", "Nhiều app", "More apps", "6 cột, thấy thêm một hàng app", "6 columns, one more row visible",
         mapOf("columns" to 6, "rows_below_dock" to 1, "background_color" to "#000000"), null, listOf(0xFF111111, 0xFF222233)),

@@ -669,6 +669,11 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     /** Đưa một config.json (của tivi hoặc file cấu hình đã lưu) vào các lựa chọn trên màn Home sạch. */
     private fun napTuJson(j: JSONObject) {
+        // Khoá do theme đang dùng ghi (vgs_theme, từ 2.9) không phải lựa chọn của người dùng: đọc như mặc định, không thì
+        // đổi sang theme khác vẫn dính (Kiểu Apple TV bật uniform_tiles, dock_glass, ẩn lời chào, dời hàng app).
+        val theme = zone.vgs.tvsach.dulieu.THEMES.firstOrNull { it.id == j.optString("vgs_theme") }
+        theme?.let { themeChon = it }
+        fun cuaTheme(k: String) = theme?.cauHinh?.containsKey(k) == true
         amLich = j.optBoolean("lunar_date", amLich)
         tenDuoiApp = j.optBoolean("always_show_names", false)
         tenToTrenDock = j.optBoolean("dock_title", true)
@@ -676,15 +681,15 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         thuVienApp = j.optBoolean("app_library", false)
         dongHoKhiYen = j.optInt("home_idle_clock_minutes", 0)
         tiviYeu = j.optBoolean("reduced_motion", false)
-        hieuUngKinh = j.optBoolean("dock_glass", false)
+        hieuUngKinh = !cuaTheme("dock_glass") && j.optBoolean("dock_glass", false)
         lamToiNen = j.optInt("wallpaper_dim", 0)
         hienThongSo = j.optBoolean("show_stats", false)
-        doiHang = if (j.optBoolean("rows_middle", false)) HANG_GIUA else j.optInt("rows_offset_dp", 0)
+        doiHang = if (j.optBoolean("rows_middle", false)) HANG_GIUA else if (cuaTheme("rows_offset_dp")) 0 else j.optInt("rows_offset_dp", 0)
         nutDangPhat = j.optBoolean("now_playing", true)
         coChuDau = j.optInt("header_scale", 100)
         motHang = j.optBoolean("single_row", false)
-        anLoiChao = !j.optBoolean("show_greeting", true)
-        oDeuNhau = j.optBoolean("uniform_tiles", false)
+        anLoiChao = !cuaTheme("show_greeting") && !j.optBoolean("show_greeting", true)
+        oDeuNhau = !cuaTheme("uniform_tiles") && j.optBoolean("uniform_tiles", false)
         // Chỉ nạp số cột do người dùng chọn ở đây (vgs_so_cot), không lấy columns của theme.
         soCot = if (j.optBoolean("vgs_so_cot", false)) j.optInt("columns", 0) else 0
         if (j.has("handle_view_inputs")) nutInput = j.optBoolean("handle_view_inputs", nutInput)
@@ -816,7 +821,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // Giữ OK trên ô app: menu Di chuyển / Thêm vào dock / Bỏ khỏi Home / Thông tin (upstream #464, #746; tắt mặc định
         // ở upstream). CleanTV bật sẵn vì người dùng xin đổi chỗ dock ngay trên tivi (22/10/2026); Nâng cao vẫn tắt được.
         put("tile_menu", true)
-        if (doiHang == HANG_GIUA) put("rows_middle", true) else if (doiHang != 0) put("rows_offset_dp", doiHang)
+        // Giữa màn hình bỏ khoảng dời của theme (Kiểu Apple TV hạ dock 90dp) để hàng app nằm đúng giữa.
+        if (doiHang == HANG_GIUA) { put("rows_middle", true); put("rows_offset_dp", 0) } else if (doiHang != 0) put("rows_offset_dp", doiHang)
         if (!nutDangPhat) put("now_playing", false)
         if (coChuDau != 100) put("header_scale", coChuDau)
         if (motHang) { put("dock_row", true); put("single_row", true) }
