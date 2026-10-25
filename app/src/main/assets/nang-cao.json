@@ -230,6 +230,14 @@
 "moTaVi": "Khi dùng nút tròn chỉ có biểu tượng: vẫn hiện tên mạng Wi-Fi tới độ rộng này (dp), dài quá thì cắt. 0 là chỉ còn biểu tượng."
 },
 {
+"khoa": "show_library_pill",
+"kieu": "bool",
+"moTa": "The App library pill after the last Home row (true by default); false hides it while library_button is on, so the top-bar button stays the way in and Down from the last row stays put, as with app_library off",
+"canThan": false,
+"ten": "Viên Thư viện cuối hàng app",
+"moTaVi": "Viên \"Thư viện ứng dụng\" sau hàng app cuối (mặc định bật). Tắt thì chỉ còn nút thư viện trên thanh trên cùng (cần bật nút đó)."
+},
+{
 "khoa": "wallpaper_true_color",
 "kieu": "bool",
 "moTa": "Decode wallpapers in 32-bit colour (8 MB at 1080p) instead of RGB_565 (4 MB), which bands dark gradients such as a night sky; for TVs with 2 GB or more (false by default)",
@@ -252,6 +260,14 @@
 "canThan": false,
 "ten": "Chọn app Home trong Thư viện",
 "moTaVi": "Trong Thư viện app, bấm OK để tích / bỏ tích app hiện ở Home; app đã tích xếp trước. Cần bật Thư viện app."
+},
+{
+"khoa": "library_ok_opens",
+"kieu": "bool",
+"moTa": "OK opens every app in the library, not only the ones on Home, for a library that holds the apps hidden_apps keeps off Home; holding OK still offers Add to Home, and cards drop their \"Add to Home\" line. Requires app_library; app_library_selection wins when both are on; false by default",
+"canThan": false,
+"ten": "Bấm OK trong thư viện là mở app",
+"moTaVi": "Trong Thư viện ứng dụng, bấm OK là mở luôn app thay vì đánh dấu thêm / bớt khỏi Home (mặc định tắt)."
 },
 {
 "khoa": "library_apps",
@@ -278,6 +294,14 @@
 "canThan": false,
 "ten": "Múi giờ tính âm lịch",
 "moTaVi": "Số giờ lệch UTC dùng để tính âm lịch: 7 là lịch Việt Nam, 8 là lịch Trung Quốc; thỉnh thoảng lệch nhau một ngày. Để trống: 7 khi tivi tiếng Việt, 8 khi khác."
+},
+{
+"khoa": "date_below_clock",
+"kieu": "bool",
+"moTa": "The date (with the Shamsi and lunar lines) on its own line under the clock instead of beside it, for a top bar whose pills leave the date too little room (false by default)",
+"canThan": false,
+"ten": "Ngày nằm dưới đồng hồ",
+"moTaVi": "Ngày (kèm âm lịch) xuống dòng riêng dưới đồng hồ thay vì đứng bên cạnh, hợp khi thanh trên cùng có nhiều nút (mặc định tắt)."
 },
 {
 "khoa": "show_greeting",
@@ -510,7 +534,7 @@
 {
 "khoa": "gamepad_passthrough",
 "kieu": "bool",
-"moTa": "true makes the key helpers stop filtering keys while a game controller is connected, so games see its buttons (Steam Link with an Xbox controller); the remote buttons above do nothing until it disconnects. Needs key_filter on. A voice remote that reports a joystick does not count. Off by default",
+"moTa": "true makes the key helpers stop filtering keys while a game controller is connected, so games see its buttons (Steam Link with an Xbox controller, Moonlight with two controllers); the remote buttons above do nothing until it disconnects. Needs key_filter on. A voice remote that reports a joystick does not count. Off by default",
 "canThan": false,
 "ten": "Nhường phím cho tay cầm game",
 "moTaVi": "Bật thì khi có tay cầm game kết nối, dịch vụ bắt phím của Home sạch ngừng lọc phím để game nhận đủ nút (vd Steam Link với tay Xbox); các nút remote gán sẵn tạm không chạy tới khi rút tay cầm. Cần bật key_filter. Mặc định tắt."
@@ -624,6 +648,14 @@
 "canThan": false,
 "ten": "Viền dải dock đều",
 "moTaVi": "Khoảng cách từ mép dải dock tới các ô bằng khoảng cách giữa các ô, đều cả bốn phía (mặc định tắt)."
+},
+{
+"khoa": "dock_band",
+"kieu": "bool",
+"moTa": "Draw the dock band and its edge (true by default); false leaves the tiles floating on the wallpaper with no band, border or dark slab",
+"canThan": false,
+"ten": "Dải nền sau dock",
+"moTaVi": "Vẽ dải nền và viền sau hàng dock (mặc định bật). Tắt thì ô app nằm thẳng trên hình nền."
 },
 {
 "khoa": "single_row",

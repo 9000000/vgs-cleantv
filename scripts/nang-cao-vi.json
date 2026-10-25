@@ -322,5 +322,21 @@
   "dock_band_all": {
     "ten": "Dải nền chạy suốt hàng",
     "moTa": "Khi bật một hàng: dải nền sau dock chạy sau mọi app trong hàng, không chỉ app dock (mặc định tắt)."
+  },
+  "show_library_pill": {
+    "ten": "Viên Thư viện cuối hàng app",
+    "moTa": "Viên \"Thư viện ứng dụng\" sau hàng app cuối (mặc định bật). Tắt thì chỉ còn nút thư viện trên thanh trên cùng (cần bật nút đó)."
+  },
+  "library_ok_opens": {
+    "ten": "Bấm OK trong thư viện là mở app",
+    "moTa": "Trong Thư viện ứng dụng, bấm OK là mở luôn app thay vì đánh dấu thêm / bớt khỏi Home (mặc định tắt)."
+  },
+  "date_below_clock": {
+    "ten": "Ngày nằm dưới đồng hồ",
+    "moTa": "Ngày (kèm âm lịch) xuống dòng riêng dưới đồng hồ thay vì đứng bên cạnh, hợp khi thanh trên cùng có nhiều nút (mặc định tắt)."
+  },
+  "dock_band": {
+    "ten": "Dải nền sau dock",
+    "moTa": "Vẽ dải nền và viền sau hàng dock (mặc định bật). Tắt thì ô app nằm thẳng trên hình nền."
   }
 }

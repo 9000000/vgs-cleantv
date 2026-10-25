@@ -257,6 +257,13 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var ketQuaXa by mutableStateOf<List<zone.vgs.tvsach.dulieu.XaPhuong.Xa>>(emptyList())
         private set
     private var viecTimXa: kotlinx.coroutines.Job? = null
+    /** Mở thẳng màn chọn app "Mở khi khởi động" trên tivi (25/10/2026: dmenh568 không tìm thấy chỗ chọn trên Xiaomi). */
+    var baoChonApp by mutableStateOf("")
+    fun moChonAppKhiBat() = chay(t("Đang mở trên tivi…", "Opening on the TV…")) {
+        io { tv.moCaiDatLauncher() }
+        baoChonApp = t("Đã mở Cài đặt launcher trên tivi: chọn \"Mở khi khởi động\" rồi chọn app.", "Launcher settings are open on the TV: pick \"Open on start\", then the app.")
+    }
+
     fun doiTimXa(q: String) {
         timXa = q
         viecTimXa?.cancel()
@@ -484,6 +491,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         saoLuuTuTv = slMay == null && saoLuu != null
         // Xiaomi: sau khi đổi Home, nút INPUT của remote không mở bảng nguồn nữa (upstream #1368) — bật sẵn để Home sạch nhận.
         nutInput = tt.homeHienTai == "com.google.android.apps.tv.launcherx" || info.brand.equals("Xiaomi", ignoreCase = true)
+        // Sony 2015 (bo SVP-DTV15): Cài đặt dễ mở ra trống mà muốn bật lại Gỡ lỗi USB lại phải qua Cài đặt — tự tắt ADB là
+        // khoá chủ nhà ở ngoài, không sửa được nữa (25/10/2026, 2 máy phải reset cứng). Mặc định giữ ADB, vẫn tắt được tay.
+        giuAdb = info.device == "SVP-DTV15"
         laMayChieu = tv.coVeMayChieu(tt, info)
         man = if (dangKhoiPhuc) Man.KHOI_PHUC else Man.THONG_TIN
     }
@@ -866,6 +876,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (!nutDangPhat) put("now_playing", false)
         if (coChuDau != 100) put("header_scale", coChuDau)
         if (motHang) { put("dock_row", true); put("single_row", true) }
+        // Một hàng + thư viện app: viên Thư viện chen vào hàng app, đã có nút trên thanh trên cùng (góp ý Giun2911 25/10/2026).
+        if (motHang && thuVienApp) put("show_library_pill", false)
         if (anLoiChao) put("show_greeting", false)
         if (oDeuNhau) put("uniform_tiles", true)
         if (moKhiBat) put("open_on_start_choice", true)

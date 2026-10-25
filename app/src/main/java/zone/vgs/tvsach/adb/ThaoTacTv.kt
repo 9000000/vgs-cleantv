@@ -761,6 +761,9 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
      * Nút "Đang phát" của Home sạch (24/10/2026, góp ý nhiều app phát chồng tiếng): cho phép NowPlayingListener của
      * launcher làm trình nghe thông báo, nhờ đó launcher đọc được các phiên phát nhạc / video. Lỗi thì nút không hiện.
      */
+    /** Mở màn Cài đặt launcher của Home sạch trên tivi (chỗ chọn "Mở khi khởi động"). Bấm nút Cài đặt thì ra Cài đặt hệ thống. */
+    fun moCaiDatLauncher() { sh("am start -a com.gathin.tvhome.action.LAUNCHER_SETTINGS -n $cmpHome >/dev/null 2>&1; true") }
+
     fun choPhepDangPhat() { runCatching { sh("cmd notification allow_listener $pkgHome/$NS_HOME.NowPlayingListener 2>/dev/null; true") } }
 
     /** Bật HomeKeyService cho phím remote của mẫu (nút app, Cài đặt). Bo CVTE: không (upstream #741). */

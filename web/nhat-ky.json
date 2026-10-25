@@ -1,5 +1,21 @@
 [
  {
+  "ban": "2.10.4",
+  "ngay": "2026-10-25",
+  "vi": [
+   "• Sony BRAVIA 2015: không còn tắt các gói màn Cài đặt cần; tivi này mặc định giữ ADB bật để không bị khoá ngoài",
+   "• \"Mở một app khi bật tivi\": thêm nút \"Mở màn chọn app trên tivi\", bấm là tivi mở đúng chỗ chọn (góp ý của dmenh568)",
+   "• Tất cả app một hàng: viên Thư viện ứng dụng không còn chen vào hàng app (góp ý của Giun2911)",
+   "• Home sạch mới: nút YouTube/Netflix trên remote TCL vẫn mở đúng app khi Home sạch mở đè Home gốc; Nâng cao thêm \"Ngày nằm dưới đồng hồ\", \"Bấm OK trong thư viện là mở app\""
+  ],
+  "en": [
+   "• 2015 Sony BRAVIA: Settings-related packages are kept; ADB stays on by default there",
+   "• \"Open an app at power-on\": a button opens the picker on the TV",
+   "• Single row: the App library pill no longer sits in the row",
+   "• Newer clean Home: TCL remote app buttons keep working; Advanced adds date under the clock and OK-opens in the library"
+  ]
+ },
+ {
   "ban": "2.10.3",
   "ngay": "2026-10-25",
   "vi": [
