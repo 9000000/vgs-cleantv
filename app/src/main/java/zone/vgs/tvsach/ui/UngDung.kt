@@ -1032,6 +1032,11 @@ private fun TheTuyChinh(vm: PhienLamViec) {
         Hang(t("Nút màn hình chờ", "Screensaver button"), t("Bấm là bật ảnh / đồng hồ, tiện khi nghe nhạc", "Starts the photo / clock screensaver, handy with music"), vm.nutManCho) { vm.nutManCho = it }
         Hang(t("Thư viện app", "App library"), t("Nút xem mọi app trên tivi, thêm / bớt khỏi Home", "A button listing every app; add or remove from Home"), vm.thuVienApp) { vm.thuVienApp = it }
         Hang(t("Hiện CPU / bộ nhớ", "Show CPU / memory"), t("Một dòng nhỏ dưới đồng hồ", "One small line under the clock"), vm.hienThongSo) { vm.doiHienThongSo(it) }
+        Hang(t("Thời tiết góc trên nút cài đặt", "Corner weather above settings"), t("Hiện nhiệt độ và nơi chốn nhỏ gọn ở góc trên bên phải màn hình", "Compact temperature and location above settings"), vm.thoiTietGoc) { vm.thoiTietGoc = it }
+        Hang(t("Hiện sự kiện & đếm ngược ngày", "Show events & countdowns"), t("Dải thẻ sự kiện, đếm ngược Tết, Rằm, Mùng 1", "Upcoming events & Tet countdown row"), vm.hienSuKien) { vm.hienSuKien = it }
+        Hang(t("Hiện khối Hôm nay (Danh ngôn & Lịch sử)", "Show Today quote & history card"), t("Thẻ câu nói hay và sự kiện Ngày này năm xưa", "Daily quotes and historical events card"), vm.hienHomNay) { vm.hienHomNay = it }
+        Hang(t("Hiện khối Thời tiết & Dự báo", "Show Weather & forecast card"), t("Nhiệt độ, chất lượng không khí AQI và dự báo 4 ngày", "Temperature, AQI and 4-day forecast"), vm.hienThoiTiet) { vm.hienThoiTiet = it }
+        Hang(t("Tự xoay danh ngôn Hôm nay", "Today carousel"), t("Tự động chuyển câu danh ngôn và sự kiện lịch sử", "Automatically rotate quotes and history items"), vm.tuXoayHomNay) { vm.tuXoayHomNay = it }
     }
     The(t("Remote", "Remote"), Icons.Rounded.SettingsRemote) {
         Hang(t("Nút Input trên remote mở bảng chọn HDMI", "Remote Input button opens the input picker"), t("Nên bật cho Google TV", "Recommended on Google TV"), vm.nutInput) { vm.nutInput = it }
@@ -1092,7 +1097,7 @@ private val NHOM_NANG_CAO = listOf(
     NhomNangCao(
         "clock", "Đồng hồ & thông tin", "Clock & info",
         "Lời chào, ngày tháng và nội dung đồng hồ", "The greeting, dates and what shows under the clock",
-        Regex("^(home_idle_clock_minutes|show_stats|shamsi_date|greeting|show_events|show_today|show_weather|today_carousel)$")
+        Regex("^(home_idle_clock_minutes|show_stats|shamsi_date|greeting|show_events|show_today|show_weather|today_carousel|weather_corner|countdown_events)$")
     ),
     NhomNangCao(
         "behaviour", "Hành vi", "Behaviour",
@@ -1102,7 +1107,7 @@ private val NHOM_NANG_CAO = listOf(
     NhomNangCao(
         "more", "Nâng cao & nguồn vào", "More",
         "Nguồn vào HDMI, menu hãng và tiện ích khác", "Inputs and menus for particular TVs, and anything new",
-        Regex("^(live_tv_.*|source_panel_.*|coocaa_sources|input_.*)$")
+        Regex("^(live_tv_.*|source_panel_.*|coocaa_sources|input_.*|race_calendar|settings_fallback_components)$")
     )
 )
 

@@ -211,24 +211,15 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var hieuUngKinh by mutableStateOf(false)
     var lamToiNen by mutableStateOf(0)
     var hienThongSo by mutableStateOf(false)
-    /** Các tuỳ chọn đã có giao diện riêng trong Home, Tuỳ chỉnh hoặc Cài đặt trên TV -> không hiện lặp lại trong Nâng cao. */
-    private val KHOA_DA_CO = setOf(
-        "columns", "rows_below_dock", "rows_offset_dp", "rows_middle", "dock_row", "dock_band",
-        "dock_opacity", "dock_apps", "fill_dock", "dock_title", "always_show_names", "icon_tile_color",
-        "single_row", "uniform_tiles", "top_compact", "wallpaper", "wallpaper_dim",
-        "wallpaper_rotation_minutes", "wallpaper_order", "show_stats", "home_idle_clock_minutes",
-        "show_greeting", "greeting_name", "greeting_bright", "lunar_date", "lunar_utc_offset",
-        "weather", "weather_lat", "weather_lon", "weather_place", "weather_provider", "weather_api_key",
-        "show_events", "show_today", "show_weather", "weather_corner", "today_carousel",
-        "app_library", "now_playing", "screensaver_button", "boot_to_app", "wake_to_app",
-        "open_on_start_choice", "handle_view_inputs", "input_action", "hold_volume_continuous",
-        "remote_odd_home", "remote_app_buttons", "vtv_channels", "hidden_apps", "header_scale",
-        "dock_glass", "app_glow", "reduced_motion", "animations", "advanced_effects", "projector_actions"
-    )
+    var thoiTietGoc by mutableStateOf(false)
+    var hienSuKien by mutableStateOf(true)
+    var hienHomNay by mutableStateOf(true)
+    var hienThoiTiet by mutableStateOf(true)
+    var tuXoayHomNay by mutableStateOf(true)
 
-    /** Mục Nâng cao: danh sách tuỳ chọn + giá trị người dùng đặt (khoá → chữ; thiếu = mặc định). */
+    /** Mục Nâng cao: toàn bộ danh sách tuỳ chọn của launcher + giá trị người dùng đặt (khoá → chữ; thiếu = mặc định). */
     val dsNangCao: List<zone.vgs.tvsach.dulieu.TuyChon> by lazy {
-        zone.vgs.tvsach.dulieu.NangCao.nap(ctx).filter { it.khoa !in KHOA_DA_CO }
+        zone.vgs.tvsach.dulieu.NangCao.nap(ctx)
     }
     val nangCao = androidx.compose.runtime.mutableStateMapOf<String, String>()
     var homeXong by mutableStateOf(false)
@@ -252,6 +243,11 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         tenToTrenDock = (nangCao["dock_title"] ?: th.cauHinh["dock_title"]?.toString())?.toBooleanStrictOrNull() ?: true
         toMauOApp = (nangCao["icon_tile_color"] ?: th.cauHinh["icon_tile_color"]?.toString())?.toBooleanStrictOrNull() ?: true
         daiNenDock = (nangCao["dock_band"] ?: th.cauHinh["dock_band"]?.toString())?.toBooleanStrictOrNull() ?: false
+        thoiTietGoc = (nangCao["weather_corner"] ?: th.cauHinh["weather_corner"]?.toString())?.toBooleanStrictOrNull() ?: false
+        hienSuKien = (nangCao["show_events"] ?: th.cauHinh["show_events"]?.toString())?.toBooleanStrictOrNull() ?: true
+        hienHomNay = (nangCao["show_today"] ?: th.cauHinh["show_today"]?.toString())?.toBooleanStrictOrNull() ?: true
+        hienThoiTiet = (nangCao["show_weather"] ?: th.cauHinh["show_weather"]?.toString())?.toBooleanStrictOrNull() ?: true
+        tuXoayHomNay = (nangCao["today_carousel"] ?: th.cauHinh["today_carousel"]?.toString())?.toBooleanStrictOrNull() ?: true
     }
 
     /** Lưu cấu hình đang chỉnh sửa trong nangCao vào bộ nhớ của theme hiện tại. */
@@ -926,6 +922,11 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
         nutManCho = j.optBoolean("dream_button", nutManCho)
         gonNut = j.optBoolean("top_compact", gonNut)
+        thoiTietGoc = j.optBoolean("weather_corner", thoiTietGoc)
+        hienSuKien = j.optBoolean("show_events", hienSuKien)
+        hienHomNay = j.optBoolean("show_today", hienHomNay)
+        hienThoiTiet = j.optBoolean("show_weather", hienThoiTiet)
+        tuXoayHomNay = j.optBoolean("today_carousel", tuXoayHomNay)
         j.optJSONArray("dock_apps")?.let { a -> val ds = (0 until a.length()).map { a.optString(it) }.filter { it.isNotBlank() && !it.startsWith(GOI_KENH) }; if (ds.isNotEmpty()) { dock.clear(); dock.addAll(ds.take(DOCK_TOI_DA)) } }
         kenhVtv.clear()
         j.optJSONArray("link_tiles")?.let { a -> (0 until a.length()).map { a.optString(it).substringBefore('|') }.filter { k -> KENH_VTV.any { it.first == k } }.forEach { kenhVtv.add(it) } }
@@ -1034,6 +1035,11 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (trangThai?.caiDat?.contains("com.xiaomi.mitv.tvplayer") == true) put("input_action", "com.xiaomi.mitv.tvplayer.EXTSRC_PLAY")
         put("dream_button", nutManCho)
         put("top_compact", gonNut)
+        if (thoiTietGoc) put("weather_corner", true)
+        if (!hienSuKien) put("show_events", false)
+        if (!hienHomNay) put("show_today", false)
+        if (!hienThoiTiet) put("show_weather", false)
+        if (!tuXoayHomNay) put("today_carousel", false)
         thanhPho?.let { put("weather_lat", it.lat); put("weather_lon", it.lon); put("weather_place", it.ten) }
         if (ghimMayChieu.isNotEmpty()) put("projector_actions", JSONArray(ghimMayChieu.map { (comp, nhan) -> "$nhan=$comp" }))
         put("lunar_date", amLich)
