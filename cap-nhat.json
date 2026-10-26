@@ -2,7 +2,8 @@
   "app": {
     "versionCode": 96,
     "versionName": "3.0.13",
-    "apk": "https://github.com/9000000/vgs-cleantv/releases/download/v3.0.13/CleanTV-v3.0.13.apk",
+    "apk": "https://github.com/9000000/vgs-cleantv/releases/latest/download/CleanTV-v3.0.13.apk",
+    "releaseUrl": "https://github.com/9000000/vgs-cleantv/releases/latest",
     "co": 17138854,
     "ghiChu": "CleanTV v3.0.13",
     "ghiChuEn": "CleanTV v3.0.13 release",

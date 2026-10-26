@@ -309,7 +309,7 @@ def sync_ota_metadata(version: str, target_code: int, apk_file: Path, tag: str, 
     Dong bo file cap-nhat.json (web/cap-nhat.json va cap-nhat.json) cho he thong OTA.
     """
     today_str = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=7))).strftime("%Y-%m-%d")
-    apk_url = f"https://github.com/{GITHUB_OWNER}/{GITHUB_REPO}/releases/download/{tag}/{apk_file.name}"
+    apk_url = f"https://github.com/{GITHUB_OWNER}/{GITHUB_REPO}/releases/latest/download/{apk_file.name}"
     apk_size = apk_file.stat().st_size if apk_file.exists() else 0
 
     first_line_notes = notes.strip().splitlines()[0].replace("#", "").strip() if notes else f"CleanTV {tag}"
@@ -319,6 +319,7 @@ def sync_ota_metadata(version: str, target_code: int, apk_file: Path, tag: str, 
             "versionCode": target_code,
             "versionName": version,
             "apk": apk_url,
+            "releaseUrl": f"https://github.com/{GITHUB_OWNER}/{GITHUB_REPO}/releases/latest",
             "co": apk_size,
             "ghiChu": first_line_notes,
             "ghiChuEn": f"CleanTV {tag} release",

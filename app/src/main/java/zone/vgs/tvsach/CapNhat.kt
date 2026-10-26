@@ -69,6 +69,95 @@ object CapNhat {
         error("Chuyển hướng quá nhiều lần: $urlBanDau")
     }
 
+    const val URL_LATEST_RELEASE = "https://github.com/$GITHUB_REPO/releases/latest"
+    const val URL_API_LATEST = "https://api.github.com/repos/$GITHUB_REPO/releases/latest"
+
+    /**
+     * So sánh 2 chuỗi phiên bản (Semantic Versioning), ví dụ "3.0.13" vs "3.0.12".
+     * Trả về true nếu banMoi lớn hơn banHienTai.
+     */
+    fun laBanMoiHon(banMoi: String, banHienTai: String): Boolean {
+        if (banMoi.isBlank()) return false
+        val regex = Regex("[^0-9.]")
+        val cleanMoi = regex.replace(banMoi, "").split(".").mapNotNull { it.toIntOrNull() }
+        val cleanHienTai = regex.replace(banHienTai, "").split(".").mapNotNull { it.toIntOrNull() }
+        val maxLen = maxOf(cleanMoi.size, cleanHienTai.size)
+        for (i in 0 until maxLen) {
+            val vMoi = cleanMoi.getOrElse(i) { 0 }
+            val vHienTai = cleanHienTai.getOrElse(i) { 0 }
+            if (vMoi > vHienTai) return true
+            if (vMoi < vHienTai) return false
+        }
+        return false
+    }
+
+    /**
+     * Nhận diện bản mới trực tiếp từ https://github.com/9000000/vgs-cleantv/releases/latest.
+     * 1. Thử qua GitHub API (lấy tag_name, browser_download_url và changelog chi tiết).
+     * 2. Nếu API bị giới hạn (403), đọc chuyển hướng Location từ https://github.com/.../releases/latest.
+     */
+    fun kiemTraTuGitHubReleases(): BanMoi? {
+        // 1. Thử qua GitHub API
+        runCatching {
+            val c = URL(URL_API_LATEST).openConnection() as HttpURLConnection
+            c.connectTimeout = 10000
+            c.readTimeout = 10000
+            c.setRequestProperty("User-Agent", "CleanTV-Android/${BuildConfig.VERSION_NAME}")
+            c.setRequestProperty("Accept", "application/vnd.github.v3+json")
+            if (c.responseCode == 200) {
+                val j = JSONObject(String(c.inputStream.use { it.readBytes() }, Charsets.UTF_8))
+                val tag = j.optString("tag_name", "").trim()
+                val versionName = tag.removePrefix("v").removePrefix("V")
+                if (laBanMoiHon(versionName, BuildConfig.VERSION_NAME)) {
+                    val assets = j.optJSONArray("assets")
+                    var downloadUrl = ""
+                    if (assets != null) {
+                        for (i in 0 until assets.length()) {
+                            val a = assets.optJSONObject(i) ?: continue
+                            val name = a.optString("name", "")
+                            if (name.endsWith(".apk", ignoreCase = true)) {
+                                downloadUrl = a.optString("browser_download_url", "")
+                                if (name.contains(versionName)) break
+                            }
+                        }
+                    }
+                    if (downloadUrl.isEmpty()) {
+                        downloadUrl = "https://github.com/$GITHUB_REPO/releases/download/$tag/CleanTV-$tag.apk"
+                    }
+                    val body = j.optString("body", "").trim()
+                    val firstLine = body.lines().firstOrNull { it.isNotBlank() }?.replace("#", "")?.trim()
+                    val ghiChu = if (!firstLine.isNullOrBlank()) firstLine else "CleanTV $tag"
+                    return BanMoi(0, versionName, downloadUrl, ghiChu)
+                }
+            }
+        }
+
+        // 2. Thử qua HTTP redirect Location của trang web releases/latest
+        runCatching {
+            val c = URL(URL_LATEST_RELEASE).openConnection() as HttpURLConnection
+            c.connectTimeout = 10000
+            c.readTimeout = 10000
+            c.instanceFollowRedirects = false
+            c.setRequestProperty("User-Agent", "CleanTV-Android/${BuildConfig.VERSION_NAME}")
+            val code = c.responseCode
+            val targetUrl = if (code in 301..308) {
+                c.getHeaderField("Location") ?: ""
+            } else {
+                c.url.toString()
+            }
+            if (targetUrl.contains("/tag/")) {
+                val tag = targetUrl.substringAfterLast("/tag/").substringBefore("?").substringBefore("#").trim()
+                val versionName = tag.removePrefix("v").removePrefix("V")
+                if (laBanMoiHon(versionName, BuildConfig.VERSION_NAME)) {
+                    val downloadUrl = "https://github.com/$GITHUB_REPO/releases/download/$tag/CleanTV-$tag.apk"
+                    return BanMoi(0, versionName, downloadUrl, "CleanTV $tag")
+                }
+            }
+        }
+
+        return null
+    }
+
     private fun taiJsonCapNhat(): JSONObject {
         var loiCuoi: Exception? = null
         for (u in URL_CAP_NHAT) {
@@ -83,13 +172,13 @@ object CapNhat {
     }
 
     /**
-     * Đọc cap-nhat.json từ GitHub, kéo dữ liệu mới về nếu khác bản đang có.
-     * Trả về bản app mới nếu có (versionCode cao hơn bản đang chạy).
+     * Nhận diện bản app mới (ưu tiên GitHub releases/latest, fallback cap-nhat.json),
+     * đồng thời kéo dữ liệu OTA mới về nếu có khác biệt.
      */
     fun kiemTra(ctx: Context): BanMoi? {
-        val j = taiJsonCapNhat()
+        val otaJson = runCatching { taiJsonCapNhat() }.getOrNull()
         val prefs = ctx.getSharedPreferences("ota", Context.MODE_PRIVATE)
-        j.optJSONObject("duLieu")?.let { dl ->
+        otaJson?.optJSONObject("duLieu")?.let { dl ->
             for (ten in dl.keys()) {
                 val o = dl.getJSONObject(ten)
                 if (o.optInt("tuBan", 0) < BuildConfig.VERSION_CODE) { fileDuLieu(ctx, ten).delete(); continue }
@@ -108,15 +197,18 @@ object CapNhat {
                 }
             }
         }
-        return banApp(j)
+        return kiemTraTuGitHubReleases() ?: otaJson?.let { banApp(it) }
     }
 
     /** Chỉ đọc bản app mới (không kéo dữ liệu) — cho việc kiểm tra chạy nền. */
-    fun kiemTraApp(): BanMoi? = banApp(taiJsonCapNhat())
+    fun kiemTraApp(): BanMoi? {
+        return kiemTraTuGitHubReleases() ?: runCatching { banApp(taiJsonCapNhat()) }.getOrNull()
+    }
 
     private fun banApp(j: JSONObject): BanMoi? {
         val app = j.optJSONObject("app") ?: return null
         val code = app.optInt("versionCode")
+        val versionName = app.optString("versionName")
         val apkRaw = app.optString("apk")
         val apkUrl = when {
             apkRaw.startsWith("http://") || apkRaw.startsWith("https://") -> apkRaw
@@ -127,8 +219,9 @@ object CapNhat {
         val tuNguonHopLe = apkUrl.contains("github.com/$GITHUB_REPO/") || apkUrl.contains("raw.githubusercontent.com/$GITHUB_REPO/")
         if (!tuNguonHopLe) return null
 
-        return if (code > BuildConfig.VERSION_CODE)
-            BanMoi(code, app.optString("versionName"), apkUrl,
+        val coBanMoi = code > BuildConfig.VERSION_CODE || (versionName.isNotBlank() && laBanMoiHon(versionName, BuildConfig.VERSION_NAME))
+        return if (coBanMoi)
+            BanMoi(code, versionName, apkUrl,
                 t(app.optString("ghiChu"), app.optString("ghiChuEn").ifBlank { app.optString("ghiChu") }))
         else null
     }
