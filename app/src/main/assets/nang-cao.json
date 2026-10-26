@@ -824,5 +824,29 @@
     "canThan": false,
     "ten": "Đếm ngược ngày (Tết, Rằm, Mùng 1, Lễ)",
     "moTaVi": "Tự động tính và đếm ngược số ngày đến Tết Nguyên Đán, ngày Rằm, Mùng 1 và các ngày lễ truyền thống Việt Nam."
+  },
+  {
+    "khoa": "show_events",
+    "kieu": "bool",
+    "moTa": "Show upcoming events and countdown chips under the clock. True by default",
+    "canThan": false,
+    "ten": "Hiện sự kiện & đếm ngược ngày",
+    "moTaVi": "Dải thẻ đếm ngược ngày và sự kiện sắp tới (Tết, Rằm, Quốc khánh...) dưới đồng hồ (mặc định bật)."
+  },
+  {
+    "khoa": "show_today",
+    "kieu": "bool",
+    "moTa": "Show the Today card (quotes and this day in history). True by default",
+    "canThan": false,
+    "ten": "Hiện khối Hôm nay (Danh ngôn & Lịch sử)",
+    "moTaVi": "Khối hiển thị câu nói hay và sự kiện Ngày này năm xưa từ Wikipedia tiếng Việt (mặc định bật)."
+  },
+  {
+    "khoa": "show_weather",
+    "kieu": "bool",
+    "moTa": "Show the middle weather card with 4-day forecast and air quality. True by default",
+    "canThan": false,
+    "ten": "Hiện khối Thời tiết & Dự báo",
+    "moTaVi": "Khối hiển thị nhiệt độ, chất lượng không khí AQI và dự báo thời tiết 4 ngày tới (mặc định bật)."
   }
 ]

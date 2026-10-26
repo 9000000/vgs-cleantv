@@ -434,5 +434,17 @@
   "countdown_events": {
     "ten": "Đếm ngược ngày (Tết, Rằm, Mùng 1, Lễ)",
     "moTa": "Tự động tính và đếm ngược số ngày đến Tết Nguyên Đán, ngày Rằm, Mùng 1 và các ngày lễ truyền thống Việt Nam."
+  },
+  "show_events": {
+    "ten": "Hiện sự kiện & đếm ngược ngày",
+    "moTa": "Dải thẻ đếm ngược ngày và sự kiện sắp tới (Tết, Rằm, Quốc khánh...) dưới đồng hồ (mặc định bật)."
+  },
+  "show_today": {
+    "ten": "Hiện khối Hôm nay (Danh ngôn & Lịch sử)",
+    "moTa": "Khối hiển thị câu nói hay và sự kiện Ngày này năm xưa từ Wikipedia tiếng Việt (mặc định bật)."
+  },
+  "show_weather": {
+    "ten": "Hiện khối Thời tiết & Dự báo",
+    "moTa": "Khối hiển thị nhiệt độ, chất lượng không khí AQI và dự báo thời tiết 4 ngày tới (mặc định bật)."
   }
 }

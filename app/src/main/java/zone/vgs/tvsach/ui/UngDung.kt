@@ -1074,7 +1074,7 @@ private val NHOM_NANG_CAO = listOf(
     NhomNangCao(
         "clock", "Đồng hồ & thông tin", "Clock & info",
         "Lời chào, ngày tháng và nội dung đồng hồ", "The greeting, dates and what shows under the clock",
-        Regex("^(home_idle_clock_minutes|show_stats|shamsi_date|greeting)$")
+        Regex("^(home_idle_clock_minutes|show_stats|shamsi_date|greeting|show_events|show_today|show_weather|today_carousel)$")
     ),
     NhomNangCao(
         "behaviour", "Hành vi", "Behaviour",

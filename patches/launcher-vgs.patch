@@ -7475,17 +7475,25 @@ index 6b61aa40..70c21fde 100644
                              android:id="@+id/lunarDate"
                              android:gravity="right"
 diff --git a/launcher/app/src/main/res/layout/activity_launcher_settings.xml b/launcher/app/src/main/res/layout/activity_launcher_settings.xml
-index b3de8647..6f1a4dae 100644
+index b3de8647..245b0be1 100644
 --- a/launcher/app/src/main/res/layout/activity_launcher_settings.xml
 +++ b/launcher/app/src/main/res/layout/activity_launcher_settings.xml
-@@ -93,6 +93,21 @@
+@@ -93,6 +93,29 @@
              style="@style/SettingsRow"
              android:layout_marginTop="28dp" />
  
 +        <TextView
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:layout_marginTop="28dp"
++            android:text="@string/widgets_header"
++            android:textColor="#FFFFFFFF"
++            android:textSize="20sp" />
++
++        <TextView
 +            android:id="@+id/eventsChoice"
 +            style="@style/SettingsRow"
-+            android:layout_marginTop="28dp" />
++            android:layout_marginTop="10dp" />
 +
 +        <TextView
 +            android:id="@+id/todayChoice"
@@ -8115,20 +8123,21 @@ index 9e58a7d8..00000000
 -    <string name="font_medium" translatable="false">sans-serif-medium</string>
 -</resources>
 diff --git a/launcher/app/src/main/res/values-vi/strings.xml b/launcher/app/src/main/res/values-vi/strings.xml
-index 48609291..963e1347 100644
+index 48609291..b7f225a8 100644
 --- a/launcher/app/src/main/res/values-vi/strings.xml
 +++ b/launcher/app/src/main/res/values-vi/strings.xml
-@@ -33,6 +33,9 @@
+@@ -33,6 +33,10 @@
      <string name="animations_state">Hiệu ứng: %1$s</string>
      <string name="advanced_effects">Hiệu ứng nâng cao</string>
      <string name="advanced_effects_state">Hiệu ứng nâng cao: %1$s</string>
++    <string name="widgets_header">Tiện ích Widget (Sự kiện, Hôm nay, Thời tiết)</string>
 +    <string name="widget_events_state">Sự kiện &amp; Đếm ngược ngày: %1$s</string>
 +    <string name="widget_today_state">Khối Hôm nay &amp; Danh ngôn: %1$s</string>
 +    <string name="widget_weather_state">Khối Thời tiết &amp; AQI: %1$s</string>
      <string name="open_on_start_label">Mở khi khởi động</string>
      <string name="open_on_start_state">Mở khi khởi động: %1$s</string>
      <string name="advanced_effects_warning">Thêm hiệu ứng ô nổi lên, phóng to biểu tượng và chuyển màu mượt. Có thể tốn thêm bộ nhớ; mức chênh lệch tùy từng TV.</string>
-@@ -119,4 +122,14 @@
+@@ -119,4 +123,14 @@
      <string name="race_countdown_days">%1$d ngày %2$d giờ</string>
      <string name="last_opened">Mở lần cuối %1$s</string>
      <string name="tile_move">Di chuyển</string>
@@ -8159,20 +8168,21 @@ index adbb30db..91098f5c 100644
      <string name="font_light" translatable="false">@font/outfit_light</string>
      <string name="font_extralight" translatable="false">@font/outfit_extralight</string>
 diff --git a/launcher/app/src/main/res/values/strings.xml b/launcher/app/src/main/res/values/strings.xml
-index c4e5a5a9..f34cc8c1 100644
+index c4e5a5a9..b52b3702 100644
 --- a/launcher/app/src/main/res/values/strings.xml
 +++ b/launcher/app/src/main/res/values/strings.xml
-@@ -59,6 +59,9 @@
+@@ -59,6 +59,10 @@
      <string name="animations_state">Animations: %1$s</string>
      <string name="advanced_effects">Advanced effects</string>
      <string name="advanced_effects_state">Advanced effects: %1$s</string>
++    <string name="widgets_header">Home Screen Widgets</string>
 +    <string name="widget_events_state">Events &amp; countdowns: %1$s</string>
 +    <string name="widget_today_state">Today card &amp; sayings: %1$s</string>
 +    <string name="widget_weather_state">Detailed weather &amp; AQI: %1$s</string>
      <string name="open_on_start_label">Open on start</string>
      <string name="open_on_start_state">Open on start: %1$s</string>
      <string name="advanced_effects_warning">Adds a lifted tile, icon zoom and smooth colour transitions. May increase memory use; the actual difference depends on your TV.</string>
-@@ -149,4 +152,11 @@
+@@ -149,4 +153,11 @@
      <!-- Cinematic top shelf (cinematic_home): the line under the focused dock app's name; %1$s is when it was
           last opened, e.g. "5 minutes ago" or "yesterday, 9:40 pm". -->
      <string name="last_opened">Last opened %1$s</string>
@@ -8247,3 +8257,18 @@ index 00000000..65e6f4a2
 +        }
 +    }
 +}
+diff --git a/themes/README.md b/themes/README.md
+index d080af63..4c9c0bd0 100644
+--- a/themes/README.md
++++ b/themes/README.md
+@@ -142,6 +142,10 @@ A new key needs one there in the same pull request.
+ | `ambient_glow` | bool | The glow behind the dock in the focused app's colour (`true` by default); `false` keeps only `background_color` or the wallpaper, e.g. for a calm photo background |
+ | `app_glow` | bool | The focus highlight glows in the focused app's colour on every tile, as `cinematic_home` does for the dock (`false` by default) |
+ | `fade_rows` | bool | The rows fade out as they scroll up under the clock instead of being cut off at a hard line; the wallpaper or sky shows through. The grid then draws into a hardware layer (about 6 MB of graphics memory at 1080p) (`false` by default) |
++| `show_events` | bool | Show events and countdown chips under the clock. True by default |
++| `show_today` | bool | Show the Today card (quotes and this day in history). True by default |
++| `show_weather` | bool | Show the middle weather card with 4-day forecast and air quality. True by default |
++| `today_carousel` | bool | Rotate quotes and history in the Today card every 15 seconds. True by default |
+ 
+ ## Wallpapers
+ 
