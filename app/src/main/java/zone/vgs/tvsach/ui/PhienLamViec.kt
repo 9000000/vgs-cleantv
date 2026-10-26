@@ -102,6 +102,10 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     // Tivi
     var thongTin by mutableStateOf<ThongTinTv?>(null)
+    /** Máy đích không khai là tivi (laTivi): chặn dọn / đổi Home cho tới khi người dùng xác nhận đúng là tivi. */
+    var khongPhaiTivi by mutableStateOf(false)
+    var xacNhanLaTivi by mutableStateOf(false)
+    val chanKhongPhaiTivi get() = khongPhaiTivi && !xacNhanLaTivi
     private var getprop = ""
     var trangThai by mutableStateOf<TrangThaiGoi?>(null)
     var ungVien by mutableStateOf<List<Pair<MauTv, Int>>>(emptyList())
@@ -158,6 +162,13 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var soCot by mutableStateOf(0)
     /** Cho chọn app tự mở khi bật tivi (open_on_start_choice của launcher; góp ý dmenh568, quan1sd1998 24/10/2026). */
     var moKhiBat by mutableStateOf(false)
+    /** Mở app đã chọn cả khi bật tivi từ chế độ chờ, không chỉ khi khởi động lại (wake_open_app trong bản vá launcher, cần
+     *  HomeKeyService). Góp ý dmenh568, quan1sd1998 25/10/2026. */
+    var moKhiThuc by mutableStateOf(false)
+    /** Chữ giờ / ngày trắng sáng hẳn (header_white của launcher). Góp ý tranhoangnt555 26/10/2026. */
+    var chuTrang by mutableStateOf(false)
+    /** HomeKeyService cần bật: phím Home lạ, phím app remote, hoặc mở app khi bật từ chế độ chờ. */
+    val canDichVuPhim get() = nutHome || dungPhimRemote || (moKhiBat && moKhiThuc)
     /** Kênh VTV đặt ở đầu dock (tên VTV1…), theo thứ tự KENH_VTV. */
     val kenhVtv = mutableStateListOf<String>()
     val coVtvGo get() = trangThai?.caiDat?.contains(GOI_VTVGO) == true
@@ -486,6 +497,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val (info, gp) = io { tv.docThongTin() }
         goiHome = io { tv.pkgHome }
         thongTin = info; getprop = gp
+        khongPhaiTivi = !io { tv.laTivi() }
+        xacNhanLaTivi = false
         val tt = io { tv.docTrangThai() }
         trangThai = tt
         // Công tắc DNS AdGuard theo đúng tivi (24/10/2026, góp ý kimhuenguyen1964: kết nối lại thì công tắc luôn tắt).
@@ -517,6 +530,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     fun lapKeHoach() = chay(t("Đang so với ${tatCaMau.size.takeIf { it > 0 } ?: "các"} mẫu tivi…", "Comparing with ${tatCaMau.size.takeIf { it > 0 } ?: "the"} TV models…")) {
         val tt = trangThai ?: return@chay
+        if (chanKhongPhaiTivi) return@chay
         val du = io { DuLieu.nap(ctx) }
         val ds = io { KeHoach.lap(du, mauChon, tt) }
         muc = ds
@@ -530,6 +544,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     fun batDauTat() = chay(t("Đang sao lưu…", "Backing up…")) {
         val info = thongTin ?: return@chay
+        if (chanKhongPhaiTivi) return@chay
         nhatKy.clear(); ketQua = null; tienDo = 0f
         manTruocHome = Man.DANG_TAT
         man = Man.DANG_TAT
@@ -747,6 +762,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         giuAmLuong = !cuaTheme("key_filter") && !j.optBoolean("key_filter", true) && !laTclGoogleTv
         oDeuNhau = !cuaTheme("uniform_tiles") && j.optBoolean("uniform_tiles", false)
         moKhiBat = j.optBoolean("open_on_start_choice", false)
+        moKhiThuc = j.optBoolean("wake_open_app", false)
+        chuTrang = !cuaTheme("header_white") && j.optBoolean("header_white", false)
         // Chỉ nạp số cột do người dùng chọn ở đây (vgs_so_cot), không lấy columns của theme.
         soCot = if (j.optBoolean("vgs_so_cot", false)) j.optInt("columns", 0) else 0
         if (j.has("handle_view_inputs")) nutInput = j.optBoolean("handle_view_inputs", nutInput)
@@ -793,7 +810,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val anh = anhNenTheme()
         val bo = boAnhTheme()
         napAnhKenh()
-        val loiCai = io { tv.caiLauncher(apk, sl, cauHinh, anh, bo, nutInput, nutHome || dungPhimRemote) { s -> ghiTuIo(s) } }
+        val loiCai = io { tv.caiLauncher(apk, sl, cauHinh, anh, bo, nutInput, canDichVuPhim) { s -> ghiTuIo(s) } }
         // caiLauncher báo lỗi là đã tự trả Home gốc: huỷ canh gác trên tivi.
         if (loiCai != null) { io { tv.boGac() }; error(loiCai) }
         if (nutDangPhat) io { tv.choPhepDangPhat() }
@@ -894,6 +911,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (anLoiChao) put("show_greeting", false)
         if (oDeuNhau) put("uniform_tiles", true)
         if (moKhiBat) put("open_on_start_choice", true)
+        if (moKhiBat && moKhiThuc) put("wake_open_app", true)
+        if (chuTrang) put("header_white", true)
         if (soCot > 0) { put("columns", soCot); put("vgs_so_cot", true) }
         // Phím APPS (KEYCODE_ALL_APPS) chỉ là nút Home với que / tivi Xiaomi hoặc khi bật "Remote gửi phím Home lạ";
         // tivi khác (Sony VH2: nút Apps mở Home sạch như Back, abc999roses 24/10/2026) để phím cho tivi.
@@ -971,7 +990,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             add("pm disable-user --user 0 $goc")
         }
         add("cmd package set-home-activity --user 0 ${tv.cmpHome}")
-        if (nutHome || dungPhimRemote) add("settings put secure enabled_accessibility_services $pk/com.gathin.tvhome.HomeKeyService")
+        if (canDichVuPhim) add("settings put secure enabled_accessibility_services $pk/com.gathin.tvhome.HomeKeyService")
         if (nutInput) add("settings put secure enabled_accessibility_services $pk/com.gathin.tvhome.InputKeyService")
         if (dnsChanQc) add("settings put global private_dns_specifier dns.adguard-dns.com")
         add(t("# Thử nút Home thật", "# Test the real Home button"))
@@ -1050,7 +1069,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val bo = boAnhTheme()
         if (bo != null) thongBao = t("Đang gửi ${bo.size} ảnh phong cảnh…", "Sending ${bo.size} landscape pictures…")
         io { tv.dayCauHinh(json, anh, bo) }
-        if (dungPhimRemote) io { tv.batBatPhimHome() }
+        if (dungPhimRemote || (moKhiBat && moKhiThuc)) io { tv.batBatPhimHome() }
         // Đổi giao diện cũng bật / tắt DNS AdGuard theo công tắc (trước 2.7.3 chỉ lúc cài Home sạch mới đặt).
         val dangChan = io { tv.dnsDangChan() }
         if (dnsChanQc && !dangChan) saoLuu?.let { sl -> io { tv.batDnsChanQc(sl) } }

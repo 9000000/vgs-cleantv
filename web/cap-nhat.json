@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 79,
-  "versionName": "2.10.11",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.11.apk",
-  "co": 11992385,
-  "ghiChu": "Danh sách lên 300 mẫu tivi; Home sạch theo bản gốc CleanYourTV 3.0.",
-  "ghiChuEn": "300 TV models; Home sạch now on CleanYourTV 3.0.",
-  "ngay": "2026-10-25"
+  "versionCode": 80,
+  "versionName": "2.10.12",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.12.apk",
+  "co": 12012469,
+  "ghiChu": "Chặn dọn nhầm điện thoại; mở app đã chọn cả khi bật tivi từ chế độ chờ; chữ giờ ngày trắng sáng.",
+  "ghiChuEn": "Blocks cleaning a phone by mistake; the chosen app also opens when the TV wakes from standby; bright white clock and date.",
+  "ngay": "2026-10-26"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "a577a678e1e1b308",
+   "phienBan": "b6384b8a5240f008",
    "url": "/ota/du-lieu.json",
-   "co": 1725134,
-   "tuBan": 79
+   "co": 1774491,
+   "tuBan": 80
   },
   "tvhome.apk": {
-   "phienBan": "7e6596d3a226140e",
+   "phienBan": "138e85b5f0e51939",
    "url": "/ota/tvhome.apk",
-   "co": 641645,
-   "tuBan": 79
+   "co": 644249,
+   "tuBan": 80
   }
  }
 }

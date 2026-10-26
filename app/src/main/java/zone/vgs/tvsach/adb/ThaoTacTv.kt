@@ -48,6 +48,17 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         return ThongTinTv.tuGetprop(gp) to gp
     }
 
+    /**
+     * Máy có phải tivi / hộp tivi / máy chiếu không: Android TV khai android.software.leanback hoặc
+     * android.hardware.type.television. Điện thoại không có cả hai (26/10/2026: một người dọn nhầm chính điện thoại,
+     * máy không khởi động được). Lệnh lỗi thì coi như tivi để không chặn nhầm.
+     */
+    fun laTivi(): Boolean {
+        val f = runCatching { sh("pm list features") }.getOrDefault("")
+        if (!f.contains("feature:")) return true
+        return f.contains("feature:android.software.leanback") || f.contains("feature:android.hardware.type.television")
+    }
+
     fun docTrangThai(): TrangThaiGoi {
         fun goi(lenh: String) = sh(lenh).lines().mapNotNull { l ->
             l.trim().removePrefix("package:").takeIf { it.isNotEmpty() && TEN_GOI.matches(it) }
