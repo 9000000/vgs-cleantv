@@ -675,10 +675,10 @@ index dd324c91..2495b2e8 100644
          int to = PALETTE[colorIndex];
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/EventsTracker.java b/launcher/app/src/main/java/com/gathin/tvhome/EventsTracker.java
 new file mode 100644
-index 00000000..107f72a3
+index 00000000..7cbaba9f
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/EventsTracker.java
-@@ -0,0 +1,316 @@
+@@ -0,0 +1,319 @@
 +package com.gathin.tvhome;
 +
 +import java.util.Calendar;
@@ -757,9 +757,9 @@ index 00000000..107f72a3
 +        int curMonth = cal.get(Calendar.MONTH) + 1;
 +        int curDay = cal.get(Calendar.DAY_OF_MONTH);
 +
-+        // 1. Tìm Rằm hoặc Mùng 1 gần nhất
++        // 1. Tìm Rằm hoặc Mùng 1 gần nhất (trong vòng 7 ngày)
 +        EventChip moonChip = null;
-+        for (int offset = 0; offset <= 30; offset++) {
++        for (int offset = 0; offset <= 7; offset++) {
 +            Calendar target = Calendar.getInstance();
 +            target.add(Calendar.DAY_OF_YEAR, offset);
 +            int td = target.get(Calendar.DAY_OF_MONTH);
@@ -779,9 +779,9 @@ index 00000000..107f72a3
 +        }
 +        if (moonChip != null) list.add(moonChip);
 +
-+        // 2. Tìm Tết Nguyên Đán
++        // 2. Tìm Tết Nguyên Đán (trong vòng 7 ngày)
 +        EventChip tetChip = null;
-+        for (int offset = 0; offset <= 385; offset++) {
++        for (int offset = 0; offset <= 7; offset++) {
 +            Calendar target = Calendar.getInstance();
 +            target.add(Calendar.DAY_OF_YEAR, offset);
 +            int td = target.get(Calendar.DAY_OF_MONTH);
@@ -795,11 +795,11 @@ index 00000000..107f72a3
 +            }
 +        }
 +
-+        // 3. Tìm các ngày lễ nổi bật sắp tới
++        // 3. Tìm các ngày lễ nổi bật sắp tới (trong vòng 7 ngày)
 +        EventChip holidayChip1 = null;
 +        EventChip holidayChip2 = null;
 +
-+        for (int offset = 0; offset <= 365; offset++) {
++        for (int offset = 0; offset <= 7; offset++) {
 +            Calendar target = Calendar.getInstance();
 +            target.add(Calendar.DAY_OF_YEAR, offset);
 +            int td = target.get(Calendar.DAY_OF_MONTH);
@@ -836,6 +836,9 @@ index 00000000..107f72a3
 +        } else if (holidayChip2 != null) {
 +            list.add(holidayChip2);
 +        }
++
++        // Lọc nghiêm ngặt: chỉ giữ các sự kiện còn từ 0 đến 7 ngày nữa
++        list.removeIf(c -> c.days < 0 || c.days > 7);
 +
 +        // Sắp xếp theo thứ tự số ngày tăng dần
 +        java.util.Collections.sort(list, (a, b) -> Integer.compare(a.days, b.days));
@@ -1483,7 +1486,7 @@ index 00000000..9b2fd8e3
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 13f181e8..8d0a7816 100644
+index 13f181e8..3c4b441c 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -55,6 +55,7 @@ import android.text.style.ForegroundColorSpan;
@@ -1737,7 +1740,7 @@ index 13f181e8..8d0a7816 100644
          if (!ambientGlow) return;
          if (!animations || reducedMotion) {
              setAmbient(color);
-@@ -2039,6 +2177,215 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2039,6 +2177,221 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -1773,6 +1776,12 @@ index 13f181e8..8d0a7816 100644
 +        if (!showEvents || eventsRow == null) return;
 +        eventsRow.removeAllViews();
 +        List<EventsTracker.EventChip> chips = EventsTracker.getUpcomingChips();
++        if (chips.isEmpty()) {
++            eventsRow.setVisibility(View.GONE);
++            return;
++        } else {
++            eventsRow.setVisibility(View.VISIBLE);
++        }
 +        LayoutInflater inflater = LayoutInflater.from(this);
 +        for (EventsTracker.EventChip c : chips) {
 +            View chipView = inflater.inflate(R.layout.item_event_chip, eventsRow, false);
@@ -1953,7 +1962,7 @@ index 13f181e8..8d0a7816 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2103,13 +2450,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2103,13 +2456,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -1981,7 +1990,7 @@ index 13f181e8..8d0a7816 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2304,6 +2662,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2304,6 +2668,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -1992,7 +2001,7 @@ index 13f181e8..8d0a7816 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2665,7 +3027,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2665,7 +3033,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -2005,7 +2014,7 @@ index 13f181e8..8d0a7816 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2920,7 +3286,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2920,7 +3292,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       *  source number; "HW8=-" leaves that input out of the Inputs menu (a port the board reports but the set
       *  does not have). Returns the number, -1 for a left-out input, or null when the input is not listed. */
      private Integer mappedSource(String inputId) {
@@ -2039,7 +2048,7 @@ index 13f181e8..8d0a7816 100644
      }
  
      /** Switches to a passthrough input (HDMI, AV). An input mapped in `input_sources` is opened by sending
-@@ -3322,10 +3713,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3322,10 +3719,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
@@ -3247,7 +3256,7 @@ index b3de8647..245b0be1 100644
              android:id="@+id/animationsChoice"
              style="@style/SettingsRow"
 diff --git a/launcher/app/src/main/res/layout/activity_main.xml b/launcher/app/src/main/res/layout/activity_main.xml
-index 9c071595..6f92f5dd 100644
+index 9c071595..b04a41f7 100644
 --- a/launcher/app/src/main/res/layout/activity_main.xml
 +++ b/launcher/app/src/main/res/layout/activity_main.xml
 @@ -146,6 +146,164 @@
@@ -3261,7 +3270,7 @@ index 9c071595..6f92f5dd 100644
 +        android:layout_height="wrap_content"
 +        android:layout_marginStart="56dp"
 +        android:layout_marginEnd="56dp"
-+        android:layout_marginTop="128dp"
++        android:layout_marginTop="160dp"
 +        android:clipChildren="false"
 +        android:clipToPadding="false">
 +
