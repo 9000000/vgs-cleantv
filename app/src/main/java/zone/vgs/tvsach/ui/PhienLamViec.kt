@@ -598,6 +598,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         daNapCu = false
         tv.quenTivi()
         thongBao = t("Đang đọc thông tin tivi…", "Reading the TV…")
+        io { runCatching { tv.huyTatAdbTrenTv() } }
         val (info, gp) = io { tv.docThongTin() }
         goiHome = io { tv.pkgHome }
         thongTin = info; getprop = gp
@@ -620,9 +621,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         saoLuuTuTv = slMay == null && saoLuu != null
         // Xiaomi: sau khi đổi Home, nút INPUT của remote không mở bảng nguồn nữa (upstream #1368) — bật sẵn để Home sạch nhận.
         nutInput = tt.homeHienTai == "com.google.android.apps.tv.launcherx" || info.brand.equals("Xiaomi", ignoreCase = true)
-        // Sony 2015 (bo SVP-DTV15): Cài đặt dễ mở ra trống mà muốn bật lại Gỡ lỗi USB lại phải qua Cài đặt — tự tắt ADB là
-        // khoá chủ nhà ở ngoài, không sửa được nữa (25/10/2026, 2 máy phải reset cứng). Mặc định giữ ADB, vẫn tắt được tay.
-        giuAdb = info.device == "SVP-DTV15"
+        // Không tự tắt chế độ gỡ lỗi (chỉ tắt khi người dùng chủ động bấm nút Tắt ADB & kết thúc).
+        giuAdb = true
         laMayChieu = tv.coVeMayChieu(tt, info)
         man = if (dangKhoiPhuc) Man.KHOI_PHUC else Man.THONG_TIN
     }
@@ -1254,18 +1254,15 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     }
 
     /**
-     * Tự tắt ADB khi xong (24/10/2026, học cleanyourtv-app): đang ở màn Xong mà người dùng rời app thì hẹn TIVI tự tắt
-     * ADB sau 60 giây (hẹn giờ phải nằm trên tivi: Android 14 đóng băng app nằm nền). Quay lại trước đó thì huỷ; quá
-     * hạn thì về màn chính, báo đã tự tắt. Bật "Giữ ADB bật cho lần sau" thì không hẹn.
+     * Không tự tắt chế độ gỡ lỗi (26/10/2026): Chỉ tắt khi người dùng chủ động bấm "Tắt ADB & kết thúc".
      */
-    var giuAdb by mutableStateOf(false)
+    var giuAdb by mutableStateOf(true)
     var daTuTatAdb by mutableStateOf(false)
     private var daHenTatAdb = false
 
     fun henTuTatAdb() {
-        if (giuAdb || man != Man.XONG || dangBan) return
-        daHenTatAdb = true
-        viewModelScope.launch { runCatching { io { tv.henTatAdbTrenTv(60) } }.onFailure { daHenTatAdb = false } }
+        // Không tự tắt ADB khi rời app; chỉ tắt khi bấm nút Tắt ADB & kết thúc.
+        return
     }
 
     fun huyTuTatAdb() {

@@ -1326,16 +1326,6 @@ private fun Hang(chu: String, phu: String, bat: Boolean, doi: (Boolean) -> Unit)
 
 @Composable
 private fun ManXong(vm: PhienLamViec) = Cuon {
-    // Rời app khi đang ở màn này: hẹn tự tắt ADB sau 60 giây; quay lại trước đó thì huỷ.
-    val vongDoi = androidx.compose.ui.platform.LocalLifecycleOwner.current
-    DisposableEffect(vongDoi) {
-        val nghe = androidx.lifecycle.LifecycleEventObserver { _, e ->
-            if (e == androidx.lifecycle.Lifecycle.Event.ON_STOP) vm.henTuTatAdb()
-            if (e == androidx.lifecycle.Lifecycle.Event.ON_START) vm.huyTuTatAdb()
-        }
-        vongDoi.lifecycle.addObserver(nghe)
-        onDispose { vongDoi.lifecycle.removeObserver(nghe) }
-    }
     DauTrang({
         Box(Modifier.size(96.dp).clip(RoundedCornerShape(30.dp)).background(Gradient), contentAlignment = Alignment.Center) {
             Icon(Icons.Rounded.AutoAwesome, null, Modifier.size(52.dp), tint = Color.White)
@@ -1347,7 +1337,7 @@ private fun ManXong(vm: PhienLamViec) = Cuon {
     The(t("Trước khi về", "Before you leave"), Icons.Rounded.Checklist) {
         BuocSo(1, t("Thử lại YouTube, Netflix, HDMI, Cài đặt, remote.", "Try YouTube, Netflix, HDMI, Settings and the remote."))
         BuocSo(2, t("Khởi động lại một lần xem gói nào tự bật lại.", "Reboot once to see if anything re-enables itself."))
-        BuocSo(3, t("Tắt ADB: để mở là ai cùng mạng cũng điều khiển được tivi. Rời app quá 1 phút thì tivi tự tắt.", "Turn ADB off: left on, anyone on the network can control the TV. Leave the app for over a minute and the TV turns ADB off itself."))
+        BuocSo(3, t("Tắt ADB: CleanTV không tự tắt chế độ gỡ lỗi khi bạn rời app. Chỉ tắt khi bạn chủ động bấm nút tắt bên dưới.", "Turn ADB off: CleanTV will never auto-turn-off debugging when you leave the app. It only turns off when you click the button below."))
         Hang(t("Giữ ADB bật cho lần sau", "Keep ADB on for next time"), t("Lần sau đổi giao diện / khôi phục không phải bật lại gỡ lỗi trên tivi", "Next time you change the look or restore, no need to turn debugging on again"), vm.giuAdb) { vm.giuAdb = it }
         NutPhu(t("Xem màn hình tivi", "View TV screen"), Icons.Rounded.Screenshot) { vm.chupManHinh() }
         NutPhu(t("Khởi động lại tivi", "Reboot the TV"), Icons.Rounded.RestartAlt) { vm.khoiDongLaiTv() }
@@ -1364,9 +1354,17 @@ private fun ManXong(vm: PhienLamViec) = Cuon {
     TheKichBan(vm)
     TheGuiDanhSach(vm)
     NutGopY(vm)
-    NutChinh(t("Tắt ADB & kết thúc", "Turn off ADB & finish"), enabled = !vm.dangBan, icon = Icons.Rounded.Lock) { vm.tatAdbVaKetThuc() }
-    Phu(t("Sau đó trên tivi: Tuỳ chọn nhà phát triển → tắt Gỡ lỗi USB, chọn \"Thu hồi uỷ quyền gỡ lỗi USB\". Bản sao lưu vẫn trong điện thoại để khôi phục.",
-        "Then on the TV: Developer options → turn off USB debugging and \"Revoke USB debugging authorisations\". The backup stays on this phone for restoring."))
+    if (vm.giuAdb) {
+        NutChinh(t("Hoàn tất (Giữ gỡ lỗi)", "Done (Keep debugging on)"), enabled = !vm.dangBan, icon = Icons.Rounded.Check) {
+            vm.datLai()
+            vm.man = Man.CHINH
+        }
+        NutPhu(t("Tắt ADB & kết thúc", "Turn off ADB & finish"), icon = Icons.Rounded.Lock) { vm.tatAdbVaKetThuc() }
+    } else {
+        NutChinh(t("Tắt ADB & kết thúc", "Turn off ADB & finish"), enabled = !vm.dangBan, icon = Icons.Rounded.Lock) { vm.tatAdbVaKetThuc() }
+    }
+    Phu(t("Nếu tắt gỡ lỗi: Tuỳ chọn nhà phát triển trên tivi → tắt Gỡ lỗi USB, chọn \"Thu hồi uỷ quyền gỡ lỗi USB\". Bản sao lưu vẫn trong điện thoại để khôi phục.",
+        "If turning debugging off: Developer options on the TV → turn off USB debugging and \"Revoke USB debugging authorisations\". The backup stays on this phone for restoring."))
 }
 
 // ---------------- Khôi phục ----------------
