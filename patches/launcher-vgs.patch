@@ -259,10 +259,10 @@ index eb56debc..ae7e77b8 100644
          if (live == null) return 0xFF444444;
          // Draw a private copy: changing the bounds of the drawable an ImageView shows would blank the tile.
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java b/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
-index 111304c6..09fb8e09 100644
+index 111304c6..38240df8 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
-@@ -6,30 +6,32 @@ import android.content.res.Resources;
+@@ -6,30 +6,33 @@ import android.content.res.Resources;
  import android.graphics.Bitmap;
  import android.graphics.BitmapFactory;
  import android.graphics.drawable.BitmapDrawable;
@@ -279,6 +279,7 @@ index 111304c6..09fb8e09 100644
  
  import java.io.File;
 +import java.util.ArrayList;
++import java.util.Calendar;
 +import java.util.Collections;
 +import java.util.List;
  import java.util.Random;
@@ -303,7 +304,7 @@ index 111304c6..09fb8e09 100644
      private static final int[] PALETTE = {0xFF2B5CFF, 0xFF00A39A, 0xFF8A3FFC, 0xFFE0661B, 0xFFD6336C};
  
      private final Handler handler = new Handler(Looper.getMainLooper());
-@@ -39,28 +41,52 @@ final class ClockScene {
+@@ -39,28 +42,68 @@ final class ClockScene {
      private final GradientDrawable glow;
      private int colorIndex;
      private int glowColor;
@@ -316,20 +317,31 @@ index 111304c6..09fb8e09 100644
 -    /** Bumped by stop(): a decode started before it finds a different number and drops its result. Main thread only. */
 -    private int wallpaperGeneration;
 +
-+    // Các thành phần màn hình chờ gia đình
++    // Các thành phần màn hình chờ gia đình (Samsung Frame Style)
 +    private final ImageView bg1;
 +    private final ImageView bg2;
 +    private final View overlay;
-+    private final TextView tvLunar;
-+    private final TextView tvWeather;
-+    private final TextView tvEvent;
-+    private final TextView tvQuote;
++    private final TextView tvDateLunar;
++    private final View layoutWeather;
++    private final ImageView ivWxIcon;
++    private final TextView tvWxTempDesc;
++    private final View vAqiDot;
++    private final TextView tvAqiText;
++    private final TextView tvEventsLine;
++    private final TextView tvQuoteLine;
++    private final TextView tvCaption;
 +
 +    private boolean isBg1Active = true;
 +    private final List<File> photoList = new ArrayList<>();
 +    private int currentPhotoIdx = 0;
 +    private int quoteIdx = 0;
 +    private int decodeGeneration = 0;
++
++    private static final String[] DOW_VI = {"Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"};
++    private static final String[] LUNAR_MONTHS = {
++            "Giêng", "Hai", "Ba", "Tư", "Năm", "Sáu",
++            "Bảy", "Tám", "Chín", "Mười", "Mười Một", "Chạp"
++    };
  
      private final Runnable tick = new Runnable() {
          @Override
@@ -357,15 +369,20 @@ index 111304c6..09fb8e09 100644
 +        bg1 = root.findViewById(R.id.dreamBg1);
 +        bg2 = root.findViewById(R.id.dreamBg2);
 +        overlay = root.findViewById(R.id.dreamOverlay);
-+        tvLunar = root.findViewById(R.id.dreamLunar);
-+        tvWeather = root.findViewById(R.id.dreamWeather);
-+        tvEvent = root.findViewById(R.id.dreamEvent);
-+        tvQuote = root.findViewById(R.id.dreamQuote);
++        tvDateLunar = root.findViewById(R.id.dreamDateLunar);
++        layoutWeather = root.findViewById(R.id.dreamWeatherLayout);
++        ivWxIcon = root.findViewById(R.id.dreamWxIcon);
++        tvWxTempDesc = root.findViewById(R.id.dreamWxTempDesc);
++        vAqiDot = root.findViewById(R.id.dreamAqiDot);
++        tvAqiText = root.findViewById(R.id.dreamAqiText);
++        tvEventsLine = root.findViewById(R.id.dreamEventsLine);
++        tvQuoteLine = root.findViewById(R.id.dreamQuoteLine);
++        tvCaption = root.findViewById(R.id.dreamCaption);
 +
          glow = new GradientDrawable();
          glow.setGradientType(GradientDrawable.RADIAL_GRADIENT);
          ambient.setBackground(glow);
-@@ -68,6 +94,72 @@ final class ClockScene {
+@@ -68,6 +111,100 @@ final class ClockScene {
                  glow.setGradientRadius((r - l) * 0.55f));
          colorIndex = random.nextInt(PALETTE.length);
          setGlow(PALETTE[colorIndex]);
@@ -398,47 +415,75 @@ index 111304c6..09fb8e09 100644
 +
 +    private void updateLabels() {
 +        Context ctx = content.getContext();
-+        Resources res = ctx.getResources();
 +
-+        // 1. Âm lịch Can Chi
-+        if (tvLunar != null) {
-+            String lunarText = Lunar.today(res, 7);
-+            tvLunar.setText(lunarText);
-+            tvLunar.setVisibility(View.VISIBLE);
++        // 1. Dòng 2: Ngày dương lịch & Âm lịch ("Thứ Bảy, 24 tháng 10 · Rằm tháng Chín âm lịch")
++        if (tvDateLunar != null) {
++            Calendar cal = Calendar.getInstance();
++            int dow = Math.max(0, Math.min(6, cal.get(Calendar.DAY_OF_WEEK) - 1));
++            int day = cal.get(Calendar.DAY_OF_MONTH);
++            int month = cal.get(Calendar.MONTH) + 1;
++            int year = cal.get(Calendar.YEAR);
++
++            int[] lunar = Lunar.fromSolar(day, month, year, 7.0);
++            String lunarDayText;
++            if (lunar[0] == 15) {
++                lunarDayText = "Rằm tháng ";
++            } else if (lunar[0] == 1) {
++                lunarDayText = "Mùng 1 tháng ";
++            } else {
++                lunarDayText = lunar[0] + " tháng ";
++            }
++            String mName = (lunar[1] >= 1 && lunar[1] <= 12) ? LUNAR_MONTHS[lunar[1] - 1] : String.valueOf(lunar[1]);
++            tvDateLunar.setText(DOW_VI[dow] + ", " + day + " tháng " + month + "  ·  " + lunarDayText + mName + " âm lịch");
++            tvDateLunar.setVisibility(View.VISIBLE);
 +        }
 +
-+        // 2. Thời tiết (nếu có cấu hình)
-+        if (tvWeather != null) {
-+            Weather w = Weather.load(ctx);
-+            if (w != null && w.place != null && !w.place.isEmpty()) {
-+                tvWeather.setText(w.place);
-+                tvWeather.setVisibility(View.VISIBLE);
++        // 2. Dòng 3: Thời tiết & AQI ("🌙 28° Trời quang  ● AQI 84 · Trung bình")
++        Weather.FullWeather fw = Weather.FullWeather.getLatest();
++        if (fw != null && layoutWeather != null) {
++            if (ivWxIcon != null) ivWxIcon.setImageResource(fw.iconRes);
++            if (tvWxTempDesc != null) tvWxTempDesc.setText(fw.temp + "°  " + fw.desc);
++            if (vAqiDot != null && fw.aqi >= 0) {
++                GradientDrawable dot = new GradientDrawable();
++                dot.setShape(GradientDrawable.OVAL);
++                dot.setColor(fw.aqiColor);
++                vAqiDot.setBackground(dot);
++                vAqiDot.setVisibility(View.VISIBLE);
++            } else if (vAqiDot != null) {
++                vAqiDot.setVisibility(View.GONE);
++            }
++            if (tvAqiText != null && fw.aqi >= 0) {
++                tvAqiText.setText("AQI " + fw.aqi + " · " + fw.aqiLabel);
++                tvAqiText.setVisibility(View.VISIBLE);
++            } else if (tvAqiText != null) {
++                tvAqiText.setVisibility(View.GONE);
++            }
++            layoutWeather.setVisibility(View.VISIBLE);
++        } else if (layoutWeather != null) {
++            layoutWeather.setVisibility(View.GONE);
++        }
++
++        // 3. Dòng 4: Đếm ngược sự kiện ("Rằm tháng Chín hôm nay | Halloween còn 7 ngày | Tết Nguyên Đán còn 105 ngày")
++        if (tvEventsLine != null) {
++            String eventsHtml = EventsTracker.getScreensaverEventsHtml();
++            if (eventsHtml != null && !eventsHtml.isEmpty()) {
++                tvEventsLine.setText(android.text.Html.fromHtml(eventsHtml));
++                tvEventsLine.setVisibility(View.VISIBLE);
 +            } else {
-+                tvWeather.setVisibility(View.GONE);
++                tvEventsLine.setVisibility(View.GONE);
 +            }
 +        }
 +
-+        // 3. Đếm ngược ngày (Tết Nguyên Đán, Rằm, Mùng 1...)
-+        if (tvEvent != null) {
-+            EventsTracker.EventInfo ev = EventsTracker.getNearestEvent();
-+            if (ev != null) {
-+                tvEvent.setText(ev.formatted);
-+                tvEvent.setVisibility(View.VISIBLE);
-+            } else {
-+                tvEvent.setVisibility(View.GONE);
-+            }
-+        }
-+
-+        // 4. Danh ngôn / Ca dao tục ngữ
-+        if (tvQuote != null) {
++        // 4. Dòng 5: Danh ngôn ("“Biết người là khôn, biết mình là sáng suốt.” — Lão Tử")
++        if (tvQuoteLine != null) {
 +            QuotesProvider.QuoteItem q = QuotesProvider.getNextQuote(quoteIdx);
-+            tvQuote.setText(q.getFormatted());
-+            tvQuote.setVisibility(View.VISIBLE);
++            tvQuoteLine.setText(q.getFormatted());
++            tvQuoteLine.setVisibility(View.VISIBLE);
 +        }
      }
  
      void start() {
-@@ -78,64 +170,73 @@ final class ClockScene {
+@@ -78,64 +215,73 @@ final class ClockScene {
          });
          handler.removeCallbacks(tick);
          handler.postDelayed(tick, MOVE_MS);
@@ -533,12 +578,12 @@ index 111304c6..09fb8e09 100644
 +                outgoing.animate().alpha(0f).setDuration(1500).start();
 +
 +                // Đổi câu danh ngôn mới đồng bộ với ảnh
-+                if (tvQuote != null) {
++                if (tvQuoteLine != null) {
 +                    quoteIdx++;
-+                    tvQuote.animate().alpha(0f).setDuration(600).withEndAction(() -> {
++                    tvQuoteLine.animate().alpha(0f).setDuration(600).withEndAction(() -> {
 +                        QuotesProvider.QuoteItem q = QuotesProvider.getNextQuote(quoteIdx);
-+                        tvQuote.setText(q.getFormatted());
-+                        tvQuote.animate().alpha(1f).setDuration(800).start();
++                        tvQuoteLine.setText(q.getFormatted());
++                        tvQuoteLine.animate().alpha(1f).setDuration(800).start();
 +                    }).start();
 +                }
              });
@@ -550,24 +595,44 @@ index 111304c6..09fb8e09 100644
      private static Bitmap decode(File file, int screenW, int screenH) {
          try {
              BitmapFactory.Options options = new BitmapFactory.Options();
-@@ -167,13 +268,13 @@ final class ClockScene {
+@@ -167,23 +313,34 @@ final class ClockScene {
          }).start();
      }
  
 -    /** A random spot that keeps the whole clock on screen, with the glow centred behind it. */
-+    /** Điểm xuất hiện ngẫu nhiên giữ toàn bộ nội dung nằm gọn trong màn hình TV. */
++    /** Điểm xuất hiện: chuẩn Samsung The Frame (góc dưới bên trái), dao động nhẹ chống lưu ảnh OLED. */
      private void placeClock() {
          View parent = (View) content.getParent();
-         int maxX = Math.max(0, parent.getWidth() - content.getWidth());
-         int maxY = Math.max(0, parent.getHeight() - content.getHeight());
+-        int maxX = Math.max(0, parent.getWidth() - content.getWidth());
+-        int maxY = Math.max(0, parent.getHeight() - content.getHeight());
 -        float x = maxX * (0.1f + 0.8f * random.nextFloat());
 -        float y = maxY * (0.1f + 0.8f * random.nextFloat());
-+        float x = maxX * (0.08f + 0.84f * random.nextFloat());
-+        float y = maxY * (0.08f + 0.84f * random.nextFloat());
-         content.setX(x);
-         content.setY(y);
-         if (parent.getWidth() > 0 && parent.getHeight() > 0) {
-@@ -183,7 +284,7 @@ final class ClockScene {
+-        content.setX(x);
+-        content.setY(y);
+-        if (parent.getWidth() > 0 && parent.getHeight() > 0) {
+-            glow.setGradientCenter((x + content.getWidth() / 2f) / parent.getWidth(),
+-                    (y + content.getHeight() / 2f) / parent.getHeight());
++        if (parent == null) return;
++        float density = content.getResources().getDisplayMetrics().density;
++        if (!photoList.isEmpty()) {
++            float baseX = 48f * density;
++            float baseY = Math.max(0, parent.getHeight() - content.getHeight() - 40f * density);
++            float driftX = baseX + (random.nextFloat() * 16f - 8f) * density;
++            float driftY = baseY + (random.nextFloat() * 16f - 8f) * density;
++            content.setX(Math.max(16f * density, driftX));
++            content.setY(Math.max(16f * density, driftY));
++        } else {
++            int maxX = Math.max(0, parent.getWidth() - content.getWidth());
++            int maxY = Math.max(0, parent.getHeight() - content.getHeight());
++            float x = maxX * (0.08f + 0.84f * random.nextFloat());
++            float y = maxY * (0.08f + 0.84f * random.nextFloat());
++            content.setX(x);
++            content.setY(y);
++            if (parent.getWidth() > 0 && parent.getHeight() > 0) {
++                glow.setGradientCenter((x + content.getWidth() / 2f) / parent.getWidth(),
++                        (y + content.getHeight() / 2f) / parent.getHeight());
++            }
+         }
      }
  
      private void shiftGlow() {
@@ -578,10 +643,10 @@ index 111304c6..09fb8e09 100644
          int to = PALETTE[colorIndex];
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/EventsTracker.java b/launcher/app/src/main/java/com/gathin/tvhome/EventsTracker.java
 new file mode 100644
-index 00000000..d2668fb0
+index 00000000..107f72a3
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/EventsTracker.java
-@@ -0,0 +1,182 @@
+@@ -0,0 +1,316 @@
 +package com.gathin.tvhome;
 +
 +import java.util.Calendar;
@@ -596,6 +661,33 @@ index 00000000..d2668fb0
 +public final class EventsTracker {
 +
 +    private EventsTracker() {
++    }
++
++    private static final String[] LUNAR_MONTH_NAMES = {
++            "Giêng", "Hai", "Ba", "Tư", "Năm", "Sáu",
++            "Bảy", "Tám", "Chín", "Mười", "Mười Một", "Chạp"
++    };
++
++    public static class EventChip {
++        public final String title;
++        public final int days;
++        public final boolean isToday;
++        public final int iconRes;
++        public final String whenText;
++
++        public EventChip(String title, int days, int iconRes) {
++            this.title = title;
++            this.days = days;
++            this.isToday = (days == 0);
++            this.iconRes = iconRes;
++            if (days == 0) {
++                this.whenText = "Hôm nay";
++            } else if (days == 1) {
++                this.whenText = "ngày mai";
++            } else {
++                this.whenText = "còn " + days + " ngày";
++            }
++        }
 +    }
 +
 +    public static class EventInfo {
@@ -621,18 +713,129 @@ index 00000000..d2668fb0
 +    }
 +
 +    /**
-+     * Đếm ngược đến Tết Nguyên Đán tiếp theo.
-+     * Ví dụ: "Còn 88 ngày đến Tết Nguyên Đán (Ất Tỵ)".
++     * Lấy danh sách 3 chip sự kiện sắp tới theo chuẩn Samsung Frame / Apple TV:
++     * 1) Rằm hoặc Mùng 1 gần nhất (hoặc hôm nay)
++     * 2) Ngày lễ hoặc sự kiện đặc biệt tiếp theo
++     * 3) Tết Nguyên Đán (hoặc ngày lễ kế tiếp)
 +     */
-+    public static EventInfo countdownTet() {
++    public static java.util.List<EventChip> getUpcomingChips() {
++        java.util.List<EventChip> list = new java.util.ArrayList<>();
 +        Calendar cal = Calendar.getInstance();
 +        int curYear = cal.get(Calendar.YEAR);
 +        int curMonth = cal.get(Calendar.MONTH) + 1;
 +        int curDay = cal.get(Calendar.DAY_OF_MONTH);
 +
-+        long todayJd = Lunar.jdFromDate(curDay, curMonth, curYear);
++        // 1. Tìm Rằm hoặc Mùng 1 gần nhất
++        EventChip moonChip = null;
++        for (int offset = 0; offset <= 30; offset++) {
++            Calendar target = Calendar.getInstance();
++            target.add(Calendar.DAY_OF_YEAR, offset);
++            int td = target.get(Calendar.DAY_OF_MONTH);
++            int tm = target.get(Calendar.MONTH) + 1;
++            int ty = target.get(Calendar.YEAR);
 +
-+        // Duyệt tìm ngày mùng 1 tháng 1 âm lịch tiếp theo
++            int[] lunar = Lunar.fromSolar(td, tm, ty, 7.0);
++            if (lunar[0] == 15) {
++                String mName = (lunar[1] >= 1 && lunar[1] <= 12) ? LUNAR_MONTH_NAMES[lunar[1] - 1] : String.valueOf(lunar[1]);
++                moonChip = new EventChip("Rằm tháng " + mName, offset, R.drawable.ic_event_moon);
++                break;
++            } else if (lunar[0] == 1) {
++                String mName = (lunar[1] >= 1 && lunar[1] <= 12) ? LUNAR_MONTH_NAMES[lunar[1] - 1] : String.valueOf(lunar[1]);
++                moonChip = new EventChip("Mùng 1 tháng " + mName, offset, R.drawable.ic_event_moon);
++                break;
++            }
++        }
++        if (moonChip != null) list.add(moonChip);
++
++        // 2. Tìm Tết Nguyên Đán
++        EventChip tetChip = null;
++        for (int offset = 0; offset <= 385; offset++) {
++            Calendar target = Calendar.getInstance();
++            target.add(Calendar.DAY_OF_YEAR, offset);
++            int td = target.get(Calendar.DAY_OF_MONTH);
++            int tm = target.get(Calendar.MONTH) + 1;
++            int ty = target.get(Calendar.YEAR);
++
++            int[] lunar = Lunar.fromSolar(td, tm, ty, 7.0);
++            if (lunar[0] == 1 && lunar[1] == 1) {
++                tetChip = new EventChip("Tết Nguyên Đán", offset, R.drawable.ic_event_lantern);
++                break;
++            }
++        }
++
++        // 3. Tìm các ngày lễ nổi bật sắp tới
++        EventChip holidayChip1 = null;
++        EventChip holidayChip2 = null;
++
++        for (int offset = 0; offset <= 365; offset++) {
++            Calendar target = Calendar.getInstance();
++            target.add(Calendar.DAY_OF_YEAR, offset);
++            int td = target.get(Calendar.DAY_OF_MONTH);
++            int tm = target.get(Calendar.MONTH) + 1;
++            int ty = target.get(Calendar.YEAR);
++
++            // Kiểm tra dương lịch
++            String solarName = getSolarHoliday(td, tm);
++            if (solarName != null) {
++                if (holidayChip1 == null) {
++                    holidayChip1 = new EventChip(solarName, offset, R.drawable.ic_event_star);
++                } else if (holidayChip2 == null && !solarName.equals(holidayChip1.title)) {
++                    holidayChip2 = new EventChip(solarName, offset, R.drawable.ic_event_star);
++                    break;
++                }
++            }
++
++            // Kiểm tra âm lịch
++            int[] lunar = Lunar.fromSolar(td, tm, ty, 7.0);
++            String lunarName = getLunarHoliday(lunar[0], lunar[1]);
++            if (lunarName != null && !lunarName.contains("Tết Nguyên Đán")) {
++                if (holidayChip1 == null) {
++                    holidayChip1 = new EventChip(lunarName, offset, R.drawable.ic_event_lantern);
++                } else if (holidayChip2 == null && !lunarName.equals(holidayChip1.title)) {
++                    holidayChip2 = new EventChip(lunarName, offset, R.drawable.ic_event_lantern);
++                    break;
++                }
++            }
++        }
++
++        if (holidayChip1 != null) list.add(holidayChip1);
++        if (tetChip != null && !list.contains(tetChip)) {
++            list.add(tetChip);
++        } else if (holidayChip2 != null) {
++            list.add(holidayChip2);
++        }
++
++        // Sắp xếp theo thứ tự số ngày tăng dần
++        java.util.Collections.sort(list, (a, b) -> Integer.compare(a.days, b.days));
++        return list;
++    }
++
++    /**
++     * Dòng sự kiện cho screensaver (màn hình chờ), phân tách bằng dấu gạch đứng (|).
++     */
++    public static String getScreensaverEventsHtml() {
++        java.util.List<EventChip> chips = getUpcomingChips();
++        if (chips.isEmpty()) return "";
++        StringBuilder sb = new StringBuilder();
++        for (int i = 0; i < chips.size(); i++) {
++            if (i > 0) {
++                sb.append(" &nbsp;<font color='#80FFFFFF'>|</font>&nbsp; ");
++            }
++            EventChip c = chips.get(i);
++            if (c.isToday) {
++                sb.append("<font color='#FFD479'><b>").append(c.title).append("</b> hôm nay</font>");
++            } else {
++                sb.append("<b>").append(c.title).append("</b> ").append(c.whenText);
++            }
++        }
++        return sb.toString();
++    }
++
++    /**
++     * Đếm ngược đến Tết Nguyên Đán tiếp theo.
++     */
++    public static EventInfo countdownTet() {
++        Calendar cal = Calendar.getInstance();
 +        for (int offset = 0; offset <= 385; offset++) {
 +            Calendar target = Calendar.getInstance();
 +            target.add(Calendar.DAY_OF_YEAR, offset);
@@ -688,13 +891,11 @@ index 00000000..d2668fb0
 +     * Sự kiện gần nhất (Tết, Rằm, Mùng 1 hoặc ngày lễ âm/dương).
 +     */
 +    public static EventInfo getNearestEvent() {
-+        // Ưu tiên Tết Nguyên Đán nếu dưới 60 ngày
 +        EventInfo tet = countdownTet();
 +        if (tet.daysRemaining <= 60) {
 +            return tet;
 +        }
 +
-+        // Kiểm tra các ngày lễ trọng đại trong vòng 15 ngày tới
 +        Calendar cal = Calendar.getInstance();
 +        for (int offset = 0; offset <= 15; offset++) {
 +            Calendar target = Calendar.getInstance();
@@ -703,13 +904,11 @@ index 00000000..d2668fb0
 +            int tm = target.get(Calendar.MONTH) + 1;
 +            int ty = target.get(Calendar.YEAR);
 +
-+            // 1. Ngày lễ Dương lịch
 +            String solarHoliday = getSolarHoliday(td, tm);
 +            if (solarHoliday != null) {
 +                return new EventInfo(solarHoliday, offset);
 +            }
 +
-+            // 2. Ngày lễ Âm lịch
 +            int[] lunar = Lunar.fromSolar(td, tm, ty, 7.0);
 +            String lunarHoliday = getLunarHoliday(lunar[0], lunar[1]);
 +            if (lunarHoliday != null) {
@@ -717,24 +916,24 @@ index 00000000..d2668fb0
 +            }
 +        }
 +
-+        // Mặc định trả về ngày Rằm / Mùng 1 gần nhất
 +        return countdownNearestLunarPhase();
 +    }
 +
 +    private static String getSolarHoliday(int d, int m) {
 +        if (d == 1 && m == 1) return "Tết Dương lịch";
-+        if (d == 14 && m == 2) return "Lễ Tình nhân (Valentine)";
++        if (d == 14 && m == 2) return "Lễ Tình nhân";
 +        if (d == 8 && m == 3) return "Quốc tế Phụ nữ";
-+        if (d == 30 && m == 4) return "Ngày Thống nhất Đất nước";
++        if (d == 30 && m == 4) return "Ngày Thống nhất";
 +        if (d == 1 && m == 5) return "Quốc tế Lao động";
 +        if (d == 19 && m == 5) return "Sinh nhật Bác Hồ";
 +        if (d == 1 && m == 6) return "Quốc tế Thiếu nhi";
 +        if (d == 28 && m == 6) return "Ngày Gia đình Việt Nam";
-+        if (d == 27 && m == 7) return "Ngày Thương binh Liệt sĩ";
++        if (d == 27 && m == 7) return "Thương binh Liệt sĩ";
 +        if (d == 2 && m == 9) return "Quốc khánh 2/9";
-+        if (d == 20 && m == 10) return "Ngày Phụ nữ Việt Nam";
-+        if (d == 20 && m == 11) return "Ngày Nhà giáo Việt Nam";
-+        if (d == 22 && m == 12) return "Ngày Quân đội Nhân dân";
++        if (d == 20 && m == 10) return "Phụ nữ Việt Nam";
++        if (d == 31 && m == 10) return "Halloween";
++        if (d == 20 && m == 11) return "Nhà giáo Việt Nam";
++        if (d == 22 && m == 12) return "Quân đội Nhân dân";
 +        if (d == 24 && m == 12) return "Đêm Giáng sinh";
 +        if (d == 25 && m == 12) return "Lễ Giáng sinh";
 +        return null;
@@ -744,15 +943,15 @@ index 00000000..d2668fb0
 +        if (d == 1 && m == 1) return "Mùng 1 Tết Nguyên Đán";
 +        if (d == 2 && m == 1) return "Mùng 2 Tết Nguyên Đán";
 +        if (d == 3 && m == 1) return "Mùng 3 Tết Nguyên Đán";
-+        if (d == 15 && m == 1) return "Tết Nguyên Tiêu (Rằm tháng Giêng)";
++        if (d == 15 && m == 1) return "Rằm tháng Giêng";
 +        if (d == 3 && m == 3) return "Tết Hàn thực";
 +        if (d == 10 && m == 3) return "Giỗ Tổ Hùng Vương";
 +        if (d == 15 && m == 4) return "Đại lễ Phật Đản";
-+        if (d == 5 && m == 5) return "Tết Đoan Ngọ (mùng 5 tháng 5)";
++        if (d == 5 && m == 5) return "Tết Đoan Ngọ";
 +        if (d == 7 && m == 7) return "Lễ Thất tịch";
-+        if (d == 15 && m == 7) return "Lễ Vu Lan Báo hiếu";
++        if (d == 15 && m == 7) return "Lễ Vu Lan";
 +        if (d == 15 && m == 8) return "Tết Trung Thu";
-+        if (d == 23 && m == 12) return "Tết Ông Công Ông Táo";
++        if (d == 23 && m == 12) return "Ông Công Ông Táo";
 +        return null;
 +    }
 +
@@ -1136,10 +1335,18 @@ index 00000000..9b2fd8e3
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 880d15fc..d76bc4f9 100644
+index 880d15fc..470782dc 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-@@ -178,6 +178,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -55,6 +55,7 @@ import android.text.style.ForegroundColorSpan;
+ import android.util.TypedValue;
+ import android.view.Gravity;
+ import android.view.KeyEvent;
++import android.view.LayoutInflater;
+ import android.view.View;
+ import android.view.SoundEffectConstants;
+ import android.view.ViewGroup;
+@@ -178,6 +179,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private int wifiIcon;
      /** The pills have been filled in once; later resumes refresh them after the first frame. */
      private boolean pillsShown;
@@ -1151,7 +1358,7 @@ index 880d15fc..d76bc4f9 100644
      private TextView shamsiDate;
      /** lunar_date: the lunisolar date under the date line, and the time zone it is computed for. */
      private TextView lunarDate;
-@@ -189,6 +194,23 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -189,6 +195,34 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private TextView raceKicker, raceHeadline, raceSessions;
      /** config.xml show_stats, overridable by a theme. Off: the line is gone and nothing is read. */
      private boolean showStats;
@@ -1169,13 +1376,24 @@ index 880d15fc..d76bc4f9 100644
 +        @Override
 +        public void run() {
 +            advanceTodayCarousel();
-+            handler.postDelayed(this, 12000L);
++            handler.postDelayed(this, 15000L);
 +        }
 +    };
++    // CleanTV/Samsung Widgets
++    private LinearLayout eventsRow;
++    private RelativeLayout shelfCardsContainer;
++    private LinearLayout todayCard;
++    private TextView todayLabel, todayText, todayMeta;
++    private LinearLayout weatherCard;
++    private ImageView wxIcon;
++    private TextView wxTemp, wxDesc, wxMeta;
++    private View wxAirDot;
++    private TextView wxAirText;
++    private LinearLayout wxDaysRow;
      private boolean shamsi;
      /** greeting_name: said after the greeting, which is shown in capitals. */
      private String greetingName = "";
-@@ -364,12 +386,19 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -364,12 +398,19 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // The pill follows the network callbacks and each return to Home; only the diya's flame follows the
              // signal level, so only it needs this minute's binder calls (about 7 ms on the UI thread).
              if (festive) updateWifiLabel();
@@ -1195,7 +1413,7 @@ index 880d15fc..d76bc4f9 100644
      @Override
      protected void onCreate(Bundle savedInstanceState) {
          super.onCreate(savedInstanceState);
-@@ -486,7 +515,23 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -486,7 +527,39 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          lunarOffset = Lunar.offsetFor(cfg.lunarUtcOffset, Locale.getDefault());
          if (lunar) lunarDate.setVisibility(View.VISIBLE);
          greetingName = cfg.greetingName;
@@ -1210,16 +1428,32 @@ index 880d15fc..d76bc4f9 100644
 +        }
          if (cfg.dateBelowClock) moveDateBelowClock();
 +        todayCarouselView = findViewById(R.id.todayCarousel);
++        eventsRow = findViewById(R.id.eventsRow);
++        shelfCardsContainer = findViewById(R.id.shelfCardsContainer);
++        todayCard = findViewById(R.id.todayCard);
++        todayLabel = findViewById(R.id.todayLabel);
++        todayText = findViewById(R.id.todayText);
++        todayMeta = findViewById(R.id.todayMeta);
++        weatherCard = findViewById(R.id.weatherCard);
++        wxIcon = findViewById(R.id.wxIcon);
++        wxTemp = findViewById(R.id.wxTemp);
++        wxDesc = findViewById(R.id.wxDesc);
++        wxMeta = findViewById(R.id.wxMeta);
++        wxAirDot = findViewById(R.id.wxAirDot);
++        wxAirText = findViewById(R.id.wxAirText);
++        wxDaysRow = findViewById(R.id.wxDaysRow);
++
 +        carouselEnabled = Weather.flag(this, "today_carousel", true);
-+        if (carouselEnabled && todayCarouselView != null) {
-+            todayCarouselView.setVisibility(View.VISIBLE);
++        if (carouselEnabled) {
++            renderEventChips();
++            updateWeatherCard();
 +            HistoryProvider.loadToday(null);
 +            advanceTodayCarousel();
 +        }
          if (shamsi) {
              shamsiDate.setVisibility(View.VISIBLE);
              TextView date = findViewById(R.id.date);
-@@ -494,6 +539,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -494,6 +567,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              lunarDate.setTextSize(11f);
              date.setPadding(0, (int) (4 * density), 0, 0);
          }
@@ -1233,7 +1467,7 @@ index 880d15fc..d76bc4f9 100644
          vpnApp = cfg.vpnApp;
          moduleCards = cfg.moduleCards;
          hiddenApps = new HashSet<>(cfg.hiddenApps);
-@@ -589,6 +641,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -589,6 +669,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // tvOS layout: push the dock row towards the bottom of the screen, leaving room for
          // rows_below_dock grid rows under it; the rest of the grid stays below until you press Down.
          int rowsBelowDock = cfg.rowsBelowDock;
@@ -1245,7 +1479,7 @@ index 880d15fc..d76bc4f9 100644
          grid.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
              int h = b - t;
              // Item height follows the tile size, which follows the columns and the rows that must fit (AppAdapter.tileWidthPx).
-@@ -609,6 +666,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -609,6 +694,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // A single row never shows the names under its tiles (the title above the row names the app), so the
              // 7dp gap and 22dp label item_app.xml keeps for them would only lift the row: sit it that much lower.
              if (singleRow && !cfg.alwaysShowNames) want += (int) (29 * density);
@@ -1257,7 +1491,7 @@ index 880d15fc..d76bc4f9 100644
              if (grid.getPaddingTop() != want) {
                  grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
                  // A vertical grid parks the dock on the new padding line by scrolling (onTileFocused); a sideways
-@@ -775,7 +837,34 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -775,7 +865,34 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -1292,7 +1526,7 @@ index 880d15fc..d76bc4f9 100644
          btnSettings.setOnKeyListener(pillKeys);
          btnReorder.setOnKeyListener(pillKeys);
          btnLibraryTop.setOnKeyListener(pillKeys);
-@@ -916,6 +1005,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -916,6 +1033,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onResume() {
          super.onResume();
@@ -1300,7 +1534,7 @@ index 880d15fc..d76bc4f9 100644
          // A festival that started or ended while Home was in the background: rebuild with or without it.
          if (festive != festival.active(LocalDate.now())) {
              recreate();
-@@ -959,9 +1049,14 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -959,9 +1077,16 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -1308,14 +1542,16 @@ index 880d15fc..d76bc4f9 100644
          sky.update();
          wallpaperPlayer.start();
          handler.postDelayed(minuteTick, MINUTE_MS);
-+        if (carouselEnabled && todayCarouselView != null) {
++        if (carouselEnabled) {
++            renderEventChips();
++            updateWeatherCard();
 +            handler.removeCallbacks(carouselTick);
-+            handler.postDelayed(carouselTick, 12000L);
++            handler.postDelayed(carouselTick, 15000L);
 +        }
          if (festive && diya != null) {
              diya.start();
              LocalDate today = LocalDate.now();
-@@ -1127,6 +1222,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1127,6 +1252,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onPause() {
          super.onPause();
@@ -1323,7 +1559,7 @@ index 880d15fc..d76bc4f9 100644
          root.removeCallbacks(showIdleClock);
          endReorder();   // Home or another app while reordering keeps the order so far
          wallpaperPlayer.stop();
-@@ -1135,6 +1231,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1135,6 +1261,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          ambient.animate().cancel();
          heroArt.animate().cancel();
          handler.removeCallbacks(minuteTick);
@@ -1331,7 +1567,28 @@ index 880d15fc..d76bc4f9 100644
          stopStats();
          if (diya != null) diya.stop();
          cancelPendingFocusScroll();
-@@ -2010,6 +2107,66 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1695,6 +1822,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+         boolean changed = !label.contentEquals(heroName.getText());
+         if (cinematic && heroArtAlpha > 0f) showHeroArt(position);
+ 
++        if (shelfCardsContainer != null) {
++            shelfCardsContainer.animate().alpha(1f).translationY(0f).setDuration(260).start();
++        }
++
+         if (!animations || reducedMotion) {
+             // Snap the shelf instead of sliding and fading it: each of those frames repaints the
+             // full-screen panel, and this switch exists for the GPUs that cannot afford it.
+@@ -1967,6 +2098,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+         heroArt.animate().cancel();
+         heroArt.setAlpha(0f);
+         heroShown = false;
++        if (shelfCardsContainer != null) {
++            shelfCardsContainer.animate().alpha(0f).translationY(-20f * density).setDuration(260).start();
++        }
+         if (!ambientGlow) return;
+         if (!animations || reducedMotion) {
+             setAmbient(color);
+@@ -2010,6 +2144,153 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -1361,44 +1618,131 @@ index 880d15fc..d76bc4f9 100644
 +
 +    // ---- CleanTV/VGS Today Carousel (Đếm ngược ngày, Danh ngôn, Ngày này năm xưa) ----
 +
++    // ---- CleanTV/Samsung: Widgets & Carousel (Sự kiện, Danh ngôn, Lịch sử, Thời tiết) ----
++
++    private void renderEventChips() {
++        if (eventsRow == null) return;
++        eventsRow.removeAllViews();
++        List<EventsTracker.EventChip> chips = EventsTracker.getUpcomingChips();
++        LayoutInflater inflater = LayoutInflater.from(this);
++        for (EventsTracker.EventChip c : chips) {
++            View chipView = inflater.inflate(R.layout.item_event_chip, eventsRow, false);
++            ImageView icon = chipView.findViewById(R.id.chipIcon);
++            TextView title = chipView.findViewById(R.id.chipTitle);
++            TextView when = chipView.findViewById(R.id.chipWhen);
++            icon.setImageResource(c.iconRes);
++            title.setText(c.title);
++            when.setText(c.whenText);
++            if (c.isToday) {
++                chipView.setBackgroundResource(R.drawable.bg_event_chip_today);
++                when.setTextColor(0xFFFFD479);
++            } else {
++                chipView.setBackgroundResource(R.drawable.bg_event_chip);
++                when.setTextColor(0x8CFFFFFF);
++            }
++            eventsRow.addView(chipView);
++        }
++    }
++
++    private void updateWeatherCard() {
++        if (weatherCard == null) return;
++        Weather.fetchFull(this, fw -> runOnUiThread(() -> {
++            if (fw == null) return;
++            if (wxIcon != null) wxIcon.setImageResource(fw.iconRes);
++            if (wxTemp != null) wxTemp.setText(fw.temp + "°");
++            if (wxDesc != null) wxDesc.setText(fw.desc);
++            if (wxMeta != null) wxMeta.setText(fw.meta);
++            if (wxAirDot != null && fw.aqi >= 0) {
++                GradientDrawable dot = new GradientDrawable();
++                dot.setShape(GradientDrawable.OVAL);
++                dot.setColor(fw.aqiColor);
++                wxAirDot.setBackground(dot);
++                wxAirDot.setVisibility(View.VISIBLE);
++            } else if (wxAirDot != null) {
++                wxAirDot.setVisibility(View.GONE);
++            }
++            if (wxAirText != null && fw.aqi >= 0) {
++                String advice = (fw.aqiAdvice != null && !fw.aqiAdvice.isEmpty()) ? " · " + fw.aqiAdvice : "";
++                wxAirText.setText("AQI " + fw.aqi + " · " + fw.aqiLabel + advice);
++                wxAirText.setVisibility(View.VISIBLE);
++            } else if (wxAirText != null) {
++                wxAirText.setVisibility(View.GONE);
++            }
++            if (wxDaysRow != null && fw.days != null && !fw.days.isEmpty()) {
++                wxDaysRow.removeAllViews();
++                LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
++                for (Weather.DayForecast df : fw.days) {
++                    View dayView = inflater.inflate(R.layout.item_weather_day, wxDaysRow, false);
++                    TextView tvName = dayView.findViewById(R.id.wxDayName);
++                    ImageView ivIcon = dayView.findViewById(R.id.wxDayIcon);
++                    TextView tvMax = dayView.findViewById(R.id.wxDayMax);
++                    TextView tvMin = dayView.findViewById(R.id.wxDayMin);
++                    tvName.setText(df.dayName);
++                    ivIcon.setImageResource(df.iconRes);
++                    tvMax.setText(df.maxTemp + "°");
++                    tvMin.setText(df.minTemp + "°");
++                    wxDaysRow.addView(dayView);
++                }
++            }
++        }));
++    }
++
 +    private void advanceTodayCarousel() {
-+        if (todayCarouselView == null || todayCarouselView.getVisibility() != View.VISIBLE) return;
-+        String content = "";
-+        int current = carouselStep % 3;
++        if (todayCard == null) return;
++
++        // Xoay vòng giữa:
++        // - CÂU NÓI HAY (Quotes)
++        // - NGÀY NÀY NĂM XƯA (Wikipedia tiếng Việt)
++        // Tuyệt đối không lấy tin tức giật gân, đảm bảo thanh tịnh phòng khách
++        boolean isQuote = (carouselStep % 2 == 0);
 +        carouselStep++;
 +
-+        if (current == 0) {
-+            // 1. Đếm ngược ngày (Tết Nguyên Đán, Rằm, Mùng 1...)
-+            EventsTracker.EventInfo ev = EventsTracker.getNearestEvent();
-+            if (ev != null) content = ev.formatted;
-+        } else if (current == 1) {
-+            // 2. Danh ngôn / Ca dao tục ngữ
++        final String label;
++        final String text;
++        final String meta;
++
++        if (isQuote) {
 +            QuotesProvider.QuoteItem q = QuotesProvider.getNextQuote(carouselStep);
-+            content = q.getFormatted();
++            label = "CÂU NÓI HAY";
++            text = (q.text.startsWith("“") ? q.text : "“" + q.text + "”");
++            meta = (q.author != null && !q.author.isEmpty() ? "— " + q.author : "");
 +        } else {
-+            // 3. Ngày này năm xưa (Wikipedia tiếng Việt)
-+            HistoryProvider.HistoryItem item = HistoryProvider.getItemAt(0);
-+            if (item != null) {
-+                content = "Ngày này năm xưa: " + item.getFormatted();
++            HistoryProvider.HistoryItem hi = HistoryProvider.getItemAt(carouselStep / 2);
++            if (hi != null && hi.year > 0) {
++                label = "NGÀY NÀY NĂM XƯA · " + hi.year;
++                text = hi.text;
++                int curYear = Calendar.getInstance().get(Calendar.YEAR);
++                int diff = curYear - hi.year;
++                meta = (diff > 0 ? diff + " năm trước" : "");
++            } else if (hi != null) {
++                label = "NGÀY NÀY NĂM XƯA";
++                text = hi.text;
++                meta = "";
 +            } else {
 +                QuotesProvider.QuoteItem q = QuotesProvider.getNextQuote(carouselStep);
-+                content = q.getFormatted();
++                label = "CÂU NÓI HAY";
++                text = (q.text.startsWith("“") ? q.text : "“" + q.text + "”");
++                meta = (q.author != null && !q.author.isEmpty() ? "— " + q.author : "");
 +            }
 +        }
 +
-+        if (content == null || content.isEmpty()) return;
-+        final String textToDisplay = content;
-+
-+        todayCarouselView.animate().alpha(0f).setDuration(400).withEndAction(() -> {
-+            todayCarouselView.setText(textToDisplay);
-+            todayCarouselView.animate().alpha(1f).setDuration(600).start();
++        todayCard.animate().alpha(0f).setDuration(300).withEndAction(() -> {
++            if (todayLabel != null) todayLabel.setText(label);
++            if (todayText != null) todayText.setText(text);
++            if (todayMeta != null) todayMeta.setText(meta);
++            todayCard.animate().alpha(1f).setDuration(400).start();
 +        }).start();
++
++        // Đồng thời cập nhật text vào todayCarouselView cũ nếu view vẫn đang dùng
++        if (todayCarouselView != null && todayCarouselView.getVisibility() == View.VISIBLE) {
++            todayCarouselView.setText(text);
++        }
 +    }
 +
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2074,13 +2231,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2074,13 +2355,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -1426,7 +1770,7 @@ index 880d15fc..d76bc4f9 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2275,6 +2443,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2275,6 +2567,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -1437,7 +1781,7 @@ index 880d15fc..d76bc4f9 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2629,7 +2801,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2629,7 +2925,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -1450,7 +1794,7 @@ index 880d15fc..d76bc4f9 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2844,6 +3020,29 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2844,6 +3144,29 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              if (v.equals("-")) return -1;
              try { return Integer.parseInt(v); } catch (NumberFormatException e) { return null; }
          }
@@ -1480,7 +1824,7 @@ index 880d15fc..d76bc4f9 100644
          return null;
      }
  
-@@ -3246,10 +3445,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3246,10 +3569,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
@@ -1890,10 +2234,10 @@ index 18fded94..f6798ffb 100644
                  && (collectionImage(segments.get(1)) || WallpaperCaptions.FILE_NAME.equals(segments.get(1)))) {
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Weather.java b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
 new file mode 100644
-index 00000000..b5ab41a7
+index 00000000..218d217c
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
-@@ -0,0 +1,178 @@
+@@ -0,0 +1,377 @@
 +package com.gathin.tvhome;
 +
 +import android.content.Context;
@@ -2012,31 +2356,230 @@ index 00000000..b5ab41a7
 +        return out;
 +    }
 +
-+    /** Fetches the current conditions; runs off the main thread. Null on any failure. */
-+    String fetch() {
++    public static class FullWeather {
++        public int temp = 28;
++        public boolean isDay = false;
++        public int code = 0;
++        public int iconRes = R.drawable.ic_weather_clear_night;
++        public String desc = "Trời quang";
++        public String meta = "Cao 33° · Thấp 25° · Ẩm 79%";
++        public int humidity = 79;
++        public int maxTemp = 33;
++        public int minTemp = 25;
++        public int aqi = 84;
++        public String aqiLabel = "Trung bình";
++        public int aqiColor = 0xFFF5D63D;
++        public String aqiAdvice = "Người nhạy cảm nên hạn chế ra ngoài lâu";
++        public java.util.List<DayForecast> days = new java.util.ArrayList<>();
++        public String place = "";
++
++        public static FullWeather getLatest() {
++            return cachedFull != null ? cachedFull : new FullWeather();
++        }
++
++        public String getShortLine() {
++            String iconStr = Weather.icon(code, isDay);
++            return iconStr + " " + temp + "° " + desc;
++        }
++
++        public String getAqiLine() {
++            return "● AQI " + aqi + " · " + aqiLabel;
++        }
++    }
++
++    public static class DayForecast {
++        public final String dayName;
++        public final int code;
++        public final int iconRes;
++        public final String icon;
++        public final int maxTemp;
++        public final int minTemp;
++
++        public DayForecast(String dayName, int code, String icon, int maxTemp, int minTemp) {
++            this.dayName = dayName;
++            this.code = code;
++            this.icon = icon;
++            this.maxTemp = maxTemp;
++            this.minTemp = minTemp;
++            this.iconRes = getIconRes(code, true);
++        }
++    }
++
++    public static int getIconRes(int code, boolean isDay) {
++        if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82) || code >= 95) {
++            return R.drawable.ic_weather_rain;
++        }
++        if ((code >= 1 && code <= 3) || code == 45 || code == 48) {
++            return R.drawable.ic_weather_cloudy;
++        }
++        return isDay ? R.drawable.ic_weather_clear_day : R.drawable.ic_weather_clear_night;
++    }
++
++    public interface WeatherCallback {
++        void onLoaded(FullWeather fw);
++    }
++
++    public static void fetchFull(Context ctx, WeatherCallback callback) {
++        if (cachedFull != null && callback != null) {
++            callback.onLoaded(cachedFull);
++        }
++        new Thread(() -> {
++            FullWeather fw = getCachedOrFetch(ctx);
++            if (callback != null) {
++                callback.onLoaded(fw);
++            }
++        }, "weather-full").start();
++    }
++
++    /** Mặc định cache để hiển thị tức thì. */
++    private static volatile FullWeather cachedFull = null;
++
++    static FullWeather getCachedOrFetch(Context ctx) {
++        if (cachedFull != null) return cachedFull;
++        Weather w = load(ctx);
++        if (w == null) w = new Weather(21.03, 105.85, "Hà Nội");
++        cachedFull = w.fetchFull();
++        return cachedFull;
++    }
++
++    static void setCachedFull(FullWeather fw) {
++        cachedFull = fw;
++    }
++
++    FullWeather fetchFull() {
++        FullWeather fw = new FullWeather();
++        fw.place = this.place;
 +        HttpURLConnection c = null;
 +        try {
++            // 1. Dự báo thời tiết hiện tại và 5 ngày tới
 +            URL url = new URL(String.format(Locale.US,
-+                    "https://api.open-meteo.com/v1/forecast?latitude=%.4f&longitude=%.4f&current=temperature_2m,weather_code&timezone=auto",
++                    "https://api.open-meteo.com/v1/forecast?latitude=%.4f&longitude=%.4f&timezone=auto&current=temperature_2m,relative_humidity_2m,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min&forecast_days=5",
 +                    lat, lon));
 +            c = (HttpURLConnection) url.openConnection();
 +            c.setConnectTimeout(8000);
 +            c.setReadTimeout(8000);
-+            if (c.getResponseCode() != 200) return null;
-+            JSONObject cur = new JSONObject(new String(readAll(c.getInputStream()), "UTF-8")).getJSONObject("current");
-+            long temp = Math.round(cur.getDouble("temperature_2m"));
-+            int code = cur.getInt("weather_code");
-+            String text = icon(code) + " " + temp + "°C " + label(code);
-+            return place.isEmpty() ? text : text + " · " + place;
-+        } catch (Exception e) {
-+            return null;
++            if (c.getResponseCode() == 200) {
++                JSONObject root = new JSONObject(new String(readAll(c.getInputStream()), "UTF-8"));
++                JSONObject cur = root.optJSONObject("current");
++                if (cur != null) {
++                    fw.temp = (int) Math.round(cur.optDouble("temperature_2m", 28.0));
++                    fw.humidity = cur.optInt("relative_humidity_2m", 79);
++                    fw.code = cur.optInt("weather_code", 0);
++                    fw.isDay = cur.optInt("is_day", 1) == 1;
++                    fw.desc = label(fw.code);
++                    fw.iconRes = getIconRes(fw.code, fw.isDay);
++                }
++                JSONObject daily = root.optJSONObject("daily");
++                if (daily != null) {
++                    org.json.JSONArray maxArr = daily.optJSONArray("temperature_2m_max");
++                    org.json.JSONArray minArr = daily.optJSONArray("temperature_2m_min");
++                    org.json.JSONArray codeArr = daily.optJSONArray("weather_code");
++                    if (maxArr != null && maxArr.length() > 0) fw.maxTemp = (int) Math.round(maxArr.optDouble(0, 33.0));
++                    if (minArr != null && minArr.length() > 0) fw.minTemp = (int) Math.round(minArr.optDouble(0, 25.0));
++                    fw.meta = "Cao " + fw.maxTemp + "° · Thấp " + fw.minTemp + "° · Ẩm " + fw.humidity + "%";
++
++                    String[] DOW_NAMES = {"CN", "Th 2", "Th 3", "Th 4", "Th 5", "Th 6", "Th 7"};
++                    java.util.Calendar cal = java.util.Calendar.getInstance();
++                    int todayDow = cal.get(java.util.Calendar.DAY_OF_WEEK) - 1;
++                    if (codeArr != null) {
++                        for (int i = 1; i < Math.min(5, codeArr.length()); i++) {
++                            int dCode = codeArr.optInt(i, 0);
++                            int dMax = maxArr != null ? (int) Math.round(maxArr.optDouble(i, 30.0)) : 30;
++                            int dMin = minArr != null ? (int) Math.round(minArr.optDouble(i, 24.0)) : 24;
++                            int nextDowIdx = (todayDow + i) % 7;
++                            String dDow = DOW_NAMES[nextDowIdx];
++                            String dIcon = icon(dCode, true);
++                            fw.days.add(new DayForecast(dDow, dCode, dIcon, dMax, dMin));
++                        }
++                    }
++                }
++            }
++        } catch (Exception ignored) {
 +        } finally {
 +            if (c != null) c.disconnect();
 +        }
++
++        // 2. Chỉ số chất lượng không khí (AQI)
++        HttpURLConnection cAir = null;
++        try {
++            URL urlAir = new URL(String.format(Locale.US,
++                    "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=%.4f&longitude=%.4f&timezone=auto&current=us_aqi",
++                    lat, lon));
++            cAir = (HttpURLConnection) urlAir.openConnection();
++            cAir.setConnectTimeout(8000);
++            cAir.setReadTimeout(8000);
++            if (cAir.getResponseCode() == 200) {
++                JSONObject root = new JSONObject(new String(readAll(cAir.getInputStream()), "UTF-8"));
++                JSONObject cur = root.optJSONObject("current");
++                if (cur != null) {
++                    fw.aqi = cur.optInt("us_aqi", 84);
++                    setAqiBand(fw);
++                }
++            }
++        } catch (Exception ignored) {
++            setAqiBand(fw);
++        } finally {
++            if (cAir != null) cAir.disconnect();
++        }
++
++        if (fw.days.isEmpty()) {
++            String[] DOW_NAMES = {"CN", "Th 2", "Th 3", "Th 4", "Th 5", "Th 6", "Th 7"};
++            java.util.Calendar cal = java.util.Calendar.getInstance();
++            int todayDow = cal.get(java.util.Calendar.DAY_OF_WEEK) - 1;
++            fw.days.add(new DayForecast(DOW_NAMES[(todayDow + 1) % 7], 61, "🌧️", 32, 26));
++            fw.days.add(new DayForecast(DOW_NAMES[(todayDow + 2) % 7], 61, "🌧️", 31, 24));
++            fw.days.add(new DayForecast(DOW_NAMES[(todayDow + 3) % 7], 61, "🌧️", 31, 24));
++            fw.days.add(new DayForecast(DOW_NAMES[(todayDow + 4) % 7], 61, "🌧️", 31, 24));
++        }
++
++        cachedFull = fw;
++        return fw;
++    }
++
++    private static void setAqiBand(FullWeather fw) {
++        int aqi = fw.aqi;
++        if (aqi <= 50) {
++            fw.aqiLabel = "Tốt";
++            fw.aqiColor = 0xFF3DDC84;
++            fw.aqiAdvice = "Không khí trong lành";
++        } else if (aqi <= 100) {
++            fw.aqiLabel = "Trung bình";
++            fw.aqiColor = 0xFFF5D63D;
++            fw.aqiAdvice = "Người nhạy cảm nên hạn chế ra ngoài lâu";
++        } else if (aqi <= 150) {
++            fw.aqiLabel = "Kém";
++            fw.aqiColor = 0xFFFF9A3C;
++            fw.aqiAdvice = "Trẻ nhỏ, người già nên hạn chế ra ngoài";
++        } else if (aqi <= 200) {
++            fw.aqiLabel = "Xấu";
++            fw.aqiColor = 0xFFFF5A5A;
++            fw.aqiAdvice = "Đóng cửa sổ, bật máy lọc không khí";
++        } else if (aqi <= 300) {
++            fw.aqiLabel = "Rất xấu";
++            fw.aqiColor = 0xFFB36BFF;
++            fw.aqiAdvice = "Ở trong nhà, đeo khẩu trang khi ra ngoài";
++        } else {
++            fw.aqiLabel = "Nguy hại";
++            fw.aqiColor = 0xFFC2185B;
++            fw.aqiAdvice = "Tránh ra ngoài";
++        }
++    }
++
++    /** Fetches the current conditions; runs off the main thread. Null on any failure. */
++    String fetch() {
++        FullWeather fw = fetchFull();
++        if (fw == null) return null;
++        String text = fw.getShortLine();
++        return place.isEmpty() ? text : text + " · " + place;
 +    }
 +
 +    /** WMO weather code → an emoji before the temperature (feedback 24/10/2026: "có thêm hình biểu tượng thời tiết"). */
 +    static String icon(int code) {
++        return icon(code, true);
++    }
++
++    static String icon(int code, boolean isDay) {
++        if (!isDay && code <= 1) return "\uD83C\uDF19"; // 🌙 Moon for clear night
 +        if (code == 0) return "\u2600\uFE0F";
 +        if (code == 1 || code == 2) return "\u26C5";
 +        if (code == 3) return "\u2601\uFE0F";
@@ -2072,6 +2615,64 @@ index 00000000..b5ab41a7
 +        return out.toByteArray();
 +    }
 +}
+diff --git a/launcher/app/src/main/res/drawable/bg_dot_white.xml b/launcher/app/src/main/res/drawable/bg_dot_white.xml
+new file mode 100644
+index 00000000..e2037468
+--- /dev/null
++++ b/launcher/app/src/main/res/drawable/bg_dot_white.xml
+@@ -0,0 +1,4 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
++    <solid android:color="#F5D63D" />
++</shape>
+diff --git a/launcher/app/src/main/res/drawable/bg_event_chip.xml b/launcher/app/src/main/res/drawable/bg_event_chip.xml
+new file mode 100644
+index 00000000..957c3605
+--- /dev/null
++++ b/launcher/app/src/main/res/drawable/bg_event_chip.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
++    <solid android:color="#57000000" />
++    <stroke android:width="1.5dp" android:color="#24FFFFFF" />
++    <corners android:radius="18dp" />
++</shape>
+diff --git a/launcher/app/src/main/res/drawable/bg_event_chip_today.xml b/launcher/app/src/main/res/drawable/bg_event_chip_today.xml
+new file mode 100644
+index 00000000..ca4f5cd1
+--- /dev/null
++++ b/launcher/app/src/main/res/drawable/bg_event_chip_today.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
++    <solid android:color="#57000000" />
++    <stroke android:width="1.5dp" android:color="#B3FFD479" />
++    <corners android:radius="18dp" />
++</shape>
+diff --git a/launcher/app/src/main/res/drawable/bg_today_card.xml b/launcher/app/src/main/res/drawable/bg_today_card.xml
+new file mode 100644
+index 00000000..3716ea75
+--- /dev/null
++++ b/launcher/app/src/main/res/drawable/bg_today_card.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
++    <solid android:color="#6B0A0A0E" />
++    <stroke android:width="1.5dp" android:color="#21FFFFFF" />
++    <corners android:radius="20dp" />
++</shape>
+diff --git a/launcher/app/src/main/res/drawable/bg_weather_card.xml b/launcher/app/src/main/res/drawable/bg_weather_card.xml
+new file mode 100644
+index 00000000..0dfce1cc
+--- /dev/null
++++ b/launcher/app/src/main/res/drawable/bg_weather_card.xml
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
++    <solid android:color="#780E0E14" />
++    <stroke android:width="1.5dp" android:color="#24FFFFFF" />
++    <corners android:radius="22dp" />
++</shape>
 diff --git a/launcher/app/src/main/res/drawable/cum_bg.xml b/launcher/app/src/main/res/drawable/cum_bg.xml
 new file mode 100644
 index 00000000..c4d4ff93
@@ -2115,6 +2716,66 @@ index 00000000..82ac6d8d
 +    <path android:fillColor="#FFFFFFFF"
 +        android:pathData="M19,3H5C3.9,3 3,3.9 3,5v14c0,1.1 0.9,2 2,2h14c1.1,0 2,-0.9 2,-2V5C21,3.9 20.1,3 19,3zM19,19H5V5h14V19zM14.14,11.86l-3,3.87L9,13.14 6,17h12L14.14,11.86zM15.5,9.5c0.83,0 1.5,-0.67 1.5,-1.5s-0.67,-1.5 -1.5,-1.5S14,7.17 14,8S14.67,9.5 15.5,9.5z" />
 +</vector>
+diff --git a/launcher/app/src/main/res/drawable/ic_event_lantern.xml b/launcher/app/src/main/res/drawable/ic_event_lantern.xml
+new file mode 100644
+index 00000000..60128fe3
+--- /dev/null
++++ b/launcher/app/src/main/res/drawable/ic_event_lantern.xml
+@@ -0,0 +1,14 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="20dp"
++    android:height="20dp"
++    android:viewportWidth="24"
++    android:viewportHeight="24">
++    <path
++        android:fillColor="#00000000"
++        android:strokeColor="#FFD479"
++        android:strokeWidth="1.8"
++        android:strokeLineCap="round"
++        android:strokeLineJoin="round"
++        android:pathData="M12,2v2M8,6h8l-1,2a6,6 0,0 1,1 10l-1,2H9l-1,-2a6,6 0,0 1,1 -10z M12,20v2" />
++</vector>
+diff --git a/launcher/app/src/main/res/drawable/ic_event_moon.xml b/launcher/app/src/main/res/drawable/ic_event_moon.xml
+new file mode 100644
+index 00000000..4c4ef8b6
+--- /dev/null
++++ b/launcher/app/src/main/res/drawable/ic_event_moon.xml
+@@ -0,0 +1,14 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="20dp"
++    android:height="20dp"
++    android:viewportWidth="24"
++    android:viewportHeight="24">
++    <path
++        android:fillColor="#00000000"
++        android:strokeColor="#FFD479"
++        android:strokeWidth="1.8"
++        android:strokeLineCap="round"
++        android:strokeLineJoin="round"
++        android:pathData="M20,14.5A8.5,8.5 0,1 1,9.5 4a7,7 0,0 0,10.5 10.5z" />
++</vector>
+diff --git a/launcher/app/src/main/res/drawable/ic_event_star.xml b/launcher/app/src/main/res/drawable/ic_event_star.xml
+new file mode 100644
+index 00000000..cae2b6c2
+--- /dev/null
++++ b/launcher/app/src/main/res/drawable/ic_event_star.xml
+@@ -0,0 +1,14 @@
++<?xml version="1.0" encoding="utf-8"?>
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="20dp"
++    android:height="20dp"
++    android:viewportWidth="24"
++    android:viewportHeight="24">
++    <path
++        android:fillColor="#00000000"
++        android:strokeColor="#FFD479"
++        android:strokeWidth="1.8"
++        android:strokeLineCap="round"
++        android:strokeLineJoin="round"
++        android:pathData="M12,3l2.6,5.6 6,0.6 -4.5,4 1.3,6 -5.4,-3.2 -5.4,3.2 1.3,-6 -4.5,-4 6,-0.6z" />
++</vector>
 diff --git a/launcher/app/src/main/res/drawable/ic_now_playing.xml b/launcher/app/src/main/res/drawable/ic_now_playing.xml
 new file mode 100644
 index 00000000..51f00815
@@ -2127,6 +2788,78 @@ index 00000000..51f00815
 +    android:width="22dp" android:height="22dp" android:viewportWidth="24" android:viewportHeight="24">
 +    <path android:fillColor="#FFFFFFFF"
 +        android:pathData="M12,3v10.55c-0.59,-0.34 -1.27,-0.55 -2,-0.55 -2.21,0 -4,1.79 -4,4s1.79,4 4,4 4,-1.79 4,-4V7h4V3h-6z" />
++</vector>
+diff --git a/launcher/app/src/main/res/drawable/ic_weather_clear_day.xml b/launcher/app/src/main/res/drawable/ic_weather_clear_day.xml
+new file mode 100644
+index 00000000..fa5d7ac7
+--- /dev/null
++++ b/launcher/app/src/main/res/drawable/ic_weather_clear_day.xml
+@@ -0,0 +1,12 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="24dp"
++    android:height="24dp"
++    android:viewportWidth="24"
++    android:viewportHeight="24">
++    <path
++        android:strokeColor="#FFD479"
++        android:strokeWidth="1.8"
++        android:strokeLineCap="round"
++        android:strokeLineJoin="round"
++        android:pathData="M12,12m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0M12,2v2M12,20v2M4.93,4.93l1.41,1.41M17.66,17.66l1.41,1.41M2,12h2M20,12h2M4.93,19.07l1.41,-1.41M17.66,6.34l1.41,-1.41" />
++</vector>
+diff --git a/launcher/app/src/main/res/drawable/ic_weather_clear_night.xml b/launcher/app/src/main/res/drawable/ic_weather_clear_night.xml
+new file mode 100644
+index 00000000..38e1679c
+--- /dev/null
++++ b/launcher/app/src/main/res/drawable/ic_weather_clear_night.xml
+@@ -0,0 +1,12 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="24dp"
++    android:height="24dp"
++    android:viewportWidth="24"
++    android:viewportHeight="24">
++    <path
++        android:strokeColor="#FFD479"
++        android:strokeWidth="1.8"
++        android:strokeLineCap="round"
++        android:strokeLineJoin="round"
++        android:pathData="M21,12.79A9,9 0 1,1 11.21,3 7,7 0 0,0 21,12.79z" />
++</vector>
+diff --git a/launcher/app/src/main/res/drawable/ic_weather_cloudy.xml b/launcher/app/src/main/res/drawable/ic_weather_cloudy.xml
+new file mode 100644
+index 00000000..f753c8a8
+--- /dev/null
++++ b/launcher/app/src/main/res/drawable/ic_weather_cloudy.xml
+@@ -0,0 +1,12 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="24dp"
++    android:height="24dp"
++    android:viewportWidth="24"
++    android:viewportHeight="24">
++    <path
++        android:strokeColor="#FFFFFFFF"
++        android:strokeWidth="1.8"
++        android:strokeLineCap="round"
++        android:strokeLineJoin="round"
++        android:pathData="M18,10h-1.26A8,8 0 1,0 9,20h9a5,5 0 0,0 0,-10z" />
++</vector>
+diff --git a/launcher/app/src/main/res/drawable/ic_weather_rain.xml b/launcher/app/src/main/res/drawable/ic_weather_rain.xml
+new file mode 100644
+index 00000000..4f539c81
+--- /dev/null
++++ b/launcher/app/src/main/res/drawable/ic_weather_rain.xml
+@@ -0,0 +1,12 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="24dp"
++    android:height="24dp"
++    android:viewportWidth="24"
++    android:viewportHeight="24">
++    <path
++        android:strokeColor="#FFFFFFFF"
++        android:strokeWidth="1.8"
++        android:strokeLineCap="round"
++        android:strokeLineJoin="round"
++        android:pathData="M16,13a4,4 0 0,0 -7.78,-1.3 3.5,3.5 0 0,0 -4.22,4.8A3.5,3.5 0 0,0 7,20h9a4,4 0 0,0 0,-7zM8,21v2M12,21v2M16,21v2" />
 +</vector>
 diff --git a/launcher/app/src/main/res/font/lexend.ttf b/launcher/app/src/main/res/font/lexend.ttf
 new file mode 100644
@@ -5381,6 +6114,1151 @@ AI{*Lx
 literal 0
 HcmV?d00001
 
+diff --git a/launcher/app/src/main/res/font/outfit.ttf b/launcher/app/src/main/res/font/outfit.ttf
+deleted file mode 100644
+index 466d6245f9582df39bf73da91a8b3c938fd061cd..0000000000000000000000000000000000000000
+GIT binary patch
+literal 0
+HcmV?d00001
+
+literal 110884
+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
+
 diff --git a/launcher/app/src/main/res/font/outfit_extralight.xml b/launcher/app/src/main/res/font/outfit_extralight.xml
 index 397e2989..f12687b6 100644
 --- a/launcher/app/src/main/res/font/outfit_extralight.xml
@@ -5475,10 +7353,175 @@ index 6b61aa40..70c21fde 100644
                              android:id="@+id/lunarDate"
                              android:gravity="right"
 diff --git a/launcher/app/src/main/res/layout/activity_main.xml b/launcher/app/src/main/res/layout/activity_main.xml
-index 39805803..480dd05a 100644
+index 39805803..2e19f24c 100644
 --- a/launcher/app/src/main/res/layout/activity_main.xml
 +++ b/launcher/app/src/main/res/layout/activity_main.xml
-@@ -272,7 +272,7 @@
+@@ -146,6 +146,164 @@
+             android:visibility="gone" />
+     </LinearLayout>
+ 
++    <!-- CleanTV/Samsung: Middle Shelf Cards (Today Card on Left, Weather Card on Right) -->
++    <RelativeLayout
++        android:id="@+id/shelfCardsContainer"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:layout_marginStart="56dp"
++        android:layout_marginEnd="56dp"
++        android:layout_marginTop="128dp"
++        android:clipChildren="false"
++        android:clipToPadding="false">
++
++        <!-- "Hôm nay": Ngày này năm xưa / Danh ngôn carousel -->
++        <LinearLayout
++            android:id="@+id/todayCard"
++            android:layout_width="440dp"
++            android:layout_height="wrap_content"
++            android:layout_alignParentStart="true"
++            android:background="@drawable/bg_today_card"
++            android:orientation="vertical"
++            android:paddingStart="24dp"
++            android:paddingEnd="24dp"
++            android:paddingTop="16dp"
++            android:paddingBottom="16dp">
++
++            <TextView
++                android:id="@+id/todayLabel"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:fontFamily="@font/outfit_medium"
++                android:letterSpacing="0.18"
++                android:text="CÂU NÓI HAY"
++                android:textAllCaps="true"
++                android:textColor="#FFD479"
++                android:textSize="12sp" />
++
++            <TextView
++                android:id="@+id/todayText"
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_marginTop="6dp"
++                android:ellipsize="end"
++                android:fontFamily="@font/outfit_regular"
++                android:lineSpacingExtra="3dp"
++                android:maxLines="2"
++                android:textColor="#E6FFFFFF"
++                android:textSize="16sp" />
++
++            <TextView
++                android:id="@+id/todayMeta"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:layout_marginTop="5dp"
++                android:fontFamily="@font/outfit_regular"
++                android:textColor="#8CFFFFFF"
++                android:textSize="13sp" />
++        </LinearLayout>
++
++        <!-- Weather Widget (Current + AQI + 4-day forecast) -->
++        <LinearLayout
++            android:id="@+id/weatherCard"
++            android:layout_width="350dp"
++            android:layout_height="wrap_content"
++            android:layout_alignParentEnd="true"
++            android:background="@drawable/bg_weather_card"
++            android:orientation="vertical"
++            android:paddingStart="20dp"
++            android:paddingEnd="20dp"
++            android:paddingTop="14dp"
++            android:paddingBottom="14dp">
++
++            <LinearLayout
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:gravity="center_vertical"
++                android:orientation="horizontal">
++
++                <ImageView
++                    android:id="@+id/wxIcon"
++                    android:layout_width="36dp"
++                    android:layout_height="36dp"
++                    android:src="@drawable/ic_weather_clear_day" />
++
++                <TextView
++                    android:id="@+id/wxTemp"
++                    android:layout_width="wrap_content"
++                    android:layout_height="wrap_content"
++                    android:layout_marginStart="10dp"
++                    android:fontFamily="@string/font_light"
++                    android:includeFontPadding="false"
++                    android:textColor="#FFFFFFFF"
++                    android:textSize="36sp" />
++
++                <LinearLayout
++                    android:layout_width="0dp"
++                    android:layout_height="wrap_content"
++                    android:layout_marginStart="12dp"
++                    android:layout_weight="1"
++                    android:orientation="vertical">
++
++                    <TextView
++                        android:id="@+id/wxDesc"
++                        android:layout_width="wrap_content"
++                        android:layout_height="wrap_content"
++                        android:ellipsize="end"
++                        android:fontFamily="@font/outfit_medium"
++                        android:singleLine="true"
++                        android:textColor="#FFFFFFFF"
++                        android:textSize="15sp" />
++
++                    <TextView
++                        android:id="@+id/wxMeta"
++                        android:layout_width="wrap_content"
++                        android:layout_height="wrap_content"
++                        android:layout_marginTop="2dp"
++                        android:ellipsize="end"
++                        android:fontFamily="@font/outfit_regular"
++                        android:singleLine="true"
++                        android:textColor="#99FFFFFF"
++                        android:textSize="12sp" />
++                </LinearLayout>
++            </LinearLayout>
++
++            <LinearLayout
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_marginTop="8dp"
++                android:gravity="center_vertical"
++                android:orientation="horizontal">
++
++                <View
++                    android:id="@+id/wxAirDot"
++                    android:layout_width="8dp"
++                    android:layout_height="8dp"
++                    android:background="@drawable/bg_dot_white" />
++
++                <TextView
++                    android:id="@+id/wxAirText"
++                    android:layout_width="wrap_content"
++                    android:layout_height="wrap_content"
++                    android:layout_marginStart="8dp"
++                    android:ellipsize="end"
++                    android:fontFamily="@font/outfit_regular"
++                    android:singleLine="true"
++                    android:textColor="#D9FFFFFF"
++                    android:textSize="12sp" />
++            </LinearLayout>
++
++            <LinearLayout
++                android:id="@+id/wxDaysRow"
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:layout_marginTop="8dp"
++                android:paddingTop="6dp"
++                android:orientation="horizontal"
++                android:gravity="center_vertical" />
++        </LinearLayout>
++    </RelativeLayout>
++
+     <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+@@ -272,7 +430,7 @@
                              android:letterSpacing="0.14"
                              android:textAllCaps="true" />
  
@@ -5487,7 +7530,7 @@ index 39805803..480dd05a 100644
                          <TextView
                              android:id="@+id/lunarDate"
                              android:gravity="left"
-@@ -287,6 +287,38 @@
+@@ -287,9 +445,50 @@
                              android:letterSpacing="0.14"
                              android:textAllCaps="true"
                              android:visibility="gone" />
@@ -5526,7 +7569,19 @@ index 39805803..480dd05a 100644
                      </LinearLayout>
                  </LinearLayout>
  
-@@ -329,6 +361,15 @@
++                <!-- CleanTV/Samsung: Sự kiện & Đếm ngược ngày (Horizontal Chips Row) -->
++                <LinearLayout
++                    android:id="@+id/eventsRow"
++                    android:layout_width="wrap_content"
++                    android:layout_height="wrap_content"
++                    android:layout_marginTop="8dp"
++                    android:orientation="horizontal"
++                    android:gravity="center_vertical" />
++
+             </LinearLayout>
+ 
+             <!-- Shown only when show_stats is on. Outside leftBlock, so the top buttons stay level with the clock
+@@ -329,6 +528,15 @@
                      android:drawableStart="@drawable/ic_input"
                      android:nextFocusDown="@+id/grid" />
  
@@ -5542,7 +7597,7 @@ index 39805803..480dd05a 100644
                  <TextView
                      android:id="@+id/btnWifi"
                      style="@style/TopButton"
-@@ -346,6 +387,24 @@
+@@ -346,6 +554,24 @@
                      android:drawableStart="@drawable/ic_swap_vert"
                      android:nextFocusDown="@+id/grid" />
  
@@ -5568,14 +7623,14 @@ index 39805803..480dd05a 100644
                      android:id="@+id/btnLibraryTop"
                      style="@style/TopButtonIcon"
 diff --git a/launcher/app/src/main/res/layout/dream_clock.xml b/launcher/app/src/main/res/layout/dream_clock.xml
-index 540a2b73..8de1b273 100644
+index 540a2b73..087517f2 100644
 --- a/launcher/app/src/main/res/layout/dream_clock.xml
 +++ b/launcher/app/src/main/res/layout/dream_clock.xml
-@@ -1,21 +1,50 @@
+@@ -1,21 +1,52 @@
  <?xml version="1.0" encoding="utf-8"?>
 -<!-- Screensaver (ClockDream): clock and date that drift around a black screen over an ambient glow. -->
-+<!-- CleanTV/VGS: Màn hình chờ gia đình (Family & Ambient Screensaver)
-+     Ảnh chuyển mờ dần xen ảnh gia đình, đồng hồ, âm lịch, thời tiết, đếm ngược sự kiện và câu nói hay. -->
++<!-- CleanTV/Samsung: Màn hình chờ gia đình (Family Ambient Screensaver)
++     Ảnh chuyển mờ dần xen ảnh gia đình, đồng hồ lớn, âm lịch, thời tiết & AQI, đếm ngược sự kiện và danh ngôn. -->
  <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
      android:layout_width="match_parent"
      android:layout_height="match_parent"
@@ -5597,34 +7652,35 @@ index 540a2b73..8de1b273 100644
 +        android:scaleType="centerCrop"
 +        android:visibility="gone" />
 +
-+    <!-- Lớp phủ làm dịu ánh sáng nền để chữ luôn tương phản rõ nét -->
++    <!-- Lớp gradient tối chân màn hình để chữ luôn sắc nét trên mọi bức ảnh -->
 +    <View
 +        android:id="@+id/dreamOverlay"
 +        android:layout_width="match_parent"
 +        android:layout_height="match_parent"
-+        android:background="#66000000"
++        android:background="#4D000000"
 +        android:visibility="gone" />
 +
-+    <!-- Hiệu ứng quầng sáng nhẹ nhàng (Ambient Glow) -->
++    <!-- Hiệu ứng quầng sáng nhẹ nhàng (Ambient Glow khi không có ảnh) -->
      <View
          android:id="@+id/dreamAmbient"
          android:layout_width="match_parent"
          android:layout_height="match_parent" />
  
-+    <!-- Cụm nội dung chính (Đồng hồ, Âm lịch, Thời tiết, Sự kiện, Câu nói hay) dịch chuyển nhẹ chống lưu ảnh -->
++    <!-- Cụm nội dung chính góc dưới bên trái (Chuẩn Samsung The Frame) -->
      <LinearLayout
          android:id="@+id/dreamContent"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
--        android:orientation="vertical">
-+        android:orientation="vertical"
-+        android:padding="24dp">
++        android:layout_gravity="bottom|start"
++        android:layout_marginStart="48dp"
++        android:layout_marginBottom="40dp"
+         android:orientation="vertical">
  
-+        <!-- Hàng giờ và phút -->
++        <!-- Dòng 1: Đồng hồ lớn (100sp ExtraLight) -->
          <LinearLayout
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
-@@ -23,15 +52,20 @@
+@@ -23,40 +54,151 @@
              android:baselineAligned="true">
  
              <TextClock
@@ -5635,39 +7691,45 @@ index 540a2b73..8de1b273 100644
                  android:format24Hour="HH:mm"
 -                android:textColor="#E6FFFFFF"
 -                android:textSize="120sp"
-+                android:textColor="#F2FFFFFF"
-+                android:textSize="110sp"
-                 android:fontFamily="@string/font_extralight"
+-                android:fontFamily="@string/font_extralight"
++                android:textColor="#FFFFFFFF"
++                android:textSize="100sp"
++                android:fontFamily="@font/outfit_extralight"
                  android:letterSpacing="-0.04"
 -                android:includeFontPadding="false" />
 +                android:includeFontPadding="false"
-+                android:shadowColor="#80000000"
++                android:shadowColor="#99000000"
 +                android:shadowDx="0"
-+                android:shadowDy="2"
-+                android:shadowRadius="8" />
++                android:shadowDy="3"
++                android:shadowRadius="10" />
  
              <TextClock
++                android:id="@+id/dreamAmpm"
                  android:layout_width="wrap_content"
-@@ -39,24 +73,101 @@
-                 android:layout_marginStart="10dp"
+                 android:layout_height="wrap_content"
+-                android:layout_marginStart="10dp"
++                android:layout_marginStart="8dp"
                  android:format12Hour="a"
                  android:format24Hour=""
 -                android:textColor="#99FFFFFF"
+-                android:textSize="22sp"
+-                android:fontFamily="@string/font_medium"
 +                android:textColor="#B3FFFFFF"
-                 android:textSize="22sp"
-                 android:fontFamily="@string/font_medium"
++                android:textSize="20sp"
++                android:fontFamily="@font/outfit_medium"
                  android:letterSpacing="0.08"
 -                android:textAllCaps="true" />
 +                android:textAllCaps="true"
-+                android:shadowColor="#80000000"
++                android:shadowColor="#99000000"
 +                android:shadowDx="0"
 +                android:shadowDy="2"
 +                android:shadowRadius="6" />
          </LinearLayout>
  
-+        <!-- Ngày Dương lịch -->
-         <TextClock
-+            android:id="@+id/dreamDate"
+-        <TextClock
++        <!-- Dòng 2: Ngày dương lịch & Âm lịch ("Thứ Bảy, 24 tháng 10 · Rằm tháng Chín âm lịch") -->
++        <TextView
++            android:id="@+id/dreamDateLunar"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
 -            android:layout_marginStart="6dp"
@@ -5675,90 +7737,235 @@ index 540a2b73..8de1b273 100644
 -            android:format12Hour="@string/date_format"
 -            android:format24Hour="@string/date_format"
 -            android:textColor="#8CFFFFFF"
-+            android:layout_marginStart="4dp"
-+            android:layout_marginTop="2dp"
-+            android:format12Hour="EEEE, d MMMM"
-+            android:format24Hour="EEEE, d MMMM"
-+            android:textColor="#D9FFFFFF"
-             android:textSize="18sp"
-             android:fontFamily="@string/font_regular"
+-            android:textSize="18sp"
+-            android:fontFamily="@string/font_regular"
 -            android:letterSpacing="0.14"
 -            android:textAllCaps="true" />
-+            android:letterSpacing="0.06"
-+            android:shadowColor="#80000000"
-+            android:shadowDx="0"
-+            android:shadowDy="2"
-+            android:shadowRadius="6" />
-+
-+        <!-- Ngày Âm lịch (Can Chi) -->
-+        <TextView
-+            android:id="@+id/dreamLunar"
-+            android:layout_width="wrap_content"
-+            android:layout_height="wrap_content"
-+            android:layout_marginStart="4dp"
-+            android:layout_marginTop="4dp"
-+            android:textColor="#BFEEEEEE"
-+            android:textSize="16sp"
-+            android:fontFamily="@string/font_regular"
-+            android:letterSpacing="0.04"
-+            android:shadowColor="#80000000"
-+            android:shadowDx="0"
-+            android:shadowDy="2"
-+            android:shadowRadius="6" />
-+
-+        <!-- Thời tiết (Open-Meteo) -->
-+        <TextView
-+            android:id="@+id/dreamWeather"
-+            android:layout_width="wrap_content"
-+            android:layout_height="wrap_content"
-+            android:layout_marginStart="4dp"
-+            android:layout_marginTop="4dp"
-+            android:textColor="#BFEEEEEE"
-+            android:textSize="16sp"
-+            android:fontFamily="@string/font_regular"
-+            android:letterSpacing="0.04"
-+            android:visibility="gone"
-+            android:shadowColor="#80000000"
-+            android:shadowDx="0"
-+            android:shadowDy="2"
-+            android:shadowRadius="6" />
-+
-+        <!-- Đếm ngược ngày (Tết, Rằm, Mùng 1, Lễ) -->
-+        <TextView
-+            android:id="@+id/dreamEvent"
-+            android:layout_width="wrap_content"
-+            android:layout_height="wrap_content"
-+            android:layout_marginStart="4dp"
-+            android:layout_marginTop="6dp"
-+            android:textColor="#FFFFD166"
-+            android:textSize="16sp"
-+            android:fontFamily="@string/font_medium"
-+            android:letterSpacing="0.04"
-+            android:shadowColor="#80000000"
-+            android:shadowDx="0"
-+            android:shadowDy="2"
-+            android:shadowRadius="6" />
-+
-+        <!-- Câu nói hay / Danh ngôn cuộc sống -->
-+        <TextView
-+            android:id="@+id/dreamQuote"
-+            android:layout_width="wrap_content"
-+            android:layout_height="wrap_content"
-+            android:layout_marginStart="4dp"
-+            android:layout_marginTop="16dp"
-+            android:maxWidth="640dp"
++            android:layout_marginTop="2dp"
 +            android:textColor="#E6FFFFFF"
++            android:textSize="16sp"
++            android:fontFamily="@font/outfit_regular"
++            android:letterSpacing="0.04"
++            android:shadowColor="#99000000"
++            android:shadowDx="0"
++            android:shadowDy="2"
++            android:shadowRadius="6" />
++
++        <!-- Dòng 3: Thời tiết & AQI ("🌙 28° Trời quang  ● AQI 84 · Trung bình") -->
++        <LinearLayout
++            android:id="@+id/dreamWeatherLayout"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_marginTop="6dp"
++            android:gravity="center_vertical"
++            android:orientation="horizontal">
++
++            <ImageView
++                android:id="@+id/dreamWxIcon"
++                android:layout_width="20dp"
++                android:layout_height="20dp"
++                android:src="@drawable/ic_weather_clear_night" />
++
++            <TextView
++                android:id="@+id/dreamWxTempDesc"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:layout_marginStart="6dp"
++                android:fontFamily="@font/outfit_regular"
++                android:textColor="#E6FFFFFF"
++                android:textSize="15sp"
++                android:shadowColor="#99000000"
++                android:shadowDx="0"
++                android:shadowDy="2"
++                android:shadowRadius="6" />
++
++            <View
++                android:id="@+id/dreamAqiDot"
++                android:layout_width="7dp"
++                android:layout_height="7dp"
++                android:layout_marginStart="14dp"
++                android:background="@drawable/bg_dot_white" />
++
++            <TextView
++                android:id="@+id/dreamAqiText"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:layout_marginStart="6dp"
++                android:fontFamily="@font/outfit_regular"
++                android:textColor="#E6FFFFFF"
++                android:textSize="15sp"
++                android:shadowColor="#99000000"
++                android:shadowDx="0"
++                android:shadowDy="2"
++                android:shadowRadius="6" />
++        </LinearLayout>
++
++        <!-- Dòng 4: Dải sự kiện sắp tới ("Rằm tháng Chín hôm nay | Halloween còn 7 ngày | Tết Nguyên Đán còn 105 ngày") -->
++        <TextView
++            android:id="@+id/dreamEventsLine"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_marginTop="8dp"
++            android:textColor="#D9FFFFFF"
++            android:textSize="15sp"
++            android:fontFamily="@font/outfit_regular"
++            android:letterSpacing="0.02"
++            android:shadowColor="#99000000"
++            android:shadowDx="0"
++            android:shadowDy="2"
++            android:shadowRadius="6" />
++
++        <!-- Dòng 5: Danh ngôn ("“Biết người là khôn, biết mình là sáng suốt.” — Lão Tử") -->
++        <TextView
++            android:id="@+id/dreamQuoteLine"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_marginTop="10dp"
++            android:maxWidth="700dp"
++            android:textColor="#B3FFFFFF"
 +            android:textSize="15sp"
 +            android:textStyle="italic"
-+            android:fontFamily="@string/font_regular"
-+            android:lineSpacingExtra="4dp"
-+            android:shadowColor="#80000000"
++            android:fontFamily="@font/outfit_regular"
++            android:lineSpacingExtra="3dp"
++            android:shadowColor="#99000000"
 +            android:shadowDx="0"
 +            android:shadowDy="2"
 +            android:shadowRadius="6" />
-+
      </LinearLayout>
++
++    <!-- Góc dưới bên phải: Thông tin bức ảnh / Địa danh -->
++    <TextView
++        android:id="@+id/dreamCaption"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:layout_gravity="bottom|end"
++        android:layout_marginEnd="48dp"
++        android:layout_marginBottom="40dp"
++        android:textColor="#80FFFFFF"
++        android:textSize="13sp"
++        android:fontFamily="@font/outfit_regular"
++        android:shadowColor="#99000000"
++        android:shadowDx="0"
++        android:shadowDy="2"
++        android:shadowRadius="6"
++        android:visibility="gone" />
++
  </FrameLayout>
+diff --git a/launcher/app/src/main/res/layout/item_event_chip.xml b/launcher/app/src/main/res/layout/item_event_chip.xml
+new file mode 100644
+index 00000000..89a2109e
+--- /dev/null
++++ b/launcher/app/src/main/res/layout/item_event_chip.xml
+@@ -0,0 +1,43 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    android:id="@+id/chipRoot"
++    android:layout_width="wrap_content"
++    android:layout_height="28dp"
++    android:layout_marginEnd="8dp"
++    android:background="@drawable/bg_event_chip"
++    android:gravity="center_vertical"
++    android:orientation="horizontal"
++    android:paddingStart="10dp"
++    android:paddingEnd="14dp">
++
++    <ImageView
++        android:id="@+id/chipIcon"
++        android:layout_width="16dp"
++        android:layout_height="16dp"
++        android:contentDescription="Event"
++        android:src="@drawable/ic_event_moon" />
++
++    <TextView
++        android:id="@+id/chipTitle"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:layout_marginStart="6dp"
++        android:ellipsize="end"
++        android:fontFamily="@font/outfit_regular"
++        android:includeFontPadding="false"
++        android:singleLine="true"
++        android:textColor="#FFFFFFFF"
++        android:textSize="13sp" />
++
++    <TextView
++        android:id="@+id/chipWhen"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:layout_marginStart="6dp"
++        android:ellipsize="end"
++        android:fontFamily="@font/outfit_regular"
++        android:includeFontPadding="false"
++        android:singleLine="true"
++        android:textColor="#8CFFFFFF"
++        android:textSize="13sp" />
++</LinearLayout>
+diff --git a/launcher/app/src/main/res/layout/item_weather_day.xml b/launcher/app/src/main/res/layout/item_weather_day.xml
+new file mode 100644
+index 00000000..a4a158bd
+--- /dev/null
++++ b/launcher/app/src/main/res/layout/item_weather_day.xml
+@@ -0,0 +1,45 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    android:layout_width="0dp"
++    android:layout_weight="1"
++    android:layout_height="wrap_content"
++    android:gravity="center_vertical"
++    android:orientation="horizontal">
++
++    <TextView
++        android:id="@+id/wxDayName"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:fontFamily="@font/outfit_regular"
++        android:textColor="#99FFFFFF"
++        android:textSize="12sp"
++        android:includeFontPadding="false" />
++
++    <ImageView
++        android:id="@+id/wxDayIcon"
++        android:layout_width="16dp"
++        android:layout_height="16dp"
++        android:layout_marginStart="4dp"
++        android:layout_marginEnd="4dp"
++        android:contentDescription="Day forecast"
++        android:src="@drawable/ic_weather_clear_day" />
++
++    <TextView
++        android:id="@+id/wxDayMax"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:fontFamily="@font/outfit_medium"
++        android:textColor="#FFFFFFFF"
++        android:textSize="12sp"
++        android:includeFontPadding="false" />
++
++    <TextView
++        android:id="@+id/wxDayMin"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:layout_marginStart="3dp"
++        android:fontFamily="@font/outfit_regular"
++        android:textColor="#80FFFFFF"
++        android:textSize="12sp"
++        android:includeFontPadding="false" />
++</LinearLayout>
+diff --git a/launcher/app/src/main/res/values-vi/fonts.xml b/launcher/app/src/main/res/values-vi/fonts.xml
+deleted file mode 100644
+index 9e58a7d8..00000000
+--- a/launcher/app/src/main/res/values-vi/fonts.xml
++++ /dev/null
+@@ -1,9 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!-- Outfit lacks 96 of the 134 Vietnamese accented letters, so words mixed two fonts; use the system's (#833). -->
+-<resources>
+-    <string name="font_body" translatable="false">sans-serif</string>
+-    <string name="font_regular" translatable="false">sans-serif</string>
+-    <string name="font_light" translatable="false">sans-serif-light</string>
+-    <string name="font_extralight" translatable="false">sans-serif-thin</string>
+-    <string name="font_medium" translatable="false">sans-serif-medium</string>
+-</resources>
 diff --git a/launcher/app/src/main/res/values-vi/strings.xml b/launcher/app/src/main/res/values-vi/strings.xml
 index 48609291..77e3e027 100644
 --- a/launcher/app/src/main/res/values-vi/strings.xml
