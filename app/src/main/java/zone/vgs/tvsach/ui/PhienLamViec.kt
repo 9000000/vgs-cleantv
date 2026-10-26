@@ -103,6 +103,21 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     // Tivi
     var thongTin by mutableStateOf<ThongTinTv?>(null)
     /** Máy đích không khai là tivi (laTivi): chặn dọn / đổi Home cho tới khi người dùng xác nhận đúng là tivi. */
+    /** Múi giờ tivi khác điện thoại (giờ trên Home sạch lệch), "" khi khớp. 3.0.1. */
+    var muiGioLech by mutableStateOf("")
+    val muiGioDienThoai: String get() = java.util.TimeZone.getDefault().id
+    fun datGioNhuDienThoai() = chay(t("Đang đặt giờ cho tivi…", "Setting the TV's time zone…")) {
+        val sau = io { tv.datMuiGio(muiGioDienThoai) }
+        if (lechMuiGio(sau)) error(t("Tivi không nhận đổi múi giờ (đang $sau). Hãng có thể khoá phần này.", "The TV did not accept the time zone (still $sau). The maker may lock it."))
+        muiGioLech = ""
+        thongBao = t("Đã đặt giờ tivi theo $muiGioDienThoai.", "The TV now uses $muiGioDienThoai.")
+    }
+    /** Lệch thật khi giờ hiện tại của hai múi khác nhau (Asia/Saigon và Asia/Ho_Chi_Minh coi như khớp). */
+    private fun lechMuiGio(tz: String): Boolean {
+        if (tz.isBlank()) return false
+        val now = System.currentTimeMillis()
+        return java.util.TimeZone.getTimeZone(tz).getOffset(now) != java.util.TimeZone.getDefault().getOffset(now)
+    }
     var khongPhaiTivi by mutableStateOf(false)
     var xacNhanLaTivi by mutableStateOf(false)
     val chanKhongPhaiTivi get() = khongPhaiTivi && !xacNhanLaTivi
@@ -528,6 +543,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         goiHome = io { tv.pkgHome }
         thongTin = info; getprop = gp
         khongPhaiTivi = !io { tv.laTivi() }
+        muiGioLech = io { tv.muiGioTv() }.takeIf { lechMuiGio(it) } ?: ""
         xacNhanLaTivi = false
         val tt = io { tv.docTrangThai() }
         trangThai = tt

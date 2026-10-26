@@ -1,5 +1,15 @@
 [
  {
+  "ban": "3.0.1",
+  "ngay": "2026-10-26",
+  "vi": [
+   "- Tivi để múi giờ khác điện thoại (Xiaomi / Redmi bản Trung Quốc để giờ Bắc Kinh, nhanh hơn Việt Nam 1 tiếng, lại giấu mục chỉnh giờ): khi kết nối, app báo lệch và có nút \"Đặt giờ tivi theo điện thoại\"."
+  ],
+  "en": [
+   "- TV in a different time zone from the phone (China-market Xiaomi / Redmi run Beijing time and hide the setting): on connect the app says so and offers \"Use the phone's time zone on the TV\"."
+  ]
+ },
+ {
   "ban": "3.0.0",
   "ngay": "2026-10-26",
   "vi": [

@@ -59,6 +59,20 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         return f.contains("feature:android.software.leanback") || f.contains("feature:android.hardware.type.television")
     }
 
+    /** Múi giờ tivi đang dùng (vd Asia/Shanghai trên tivi Xiaomi / Redmi nội địa), "" nếu không đọc được. */
+    fun muiGioTv(): String = runCatching { sh("getprop persist.sys.timezone").trim() }.getOrDefault("")
+
+    /**
+     * Đặt múi giờ tivi (3.0.1, Redmi nội địa giờ Bắc Kinh nhanh hơn Việt Nam 1 tiếng mà giấu mục chỉnh giờ): tắt tự dò
+     * múi giờ rồi gọi IAlarmManager.setTimeZone (mã 3) qua service call, shell có quyền SET_TIME_ZONE. Trả về múi giờ sau
+     * khi đặt để bên gọi so lại.
+     */
+    fun datMuiGio(tz: String): String {
+        if (!Regex("[A-Za-z_]+(/[A-Za-z0-9_+-]+){1,2}").matches(tz)) return muiGioTv()
+        sh("settings put global auto_time_zone 0; service call alarm 3 s16 $tz >/dev/null 2>&1; true")
+        return muiGioTv()
+    }
+
     fun docTrangThai(): TrangThaiGoi {
         fun goi(lenh: String) = sh(lenh).lines().mapNotNull { l ->
             l.trim().removePrefix("package:").takeIf { it.isNotEmpty() && TEN_GOI.matches(it) }

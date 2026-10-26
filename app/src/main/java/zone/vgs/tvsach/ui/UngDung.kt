@@ -539,6 +539,15 @@ private fun ManThongTin(vm: PhienLamViec) = Cuon {
         Hang(t("Tôi chắc đây là tivi / hộp tivi / máy chiếu", "I am sure this is a TV / TV box / projector"),
             t("Chỉ bật nếu đúng là thiết bị xem tivi", "Only if it really is a TV device"), vm.xacNhanLaTivi) { vm.xacNhanLaTivi = it }
     }
+    if (vm.muiGioLech.isNotEmpty()) Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color(0xFF3A2A10)).padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row {
+            Icon(Icons.Rounded.Schedule, null, tint = Cam); Spacer(Modifier.width(8.dp))
+            Phu(t("Giờ trên tivi theo múi giờ ${vm.muiGioLech}, lệch với điện thoại (${vm.muiGioDienThoai}), nên đồng hồ Home sạch hiện sai. Tivi bản Trung Quốc hay bị vậy và giấu mục chỉnh giờ.",
+                "The TV uses the ${vm.muiGioLech} time zone, unlike your phone (${vm.muiGioDienThoai}), so the clean Home shows the wrong time. China-market TVs often do and hide the setting."), Color.White)
+        }
+        NutPhu(t("Đặt giờ tivi theo điện thoại", "Use the phone's time zone on the TV"), Icons.Rounded.Schedule) { vm.datGioNhuDienThoai() }
+    }
     if (vm.laAndroidCu && !vm.laFireTv) Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color(0xFF3A2A10)).padding(12.dp)) {
         Icon(Icons.Rounded.Warning, null, tint = Cam); Spacer(Modifier.width(8.dp))
         Phu(t("Máy này chạy Android ${vm.thongTin?.android}: CleanTV dọn được quảng cáo, theo dõi và app rác, nhưng KHÔNG cài được Home sạch (cần Android 8 trở lên).",
