@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 84,
-  "versionName": "3.0.3",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.0.3.apk",
-  "co": 12031201,
-  "ghiChu": "316 mẫu tivi; Home sạch theo bản gốc mới: sửa âm lịch, nút Netflix TCL, mục Khởi động lại.",
-  "ghiChuEn": "316 TV models; Home sạch on the latest CleanYourTV: lunar date fix, TCL Netflix key, Restart menu item.",
+  "versionCode": 85,
+  "versionName": "3.1.0",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.1.0.apk",
+  "co": 12047897,
+  "ghiChu": "CleanTV 3.1: đưa kênh, trận đấu, phim FPT Play ra màn chính; nhập danh sách IPTV của bạn, mở bằng VLC.",
+  "ghiChuEn": "CleanTV 3.1: put FPT Play channels, matches and films on Home; import your own IPTV list, played in VLC.",
   "ngay": "2026-10-26"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "b0696337651e380f",
+   "phienBan": "fb7008538be56a2a",
    "url": "/ota/du-lieu.json",
    "co": 1830957,
-   "tuBan": 84
+   "tuBan": 85
   },
   "tvhome.apk": {
-   "phienBan": "c2463fef2922f34d",
+   "phienBan": "c8991049926b6534",
    "url": "/ota/tvhome.apk",
-   "co": 647481,
-   "tuBan": 84
+   "co": 647585,
+   "tuBan": 85
   }
  }
 }

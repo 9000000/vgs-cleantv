@@ -933,22 +933,54 @@ private fun TheHomeNoiDung(vm: PhienLamViec) {
         }
     }
     if (vm.moChonKenh) HopChonKenh(vm)
+    if (vm.dsIptv != null) HopChonIptv(vm)
     The(t("Kênh truyền hình trên màn chính", "TV channels on Home"), Icons.Rounded.LiveTv) {
+        Phu(t("Mỗi kênh thành một ô có logo ở đầu dock, bấm là xem luôn, ông bà khỏi phải tìm. Tối đa 12 ô, lấy từ VTVgo, FPT Play hay danh sách IPTV của bạn.",
+            "Each channel becomes a tile with its logo at the start of the dock that plays it at once. Up to 12, from VTVgo, FPT Play or your own IPTV list."))
+        // Các ô đã chọn (mọi nguồn), bấm để bỏ.
+        if (vm.kenhChon.isNotEmpty()) {
+            Text(t("Đã chọn ${vm.kenhChon.size}/12 (bấm để bỏ)", "${vm.kenhChon.size}/12 picked (tap to remove)"), fontSize = 13.sp, color = ChuPhu)
+            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                vm.kenhChon.toList().forEach { o -> ChonChip(o.ten, true) { vm.batTatO(o) } }
+            }
+        }
+        Text("VTVgo", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
         if (vm.coVtvGo) {
-            Phu(t("Chọn kênh nào thì kênh đó thành một ô ở đầu dock. Bấm vào là xem luôn kênh đó trên VTVgo, ông bà khỏi phải tìm.",
-                "Pick channels: each becomes a tile at the start of the dock that opens the channel straight in VTVgo."))
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 KENH_VTV.forEach { (ten, ma, _) -> ChonChip(ten, vm.coKenh(ma.toString())) { vm.batTatKenh(ten, ma.toString()) } }
             }
-            // Kênh khác (địa phương, VTVcab…) đã chọn từ hộp danh sách: hiện riêng để bỏ chọn được.
-            val khac = vm.kenhChon.filter { (_, ma) -> KENH_VTV.none { it.second.toString() == ma } }
-            if (khac.isNotEmpty()) Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                khac.forEach { (ten, ma) -> ChonChip(ten, true) { vm.batTatKenh(ten, ma) } }
-            }
             NutPhu(t("Thêm kênh khác trên VTVgo (địa phương, VTVcab…)", "More VTVgo channels (local, VTVcab…)"), Icons.Rounded.Search) { vm.moHopKenh() }
-            if (vm.kenhChon.size >= 12) Phu(t("Tối đa 12 kênh.", "Up to 12 channels."))
         } else Phu(t("Cần app VTVgo trên tivi: vào Google Play trên tivi tìm \"VTVgo\", cài và mở một lần, rồi kết nối lại CleanTV.",
             "Needs the VTVgo app on the TV: install it from Google Play on the TV, open it once, then reconnect CleanTV."))
+        // FPT Play (3.1.0): kênh có sẵn + dán link chia sẻ (kênh, trận đấu, phim).
+        Text("FPT Play", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+        if (vm.coFpt) {
+            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                zone.vgs.tvsach.dulieu.FptPlay.KENH.forEach { (ten, slug) -> ChonChip(ten, vm.coO(zone.vgs.tvsach.dulieu.FptPlay.linkKenh(slug))) { vm.batTatKenhFpt(ten, slug) } }
+            }
+            OutlinedTextField(vm.linkFpt, { vm.linkFpt = it }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp),
+                label = { Text(t("Dán link FPT Play (kênh, trận đấu, phim)", "Paste an FPT Play link (channel, match, film)")) },
+                placeholder = { Text("fptplay.vn/su-kien/…") })
+            NutPhu(t("Thêm ô từ link này", "Add a tile from this link"), Icons.Rounded.AddLink, enabled = vm.linkFpt.isNotBlank() && !vm.dangBan) { vm.themLinkFpt() }
+            Phu(t("Lấy link: trong app hoặc web FPT Play, mở kênh / trận / phim → Chia sẻ → Sao chép link. Nội dung cần gói FPT thì tivi phải đăng nhập FPT Play.",
+                "Get a link: in the FPT Play app or website open the channel / match / film → Share → Copy link. Paid content needs an FPT Play login on the TV."))
+        } else Phu(t("Cần app \"FPT Play for Android TV\" trên tivi (Google Play trên tivi tìm \"FPT Play\"), rồi kết nối lại CleanTV.",
+            "Needs \"FPT Play for Android TV\" on the TV (search \"FPT Play\" in Google Play on the TV), then reconnect CleanTV."))
+        // IPTV cá nhân (3.1.0): danh sách m3u, mở bằng trình phát video trên tivi.
+        Text(t("Danh sách IPTV của bạn", "Your IPTV list"), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+        if (vm.trinhPhatCo.isEmpty()) Phu(t("Cần một trình phát video trên tivi: VLC (Google Play trên tivi tìm \"VLC\"), MX Player, Just Player hoặc Kodi, rồi kết nối lại CleanTV.",
+            "Needs a video player on the TV: VLC (search \"VLC\" in Google Play on the TV), MX Player, Just Player or Kodi, then reconnect CleanTV."))
+        else {
+            if (vm.trinhPhatCo.size > 1) Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                vm.trinhPhatCo.forEach { (goi, ten) -> ChonChip(t("Mở bằng $ten", "Play with $ten"), vm.trinhPhat == goi) { vm.trinhPhatChon = goi } }
+            }
+            OutlinedTextField(vm.nguonIptv, { vm.nguonIptv = it }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), maxLines = 4,
+                label = { Text(t("Link danh sách m3u (hoặc dán nội dung)", "m3u list link (or paste its content)")) },
+                placeholder = { Text("https://…/playlist.m3u") })
+            NutPhu(t("Mở danh sách và chọn kênh", "Open the list and pick channels"), Icons.Rounded.PlaylistAdd, enabled = vm.nguonIptv.isNotBlank() && !vm.dangBan) { vm.moIptv() }
+            Phu(t("Lần đầu mở, VLC có thể xin quyền truy cập bộ nhớ: bật cho VLC rồi bấm lại ô kênh. Link IPTV cần thêm mật khẩu riêng thì có thể không phát được.",
+                "On first use VLC may ask for storage access: allow it, then press the tile again. IPTV links that need extra headers may not play."))
+        }
     }
     The(t("Thời tiết", "Weather"), Icons.Rounded.WbSunny) {
         OutlinedTextField(vm.timXa, { vm.doiTimXa(it) }, label = { Text(t("Tìm phường / xã hoặc thành phố", "Find your ward or city")) },
@@ -1527,6 +1559,40 @@ private fun HopChonMau(vm: PhienLamViec) {
     )
 }
 
+/** Chọn kênh từ danh sách IPTV (3.1.0), tìm theo tên không dấu. */
+@Composable
+private fun HopChonIptv(vm: PhienLamViec) {
+    val ds = vm.dsIptv ?: return
+    var tim by remember { mutableStateOf("") }
+    val khoa = XaPhuong.boDau(tim.trim().lowercase())
+    val loc = remember(khoa, ds) { if (khoa.isEmpty()) ds else ds.filter { k -> khoa.split(" ").all { it in XaPhuong.boDau(k.ten.lowercase()) } } }
+    AlertDialog(
+        onDismissRequest = { vm.dsIptv = null },
+        confirmButton = { TextButton(onClick = { vm.dsIptv = null }) { Text(t("Xong", "Done")) } },
+        title = { Text(t("Kênh IPTV (${ds.size})", "IPTV channels (${ds.size})")) },
+        text = {
+            Column {
+                OutlinedTextField(tim, { tim = it }, singleLine = true, modifier = Modifier.fillMaxWidth(), label = { Text(t("Tìm kênh", "Search")) })
+                Text(t("Đã chọn ${vm.kenhChon.size}/12", "${vm.kenhChon.size}/12 picked"), fontSize = 12.sp, color = ChuPhu, modifier = Modifier.padding(vertical = 6.dp))
+                LazyColumn(Modifier.heightIn(max = 400.dp)) {
+                    items(loc.take(500), key = { it.url }) { k ->
+                        val chon = vm.coO(k.url)
+                        Row(Modifier.fillMaxWidth().clickable { vm.batTatIptv(k) }.padding(vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(if (chon) Icons.Rounded.CheckCircle else Icons.Rounded.AddCircleOutline, null, tint = if (chon) Xanh else ChuPhu, modifier = Modifier.size(20.dp))
+                            Spacer(Modifier.width(10.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(k.ten, fontSize = 14.sp, maxLines = 1)
+                                if (k.nhom.isNotBlank()) Text(k.nhom, fontSize = 11.sp, color = ChuPhu, maxLines = 1)
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        containerColor = The1,
+    )
+}
+
 /** Chọn kênh VTVgo bất kỳ (3.0.0): danh sách từ API VTVgo, nhóm theo gói, tìm theo tên không dấu. */
 @Composable
 private fun HopChonKenh(vm: PhienLamViec) {
@@ -1546,7 +1612,7 @@ private fun HopChonKenh(vm: PhienLamViec) {
                 if (vm.dsKenhGo.isEmpty()) Text(if (vm.dangTaiKenh) t("Đang tải danh sách kênh…", "Loading channels…")
                     else t("Không tải được danh sách kênh. Kiểm tra mạng của điện thoại rồi mở lại.", "Could not load the channel list. Check the phone's internet and try again."),
                     fontSize = 13.sp, modifier = Modifier.padding(vertical = 8.dp))
-                Text(t("Đã chọn ${vm.kenhChon.size}/12 · kênh có ổ khoá cần đăng nhập VTVgo trên tivi", "${vm.kenhChon.size}/12 picked · locked channels need a VTVgo login on the TV"),
+                Text(t("Đã chọn ${vm.kenhChon.size}/12 ô · kênh có ổ khoá cần đăng nhập VTVgo trên tivi", "${vm.kenhChon.size}/12 picked · locked channels need a VTVgo login on the TV"),
                     fontSize = 12.sp, color = ChuPhu, modifier = Modifier.padding(vertical = 6.dp))
                 LazyColumn(Modifier.heightIn(max = 400.dp)) {
                     var nhomTruoc = ""

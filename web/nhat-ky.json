@@ -1,5 +1,19 @@
 [
  {
+  "ban": "3.1.0",
+  "ngay": "2026-10-26",
+  "vi": [
+   "- Ô FPT Play trên màn chính: chọn nhanh VTV1–9, HTV7, HTV9 HD, hoặc dán link chia sẻ từ FPT Play (kênh, trận đấu, phim). Bấm ô là FPT Play trên tivi mở thẳng nội dung đó. Cần app \"FPT Play for Android TV\".",
+   "- Danh sách IPTV của bạn: dán link m3u (hoặc nội dung), chọn kênh, mỗi kênh một ô có logo; bấm là mở bằng VLC, MX Player, Just Player hoặc Kodi trên tivi.",
+   "- Tối đa 12 ô kênh, lấy từ VTVgo, FPT Play và IPTV."
+  ],
+  "en": [
+   "- FPT Play tiles on Home: quick-pick VTV1–9, HTV7, HTV9 HD, or paste a share link from FPT Play (channel, match, film); the tile opens it straight in FPT Play on the TV. Needs \"FPT Play for Android TV\".",
+   "- Your IPTV list: paste an m3u link (or its content), pick channels, each a tile with its logo, played with VLC, MX Player, Just Player or Kodi on the TV.",
+   "- Up to 12 channel tiles from VTVgo, FPT Play and IPTV."
+  ]
+ },
+ {
   "ban": "3.0.3",
   "ngay": "2026-10-26",
   "vi": [

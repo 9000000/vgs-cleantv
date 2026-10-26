@@ -189,22 +189,67 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     /** HomeKeyService cần bật: phím Home lạ, phím app remote, hoặc mở app khi bật từ chế độ chờ. */
     val canDichVuPhim get() = nutHome || dungPhimRemote || (moKhiBat && moKhiThuc) || luonVeHome
     /**
-     * Kênh VTVgo đặt ở đầu dock, theo thứ tự chọn: (tên trên ô, mã kênh VTVgo). 3.0.0: chọn được mọi kênh của VTVgo
-     * (KenhVtvGo), không chỉ VTV1–9.
+     * Ô kênh đặt ở đầu dock, theo thứ tự chọn: VTVgo (3.0.0, mọi kênh), FPT Play và IPTV (3.1.0). Tối đa 12 (link_tiles).
      */
-    val kenhChon = mutableStateListOf<Pair<String, String>>()
+    val kenhChon = mutableStateListOf<zone.vgs.tvsach.dulieu.OKenh>()
     /** Danh sách kênh VTVgo (tải khi mở hộp chọn kênh); rỗng = chưa tải. */
     var dsKenhGo by mutableStateOf<List<zone.vgs.tvsach.dulieu.KenhVtvGo.Kenh>>(emptyList())
     var moChonKenh by mutableStateOf(false)
     var dangTaiKenh by mutableStateOf(false)
-    fun coKenh(ma: String) = kenhChon.any { it.second == ma }
-    fun batTatKenh(ten: String, ma: String) {
-        val i = kenhChon.indexOfFirst { it.second == ma }
-        if (i >= 0) { kenhChon.removeAt(i); return }
-        val s = zone.vgs.tvsach.dulieu.KenhVtvGo.slug(ten)
-        if (s.isEmpty() || kenhChon.any { zone.vgs.tvsach.dulieu.KenhVtvGo.slug(it.first) == s } || kenhChon.size >= 12) return
-        kenhChon.add(ten to ma)
+    private fun uriVtvGo(ma: String) = "vtvgo://play?mediaType=CHANNEL&contentId=$ma"
+    fun coKenh(ma: String) = kenhChon.any { it.goi == GOI_VTVGO && it.uri == uriVtvGo(ma) }
+    fun batTatKenh(ten: String, ma: String) =
+        batTatO(zone.vgs.tvsach.dulieu.OKenh(ten, GOI_VTVGO, uriVtvGo(ma), KENH_VTV.firstOrNull { it.second.toString() == ma }?.third ?: "#C62828"))
+    fun coO(uri: String) = kenhChon.any { it.uri == uri }
+    /** Thêm / bỏ một ô (theo uri). Trùng tên ô (slug) thì không thêm, vì launcher đặt tên gói giả theo tên. */
+    fun batTatO(o: zone.vgs.tvsach.dulieu.OKenh): Boolean {
+        val i = kenhChon.indexOfFirst { it.uri == o.uri }
+        if (i >= 0) { kenhChon.removeAt(i); return true }
+        if (o.slug.isEmpty() || kenhChon.any { it.slug == o.slug } || kenhChon.size >= 12) return false
+        kenhChon.add(o)
+        o.anh?.let { a -> ctx.getSharedPreferences("anh_o", android.content.Context.MODE_PRIVATE).edit().putString(o.uri, a).apply() }
+        return true
     }
+    private fun anhCuaO(o: zone.vgs.tvsach.dulieu.OKenh) = o.anh ?: ctx.getSharedPreferences("anh_o", android.content.Context.MODE_PRIVATE).getString(o.uri, null)
+
+    // ---- FPT Play (3.1.0) ----
+    val coFpt get() = trangThai?.caiDat?.contains(zone.vgs.tvsach.dulieu.FptPlay.GOI) == true
+    var linkFpt by mutableStateOf("")
+    fun batTatKenhFpt(ten: String, slug: String) = viewModelScope.launch {
+        val url = zone.vgs.tvsach.dulieu.FptPlay.linkKenh(slug)
+        if (coO(url)) { kenhChon.removeAll { it.uri == url }; return@launch }
+        val anh = io { zone.vgs.tvsach.dulieu.FptPlay.docTrang(url) }?.second
+        batTatO(zone.vgs.tvsach.dulieu.OKenh(ten, zone.vgs.tvsach.dulieu.FptPlay.GOI, url, "#E65100", anh))
+    }
+    fun themLinkFpt() = chay(t("Đang đọc link FPT Play…", "Reading the FPT Play link…")) {
+        val url = zone.vgs.tvsach.dulieu.FptPlay.chuanHoa(linkFpt)
+            ?: error(t("Không phải link nội dung FPT Play. Mở kênh / trận đấu / phim trên app hoặc web FPT Play, bấm Chia sẻ → Sao chép link rồi dán vào.",
+                "Not an FPT Play content link. Open a channel / match / film in FPT Play, tap Share → Copy link and paste it here."))
+        val (ten, anh) = io { zone.vgs.tvsach.dulieu.FptPlay.docTrang(url) }
+            ?: error(t("FPT Play không có nội dung ở link này (đã kết thúc hoặc sai link).", "FPT Play has nothing at this link (ended or wrong)."))
+        if (!batTatO(zone.vgs.tvsach.dulieu.OKenh(ten, zone.vgs.tvsach.dulieu.FptPlay.GOI, url, "#E65100", anh)))
+            error(t("Không thêm được: đã đủ 12 ô hoặc trùng tên ô khác.", "Couldn't add: 12 tiles already, or the name clashes with another tile."))
+        linkFpt = ""
+    }
+
+    // ---- IPTV (3.1.0) ----
+    var nguonIptv by mutableStateOf("")
+    var dsIptv by mutableStateOf<List<zone.vgs.tvsach.dulieu.Iptv.Kenh>?>(null)
+    /** Trình phát video có trên tivi, theo thứ tự ưu tiên của Iptv.TRINH_PHAT. */
+    val trinhPhatCo get() = zone.vgs.tvsach.dulieu.Iptv.TRINH_PHAT.filter { trangThai?.caiDat?.contains(it.first) == true }
+    var trinhPhatChon by mutableStateOf<String?>(null)
+    val trinhPhat get() = trinhPhatChon?.takeIf { p -> trinhPhatCo.any { it.first == p } } ?: trinhPhatCo.firstOrNull()?.first
+    fun moIptv() = chay(t("Đang đọc danh sách IPTV…", "Reading the IPTV list…")) {
+        val ds = io { runCatching { zone.vgs.tvsach.dulieu.Iptv.doc(nguonIptv) }.getOrNull() }
+            ?: error(t("Không tải được danh sách. Kiểm tra link (http/https) và mạng của điện thoại.", "Couldn't load the list. Check the link (http/https) and the phone's internet."))
+        if (ds.isEmpty()) error(t("Không thấy kênh nào trong danh sách (cần định dạng m3u có #EXTINF và link luồng).", "No channels found (needs an m3u list with #EXTINF and stream links)."))
+        dsIptv = ds
+    }
+    fun batTatIptv(k: zone.vgs.tvsach.dulieu.Iptv.Kenh): Boolean {
+        val p = trinhPhat ?: return false
+        return batTatO(zone.vgs.tvsach.dulieu.OKenh(zone.vgs.tvsach.dulieu.OKenh.tenGon(k.ten), p, k.url, "#37474F", k.logo))
+    }
+
     fun moHopKenh() {
         moChonKenh = true
         if (dsKenhGo.isNotEmpty() || dangTaiKenh) return
@@ -824,8 +869,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         gonNut = j.optBoolean("top_compact", gonNut)
         j.optJSONArray("dock_apps")?.let { a -> val ds = (0 until a.length()).map { a.optString(it) }.filter { it.isNotBlank() && !it.startsWith(GOI_KENH) }; if (ds.isNotEmpty()) { dock.clear(); dock.addAll(ds.take(DOCK_TOI_DA)) } }
         kenhChon.clear()
-        j.optJSONArray("link_tiles")?.let { a -> (0 until a.length()).map { a.optString(it).split('|') }.filter { it.size >= 3 && it[1] == GOI_VTVGO }
-            .forEach { p -> Regex("contentId=([A-Za-z0-9_-]+)").find(p[2])?.groupValues?.get(1)?.let { ma -> kenhChon.add(p[0] to ma) } } }
+        j.optJSONArray("link_tiles")?.let { a -> (0 until a.length()).mapNotNull { zone.vgs.tvsach.dulieu.OKenh.tuDong(a.optString(it)) }.forEach { kenhChon.add(it) } }
+        // Trình phát IPTV đang dùng (ô IPTV đầu tiên) để thêm kênh mới cũng mở bằng nó.
+        kenhChon.firstOrNull { o -> zone.vgs.tvsach.dulieu.Iptv.TRINH_PHAT.any { it.first == o.goi } }?.let { trinhPhatChon = it.goi }
         j.optString("greeting_name").takeIf { it.isNotBlank() }?.let { tenChao = it }
         j.optString("weather_place").takeIf { it.isNotBlank() }?.let { ten ->
             thanhPho = THANH_PHO.firstOrNull { it.ten == ten }
@@ -918,12 +964,10 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     }
 
     private fun cauHinhHome(): String = JSONObject().apply {
-        // Ô kênh VTV đứng đầu dock, rồi tới app người dùng chọn.
-        val kenh = if (coVtvGo) kenhChon.toList() else emptyList()
-        if (kenh.isNotEmpty()) put("link_tiles", JSONArray(kenh.map { (ten, ma) ->
-            val mau = KENH_VTV.firstOrNull { it.second.toString() == ma }?.third ?: "#C62828"
-            "$ten|$GOI_VTVGO|vtvgo://play?mediaType=CHANNEL&contentId=$ma|$mau" }))
-        put("dock_apps", JSONArray(kenh.map { GOI_KENH + zone.vgs.tvsach.dulieu.KenhVtvGo.slug(it.first) } + dock.toList()))
+        // Ô kênh (VTVgo, FPT Play, IPTV) đứng đầu dock, rồi tới app người dùng chọn. Chỉ ô có app trên tivi.
+        val kenh = kenhChon.filter { trangThai?.caiDat?.contains(it.goi) == true }
+        if (kenh.isNotEmpty()) put("link_tiles", JSONArray(kenh.map { it.dong() }))
+        put("dock_apps", JSONArray(kenh.map { GOI_KENH + it.slug } + dock.toList()))
         if (tenChao.isNotBlank()) put("greeting_name", tenChao.trim())
         themeChon.ghiVao(this)
         if (anhNenRieng != null) { put("wallpaper", true); put("vgs_anh_rieng", true) }
@@ -1073,13 +1117,13 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     /** Ảnh logo kênh (assets/kenh, ảnh nhỏ của VTVgo) cho các kênh đang chọn; launcher không có mạng nên gửi kèm. */
     private suspend fun napAnhKenh() {
-        if (!coVtvGo) { tv.anhKenh = emptyList(); return }
         val ds = if (dsKenhGo.isEmpty()) io { zone.vgs.tvsach.dulieu.KenhVtvGo.docNho(ctx) } else dsKenhGo
-        tv.anhKenh = kenhChon.mapNotNull { (ten, ma) ->
-            val f = zone.vgs.tvsach.dulieu.KenhVtvGo.slug(ten) + ".jpg"
-            // VTV1–9 có ảnh sẵn trong app; kênh khác tải thumbnail của VTVgo (launcher không có mạng nên gửi kèm).
-            runCatching { f to io { ctx.assets.open("kenh/$f").readBytes() } }.getOrNull()
-                ?: ds.firstOrNull { it.ma == ma }?.anh?.let { u -> io { zone.vgs.tvsach.dulieu.KenhVtvGo.taiAnh(u) } }?.let { f to it }
+        tv.anhKenh = kenhChon.filter { trangThai?.caiDat?.contains(it.goi) == true }.mapNotNull { o ->
+            val f = o.slug + ".jpg"
+            // VTV1–9 của VTVgo có ảnh sẵn trong app; ô khác tải ảnh (thumbnail VTVgo, og:image FPT Play, tvg-logo IPTV).
+            val sanCo = if (o.goi == GOI_VTVGO) runCatching { io { ctx.assets.open("kenh/$f").readBytes() } }.getOrNull() else null
+            val url = anhCuaO(o) ?: if (o.goi == GOI_VTVGO) ds.firstOrNull { o.uri.endsWith("contentId=" + it.ma) }?.anh else null
+            (sanCo ?: url?.let { u -> io { zone.vgs.tvsach.dulieu.KenhVtvGo.taiAnh(u) } })?.let { f to it }
         }
     }
 

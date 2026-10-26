@@ -141,7 +141,7 @@ index 701b5feb..05be9b5e 100644
              android:name=".ClockDream"
              android:label="@string/dream_name"
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
-index 3632d74b..960a3838 100644
+index 3632d74b..f5a58933 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 @@ -64,7 +64,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -212,7 +212,7 @@ index 3632d74b..960a3838 100644
          if (e.kind == Entry.HOME_SETTINGS) {
              ctx.startActivity(new Intent(ctx, HomeSettingsActivity.class)
                      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-@@ -538,6 +560,21 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -538,6 +560,27 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
          }
      }
  
@@ -221,7 +221,13 @@ index 3632d74b..960a3838 100644
 +        Intent view = new Intent(Intent.ACTION_VIEW, Uri.parse(e.uri)).setPackage(e.target)
 +                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 +        PackageManager pm = ctx.getPackageManager();
-+        Intent open = pm.resolveActivity(view, 0) != null ? view : pm.getLeanbackLaunchIntentForPackage(e.target);
++        Intent open = pm.resolveActivity(view, 0) != null ? view : null;
++        // CleanTV/VGS: an IPTV stream (http/rtsp…) in a video player (VLC, MX Player…), whose filters ask for a video type.
++        if (open == null && !e.uri.startsWith("https://fptplay.vn")) {
++            Intent typed = new Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(e.uri), "video/*").setPackage(e.target);
++            if (pm.resolveActivity(typed, 0) != null) open = typed;
++        }
++        if (open == null) open = pm.getLeanbackLaunchIntentForPackage(e.target);
 +        if (open == null) open = pm.getLaunchIntentForPackage(e.target);
 +        try {
 +            if (open == null) throw new ActivityNotFoundException();
@@ -234,7 +240,7 @@ index 3632d74b..960a3838 100644
      @Override
      public int getItemCount() {
          return items.size() + (showLibrary ? 1 : 0);
-@@ -809,6 +846,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -809,6 +852,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
          return Math.max(0, Math.min(255, Math.round(v)));
      }
  
