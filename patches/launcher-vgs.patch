@@ -35056,7 +35056,7 @@ index b3de8647..da7be36e 100644
              android:id="@+id/animationsChoice"
              style="@style/SettingsRow"
 diff --git a/launcher/app/src/main/res/layout/activity_main.xml b/launcher/app/src/main/res/layout/activity_main.xml
-index c037d247..638a28a6 100644
+index c037d247..3dee4161 100644
 --- a/launcher/app/src/main/res/layout/activity_main.xml
 +++ b/launcher/app/src/main/res/layout/activity_main.xml
 @@ -146,6 +146,164 @@
@@ -35228,7 +35228,7 @@ index c037d247..638a28a6 100644
          <RelativeLayout
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
-+            android:minHeight="92dp"
++            android:minHeight="98dp"
              android:clipChildren="false"
              android:clipToPadding="false">
  
@@ -35236,7 +35236,7 @@ index c037d247..638a28a6 100644
                  android:id="@+id/leftBlock"
                  android:layout_width="match_parent"
                  android:layout_height="wrap_content"
-+                android:minHeight="92dp"
++                android:minHeight="98dp"
                  android:layout_alignParentStart="true"
                  android:layout_toStartOf="@+id/topButtons"
                  android:layout_marginEnd="16dp"
@@ -35309,7 +35309,7 @@ index c037d247..638a28a6 100644
                  android:focusable="false"
                  android:visibility="gone" />
  
-+            <!-- CleanTV/VGS: Thẻ thời tiết góc trên tinh gọn (không nền kính mờ, icon 26dp, font số 24sp, cách nút cài đặt 8dp) -->
++            <!-- CleanTV/VGS: Thẻ thời tiết góc trên tinh gọn (không nền kính mờ, icon 30dp, font số 28sp, desc 14sp, meta 12sp) -->
 +            <LinearLayout
 +                android:id="@+id/weatherCornerCard"
 +                android:layout_width="wrap_content"
@@ -35323,24 +35323,24 @@ index c037d247..638a28a6 100644
 +
 +                <ImageView
 +                    android:id="@+id/wxCornerIcon"
-+                    android:layout_width="26dp"
-+                    android:layout_height="26dp"
++                    android:layout_width="30dp"
++                    android:layout_height="30dp"
 +                    android:src="@drawable/ic_weather_clear_day" />
 +
 +                <TextView
 +                    android:id="@+id/wxCornerTemp"
 +                    android:layout_width="wrap_content"
 +                    android:layout_height="wrap_content"
-+                    android:layout_marginStart="6dp"
++                    android:layout_marginStart="7dp"
 +                    android:fontFamily="@font/lexend_light"
 +                    android:includeFontPadding="false"
 +                    android:textColor="#FFFFFFFF"
-+                    android:textSize="24sp" />
++                    android:textSize="28sp" />
 +
 +                <LinearLayout
 +                    android:layout_width="wrap_content"
 +                    android:layout_height="wrap_content"
-+                    android:layout_marginStart="8dp"
++                    android:layout_marginStart="9dp"
 +                    android:orientation="vertical">
 +
 +                    <TextView
@@ -35352,7 +35352,7 @@ index c037d247..638a28a6 100644
 +                        android:includeFontPadding="false"
 +                        android:singleLine="true"
 +                        android:textColor="#FFFFFFFF"
-+                        android:textSize="13sp" />
++                        android:textSize="14sp" />
 +
 +                    <TextView
 +                        android:id="@+id/wxCornerMeta"
@@ -35364,7 +35364,7 @@ index c037d247..638a28a6 100644
 +                        android:includeFontPadding="false"
 +                        android:singleLine="true"
 +                        android:textColor="#99FFFFFF"
-+                        android:textSize="11sp" />
++                        android:textSize="12sp" />
 +                </LinearLayout>
 +            </LinearLayout>
 +
