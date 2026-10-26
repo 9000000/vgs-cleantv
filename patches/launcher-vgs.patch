@@ -29513,10 +29513,10 @@ index 18fded94..f6798ffb 100644
                  && (collectionImage(segments.get(1)) || WallpaperCaptions.FILE_NAME.equals(segments.get(1)))) {
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Weather.java b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
 new file mode 100644
-index 00000000..5844cbe4
+index 00000000..7c8e72ad
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
-@@ -0,0 +1,418 @@
+@@ -0,0 +1,417 @@
 +package com.gathin.tvhome;
 +
 +import android.content.Context;
@@ -29790,8 +29790,7 @@ index 00000000..5844cbe4
 +                    org.json.JSONArray codeArr = daily.optJSONArray("weather_code");
 +                    if (maxArr != null && maxArr.length() > 0) fw.maxTemp = (int) Math.round(maxArr.optDouble(0, 33.0));
 +                    if (minArr != null && minArr.length() > 0) fw.minTemp = (int) Math.round(minArr.optDouble(0, 25.0));
-+                    String windStr = fw.windSpeed > 0 ? " · Gió " + fw.windSpeed + " km/h" : "";
-+                    fw.meta = "Cao " + fw.maxTemp + "° · Thấp " + fw.minTemp + "° · Ẩm " + fw.humidity + "%" + windStr;
++                    fw.meta = "Cao " + fw.maxTemp + "° · Thấp " + fw.minTemp + "° · Ẩm " + fw.humidity + "%";
 +
 +                    String[] DOW_NAMES = {"CN", "Th 2", "Th 3", "Th 4", "Th 5", "Th 6", "Th 7"};
 +                    java.util.Calendar cal = java.util.Calendar.getInstance();
@@ -35057,7 +35056,7 @@ index b3de8647..da7be36e 100644
              android:id="@+id/animationsChoice"
              style="@style/SettingsRow"
 diff --git a/launcher/app/src/main/res/layout/activity_main.xml b/launcher/app/src/main/res/layout/activity_main.xml
-index c037d247..ead1d9eb 100644
+index c037d247..8a114c7a 100644
 --- a/launcher/app/src/main/res/layout/activity_main.xml
 +++ b/launcher/app/src/main/res/layout/activity_main.xml
 @@ -146,6 +146,164 @@
@@ -35225,7 +35224,23 @@ index c037d247..ead1d9eb 100644
      <LinearLayout
          android:layout_width="match_parent"
          android:layout_height="match_parent"
-@@ -272,7 +430,7 @@
+@@ -160,6 +318,7 @@
+         <RelativeLayout
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
++            android:minHeight="82dp"
+             android:clipChildren="false"
+             android:clipToPadding="false">
+ 
+@@ -167,6 +326,7 @@
+                 android:id="@+id/leftBlock"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
++                android:minHeight="82dp"
+                 android:layout_alignParentStart="true"
+                 android:layout_toStartOf="@+id/topButtons"
+                 android:layout_marginEnd="16dp"
+@@ -272,7 +432,7 @@
                              android:letterSpacing="0.14"
                              android:textAllCaps="true" />
  
@@ -35234,7 +35249,7 @@ index c037d247..ead1d9eb 100644
                          <TextView
                              android:id="@+id/lunarDate"
                              android:gravity="left"
-@@ -283,13 +441,54 @@
+@@ -283,13 +443,54 @@
                              android:ellipsize="end"
                              android:textColor="#80FFFFFF"
                              android:textSize="14sp"
@@ -35290,47 +35305,42 @@ index c037d247..ead1d9eb 100644
              </LinearLayout>
  
              <!-- Shown only when show_stats is on. Outside leftBlock, so the top buttons stay level with the clock
-@@ -311,6 +510,68 @@
+@@ -311,6 +512,65 @@
                  android:focusable="false"
                  android:visibility="gone" />
  
-+            <!-- CleanTV/VGS: Thẻ thời tiết góc trên (Icon 3D, Nhiệt độ lớn 30sp, Mô tả 14sp & Nhiệt độ cao-thấp, độ ẩm) -->
++            <!-- CleanTV/VGS: Thẻ thời tiết góc trên tinh gọn (không nền kính mờ, icon 20dp, font nhỏ sắc nét) -->
 +            <LinearLayout
 +                android:id="@+id/weatherCornerCard"
 +                android:layout_width="wrap_content"
 +                android:layout_height="wrap_content"
 +                android:layout_above="@id/topButtons"
 +                android:layout_alignEnd="@id/topButtons"
-+                android:layout_marginBottom="28dp"
-+                android:background="@drawable/bg_weather_card"
++                android:layout_marginBottom="4dp"
 +                android:orientation="horizontal"
 +                android:gravity="center_vertical"
-+                android:paddingStart="14dp"
-+                android:paddingEnd="16dp"
-+                android:paddingTop="8dp"
-+                android:paddingBottom="8dp"
 +                android:visibility="gone">
 +
 +                <ImageView
 +                    android:id="@+id/wxCornerIcon"
-+                    android:layout_width="36dp"
-+                    android:layout_height="36dp"
++                    android:layout_width="20dp"
++                    android:layout_height="20dp"
 +                    android:src="@drawable/ic_weather_clear_day" />
 +
 +                <TextView
 +                    android:id="@+id/wxCornerTemp"
 +                    android:layout_width="wrap_content"
 +                    android:layout_height="wrap_content"
-+                    android:layout_marginStart="8dp"
++                    android:layout_marginStart="5dp"
 +                    android:fontFamily="@font/lexend_light"
 +                    android:includeFontPadding="false"
 +                    android:textColor="#FFFFFFFF"
-+                    android:textSize="30sp" />
++                    android:textSize="18sp" />
 +
 +                <LinearLayout
 +                    android:layout_width="wrap_content"
 +                    android:layout_height="wrap_content"
-+                    android:layout_marginStart="10dp"
++                    android:layout_marginStart="6dp"
 +                    android:orientation="vertical">
 +
 +                    <TextView
@@ -35339,27 +35349,29 @@ index c037d247..ead1d9eb 100644
 +                        android:layout_height="wrap_content"
 +                        android:ellipsize="end"
 +                        android:fontFamily="@font/lexend_medium"
++                        android:includeFontPadding="false"
 +                        android:singleLine="true"
 +                        android:textColor="#FFFFFFFF"
-+                        android:textSize="14sp" />
++                        android:textSize="12sp" />
 +
 +                    <TextView
 +                        android:id="@+id/wxCornerMeta"
 +                        android:layout_width="wrap_content"
 +                        android:layout_height="wrap_content"
-+                        android:layout_marginTop="2dp"
++                        android:layout_marginTop="1dp"
 +                        android:ellipsize="end"
 +                        android:fontFamily="@font/lexend"
++                        android:includeFontPadding="false"
 +                        android:singleLine="true"
 +                        android:textColor="#99FFFFFF"
-+                        android:textSize="11sp" />
++                        android:textSize="10sp" />
 +                </LinearLayout>
 +            </LinearLayout>
 +
              <LinearLayout
                  android:id="@+id/topButtons"
                  android:layout_width="wrap_content"
-@@ -329,6 +590,15 @@
+@@ -329,6 +589,15 @@
                      android:drawableStart="@drawable/ic_input"
                      android:nextFocusDown="@+id/grid" />
  
@@ -35375,7 +35387,7 @@ index c037d247..ead1d9eb 100644
                  <TextView
                      android:id="@+id/btnWifi"
                      style="@style/TopButton"
-@@ -354,6 +624,24 @@
+@@ -354,6 +623,24 @@
                      android:drawableStart="@drawable/ic_swap_vert"
                      android:nextFocusDown="@+id/grid" />
  
