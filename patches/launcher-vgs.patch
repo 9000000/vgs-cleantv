@@ -11436,7 +11436,7 @@ index e926ff8f..330da398 100644
  
      /** Gregorian date to {day, month, year, leap (1 = leap month)} of the lunar calendar at UTC+tz. */
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 880d15fc..126ef044 100644
+index 880d15fc..8b651aa6 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -55,6 +55,7 @@ import android.text.style.ForegroundColorSpan;
@@ -11615,7 +11615,7 @@ index 880d15fc..126ef044 100644
          moduleCards = cfg.moduleCards;
          hiddenApps = new HashSet<>(cfg.hiddenApps);
  
-@@ -571,6 +669,22 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -571,6 +669,21 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              public void onChildViewDetachedFromWindow(@NonNull View v) {
              }
          });
@@ -11624,21 +11624,20 @@ index 880d15fc..126ef044 100644
 +            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
 +                super.onScrolled(recyclerView, dx, dy);
 +                if (singleRow) return;
-+                int focusedRow = (COLUMNS <= 0) ? 0 : (lastFocused / COLUMNS);
-+                if (focusedRow >= 2) {
-+                    if (heroShown) showGlowOnly(lastFocused);
-+                } else {
-+                    if (!heroShown && lastFocused >= 0 && lastFocused < adapter.appCount()) {
-+                        float dockTop = lastDockTopInRoot > 0 ? lastDockTopInRoot : grid.getPaddingTop();
-+                        showHero(lastFocused, dockTop, focusedRow);
-+                    }
++                RecyclerView.ViewHolder vh0 = grid.findViewHolderForAdapterPosition(0);
++                boolean pushedUp = (vh0 == null) || (grid.getPaddingTop() - vh0.itemView.getTop() > (int) (60 * density));
++                if (pushedUp && heroShown) {
++                    showGlowOnly(lastFocused);
++                } else if (!pushedUp && !heroShown && lastFocused >= 0 && lastFocused < adapter.appCount()) {
++                    float dockTop = lastDockTopInRoot > 0 ? lastDockTopInRoot : grid.getPaddingTop();
++                    showHero(lastFocused, dockTop);
 +                }
 +            }
 +        });
          if (dockRow) grid.addItemDecoration(new DockDecoration(COLUMNS, density, cinematic, cfg.alwaysShowNames, cfg.dockOpacity, cfg.dockGlass, cfg.dockEvenPadding, cfg.dockBand,
                  singleRow, cfg.dockBandAll));
          if (cfg.fadeRows) TopFade.attach(grid, 48 * density);
-@@ -589,6 +703,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -589,6 +702,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // tvOS layout: push the dock row towards the bottom of the screen, leaving room for
          // rows_below_dock grid rows under it; the rest of the grid stays below until you press Down.
          int rowsBelowDock = cfg.rowsBelowDock;
@@ -11650,7 +11649,7 @@ index 880d15fc..126ef044 100644
          grid.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
              int h = b - t;
              // Item height follows the tile size, which follows the columns and the rows that must fit (AppAdapter.tileWidthPx).
-@@ -609,6 +728,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -609,6 +727,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // A single row never shows the names under its tiles (the title above the row names the app), so the
              // 7dp gap and 22dp label item_app.xml keeps for them would only lift the row: sit it that much lower.
              if (singleRow && !cfg.alwaysShowNames) want += (int) (29 * density);
@@ -11662,7 +11661,7 @@ index 880d15fc..126ef044 100644
              if (grid.getPaddingTop() != want) {
                  grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
                  // A vertical grid parks the dock on the new padding line by scrolling (onTileFocused); a sideways
-@@ -690,6 +814,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -690,6 +813,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          View btnSettings = findViewById(R.id.btnSettings);
          btnInputs.setOnClickListener(v -> showInputs());
          btnWifi.setOnClickListener(v -> openNetworkPill());
@@ -11670,7 +11669,7 @@ index 880d15fc..126ef044 100644
          btnWifi.setOnLongClickListener(v -> {
              open(systemIntent(Settings.ACTION_WIFI_SETTINGS));
              return true;
-@@ -716,7 +841,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -716,7 +840,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              libraryFromTopBar = true;   // closing it goes back to this button, not to the pill after the last row
          });
          btnLibraryTop.setVisibility(cfg.libraryButton && cfg.appLibrary ? View.VISIBLE : View.GONE);
@@ -11679,7 +11678,7 @@ index 880d15fc..126ef044 100644
          iconOnlyButtons = cfg.iconOnlyButtons;
          topMenu = cfg.topMenu;
          wifiIconOnly = iconOnlyButtons && cfg.wifiLabelWidth <= 0;
-@@ -775,13 +900,41 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -775,13 +899,41 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -11722,7 +11721,7 @@ index 880d15fc..126ef044 100644
              pills.addAll(topAppButtons);
              for (View button : pills) {
                  button.setOnFocusChangeListener((view, focused) -> view.animate()
-@@ -850,8 +1003,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -850,8 +1002,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          View anchor = topMenu ? findViewById(R.id.btnSettings) : btnInputs;
          if (anchor.getVisibility() != View.VISIBLE) return true;
          if (anchor.isLaidOut()) {
@@ -11738,7 +11737,7 @@ index 880d15fc..126ef044 100644
              return true;
          }
          // Cold start: the popup anchors to the pill (or the gear), so wait for the first layout.
-@@ -916,6 +1074,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -916,6 +1073,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onResume() {
          super.onResume();
@@ -11746,7 +11745,7 @@ index 880d15fc..126ef044 100644
          // A festival that started or ended while Home was in the background: rebuild with or without it.
          if (festive != festival.active(LocalDate.now())) {
              recreate();
-@@ -959,9 +1118,20 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -959,9 +1117,20 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -11768,7 +11767,7 @@ index 880d15fc..126ef044 100644
          if (festive && diya != null) {
              diya.start();
              LocalDate today = LocalDate.now();
-@@ -1127,6 +1297,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1127,6 +1296,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onPause() {
          super.onPause();
@@ -11776,7 +11775,7 @@ index 880d15fc..126ef044 100644
          root.removeCallbacks(showIdleClock);
          endReorder();   // Home or another app while reordering keeps the order so far
          wallpaperPlayer.stop();
-@@ -1135,6 +1306,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1135,6 +1305,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          ambient.animate().cancel();
          heroArt.animate().cancel();
          handler.removeCallbacks(minuteTick);
@@ -11784,7 +11783,7 @@ index 880d15fc..126ef044 100644
          stopStats();
          if (diya != null) diya.stop();
          cancelPendingFocusScroll();
-@@ -1570,6 +1742,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1570,6 +1741,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          if (openPopup != null) openPopup.dismiss();
          libraryFocusPending = false;
          libraryFromTopBar = false;
@@ -11792,7 +11791,7 @@ index 880d15fc..126ef044 100644
          appLibrary = new AppLibraryDialog(this, animations, reducedMotion, appLibrarySelection, libraryOkOpens, adapter::containsPackage, () -> reloadApps(false), () -> {
              appLibrary = null;
              openPopup = null;
-@@ -1578,6 +1751,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1578,6 +1750,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  btnLibraryTop.requestFocus();
                  return;
              }
@@ -11806,53 +11805,46 @@ index 880d15fc..126ef044 100644
              libraryFocusPending = true;
              grid.post(() -> {
                  if (libraryFocusPending && appLibrary == null && hasWindowFocus() && !isFinishing()) focusLibrary();
-@@ -1647,7 +1827,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
-             springY.animateToFinalPosition(y - glassScrollShift);
-         }
-         View item = (View) card.getParent();
--        if (dockRow && (singleRow || position < COLUMNS)) {
-+        int row = (singleRow || COLUMNS <= 0) ? 0 : (position / COLUMNS);
-+        if (dockRow && row == 0) {
-             // Dock: park it at the bottom of the screen and show the top shelf for this app. In a single row
-             // every tile is in the dock's row, which never scrolls vertically.
-             int decoratedTop = item.getTop() - (int) (6 * density);
-@@ -1659,14 +1840,22 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1659,14 +1838,33 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  if (!animations || reducedMotion) grid.scrollBy(0, dy);
                  else grid.smoothScrollBy(0, dy);
              }
 -            showHero(position, scroll ? r.top - dy : r.top);
 +            float dockTop = scroll ? r.top - dy : r.top;
 +            lastDockTopInRoot = dockTop;
-+            showHero(position, dockTop, 0);
-+        } else if (dockRow && row == 1) {
-+            // Row 2: app name also shows on top, shrunk to fit the remaining space above row 2
-+            revealRect.set(0, -(int) pad * 2, item.getWidth(), item.getHeight() + (int) pad);
-+            grid.requestChildRectangleOnScreen(item, revealRect, reducedMotion);
-+
-+            float dockTop = lastDockTopInRoot > 0 ? lastDockTopInRoot : (grid.getPaddingTop() > 0 ? grid.getPaddingTop() : r.top);
-+            showHero(position, dockTop, 1);
++            showHero(position, dockTop);
          } else {
 -            // Below the dock (or in a plain grid) the glow follows the tile without the big name; letting it
 -            // fade out left the grid on plain black.
 -            showGlowOnly(position);
--            // Scroll just enough so the whole glass (not only the tile) is visible.
-+            // Row 3 onwards: hero disappears, only glow behind tiles
+             // Scroll just enough so the whole glass (not only the tile) is visible.
              revealRect.set(0, -(int) pad * 2, item.getWidth(), item.getHeight() + (int) pad);
              grid.requestChildRectangleOnScreen(item, revealRect, reducedMotion);
 +
-+            showGlowOnly(position);
++            // Once the dock has scrolled up, hiding the shelf makes room for more tiles on screen;
++            // bringing the dock back down restores the hero name and, when present, the top shelf cards.
++            boolean gridPushedUp = false;
++            RecyclerView.ViewHolder vh0 = grid.findViewHolderForAdapterPosition(0);
++            if (vh0 == null) {
++                gridPushedUp = true;
++            } else {
++                int dockShift = grid.getPaddingTop() - vh0.itemView.getTop();
++                if (dockShift > (int) (60 * density)) {
++                    gridPushedUp = true;
++                }
++            }
++
++            if (gridPushedUp) {
++                showGlowOnly(position);
++            } else {
++                float dockTop = lastDockTopInRoot > 0 ? lastDockTopInRoot : (grid.getPaddingTop() > 0 ? grid.getPaddingTop() : r.top);
++                showHero(position, dockTop);
++            }
          }
      }
  
-@@ -1689,19 +1878,111 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
-     // ---- top shelf -------------------------------------------------------------------------------
- 
+@@ -1691,17 +1889,80 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private void showHero(int position, float dockTopInRoot) {
-+        int row = (singleRow || COLUMNS <= 0) ? 0 : (position / COLUMNS);
-+        showHero(position, dockTopInRoot, row);
-+    }
-+
-+    private void showHero(int position, float dockTopInRoot, int row) {
          String label = adapter.labelAt(position);
          int color = adapter.ambientColorAt(position);
 -        float y = dockTopInRoot - 14 * density - 26 * density - hero.getHeight();
@@ -11861,57 +11853,45 @@ index 880d15fc..126ef044 100644
 +                && todayCard != null && todayCard.getVisibility() == View.VISIBLE
 +                && weatherCard != null && weatherCard.getVisibility() == View.VISIBLE;
 +
-         boolean changed = !label.contentEquals(heroName.getText());
-+        heroName.setText(label);
-+
-+        if (row == 1) {
-+            heroName.setTextSize(TypedValue.COMPLEX_UNIT_SP, cinematic ? 44f : 36f);
-+            heroName.setLetterSpacing(-0.02f);
-+            if (heroMeta != null) heroMeta.setVisibility(View.GONE);
-+            if (heroDots != null) heroDots.setVisibility(View.GONE);
-+        } else {
-+            if (heroMeta != null && cinematic) heroMeta.setVisibility(View.VISIBLE);
-+            if (heroDots != null && cinematic) heroDots.setVisibility(View.VISIBLE);
-+            if (compactHero) {
-+                heroName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 28f);
-+                heroName.setLetterSpacing(-0.01f);
-+                if (heroMeta != null) {
-+                    heroMeta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
-+                    ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) heroMeta.getLayoutParams();
-+                    if (mlp != null && mlp.topMargin != (int) (4 * density)) {
-+                        mlp.topMargin = (int) (4 * density);
-+                        heroMeta.setLayoutParams(mlp);
-+                    }
++        if (compactHero) {
++            heroName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 28f);
++            heroName.setLetterSpacing(-0.01f);
++            if (heroMeta != null) {
++                heroMeta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
++                ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) heroMeta.getLayoutParams();
++                if (mlp != null && mlp.topMargin != (int) (4 * density)) {
++                    mlp.topMargin = (int) (4 * density);
++                    heroMeta.setLayoutParams(mlp);
 +                }
-+                if (heroDots != null) {
-+                    ViewGroup.MarginLayoutParams dlp = (ViewGroup.MarginLayoutParams) heroDots.getLayoutParams();
-+                    if (dlp != null && dlp.topMargin != (int) (8 * density)) {
-+                        dlp.topMargin = (int) (8 * density);
-+                        heroDots.setLayoutParams(dlp);
-+                    }
-+                }
-+            } else if (cinematic) {
-+                heroName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 68f);
-+                heroName.setLetterSpacing(-0.025f);
-+                if (heroMeta != null) {
-+                    heroMeta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
-+                    ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) heroMeta.getLayoutParams();
-+                    if (mlp != null && mlp.topMargin != (int) (12 * density)) {
-+                        mlp.topMargin = (int) (12 * density);
-+                        heroMeta.setLayoutParams(mlp);
-+                    }
-+                }
-+                if (heroDots != null) {
-+                    ViewGroup.MarginLayoutParams dlp = (ViewGroup.MarginLayoutParams) heroDots.getLayoutParams();
-+                    if (dlp != null && dlp.topMargin != (int) (16 * density)) {
-+                        dlp.topMargin = (int) (16 * density);
-+                        heroDots.setLayoutParams(dlp);
-+                    }
-+                }
-+            } else {
-+                heroName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 48f);
-+                heroName.setLetterSpacing(-0.02f);
 +            }
++            if (heroDots != null) {
++                ViewGroup.MarginLayoutParams dlp = (ViewGroup.MarginLayoutParams) heroDots.getLayoutParams();
++                if (dlp != null && dlp.topMargin != (int) (8 * density)) {
++                    dlp.topMargin = (int) (8 * density);
++                    heroDots.setLayoutParams(dlp);
++                }
++            }
++        } else if (cinematic) {
++            heroName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 68f);
++            heroName.setLetterSpacing(-0.025f);
++            if (heroMeta != null) {
++                heroMeta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
++                ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) heroMeta.getLayoutParams();
++                if (mlp != null && mlp.topMargin != (int) (12 * density)) {
++                    mlp.topMargin = (int) (12 * density);
++                    heroMeta.setLayoutParams(mlp);
++                }
++            }
++            if (heroDots != null) {
++                ViewGroup.MarginLayoutParams dlp = (ViewGroup.MarginLayoutParams) heroDots.getLayoutParams();
++                if (dlp != null && dlp.topMargin != (int) (16 * density)) {
++                    dlp.topMargin = (int) (16 * density);
++                    heroDots.setLayoutParams(dlp);
++                }
++            }
++        } else {
++            heroName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 48f);
++            heroName.setLetterSpacing(-0.02f);
 +        }
 +
 +        hero.measure(
@@ -11920,31 +11900,19 @@ index 880d15fc..126ef044 100644
 +        );
 +        int heroH = hero.getMeasuredHeight() > 0 ? hero.getMeasuredHeight() : hero.getHeight();
 +
-+        float baseDock = lastDockTopInRoot > 0 ? lastDockTopInRoot : (dockTopInRoot > 0 ? dockTopInRoot : grid.getPaddingTop());
 +        float y;
-+        if (row == 1) {
-+            y = baseDock - 14 * density - 26 * density - heroH;
-+            float topLimit = (clockBlock != null && clockBlock.getHeight() > 0) ? (clockBlock.getBottom() + 10 * density) : (48 * density);
-+            y = Math.max(topLimit, y);
-+        } else if (compactHero) {
-+            y = baseDock - 10f * density - heroH;
++        if (compactHero) {
++            y = dockTopInRoot - 10f * density - heroH;
 +        } else {
-+            y = baseDock - 14 * density - 26 * density - heroH;
++            y = dockTopInRoot - 14 * density - 26 * density - heroH;
 +        }
 +        final float finalY = y;
 +
+         boolean changed = !label.contentEquals(heroName.getText());
          if (cinematic && heroArtAlpha > 0f) showHeroArt(position);
  
 +        if (shelfCardsContainer != null) {
-+            if (!animations || reducedMotion) {
-+                shelfCardsContainer.animate().cancel();
-+                shelfCardsContainer.setAlpha(row == 0 ? 1f : 0f);
-+                shelfCardsContainer.setTranslationY(row == 0 ? 0f : -20f * density);
-+            } else if (row == 0) {
-+                shelfCardsContainer.animate().alpha(1f).translationY(0f).setDuration(260).start();
-+            } else {
-+                shelfCardsContainer.animate().alpha(0f).translationY(-20f * density).setDuration(260).start();
-+            }
++            shelfCardsContainer.animate().alpha(1f).translationY(0f).setDuration(260).start();
 +        }
 +
          if (!animations || reducedMotion) {
@@ -11952,63 +11920,40 @@ index 880d15fc..126ef044 100644
              // full-screen panel, and this switch exists for the GPUs that cannot afford it.
              hero.animate().cancel();
              ambient.animate().cancel();
--            fillHero(position, label);
+             fillHero(position, label);
 -            hero.setY(y);
-+            fillHero(position, label, row);
 +            hero.setY(finalY);
              hero.setTranslationX(0f);
              hero.setAlpha(1f);
              if (ambientGlow) {
-@@ -1716,8 +1997,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
-             stopAmbientAnimation();
+@@ -1717,7 +1978,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              hero.animate().cancel();
              ambient.animate().cancel();
--            fillHero(position, label);
+             fillHero(position, label);
 -            hero.setY(y);
-+            fillHero(position, label, row);
 +            hero.setY(finalY);
              hero.setTranslationX(0f);
              hero.animate().alpha(1f).setDuration(260).start();
              if (ambientGlow) {
-@@ -1728,8 +2009,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
-         } else if (changed) {
+@@ -1729,7 +1990,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              if (advancedEffects) hero.animate().cancel();
              hero.animate().alpha(0f).translationX(-12 * density).setDuration(120).withEndAction(() -> {
--                fillHero(position, label);
+                 fillHero(position, label);
 -                hero.setY(y);
-+                fillHero(position, label, row);
 +                hero.setY(finalY);
                  hero.setTranslationX(12 * density);
                  hero.animate().alpha(1f).translationX(0f).setDuration(200).start();
              }).start();
-@@ -1742,14 +2023,23 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1742,7 +2003,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  }).start();
              }
          } else {
 -            hero.setY(y);
-+            fillHero(position, label, row);
-+            if (hero.getY() != finalY) {
-+                hero.animate().y(finalY).setDuration(180).start();
-+            }
++            hero.setY(finalY);
          }
      }
  
-     /** The shelf's text for this dock app: its name and, on the cinematic shelf, "Last opened" and the dots. */
--    private void fillHero(int position, String label) {
-+    private void fillHero(int position, String label, int row) {
-         heroName.setText(label);
--        if (!cinematic) return;
-+        if (!cinematic || row == 1) {
-+            if (row == 1) {
-+                if (heroMeta != null) heroMeta.setVisibility(View.GONE);
-+                if (heroDots != null) heroDots.setVisibility(View.GONE);
-+            }
-+            return;
-+        }
-         updateHeroMeta(position);
-         updateHeroDots(position);
-     }
-@@ -1967,6 +2257,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1967,6 +2228,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          heroArt.animate().cancel();
          heroArt.setAlpha(0f);
          heroShown = false;
@@ -12018,7 +11963,7 @@ index 880d15fc..126ef044 100644
          if (!ambientGlow) return;
          if (!animations || reducedMotion) {
              setAmbient(color);
-@@ -2010,6 +2303,247 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2010,6 +2274,247 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -12266,7 +12211,7 @@ index 880d15fc..126ef044 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2074,13 +2608,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2074,13 +2579,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -12294,7 +12239,7 @@ index 880d15fc..126ef044 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2275,6 +2820,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2275,6 +2791,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -12305,7 +12250,7 @@ index 880d15fc..126ef044 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2294,7 +2843,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2294,7 +2814,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       * Puts each top_bar_apps app in the top bar as a round pill with the app's own logo, left of the network pill.
       * The logo keeps its colours: the pill style's tint, which turns the other icons white, is cleared.
       */
@@ -12314,7 +12259,7 @@ index 880d15fc..126ef044 100644
          ViewGroup bar = findViewById(R.id.topButtons);
          PackageManager pm = getPackageManager();
          int size = Math.round(22 * density);
-@@ -2302,6 +2851,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2302,6 +2822,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              Intent launch = pm.getLeanbackLaunchIntentForPackage(pkg);
              if (launch == null) launch = pm.getLaunchIntentForPackage(pkg);
              if (launch == null) continue;   // not installed, or disabled
@@ -12326,7 +12271,7 @@ index 880d15fc..126ef044 100644
              Drawable logo;
              CharSequence label;
              try {
-@@ -2320,7 +2874,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2320,7 +2845,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              button.setContentDescription(label);
              Intent target = launch;
              button.setOnClickListener(v -> open(new Intent(target)));
@@ -12336,7 +12281,7 @@ index 880d15fc..126ef044 100644
              topAppButtons.add(button);
          }
      }
-@@ -2493,8 +3048,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2493,8 +3019,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       * nothing animates, so the panel costs the GPU nothing between ticks.
       */
      private void updateRace() {
@@ -12347,7 +12292,7 @@ index 880d15fc..126ef044 100644
          if (s == null) {
              racePanel.setVisibility(View.GONE);
              return;
-@@ -2605,7 +3160,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2605,7 +3131,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          }
          // With a VPN app configured, a VPN that is down matters too: show a red "VPN off" capsule then.
          boolean vpnDown = !vpn && online && !vpnApp.isEmpty();
@@ -12357,7 +12302,7 @@ index 880d15fc..126ef044 100644
              // Network name, then the green lock-and-VPN (or red "VPN off") capsule drawn in place of the word.
              String badge = getString(vpn ? R.string.vpn : R.string.vpn_off);
              VpnBadge span = new VpnBadge(vpn ? getDrawable(R.drawable.ic_lock) : null, density);
-@@ -2629,7 +3185,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2629,7 +3156,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -12370,7 +12315,7 @@ index 880d15fc..126ef044 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2672,6 +3232,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2672,6 +3203,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private View btnLibraryTop;
      /** The open library came from that button: closing it returns there instead of scrolling to the grid's end. */
      private boolean libraryFromTopBar;
@@ -12379,7 +12324,7 @@ index 880d15fc..126ef044 100644
  
      /** Turns a labelled top pill into the round TopButtonIcon shape: no text, the icon centred by even padding. */
      private void makeIconOnly(TextView pill) {
-@@ -2735,13 +3297,60 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2735,13 +3268,60 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          return 0xFF000000 | (r << 16) | (g << 8) | b;
      }
  
@@ -12443,7 +12388,7 @@ index 880d15fc..126ef044 100644
  
      /** Every settings entry shares the standard intent and the vendor fallback (SystemSettings). */
      private Intent systemIntent(String standardAction) {
-@@ -2831,18 +3440,34 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2831,18 +3411,34 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          }
      }
  
@@ -12487,7 +12432,7 @@ index 880d15fc..126ef044 100644
          }
          return null;
      }
-@@ -3246,10 +3871,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3246,10 +3842,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
