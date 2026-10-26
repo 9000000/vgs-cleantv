@@ -1012,7 +1012,7 @@ private fun TheTuyChinh(vm: PhienLamViec) {
         }
         Text(t("Số app mỗi hàng", "Apps per row"), fontSize = 14.sp)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(0 to t("Theo theme", "Theme's"), 4 to "4", 5 to "5", 6 to "6", 7 to "7").forEach { (v, chu) ->
+            listOf(0 to t("Theo theme", "Theme's"), 4 to "4", 5 to "5", 6 to "6", 7 to "7", 8 to "8", 9 to "9").forEach { (v, chu) ->
                 ChonChip(chu, vm.soCot == v) { vm.soCot = v }
             }
         }

@@ -41,8 +41,8 @@ import java.net.Socket
 
 enum class Man { CHINH, KET_NOI, THONG_TIN, CHON_GOI, DANG_TAT, HOME_SACH, XONG, KHOI_PHUC, HUONG_DAN, GIAY_PHEP, KHOA_TRE }
 
-/** Số app tối đa trong dock: bằng số cột lớn nhất của Home sạch (columns 1–8); dock dài hơn số cột thì tràn xuống hàng sau (22/10/2026, góp ý muốn hàng đầu nhiều app hơn). */
-const val DOCK_TOI_DA = 8
+/** Số app tối đa trong dock: bằng số cột lớn nhất của Home sạch (columns 1–9); dock dài hơn số cột thì tràn xuống hàng sau (22/10/2026, góp ý muốn hàng đầu nhiều app hơn). */
+const val DOCK_TOI_DA = 9
 
 /**
  * Bảng phím chung cho TCL không có mẫu riêng: Netflix 4062, YouTube 4065, Prime Video 4099, bánh răng 83 / 4077 — cùng số
@@ -211,8 +211,25 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var hieuUngKinh by mutableStateOf(false)
     var lamToiNen by mutableStateOf(0)
     var hienThongSo by mutableStateOf(false)
+    /** Các tuỳ chọn đã có giao diện riêng trong Home, Tuỳ chỉnh hoặc Cài đặt trên TV -> không hiện lặp lại trong Nâng cao. */
+    private val KHOA_DA_CO = setOf(
+        "columns", "rows_below_dock", "rows_offset_dp", "rows_middle", "dock_row", "dock_band",
+        "dock_opacity", "dock_apps", "fill_dock", "dock_title", "always_show_names", "icon_tile_color",
+        "single_row", "uniform_tiles", "top_compact", "wallpaper", "wallpaper_dim",
+        "wallpaper_rotation_minutes", "wallpaper_order", "show_stats", "home_idle_clock_minutes",
+        "show_greeting", "greeting_name", "greeting_bright", "lunar_date", "lunar_utc_offset",
+        "weather", "weather_lat", "weather_lon", "weather_place", "weather_provider", "weather_api_key",
+        "show_events", "show_today", "show_weather", "weather_corner", "today_carousel",
+        "app_library", "now_playing", "screensaver_button", "boot_to_app", "wake_to_app",
+        "open_on_start_choice", "handle_view_inputs", "input_action", "hold_volume_continuous",
+        "remote_odd_home", "remote_app_buttons", "vtv_channels", "hidden_apps", "header_scale",
+        "dock_glass", "app_glow", "reduced_motion", "animations", "advanced_effects", "projector_actions"
+    )
+
     /** Mục Nâng cao: danh sách tuỳ chọn + giá trị người dùng đặt (khoá → chữ; thiếu = mặc định). */
-    val dsNangCao: List<zone.vgs.tvsach.dulieu.TuyChon> by lazy { zone.vgs.tvsach.dulieu.NangCao.nap(ctx) }
+    val dsNangCao: List<zone.vgs.tvsach.dulieu.TuyChon> by lazy {
+        zone.vgs.tvsach.dulieu.NangCao.nap(ctx).filter { it.khoa !in KHOA_DA_CO }
+    }
     val nangCao = androidx.compose.runtime.mutableStateMapOf<String, String>()
     var homeXong by mutableStateOf(false)
     /** Lần thử nút Home thật gần nhất ra Home sạch (thuPhimHome). */
