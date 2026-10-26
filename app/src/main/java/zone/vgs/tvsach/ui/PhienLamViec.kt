@@ -1228,7 +1228,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     /** Bộ ảnh xoay vòng của theme: mọi file ảnh trong thư mục assets boAnh. */
     private suspend fun boAnhTheme(): List<Pair<String, ByteArray>>? = if (anhNenRieng != null) null else themeChon.boAnh?.let { thu ->
-        io { (ctx.assets.list(thu) ?: emptyArray()).sorted().map { it to ctx.assets.open("$thu/$it").readBytes() } }
+        io { (ctx.assets.list(thu) ?: emptyArray()).filter { it != "screenshot.jpg" }.sorted().map { it to ctx.assets.open("$thu/$it").readBytes() } }
     }
 
     /** Đổi theme / dock cho tivi đã có Home sạch. */

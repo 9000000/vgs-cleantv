@@ -466,5 +466,17 @@
   "show_weather": {
     "ten": "Hiện khối Thời tiết & Dự báo",
     "moTa": "Khối hiển thị nhiệt độ, chất lượng không khí AQI và dự báo thời tiết 4 ngày tới (mặc định bật)."
+  },
+  "weather_corner": {
+    "ten": "Thời tiết góc trên nút cài đặt",
+    "moTa": "Hiển thị dòng thời tiết đơn giản (nhiệt độ và địa điểm) ở góc trên bên phải màn hình, phía trên cụm nút cài đặt."
+  },
+  "settings_fallback_components": {
+    "ten": "Màn hình Cài đặt dự phòng của hãng",
+    "moTa": "Danh sách component của hãng thử theo thứ tự khi không tìm thấy màn Cài đặt chuẩn của Android TV (dùng cho tivi chuyên dụng)."
+  },
+  "race_calendar": {
+    "ten": "Lịch đua xe F1 & Motorsport",
+    "moTa": "Chế độ cuối tuần đua xe. Tự động đổi hình nền trường đua vào cuối tuần và cập nhật bảng xếp hạng các giải đua (f1, motogp, wec, indycar, nascar...)."
   }
 }

@@ -258,6 +258,49 @@ val THEMES = listOf(
         "theme/dussehra.jpg",
         listOf(0xFF120809, 0xFF3D1508, 0xFFFFB23C)
     ),
+
+    // 12. Thiên nhiên tĩnh lặng (Nature calm - CleanYourTV Addons)
+    Theme(
+        "nature-calm", "Thiên nhiên", "Nature calm",
+        "12 ảnh thiên nhiên thanh bình, đổi ảnh mỗi 5 phút kèm địa danh và tác giả, dock kính mờ 6 cột",
+        "Twelve calm nature photos rotating every 5 minutes with place and photographer, 6-column frosted dock",
+        mapOf(
+            "dock_apps" to listOf(
+                "com.google.android.youtube.tv",
+                "com.netflix.ninja",
+                "com.amazon.amazonvideo.livingroom",
+                "com.apple.atve.androidtv.appletv",
+                "com.disney.disneyplus",
+                "com.wbd.stream"
+            ),
+            "fill_dock" to false,
+            "columns" to 6,
+            "rows_below_dock" to 1,
+            "background_color" to "#05070C",
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 5,
+            "wallpaper_order" to "shuffle",
+            "wallpaper_captions" to true,
+            "wallpaper_true_color" to true,
+            "wallpaper_dim" to 14,
+            "cinematic_home" to false,
+            "dock_title" to false,
+            "dock_glass" to true,
+            "dock_opacity" to 40,
+            "dock_even_padding" to true,
+            "icon_only_buttons" to true,
+            "icon_only_inputs" to true,
+            "ambient_glow" to false,
+            "app_glow" to false,
+            "fade_rows" to true,
+            "focus_overshoot" to false,
+            "advanced_effects" to true
+        ),
+        null,
+        listOf(0xFF05070C, 0xFF14241B, 0xFF283B2D),
+        boAnh = "theme/nature-calm",
+        anhXem = "theme/nature-calm/001.jpg"
+    ),
 )
 
 

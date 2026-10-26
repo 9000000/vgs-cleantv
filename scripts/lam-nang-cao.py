@@ -2,6 +2,8 @@
 """Danh sách tuỳ chọn ("switches") của launcher cho mục Nâng cao trong app, đọc bảng ở upstream themes/README.md.
 Ghi assets/nang-cao.json: [{khoa, kieu (bool|so|chon|chu|ds|ds-so), min, max, chon[], moTa, canThan}]."""
 import json, re, sys
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 readme = sys.argv[1] if len(sys.argv) > 1 else "upstream/themes/README.md"
 out = sys.argv[2] if len(sys.argv) > 2 else "app/src/main/assets/nang-cao.json"
 # App đã có công tắc / ô nhập riêng cho các khoá này (hoặc khoá không hợp nhập tay) — không lặp ở Nâng cao.
@@ -31,7 +33,31 @@ for dong in open(readme, encoding="utf-8"):
     for khoa in khoas:
         if khoa in APP_CO_SAN or khoa in da: continue
         da.add(khoa)
-        ds.append({"khoa": khoa, **k, "moTa": re.sub(r"`", "", mo)[:400], "canThan": khoa in CAN_THAN})
+        cur_k = dict(k)
+        if khoa == "columns" and cur_k.get("max") == 8:
+            cur_k["max"] = 9
+        ds.append({"khoa": khoa, **cur_k, "moTa": re.sub(r"`", "", mo)[:400], "canThan": khoa in CAN_THAN})
+
+VGS_THEM = [
+    {"khoa": "today_carousel", "kieu": "bool", "moTa": "Today Carousel (Quotes, History)", "canThan": False},
+    {"khoa": "countdown_events", "kieu": "bool", "moTa": "Holiday & Tet countdown", "canThan": False},
+    {"khoa": "show_events", "kieu": "bool", "moTa": "Show events row", "canThan": False},
+    {"khoa": "show_today", "kieu": "bool", "moTa": "Show today card", "canThan": False},
+    {"khoa": "show_weather", "kieu": "bool", "moTa": "Show weather card", "canThan": False},
+    {"khoa": "weather_corner", "kieu": "bool", "moTa": "Show simple weather above settings button", "canThan": False},
+    {"khoa": "settings_fallback_components", "kieu": "ds", "moTa": "Vendor settings components tried in order", "canThan": True},
+    {"khoa": "race_calendar", "kieu": "ds", "moTa": "F1 race-weekend mode", "canThan": False},
+    {"khoa": "rows_offset_dp", "kieu": "so", "min": -300, "max": 300, "moTa": "Offset the dock and grid rows up (negative) or down (positive) in dp within the screen (0 by default)", "canThan": False},
+    {"khoa": "icon_tile_color", "kieu": "bool", "moTa": "Phone apps without a TV banner get a tile filled with their icon's colour and a larger icon instead of a grey card (true by default)", "canThan": False},
+    {"khoa": "dream_button", "kieu": "bool", "moTa": "Screensaver button in the top bar to quickly launch the screensaver/clock (false by default)", "canThan": False},
+    {"khoa": "top_compact", "kieu": "bool", "moTa": "Compact icon-only cluster for top header buttons, dropping text labels (false by default)", "canThan": False},
+    {"khoa": "media_bar", "kieu": "bool", "moTa": "Show active music playback controls (Spotify, YouTube Music...) on the top bar (true by default)", "canThan": False},
+]
+for them in VGS_THEM:
+    if them["khoa"] not in da:
+        da.add(them["khoa"])
+        ds.append(them)
+
 # Tên + mô tả tiếng Việt (scripts/nang-cao-vi.json, 22/10/2026): người không biết tiếng Anh vẫn dùng được.
 import os
 vi_tep = os.path.join(os.path.dirname(os.path.abspath(__file__)), "nang-cao-vi.json")
