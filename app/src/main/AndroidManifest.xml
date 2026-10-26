@@ -13,7 +13,10 @@
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <uses-feature android:name="android.software.leanback" android:required="false" />
 
+    <!-- usesCleartextTraffic (3.1.0): danh sách IPTV người dùng dán vào hay là link http:// thường; app chỉ đọc danh sách
+         và trang công khai, không gửi gì riêng tư qua đó. -->
     <application
+        android:usesCleartextTraffic="true"
         android:banner="@drawable/banner_tv"
         android:label="CleanTV"
         android:icon="@mipmap/ic_launcher"

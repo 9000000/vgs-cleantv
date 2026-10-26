@@ -1,5 +1,89 @@
 [
  {
+  "ban": "3.1.2",
+  "ngay": "2026-10-26",
+  "vi": [
+   "- Thẻ \"Cộng đồng VGS\" ở màn chính và màn xong: nhóm Facebook Vietnam Gaming Setup, nhóm Telegram VGS, tham gia VGSZone."
+  ],
+  "en": [
+   "- \"The VGS community\" card on the main and final screens: the Vietnam Gaming Setup Facebook group, VGS on Telegram, VGSZone."
+  ]
+ },
+ {
+  "ban": "3.1.1",
+  "ngay": "2026-10-26",
+  "vi": [
+   "- \"Dò một nút trên remote\" ở Tuỳ chỉnh → Remote: nút app lạ trên remote (VTVgo, FPT Play…) không mở app nữa sau khi đổi Home thì bấm Dò, bấm nút đó trên remote, chọn app cho nó, Áp dụng lên tivi (góp ý Hoàng Hữu, TCL 65C655)."
+  ],
+  "en": [
+   "- \"Detect a remote button\" under Options → Remote: if a remote's own app button (VTVgo, FPT Play…) stopped opening its app after the Home change, tap Detect, press it, pick its app and apply."
+  ]
+ },
+ {
+  "ban": "3.1.0",
+  "ngay": "2026-10-26",
+  "vi": [
+   "- Ô FPT Play trên màn chính: chọn nhanh VTV1–9, HTV7, HTV9 HD, hoặc dán link chia sẻ từ FPT Play (kênh, trận đấu, phim). Bấm ô là FPT Play trên tivi mở thẳng nội dung đó. Cần app \"FPT Play for Android TV\".",
+   "- Danh sách IPTV của bạn: dán link m3u (hoặc nội dung), chọn kênh, mỗi kênh một ô có logo; bấm là mở bằng VLC, MX Player, Just Player hoặc Kodi trên tivi.",
+   "- Tối đa 12 ô kênh, lấy từ VTVgo, FPT Play và IPTV."
+  ],
+  "en": [
+   "- FPT Play tiles on Home: quick-pick VTV1–9, HTV7, HTV9 HD, or paste a share link from FPT Play (channel, match, film); the tile opens it straight in FPT Play on the TV. Needs \"FPT Play for Android TV\".",
+   "- Your IPTV list: paste an m3u link (or its content), pick channels, each a tile with its logo, played with VLC, MX Player, Just Player or Kodi on the TV.",
+   "- Up to 12 channel tiles from VTVgo, FPT Play and IPTV."
+  ]
+ },
+ {
+  "ban": "3.0.3",
+  "ngay": "2026-10-26",
+  "vi": [
+   "- Danh sách mẫu tivi lên 316 mẫu, 90 hãng.",
+   "- Home sạch theo bản gốc CleanYourTV mới: âm lịch không còn hiện \"ngày 0\" sát ngày sóc, nút Netflix trên remote TCL mở đúng app, menu Cài đặt có mục Khởi động lại, màn hình chờ dùng cùng hình nền với Home."
+  ],
+  "en": [
+   "- TV list now has 316 models from 90 brands.",
+   "- Home sạch follows the latest CleanYourTV: no lunar \"day 0\" just before a new moon, the TCL Netflix key opens Netflix, a Restart item in the Settings menu, the screensaver uses Home's wallpaper."
+  ]
+ },
+ {
+  "ban": "3.0.2",
+  "ngay": "2026-10-26",
+  "vi": [
+   "- Màn \"Tivi đã sạch!\" hỏi rõ hai lựa chọn: \"Tắt ADB (an toàn hơn)\" hoặc \"Giữ ADB để chỉnh tiếp\" (lần sau đổi giao diện không phải bật lại gỡ lỗi trên tivi). Chưa chọn mà rời app quá 1 phút thì tivi vẫn tự tắt ADB cho an toàn."
+  ],
+  "en": [
+   "- The \"TV is clean!\" screen asks: \"Turn ADB off (safer)\" or \"Keep ADB on to tweak later\" (no need to enable debugging again next time). Leave without choosing for over a minute and the TV still turns ADB off."
+  ]
+ },
+ {
+  "ban": "3.0.1",
+  "ngay": "2026-10-26",
+  "vi": [
+   "- Tivi để múi giờ khác điện thoại (Xiaomi / Redmi bản Trung Quốc để giờ Bắc Kinh, nhanh hơn Việt Nam 1 tiếng, lại giấu mục chỉnh giờ): khi kết nối, app báo lệch và có nút \"Đặt giờ tivi theo điện thoại\"."
+  ],
+  "en": [
+   "- TV in a different time zone from the phone (China-market Xiaomi / Redmi run Beijing time and hide the setting): on connect the app says so and offers \"Use the phone's time zone on the TV\"."
+  ]
+ },
+ {
+  "ban": "3.0.0",
+  "ngay": "2026-10-26",
+  "vi": [
+   "- Kênh truyền hình trên màn chính: chọn được mọi kênh của VTVgo (kênh địa phương như Hà Nội 1, Vĩnh Long 1, Quảng Ngãi…, VTV5 Tây Nam Bộ, VTVcab…), mỗi kênh một ô có logo, bấm là xem ngay (góp ý caicotdien04, xemtivi661).",
+   "- Ảnh riêng vừa khung, không cắt: cả ảnh nằm trọn trên màn, hai bên là ảnh làm mờ (góp ý hieuinter).",
+   "- \"Luôn mở Home sạch khi bật tivi\" ở Tuỳ chỉnh: cho tivi tự mở lại Home gốc, HDMI hay app cũ mỗi lần bật.",
+   "- \"Ô icon đều nhau\" tắt được cả khi dùng giao diện Kiểu Apple TV, để dùng lại ảnh banner của app (góp ý contact.khanhtoan).",
+   "- Tivi Xiaomi gỡ mất Home sạch ngay sau khi cài: app tự cài lại bằng tên Xiaomi cho phép."
+  ],
+  "en": [
+   "- TV channels on Home: pick any VTVgo channel (local ones, VTV5 regions, VTVcab…), each a tile with its logo that plays the channel at once.",
+   "- Fit your picture, no cropping: the whole picture fits with a blurred copy at the sides.",
+   "- \"Always open the clean Home at power-on\" under Options, for TVs that come back to the stock Home, HDMI or the last app.",
+   "- \"Uniform icon tiles\" can be turned off even with the Apple TV look, to bring back app banners.",
+   "- When a Xiaomi TV removes the clean Home right after install, the app reinstalls it under a name Xiaomi allows."
+  ]
+ },
+ {
   "ban": "2.10.12",
   "ngay": "2026-10-26",
   "vi": [

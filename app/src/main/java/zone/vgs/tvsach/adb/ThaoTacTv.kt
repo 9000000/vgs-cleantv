@@ -59,6 +59,40 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         return f.contains("feature:android.software.leanback") || f.contains("feature:android.hardware.type.television")
     }
 
+    /**
+     * Dò một nút remote (3.1.1, "Dò phím remote"): nhờ HomeKeyService của Home sạch học phím kế tiếp (broadcast LEARN_KEY,
+     * nó ghi logcat CleanTVKey "key=… scan=…" rồi nuốt phím), song song đọc getevent làm dự phòng cho tivi chưa lọc phím.
+     * Trả về (keycode, scancode), keycode 0 khi chỉ có getevent; null nếu hết giờ không thấy phím.
+     */
+    fun docPhimRemote(giay: Int = 20, conDung: () -> Boolean = { true }): Pair<Int, Int>? {
+        val tam = "/data/local/tmp/cleantv-phim"
+        sh("logcat -c 2>/dev/null; rm -f $tam; am broadcast -a zone.vgs.cleantv.LEARN_KEY -p $pkgHome >/dev/null 2>&1; " +
+            "(timeout $giay getevent -q 2>/dev/null | grep -m1 -E ' 0001 [0-9a-f]{4} 00000001' > $tam) >/dev/null 2>&1 & true")
+        val het = System.currentTimeMillis() + giay * 1000L
+        while (System.currentTimeMillis() < het && conDung()) {
+            Thread.sleep(800)
+            Regex("""key=(\d+) scan=(\d+)""").find(sh("logcat -d -s CleanTVKey:I 2>/dev/null | tail -1"))?.let {
+                return it.groupValues[1].toInt() to it.groupValues[2].toInt()
+            }
+            Regex(""" 0001 ([0-9a-f]{4}) 00000001""").find(sh("cat $tam 2>/dev/null"))?.let { return 0 to it.groupValues[1].toInt(16) }
+        }
+        return null
+    }
+
+    /** Múi giờ tivi đang dùng (vd Asia/Shanghai trên tivi Xiaomi / Redmi nội địa), "" nếu không đọc được. */
+    fun muiGioTv(): String = runCatching { sh("getprop persist.sys.timezone").trim() }.getOrDefault("")
+
+    /**
+     * Đặt múi giờ tivi (3.0.1, Redmi nội địa giờ Bắc Kinh nhanh hơn Việt Nam 1 tiếng mà giấu mục chỉnh giờ): tắt tự dò
+     * múi giờ rồi gọi IAlarmManager.setTimeZone (mã 3) qua service call, shell có quyền SET_TIME_ZONE. Trả về múi giờ sau
+     * khi đặt để bên gọi so lại.
+     */
+    fun datMuiGio(tz: String): String {
+        if (!Regex("[A-Za-z_]+(/[A-Za-z0-9_+-]+){1,2}").matches(tz)) return muiGioTv()
+        sh("settings put global auto_time_zone 0; service call alarm 3 s16 $tz >/dev/null 2>&1; true")
+        return muiGioTv()
+    }
+
     fun docTrangThai(): TrangThaiGoi {
         fun goi(lenh: String) = sh(lenh).lines().mapNotNull { l ->
             l.trim().removePrefix("package:").takeIf { it.isNotEmpty() && TEN_GOI.matches(it) }
@@ -311,6 +345,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         boAnh: List<Pair<String, ByteArray>>?,
         nutInput: Boolean,
         nutHome: Boolean,
+        apkXiaomi: (() -> ByteArray)? = null,
         bao: (String) -> Unit,
     ): String? {
         val home = homeHienTai().substringBefore('/')
@@ -361,6 +396,14 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         bao(t("Mở thử Home sạch…", "Starting the clean Home…"))
         val start = sh("am start -W -n $cmpHome")
         if (!start.contains("Status: ok") || start.lines().any { it.startsWith("Error") }) {
+            // Xiaomi gỡ ngay launcher không có tên trong danh sách của hãng ("Activity class … does not exist" ngay sau
+            // Success; góp ý anhntcn, MiTV-MOOR2 26/10/2026): cài lại bằng bản tên com.ts.launcher mà hãng cho phép.
+            val xiaomi = Regex("xiaomi|redmi", RegexOption.IGNORE_CASE).containsMatchIn(sh("getprop ro.product.brand; getprop ro.product.manufacturer"))
+            if (apkXiaomi != null && pkgHome == PKG_HOME && xiaomi && start.contains("does not exist")) {
+                bao(t("Tivi Xiaomi gỡ mất Home sạch, cài lại bằng tên Xiaomi cho phép…", "The Xiaomi TV removed the clean Home; reinstalling under a name Xiaomi allows…"))
+                pkgHomeDaDo = PKG_HOME_XIAOMI
+                return caiLauncher(apkXiaomi(), sl, cauHinh, anhNen, boAnh, nutInput, nutHome, null, bao)
+            }
             return t("Home sạch không mở được, Home gốc vẫn giữ nguyên.\n$start", "The clean Home did not start; the stock Home is untouched.\n$start")
         }
         sh("pm grant $pkgHome android.permission.ACCESS_FINE_LOCATION 2>/dev/null; true")
