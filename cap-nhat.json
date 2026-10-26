@@ -5,8 +5,8 @@
     "apk": "https://github.com/9000000/vgs-cleantv/releases/latest/download/CleanTV-v3.1.4.apk",
     "releaseUrl": "https://github.com/9000000/vgs-cleantv/releases/latest",
     "co": 17167562,
-    "ghiChu": "CleanTV v3.1.4",
-    "ghiChuEn": "CleanTV v3.1.4 release",
+    "ghiChu": "CleanTV v3.1.4: Thẻ thời tiết góc màn hình cao cấp với Icon 3D, nhiệt độ lớn 30sp, đầy đủ nhiệt độ cao-thấp, độ ẩm và tăng khoảng cách trên nút cài đặt",
+    "ghiChuEn": "CleanTV v3.1.4: Premium corner weather card with 3D icons, large 30sp temp, high-low/humidity meta and increased margin above settings button",
     "ngay": "2026-10-26"
   },
   "duLieu": {
@@ -17,9 +17,9 @@
       "tuBan": 80
     },
     "tvhome.apk": {
-      "phienBan": "138e85b5f0e51939",
+      "phienBan": "2b9804588734ec5f",
       "url": "/ota/tvhome.apk",
-      "co": 644249,
+      "co": 674289,
       "tuBan": 80
     }
   }
