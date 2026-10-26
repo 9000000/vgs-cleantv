@@ -1509,7 +1509,7 @@ index e926ff8f..330da398 100644
  
      /** Gregorian date to {day, month, year, leap (1 = leap month)} of the lunar calendar at UTC+tz. */
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 13f181e8..9d90026b 100644
+index 13f181e8..4dabdec4 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -55,6 +55,7 @@ import android.text.style.ForegroundColorSpan;
@@ -1643,7 +1643,7 @@ index 13f181e8..9d90026b 100644
          vpnApp = cfg.vpnApp;
          vpnPill = cfg.vpnPill && !cfg.topMenu;
          btnVpn = findViewById(R.id.btnVpn);
-@@ -585,6 +666,21 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -585,6 +666,22 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              public void onChildViewDetachedFromWindow(@NonNull View v) {
              }
          });
@@ -1652,20 +1652,21 @@ index 13f181e8..9d90026b 100644
 +            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
 +                super.onScrolled(recyclerView, dx, dy);
 +                if (singleRow) return;
-+                RecyclerView.ViewHolder vh0 = grid.findViewHolderForAdapterPosition(0);
-+                boolean pushedUp = (vh0 == null) || (grid.getPaddingTop() - vh0.itemView.getTop() > (int) (60 * density));
-+                if (pushedUp && heroShown) {
-+                    showGlowOnly(lastFocused);
-+                } else if (!pushedUp && !heroShown && lastFocused >= 0 && lastFocused < adapter.appCount()) {
-+                    float dockTop = lastDockTopInRoot > 0 ? lastDockTopInRoot : grid.getPaddingTop();
-+                    showHero(lastFocused, dockTop);
++                int focusedRow = (COLUMNS <= 0) ? 0 : (lastFocused / COLUMNS);
++                if (focusedRow >= 2) {
++                    if (heroShown) showGlowOnly(lastFocused);
++                } else {
++                    if (!heroShown && lastFocused >= 0 && lastFocused < adapter.appCount()) {
++                        float dockTop = lastDockTopInRoot > 0 ? lastDockTopInRoot : grid.getPaddingTop();
++                        showHero(lastFocused, dockTop, focusedRow);
++                    }
 +                }
 +            }
 +        });
          if (dockRow) grid.addItemDecoration(new DockDecoration(COLUMNS, density, cinematic, cfg.alwaysShowNames, cfg.dockOpacity, cfg.dockGlass, cfg.dockEvenPadding, cfg.dockBand,
                  singleRow, cfg.dockBandAll));
          if (cfg.fadeRows) TopFade.attach(grid, 48 * density);
-@@ -603,6 +699,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -603,6 +700,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // tvOS layout: push the dock row towards the bottom of the screen, leaving room for
          // rows_below_dock grid rows under it; the rest of the grid stays below until you press Down.
          int rowsBelowDock = cfg.rowsBelowDock;
@@ -1677,7 +1678,7 @@ index 13f181e8..9d90026b 100644
          grid.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
              int h = b - t;
              // Item height follows the tile size, which follows the columns and the rows that must fit (AppAdapter.tileWidthPx).
-@@ -623,6 +724,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -623,6 +725,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // A single row never shows the names under its tiles (the title above the row names the app), so the
              // 7dp gap and 22dp label item_app.xml keeps for them would only lift the row: sit it that much lower.
              if (singleRow && !cfg.alwaysShowNames) want += (int) (29 * density);
@@ -1689,7 +1690,7 @@ index 13f181e8..9d90026b 100644
              if (grid.getPaddingTop() != want) {
                  grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
                  // A vertical grid parks the dock on the new padding line by scrolling (onTileFocused); a sideways
-@@ -790,8 +896,35 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -790,8 +897,35 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -1726,7 +1727,7 @@ index 13f181e8..9d90026b 100644
          btnSettings.setOnKeyListener(pillKeys);
          btnReorder.setOnKeyListener(pillKeys);
          btnLibraryTop.setOnKeyListener(pillKeys);
-@@ -937,6 +1070,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -937,6 +1071,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onResume() {
          super.onResume();
@@ -1734,7 +1735,7 @@ index 13f181e8..9d90026b 100644
          // A festival that started or ended while Home was in the background: rebuild with or without it.
          if (festive != festival.active(LocalDate.now())) {
              recreate();
-@@ -980,9 +1114,20 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -980,9 +1115,20 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -1756,7 +1757,7 @@ index 13f181e8..9d90026b 100644
          if (festive && diya != null) {
              diya.start();
              LocalDate today = LocalDate.now();
-@@ -1148,6 +1293,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1148,6 +1294,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onPause() {
          super.onPause();
@@ -1764,7 +1765,7 @@ index 13f181e8..9d90026b 100644
          root.removeCallbacks(showIdleClock);
          endReorder();   // Home or another app while reordering keeps the order so far
          wallpaperPlayer.stop();
-@@ -1156,6 +1302,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1156,6 +1303,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          ambient.animate().cancel();
          heroArt.animate().cancel();
          handler.removeCallbacks(minuteTick);
@@ -1772,44 +1773,53 @@ index 13f181e8..9d90026b 100644
          stopStats();
          if (diya != null) diya.stop();
          cancelPendingFocusScroll();
-@@ -1688,14 +1835,31 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1676,7 +1824,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+             springY.animateToFinalPosition(y - glassScrollShift);
+         }
+         View item = (View) card.getParent();
+-        if (dockRow && (singleRow || position < COLUMNS)) {
++        int row = (singleRow || COLUMNS <= 0) ? 0 : (position / COLUMNS);
++        if (dockRow && row == 0) {
+             // Dock: park it at the bottom of the screen and show the top shelf for this app. In a single row
+             // every tile is in the dock's row, which never scrolls vertically.
+             int decoratedTop = item.getTop() - (int) (6 * density);
+@@ -1688,14 +1837,22 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  if (!animations || reducedMotion) grid.scrollBy(0, dy);
                  else grid.smoothScrollBy(0, dy);
              }
 -            showHero(position, scroll ? r.top - dy : r.top);
 +            float dockTop = scroll ? r.top - dy : r.top;
 +            lastDockTopInRoot = dockTop;
-+            showHero(position, dockTop);
++            showHero(position, dockTop, 0);
++        } else if (dockRow && row == 1) {
++            // Row 2: app name also shows on top, shrunk to fit the remaining space above row 2
++            revealRect.set(0, -(int) pad * 2, item.getWidth(), item.getHeight() + (int) pad);
++            grid.requestChildRectangleOnScreen(item, revealRect, reducedMotion);
++
++            float dockTop = lastDockTopInRoot > 0 ? lastDockTopInRoot : (grid.getPaddingTop() > 0 ? grid.getPaddingTop() : r.top);
++            showHero(position, dockTop, 1);
          } else {
 -            // Below the dock (or in a plain grid) the glow follows the tile without the big name; letting it
 -            // fade out left the grid on plain black.
 -            showGlowOnly(position);
-             // Scroll just enough so the whole glass (not only the tile) is visible.
+-            // Scroll just enough so the whole glass (not only the tile) is visible.
++            // Row 3 onwards: hero disappears, only glow behind tiles
              revealRect.set(0, -(int) pad * 2, item.getWidth(), item.getHeight() + (int) pad);
              grid.requestChildRectangleOnScreen(item, revealRect, reducedMotion);
 +
-+            boolean gridPushedUp = false;
-+            RecyclerView.ViewHolder vh0 = grid.findViewHolderForAdapterPosition(0);
-+            if (vh0 == null) {
-+                gridPushedUp = true;
-+            } else {
-+                int dockShift = grid.getPaddingTop() - vh0.itemView.getTop();
-+                if (dockShift > (int) (60 * density)) {
-+                    gridPushedUp = true;
-+                }
-+            }
-+
-+            if (gridPushedUp) {
-+                showGlowOnly(position);
-+            } else {
-+                float dockTop = lastDockTopInRoot > 0 ? lastDockTopInRoot : (grid.getPaddingTop() > 0 ? grid.getPaddingTop() : r.top);
-+                showHero(position, dockTop);
-+            }
++            showGlowOnly(position);
          }
      }
  
-@@ -1720,17 +1884,80 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1718,19 +1875,103 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+     // ---- top shelf -------------------------------------------------------------------------------
+ 
      private void showHero(int position, float dockTopInRoot) {
++        int row = (singleRow || COLUMNS <= 0) ? 0 : (position / COLUMNS);
++        showHero(position, dockTopInRoot, row);
++    }
++
++    private void showHero(int position, float dockTopInRoot, int row) {
          String label = adapter.labelAt(position);
          int color = adapter.ambientColorAt(position);
 -        float y = dockTopInRoot - 14 * density - 26 * density - hero.getHeight();
@@ -1818,7 +1828,12 @@ index 13f181e8..9d90026b 100644
 +                && todayCard != null && todayCard.getVisibility() == View.VISIBLE
 +                && weatherCard != null && weatherCard.getVisibility() == View.VISIBLE;
 +
-+        if (compactHero) {
++        if (row == 1) {
++            heroName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f);
++            heroName.setLetterSpacing(-0.01f);
++            if (heroMeta != null) heroMeta.setVisibility(View.GONE);
++            if (heroDots != null) heroDots.setVisibility(View.GONE);
++        } else if (compactHero) {
 +            heroName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 28f);
 +            heroName.setLetterSpacing(-0.01f);
 +            if (heroMeta != null) {
@@ -1866,7 +1881,18 @@ index 13f181e8..9d90026b 100644
 +        int heroH = hero.getMeasuredHeight() > 0 ? hero.getMeasuredHeight() : hero.getHeight();
 +
 +        float y;
-+        if (compactHero) {
++        if (row == 1) {
++            RecyclerView.ViewHolder vh0 = grid.findViewHolderForAdapterPosition(0);
++            float actualDockTop = (vh0 != null) ? (lastDockTopInRoot - (grid.getPaddingTop() - vh0.itemView.getTop())) : lastDockTopInRoot;
++            if (actualDockTop <= 0) actualDockTop = dockTopInRoot;
++
++            float shelfBottom = (shelfCardsContainer != null && shelfCardsContainer.getVisibility() == View.VISIBLE)
++                    ? (shelfCardsContainer.getBottom() + 6f * density)
++                    : (24f * density);
++
++            float candidateY = actualDockTop - 8f * density - heroH;
++            y = Math.max(shelfBottom, candidateY);
++        } else if (compactHero) {
 +            y = dockTopInRoot - 10f * density - heroH;
 +        } else {
 +            y = dockTopInRoot - 14 * density - 26 * density - heroH;
@@ -1885,40 +1911,63 @@ index 13f181e8..9d90026b 100644
              // full-screen panel, and this switch exists for the GPUs that cannot afford it.
              hero.animate().cancel();
              ambient.animate().cancel();
-             fillHero(position, label);
+-            fillHero(position, label);
 -            hero.setY(y);
++            fillHero(position, label, row);
 +            hero.setY(finalY);
              hero.setTranslationX(0f);
              hero.setAlpha(1f);
              if (ambientGlow) {
-@@ -1746,7 +1973,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1745,8 +1986,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+             stopAmbientAnimation();
              hero.animate().cancel();
              ambient.animate().cancel();
-             fillHero(position, label);
+-            fillHero(position, label);
 -            hero.setY(y);
++            fillHero(position, label, row);
 +            hero.setY(finalY);
              hero.setTranslationX(0f);
              hero.animate().alpha(1f).setDuration(260).start();
              if (ambientGlow) {
-@@ -1758,7 +1985,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1757,8 +1998,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+         } else if (changed) {
              if (advancedEffects) hero.animate().cancel();
              hero.animate().alpha(0f).translationX(-12 * density).setDuration(120).withEndAction(() -> {
-                 fillHero(position, label);
+-                fillHero(position, label);
 -                hero.setY(y);
++                fillHero(position, label, row);
 +                hero.setY(finalY);
                  hero.setTranslationX(12 * density);
                  hero.animate().alpha(1f).translationX(0f).setDuration(200).start();
              }).start();
-@@ -1771,7 +1998,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1771,14 +2012,23 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  }).start();
              }
          } else {
 -            hero.setY(y);
-+            hero.setY(finalY);
++            fillHero(position, label, row);
++            if (hero.getY() != finalY) {
++                hero.animate().y(finalY).setDuration(180).start();
++            }
          }
      }
  
-@@ -1996,6 +2223,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+     /** The shelf's text for this dock app: its name and, on the cinematic shelf, "Last opened" and the dots. */
+-    private void fillHero(int position, String label) {
++    private void fillHero(int position, String label, int row) {
+         heroName.setText(label);
+-        if (!cinematic) return;
++        if (!cinematic || row == 1) {
++            if (row == 1) {
++                if (heroMeta != null) heroMeta.setVisibility(View.GONE);
++                if (heroDots != null) heroDots.setVisibility(View.GONE);
++            }
++            return;
++        }
+         updateHeroMeta(position);
+         updateHeroDots(position);
+     }
+@@ -1996,6 +2246,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          heroArt.animate().cancel();
          heroArt.setAlpha(0f);
          heroShown = false;
@@ -1928,7 +1977,7 @@ index 13f181e8..9d90026b 100644
          if (!ambientGlow) return;
          if (!animations || reducedMotion) {
              setAmbient(color);
-@@ -2039,6 +2269,221 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2039,6 +2292,221 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -2150,7 +2199,7 @@ index 13f181e8..9d90026b 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2103,13 +2548,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2103,13 +2571,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -2178,7 +2227,7 @@ index 13f181e8..9d90026b 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2304,6 +2760,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2304,6 +2783,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -2189,7 +2238,7 @@ index 13f181e8..9d90026b 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2665,7 +3125,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2665,7 +3148,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -2202,7 +2251,7 @@ index 13f181e8..9d90026b 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2920,7 +3384,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2920,7 +3407,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       *  source number; "HW8=-" leaves that input out of the Inputs menu (a port the board reports but the set
       *  does not have). Returns the number, -1 for a left-out input, or null when the input is not listed. */
      private Integer mappedSource(String inputId) {
@@ -2236,7 +2285,7 @@ index 13f181e8..9d90026b 100644
      }
  
      /** Switches to a passthrough input (HDMI, AV). An input mapped in `input_sources` is opened by sending
-@@ -3322,10 +3811,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3322,10 +3834,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
