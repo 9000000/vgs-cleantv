@@ -1161,21 +1161,118 @@ index 016d41d4..3e57a1e5 100644
          return true;
      }
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/LauncherSettingsActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/LauncherSettingsActivity.java
-index 93dc758b..e93cd2ff 100644
+index 93dc758b..668bcdad 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/LauncherSettingsActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/LauncherSettingsActivity.java
-@@ -38,6 +38,11 @@ public final class LauncherSettingsActivity extends Activity {
+@@ -30,6 +30,9 @@ public final class LauncherSettingsActivity extends Activity {
+     private TextView wallpaperChoice;
+     private TextView animationsChoice;
+     private TextView advancedChoice;
++    private TextView eventsChoice;
++    private TextView todayChoice;
++    private TextView weatherChoice;
+     private TextView followThemeChoice;
+     private TextView openOnStartChoice;
+     private int columns;
+@@ -37,6 +40,14 @@ public final class LauncherSettingsActivity extends Activity {
+     private int dockOpacity;
      private boolean animations;
      private boolean advancedEffects;
- 
++    private boolean showEvents;
++    private boolean showToday;
++    private boolean showWeather;
++
 +    @Override
 +    protected void attachBaseContext(android.content.Context base) {
 +        super.attachBaseContext(Weather.ngonNgu(base));   // CleanTV/VGS: config.json locale
 +    }
-+
+ 
      @Override
      protected void onCreate(Bundle state) {
-         super.onCreate(state);
+@@ -101,6 +112,35 @@ public final class LauncherSettingsActivity extends Activity {
+         }
+         wallpaperChoice = findViewById(R.id.wallpaperChoice);
+         wallpaperChoice.setOnClickListener(v -> showWallpaperPicker());
++
++        showEvents = choices.getBoolean("show_events", Weather.flag(this, "show_events", true));
++        showToday = choices.getBoolean("show_today", Weather.flag(this, "show_today", true));
++        showWeather = choices.getBoolean("show_weather", Weather.flag(this, "show_weather", true));
++
++        eventsChoice = findViewById(R.id.eventsChoice);
++        eventsChoice.setOnClickListener(v -> {
++            showEvents = !showEvents;
++            choices.edit().putBoolean("show_events", showEvents).apply();
++            changed();
++            refresh();
++        });
++
++        todayChoice = findViewById(R.id.todayChoice);
++        todayChoice.setOnClickListener(v -> {
++            showToday = !showToday;
++            choices.edit().putBoolean("show_today", showToday).apply();
++            changed();
++            refresh();
++        });
++
++        weatherChoice = findViewById(R.id.weatherChoice);
++        weatherChoice.setOnClickListener(v -> {
++            showWeather = !showWeather;
++            choices.edit().putBoolean("show_weather", showWeather).apply();
++            changed();
++            refresh();
++        });
++
+         animationsChoice = findViewById(R.id.animationsChoice);
+         animationsChoice.setOnClickListener(v -> {
+             animations = !animations;
+@@ -133,13 +173,17 @@ public final class LauncherSettingsActivity extends Activity {
+             if (!hasOnTvChoices()) return;
+             choices.edit().remove("columns").remove(Config.ROWS_BELOW_DOCK_KEY).remove("animations")
+                     .remove("advanced_effects").remove(Config.WALLPAPER_CHOICE_KEY)
+-                    .remove(Config.DOCK_OPACITY_KEY).remove(OpenOnStart.KEY).commit();
++                    .remove(Config.DOCK_OPACITY_KEY).remove(OpenOnStart.KEY)
++                    .remove("show_events").remove("show_today").remove("show_weather").commit();
+             Config current = Config.load(this);
+             columns = current.columns;
+             rowsBelowDock = current.rowsBelowDock;
+             dockOpacity = current.dockOpacity;
+             animations = current.animations;
+             advancedEffects = current.animations && current.advancedEffects;
++            showEvents = Weather.flag(this, "show_events", true);
++            showToday = Weather.flag(this, "show_today", true);
++            showWeather = Weather.flag(this, "show_weather", true);
+             changed();
+             refresh();
+         });
+@@ -285,6 +329,18 @@ public final class LauncherSettingsActivity extends Activity {
+                 getString(advancedEffects ? R.string.on : R.string.off)));
+         advancedChoice.setEnabled(animations);
+         advancedChoice.setAlpha(animations ? 1f : 0.5f);
++        if (eventsChoice != null) {
++            eventsChoice.setText(getString(R.string.widget_events_state,
++                    getString(showEvents ? R.string.on : R.string.off)));
++        }
++        if (todayChoice != null) {
++            todayChoice.setText(getString(R.string.widget_today_state,
++                    getString(showToday ? R.string.on : R.string.off)));
++        }
++        if (weatherChoice != null) {
++            weatherChoice.setText(getString(R.string.widget_weather_state,
++                    getString(showWeather ? R.string.on : R.string.off)));
++        }
+         String wallpaperCurrent = choices.getString(Config.WALLPAPER_CHOICE_KEY, null);
+         wallpaperChoice.setText(getString(R.string.wallpaper_state,
+                 "none".equals(wallpaperCurrent) ? getString(R.string.wallpaper_none)
+@@ -298,7 +354,8 @@ public final class LauncherSettingsActivity extends Activity {
+         return choices.contains("columns") || choices.contains(Config.ROWS_BELOW_DOCK_KEY)
+                 || choices.contains("animations") || choices.contains("advanced_effects")
+                 || choices.contains(Config.WALLPAPER_CHOICE_KEY) || choices.contains(Config.DOCK_OPACITY_KEY)
+-                || choices.contains(OpenOnStart.KEY);
++                || choices.contains(OpenOnStart.KEY)
++                || choices.contains("show_events") || choices.contains("show_today") || choices.contains("show_weather");
+     }
+ 
+     private void open(Intent intent) {
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/LinkTiles.java b/launcher/app/src/main/java/com/gathin/tvhome/LinkTiles.java
 new file mode 100644
 index 00000000..9b2fd8e3
@@ -1335,7 +1432,7 @@ index 00000000..9b2fd8e3
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 880d15fc..470782dc 100644
+index 880d15fc..47260b4a 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -55,6 +55,7 @@ import android.text.style.ForegroundColorSpan;
@@ -1358,7 +1455,7 @@ index 880d15fc..470782dc 100644
      private TextView shamsiDate;
      /** lunar_date: the lunisolar date under the date line, and the time zone it is computed for. */
      private TextView lunarDate;
-@@ -189,6 +195,34 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -189,6 +195,37 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private TextView raceKicker, raceHeadline, raceSessions;
      /** config.xml show_stats, overridable by a theme. Off: the line is gone and nothing is read. */
      private boolean showStats;
@@ -1380,6 +1477,9 @@ index 880d15fc..470782dc 100644
 +        }
 +    };
 +    // CleanTV/Samsung Widgets
++    private boolean showEvents = true;
++    private boolean showToday = true;
++    private boolean showWeather = true;
 +    private LinearLayout eventsRow;
 +    private RelativeLayout shelfCardsContainer;
 +    private LinearLayout todayCard;
@@ -1393,7 +1493,7 @@ index 880d15fc..470782dc 100644
      private boolean shamsi;
      /** greeting_name: said after the greeting, which is shown in capitals. */
      private String greetingName = "";
-@@ -364,12 +398,19 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -364,12 +401,19 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // The pill follows the network callbacks and each return to Home; only the diya's flame follows the
              // signal level, so only it needs this minute's binder calls (about 7 ms on the UI thread).
              if (festive) updateWifiLabel();
@@ -1413,7 +1513,7 @@ index 880d15fc..470782dc 100644
      @Override
      protected void onCreate(Bundle savedInstanceState) {
          super.onCreate(savedInstanceState);
-@@ -486,7 +527,39 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -486,7 +530,59 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          lunarOffset = Lunar.offsetFor(cfg.lunarUtcOffset, Locale.getDefault());
          if (lunar) lunarDate.setVisibility(View.VISIBLE);
          greetingName = cfg.greetingName;
@@ -1443,17 +1543,37 @@ index 880d15fc..470782dc 100644
 +        wxAirText = findViewById(R.id.wxAirText);
 +        wxDaysRow = findViewById(R.id.wxDaysRow);
 +
++        SharedPreferences choices = getSharedPreferences(Config.SETTINGS_NAME, MODE_PRIVATE);
++        showEvents = choices.getBoolean("show_events", Weather.flag(this, "show_events", true));
++        showToday = choices.getBoolean("show_today", Weather.flag(this, "show_today", true));
++        showWeather = choices.getBoolean("show_weather", Weather.flag(this, "show_weather", true));
 +        carouselEnabled = Weather.flag(this, "today_carousel", true);
++
++        if (eventsRow != null) {
++            eventsRow.setVisibility(showEvents ? View.VISIBLE : View.GONE);
++        }
++        if (todayCard != null) {
++            todayCard.setVisibility(showToday ? View.VISIBLE : View.GONE);
++        }
++        if (weatherCard != null) {
++            weatherCard.setVisibility(showWeather ? View.VISIBLE : View.GONE);
++        }
++        if (shelfCardsContainer != null) {
++            shelfCardsContainer.setVisibility((showToday || showWeather) ? View.VISIBLE : View.GONE);
++        }
++
 +        if (carouselEnabled) {
-+            renderEventChips();
-+            updateWeatherCard();
-+            HistoryProvider.loadToday(null);
-+            advanceTodayCarousel();
++            if (showEvents) renderEventChips();
++            if (showWeather) updateWeatherCard();
++            if (showToday) {
++                HistoryProvider.loadToday(null);
++                advanceTodayCarousel();
++            }
 +        }
          if (shamsi) {
              shamsiDate.setVisibility(View.VISIBLE);
              TextView date = findViewById(R.id.date);
-@@ -494,6 +567,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -494,6 +590,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              lunarDate.setTextSize(11f);
              date.setPadding(0, (int) (4 * density), 0, 0);
          }
@@ -1467,7 +1587,7 @@ index 880d15fc..470782dc 100644
          vpnApp = cfg.vpnApp;
          moduleCards = cfg.moduleCards;
          hiddenApps = new HashSet<>(cfg.hiddenApps);
-@@ -589,6 +669,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -589,6 +692,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // tvOS layout: push the dock row towards the bottom of the screen, leaving room for
          // rows_below_dock grid rows under it; the rest of the grid stays below until you press Down.
          int rowsBelowDock = cfg.rowsBelowDock;
@@ -1479,7 +1599,7 @@ index 880d15fc..470782dc 100644
          grid.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
              int h = b - t;
              // Item height follows the tile size, which follows the columns and the rows that must fit (AppAdapter.tileWidthPx).
-@@ -609,6 +694,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -609,6 +717,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // A single row never shows the names under its tiles (the title above the row names the app), so the
              // 7dp gap and 22dp label item_app.xml keeps for them would only lift the row: sit it that much lower.
              if (singleRow && !cfg.alwaysShowNames) want += (int) (29 * density);
@@ -1491,7 +1611,7 @@ index 880d15fc..470782dc 100644
              if (grid.getPaddingTop() != want) {
                  grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
                  // A vertical grid parks the dock on the new padding line by scrolling (onTileFocused); a sideways
-@@ -775,7 +865,34 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -775,7 +888,34 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -1526,7 +1646,7 @@ index 880d15fc..470782dc 100644
          btnSettings.setOnKeyListener(pillKeys);
          btnReorder.setOnKeyListener(pillKeys);
          btnLibraryTop.setOnKeyListener(pillKeys);
-@@ -916,6 +1033,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -916,6 +1056,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onResume() {
          super.onResume();
@@ -1534,7 +1654,7 @@ index 880d15fc..470782dc 100644
          // A festival that started or ended while Home was in the background: rebuild with or without it.
          if (festive != festival.active(LocalDate.now())) {
              recreate();
-@@ -959,9 +1077,16 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -959,9 +1100,18 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -1543,15 +1663,17 @@ index 880d15fc..470782dc 100644
          wallpaperPlayer.start();
          handler.postDelayed(minuteTick, MINUTE_MS);
 +        if (carouselEnabled) {
-+            renderEventChips();
-+            updateWeatherCard();
++            if (showEvents) renderEventChips();
++            if (showWeather) updateWeatherCard();
 +            handler.removeCallbacks(carouselTick);
-+            handler.postDelayed(carouselTick, 15000L);
++            if (showToday) {
++                handler.postDelayed(carouselTick, 15000L);
++            }
 +        }
          if (festive && diya != null) {
              diya.start();
              LocalDate today = LocalDate.now();
-@@ -1127,6 +1252,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1127,6 +1277,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onPause() {
          super.onPause();
@@ -1559,7 +1681,7 @@ index 880d15fc..470782dc 100644
          root.removeCallbacks(showIdleClock);
          endReorder();   // Home or another app while reordering keeps the order so far
          wallpaperPlayer.stop();
-@@ -1135,6 +1261,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1135,6 +1286,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          ambient.animate().cancel();
          heroArt.animate().cancel();
          handler.removeCallbacks(minuteTick);
@@ -1567,7 +1689,7 @@ index 880d15fc..470782dc 100644
          stopStats();
          if (diya != null) diya.stop();
          cancelPendingFocusScroll();
-@@ -1695,6 +1822,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1695,6 +1847,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          boolean changed = !label.contentEquals(heroName.getText());
          if (cinematic && heroArtAlpha > 0f) showHeroArt(position);
  
@@ -1578,7 +1700,7 @@ index 880d15fc..470782dc 100644
          if (!animations || reducedMotion) {
              // Snap the shelf instead of sliding and fading it: each of those frames repaints the
              // full-screen panel, and this switch exists for the GPUs that cannot afford it.
-@@ -1967,6 +2098,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1967,6 +2123,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          heroArt.animate().cancel();
          heroArt.setAlpha(0f);
          heroShown = false;
@@ -1588,7 +1710,7 @@ index 880d15fc..470782dc 100644
          if (!ambientGlow) return;
          if (!animations || reducedMotion) {
              setAmbient(color);
-@@ -2010,6 +2144,153 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2010,6 +2169,153 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -1621,7 +1743,7 @@ index 880d15fc..470782dc 100644
 +    // ---- CleanTV/Samsung: Widgets & Carousel (Sự kiện, Danh ngôn, Lịch sử, Thời tiết) ----
 +
 +    private void renderEventChips() {
-+        if (eventsRow == null) return;
++        if (!showEvents || eventsRow == null) return;
 +        eventsRow.removeAllViews();
 +        List<EventsTracker.EventChip> chips = EventsTracker.getUpcomingChips();
 +        LayoutInflater inflater = LayoutInflater.from(this);
@@ -1645,7 +1767,7 @@ index 880d15fc..470782dc 100644
 +    }
 +
 +    private void updateWeatherCard() {
-+        if (weatherCard == null) return;
++        if (!showWeather || weatherCard == null) return;
 +        Weather.fetchFull(this, fw -> runOnUiThread(() -> {
 +            if (fw == null) return;
 +            if (wxIcon != null) wxIcon.setImageResource(fw.iconRes);
@@ -1688,7 +1810,7 @@ index 880d15fc..470782dc 100644
 +    }
 +
 +    private void advanceTodayCarousel() {
-+        if (todayCard == null) return;
++        if (!showToday || todayCard == null) return;
 +
 +        // Xoay vòng giữa:
 +        // - CÂU NÓI HAY (Quotes)
@@ -1742,7 +1864,7 @@ index 880d15fc..470782dc 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2074,13 +2355,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2074,13 +2380,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -1770,7 +1892,7 @@ index 880d15fc..470782dc 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2275,6 +2567,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2275,6 +2592,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -1781,7 +1903,7 @@ index 880d15fc..470782dc 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2629,7 +2925,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2629,7 +2950,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -1794,7 +1916,7 @@ index 880d15fc..470782dc 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2844,6 +3144,29 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2844,6 +3169,29 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              if (v.equals("-")) return -1;
              try { return Integer.parseInt(v); } catch (NumberFormatException e) { return null; }
          }
@@ -1824,7 +1946,7 @@ index 880d15fc..470782dc 100644
          return null;
      }
  
-@@ -3246,10 +3569,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3246,10 +3594,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
@@ -7352,6 +7474,32 @@ index 6b61aa40..70c21fde 100644
                          <TextView
                              android:id="@+id/lunarDate"
                              android:gravity="right"
+diff --git a/launcher/app/src/main/res/layout/activity_launcher_settings.xml b/launcher/app/src/main/res/layout/activity_launcher_settings.xml
+index b3de8647..6f1a4dae 100644
+--- a/launcher/app/src/main/res/layout/activity_launcher_settings.xml
++++ b/launcher/app/src/main/res/layout/activity_launcher_settings.xml
+@@ -93,6 +93,21 @@
+             style="@style/SettingsRow"
+             android:layout_marginTop="28dp" />
+ 
++        <TextView
++            android:id="@+id/eventsChoice"
++            style="@style/SettingsRow"
++            android:layout_marginTop="28dp" />
++
++        <TextView
++            android:id="@+id/todayChoice"
++            style="@style/SettingsRow"
++            android:layout_marginTop="10dp" />
++
++        <TextView
++            android:id="@+id/weatherChoice"
++            style="@style/SettingsRow"
++            android:layout_marginTop="10dp" />
++
+         <TextView
+             android:id="@+id/animationsChoice"
+             style="@style/SettingsRow"
 diff --git a/launcher/app/src/main/res/layout/activity_main.xml b/launcher/app/src/main/res/layout/activity_main.xml
 index 39805803..2e19f24c 100644
 --- a/launcher/app/src/main/res/layout/activity_main.xml
@@ -7967,10 +8115,20 @@ index 9e58a7d8..00000000
 -    <string name="font_medium" translatable="false">sans-serif-medium</string>
 -</resources>
 diff --git a/launcher/app/src/main/res/values-vi/strings.xml b/launcher/app/src/main/res/values-vi/strings.xml
-index 48609291..77e3e027 100644
+index 48609291..963e1347 100644
 --- a/launcher/app/src/main/res/values-vi/strings.xml
 +++ b/launcher/app/src/main/res/values-vi/strings.xml
-@@ -119,4 +119,14 @@
+@@ -33,6 +33,9 @@
+     <string name="animations_state">Hiệu ứng: %1$s</string>
+     <string name="advanced_effects">Hiệu ứng nâng cao</string>
+     <string name="advanced_effects_state">Hiệu ứng nâng cao: %1$s</string>
++    <string name="widget_events_state">Sự kiện &amp; Đếm ngược ngày: %1$s</string>
++    <string name="widget_today_state">Khối Hôm nay &amp; Danh ngôn: %1$s</string>
++    <string name="widget_weather_state">Khối Thời tiết &amp; AQI: %1$s</string>
+     <string name="open_on_start_label">Mở khi khởi động</string>
+     <string name="open_on_start_state">Mở khi khởi động: %1$s</string>
+     <string name="advanced_effects_warning">Thêm hiệu ứng ô nổi lên, phóng to biểu tượng và chuyển màu mượt. Có thể tốn thêm bộ nhớ; mức chênh lệch tùy từng TV.</string>
+@@ -119,4 +122,14 @@
      <string name="race_countdown_days">%1$d ngày %2$d giờ</string>
      <string name="last_opened">Mở lần cuối %1$s</string>
      <string name="tile_move">Di chuyển</string>
@@ -8001,10 +8159,20 @@ index adbb30db..91098f5c 100644
      <string name="font_light" translatable="false">@font/outfit_light</string>
      <string name="font_extralight" translatable="false">@font/outfit_extralight</string>
 diff --git a/launcher/app/src/main/res/values/strings.xml b/launcher/app/src/main/res/values/strings.xml
-index c4e5a5a9..e36a4ad1 100644
+index c4e5a5a9..f34cc8c1 100644
 --- a/launcher/app/src/main/res/values/strings.xml
 +++ b/launcher/app/src/main/res/values/strings.xml
-@@ -149,4 +149,11 @@
+@@ -59,6 +59,9 @@
+     <string name="animations_state">Animations: %1$s</string>
+     <string name="advanced_effects">Advanced effects</string>
+     <string name="advanced_effects_state">Advanced effects: %1$s</string>
++    <string name="widget_events_state">Events &amp; countdowns: %1$s</string>
++    <string name="widget_today_state">Today card &amp; sayings: %1$s</string>
++    <string name="widget_weather_state">Detailed weather &amp; AQI: %1$s</string>
+     <string name="open_on_start_label">Open on start</string>
+     <string name="open_on_start_state">Open on start: %1$s</string>
+     <string name="advanced_effects_warning">Adds a lifted tile, icon zoom and smooth colour transitions. May increase memory use; the actual difference depends on your TV.</string>
+@@ -149,4 +152,11 @@
      <!-- Cinematic top shelf (cinematic_home): the line under the focused dock app's name; %1$s is when it was
           last opened, e.g. "5 minutes ago" or "yesterday, 9:40 pm". -->
      <string name="last_opened">Last opened %1$s</string>
