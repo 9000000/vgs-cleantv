@@ -311,6 +311,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         boAnh: List<Pair<String, ByteArray>>?,
         nutInput: Boolean,
         nutHome: Boolean,
+        apkXiaomi: (() -> ByteArray)? = null,
         bao: (String) -> Unit,
     ): String? {
         val home = homeHienTai().substringBefore('/')
@@ -361,6 +362,14 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         bao(t("Mở thử Home sạch…", "Starting the clean Home…"))
         val start = sh("am start -W -n $cmpHome")
         if (!start.contains("Status: ok") || start.lines().any { it.startsWith("Error") }) {
+            // Xiaomi gỡ ngay launcher không có tên trong danh sách của hãng ("Activity class … does not exist" ngay sau
+            // Success; góp ý anhntcn, MiTV-MOOR2 26/10/2026): cài lại bằng bản tên com.ts.launcher mà hãng cho phép.
+            val xiaomi = Regex("xiaomi|redmi", RegexOption.IGNORE_CASE).containsMatchIn(sh("getprop ro.product.brand; getprop ro.product.manufacturer"))
+            if (apkXiaomi != null && pkgHome == PKG_HOME && xiaomi && start.contains("does not exist")) {
+                bao(t("Tivi Xiaomi gỡ mất Home sạch, cài lại bằng tên Xiaomi cho phép…", "The Xiaomi TV removed the clean Home; reinstalling under a name Xiaomi allows…"))
+                pkgHomeDaDo = PKG_HOME_XIAOMI
+                return caiLauncher(apkXiaomi(), sl, cauHinh, anhNen, boAnh, nutInput, nutHome, null, bao)
+            }
             return t("Home sạch không mở được, Home gốc vẫn giữ nguyên.\n$start", "The clean Home did not start; the stock Home is untouched.\n$start")
         }
         sh("pm grant $pkgHome android.permission.ACCESS_FINE_LOCATION 2>/dev/null; true")

@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 80,
-  "versionName": "2.10.12",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-2.10.12.apk",
-  "co": 12012469,
-  "ghiChu": "Chặn dọn nhầm điện thoại; mở app đã chọn cả khi bật tivi từ chế độ chờ; chữ giờ ngày trắng sáng.",
-  "ghiChuEn": "Blocks cleaning a phone by mistake; the chosen app also opens when the TV wakes from standby; bright white clock and date.",
+  "versionCode": 81,
+  "versionName": "3.0.0",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.0.0.apk",
+  "co": 12012461,
+  "ghiChu": "CleanTV 3.0: chọn mọi kênh trên VTVgo (địa phương, VTVcab…) đặt lên màn chính; ảnh nền vừa khung; luôn mở Home sạch khi bật tivi.",
+  "ghiChuEn": "CleanTV 3.0: put any VTVgo channel on Home; fit-to-screen wallpaper; always open the clean Home at power-on.",
   "ngay": "2026-10-26"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "b6384b8a5240f008",
    "url": "/ota/du-lieu.json",
    "co": 1774491,
-   "tuBan": 80
+   "tuBan": 81
   },
   "tvhome.apk": {
    "phienBan": "138e85b5f0e51939",
    "url": "/ota/tvhome.apk",
    "co": 644249,
-   "tuBan": 80
+   "tuBan": 81
   }
  }
 }

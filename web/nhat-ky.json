@@ -1,5 +1,23 @@
 [
  {
+  "ban": "3.0.0",
+  "ngay": "2026-10-26",
+  "vi": [
+   "- Kênh truyền hình trên màn chính: chọn được mọi kênh của VTVgo (kênh địa phương như Hà Nội 1, Vĩnh Long 1, Quảng Ngãi…, VTV5 Tây Nam Bộ, VTVcab…), mỗi kênh một ô có logo, bấm là xem ngay (góp ý caicotdien04, xemtivi661).",
+   "- Ảnh riêng vừa khung, không cắt: cả ảnh nằm trọn trên màn, hai bên là ảnh làm mờ (góp ý hieuinter).",
+   "- \"Luôn mở Home sạch khi bật tivi\" ở Tuỳ chỉnh: cho tivi tự mở lại Home gốc, HDMI hay app cũ mỗi lần bật.",
+   "- \"Ô icon đều nhau\" tắt được cả khi dùng giao diện Kiểu Apple TV, để dùng lại ảnh banner của app (góp ý contact.khanhtoan).",
+   "- Tivi Xiaomi gỡ mất Home sạch ngay sau khi cài: app tự cài lại bằng tên Xiaomi cho phép."
+  ],
+  "en": [
+   "- TV channels on Home: pick any VTVgo channel (local ones, VTV5 regions, VTVcab…), each a tile with its logo that plays the channel at once.",
+   "- Fit your picture, no cropping: the whole picture fits with a blurred copy at the sides.",
+   "- \"Always open the clean Home at power-on\" under Options, for TVs that come back to the stock Home, HDMI or the last app.",
+   "- \"Uniform icon tiles\" can be turned off even with the Apple TV look, to bring back app banners.",
+   "- When a Xiaomi TV removes the clean Home right after install, the app reinstalls it under a name Xiaomi allows."
+  ]
+ },
+ {
   "ban": "2.10.12",
   "ngay": "2026-10-26",
   "vi": [
