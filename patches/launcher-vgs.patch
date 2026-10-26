@@ -259,10 +259,10 @@ index eb56debc..ae7e77b8 100644
          if (live == null) return 0xFF444444;
          // Draw a private copy: changing the bounds of the drawable an ImageView shows would blank the tile.
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java b/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
-index dd324c91..e3bd1cae 100644
+index dd324c91..13f1493b 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
-@@ -6,31 +6,33 @@ import android.content.res.Resources;
+@@ -6,31 +6,34 @@ import android.content.res.Resources;
  import android.graphics.Bitmap;
  import android.graphics.BitmapFactory;
  import android.graphics.drawable.BitmapDrawable;
@@ -298,13 +298,14 @@ index dd324c91..e3bd1cae 100644
      private static final long MOVE_MS = 60_000L;
 -    /** The glow's colour change: 16 steps over 8 s. Animated per frame it redrew the full-screen gradient ~480 times. */
 +    private static final long PHOTO_INTERVAL_MS = 20_000L;
++    private static final long QUOTE_INTERVAL_MS = 20_000L;
      private static final int GLOW_STEPS = 16;
      private static final long GLOW_STEP_MS = 500L;
 -    /** Deep, low-brightness glow colours; the glow is drawn at partial alpha on black. */
      private static final int[] PALETTE = {0xFF2B5CFF, 0xFF00A39A, 0xFF8A3FFC, 0xFFE0661B, 0xFFD6336C};
  
      private final Handler handler = new Handler(Looper.getMainLooper());
-@@ -40,28 +42,68 @@ final class ClockScene {
+@@ -40,28 +43,76 @@ final class ClockScene {
      private final GradientDrawable glow;
      private int colorIndex;
      private int glowColor;
@@ -362,6 +363,14 @@ index dd324c91..e3bd1cae 100644
 +        }
 +    };
 +
++    private final Runnable quoteTick = new Runnable() {
++        @Override
++        public void run() {
++            advanceQuote();
++            handler.postDelayed(this, QUOTE_INTERVAL_MS);
++        }
++    };
++
 +    /** root là layout dream_clock đã được inflate. */
      ClockScene(View root) {
          content = root.findViewById(R.id.dreamContent);
@@ -382,7 +391,7 @@ index dd324c91..e3bd1cae 100644
          glow = new GradientDrawable();
          glow.setGradientType(GradientDrawable.RADIAL_GRADIENT);
          ambient.setBackground(glow);
-@@ -69,6 +111,100 @@ final class ClockScene {
+@@ -69,6 +120,111 @@ final class ClockScene {
                  glow.setGradientRadius((r - l) * 0.55f));
          colorIndex = random.nextInt(PALETTE.length);
          setGlow(PALETTE[colorIndex]);
@@ -475,19 +484,33 @@ index dd324c91..e3bd1cae 100644
 +        }
 +
 +        // 4. Dòng 5: Danh ngôn ("“Biết người là khôn, biết mình là sáng suốt.” — Lão Tử")
-+        if (tvQuoteLine != null) {
++        if (tvQuoteLine != null && (tvQuoteLine.getText() == null || tvQuoteLine.getText().length() == 0)) {
 +            QuotesProvider.QuoteItem q = QuotesProvider.getNextQuote(quoteIdx);
 +            tvQuoteLine.setText(q.getFormatted());
 +            tvQuoteLine.setVisibility(View.VISIBLE);
 +        }
++    }
++
++    private void advanceQuote() {
++        if (tvQuoteLine == null) return;
++        quoteIdx++;
++        QuotesProvider.QuoteItem q = QuotesProvider.getNextQuote(quoteIdx);
++        tvQuoteLine.animate().alpha(0f).setDuration(500).withEndAction(() -> {
++            tvQuoteLine.setText(q.getFormatted());
++            tvQuoteLine.setVisibility(View.VISIBLE);
++            tvQuoteLine.animate().alpha(1f).setDuration(700).start();
++        }).start();
      }
  
      void start() {
-@@ -79,67 +215,63 @@ final class ClockScene {
+@@ -79,67 +235,67 @@ final class ClockScene {
          });
          handler.removeCallbacks(tick);
          handler.postDelayed(tick, MOVE_MS);
 -        if (wallpaperFile != null && !wallpaperShown) loadWallpaper();
++
++        handler.removeCallbacks(quoteTick);
++        handler.postDelayed(quoteTick, QUOTE_INTERVAL_MS);
 +
 +        if (!photoList.isEmpty() && bg1 != null && bg2 != null) {
 +            bg1.setVisibility(View.VISIBLE);
@@ -504,6 +527,7 @@ index dd324c91..e3bd1cae 100644
 +        handler.removeCallbacksAndMessages(null);
          content.animate().cancel();
 -        wallpaperGeneration++;   // a decode still running must not attach its picture to a stopped scene
++        if (tvQuoteLine != null) tvQuoteLine.animate().cancel();
 +        decodeGeneration++;
      }
  
@@ -588,7 +612,7 @@ index dd324c91..e3bd1cae 100644
      private static Bitmap decode(File file, int screenW, int screenH) {
          try {
              BitmapFactory.Options options = new BitmapFactory.Options();
-@@ -171,23 +303,34 @@ final class ClockScene {
+@@ -171,23 +327,34 @@ final class ClockScene {
          }).start();
      }
  
@@ -958,10 +982,10 @@ index 00000000..107f72a3
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/HistoryProvider.java b/launcher/app/src/main/java/com/gathin/tvhome/HistoryProvider.java
 new file mode 100644
-index 00000000..31b51700
+index 00000000..2267989e
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/HistoryProvider.java
-@@ -0,0 +1,164 @@
+@@ -0,0 +1,188 @@
 +package com.gathin.tvhome;
 +
 +import android.os.Handler;
@@ -979,6 +1003,7 @@ index 00000000..31b51700
 +import java.util.Collections;
 +import java.util.List;
 +import java.util.Locale;
++import java.util.regex.Matcher;
 +import java.util.regex.Pattern;
 +
 +/**
@@ -1015,6 +1040,10 @@ index 00000000..31b51700
 +            "\\b(kill|dead|death|bomb|attack|massacre|crash|shoot|shot\\b|murder|terror|genocide|hostage)\\b|" +
 +            "giết|thảm sát|khủng bố|đánh bom|tử vong|thiệt mạng|xả súng|tai nạn|hành quyết|ám sát|con tin",
 +            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
++    );
++
++    private static final Pattern YEAR_PATTERN = Pattern.compile(
++            "^\\s*(?:\\[\\[)?(\\d{1,4})(?:\\]\\])?\\s*[–—\\-:]?\\s*(.*)"
 +    );
 +
 +    private static final List<HistoryItem> CACHED_ITEMS = Collections.synchronizedList(new ArrayList<>());
@@ -1056,9 +1085,7 @@ index 00000000..31b51700
 +        List<HistoryItem> list = new ArrayList<>();
 +        HttpURLConnection conn = null;
 +        try {
-+            String padMonth = String.format(Locale.ROOT, "%02d", month);
-+            String padDay = String.format(Locale.ROOT, "%02d", day);
-+            URL url = new URL("https://vi.wikipedia.org/api/rest_v1/feed/onthisday/events/" + padMonth + "/" + padDay);
++            URL url = new URL("https://vi.wikipedia.org/w/api.php?action=parse&page=" + day + "_th%C3%A1ng_" + month + "&prop=wikitext&format=json");
 +            conn = (HttpURLConnection) url.openConnection();
 +            conn.setRequestMethod("GET");
 +            conn.setRequestProperty("User-Agent", "CleanTV-AndroidTV/2.10 (https://vgs.zone/cleantv)");
@@ -1073,15 +1100,30 @@ index 00000000..31b51700
 +                br.close();
 +
 +                JSONObject root = new JSONObject(sb.toString());
-+                JSONArray events = root.optJSONArray("events");
-+                if (events != null) {
-+                    for (int i = 0; i < events.length(); i++) {
-+                        JSONObject ev = events.getJSONObject(i);
-+                        int year = ev.optInt("year", 0);
-+                        String text = ev.optString("text", "").trim();
-+                        // Làm sạch và lọc an toàn
-+                        if (!text.isEmpty() && !GRIM.matcher(text).find()) {
-+                            list.add(new HistoryItem(year, cleanWikiText(text)));
++                JSONObject parseObj = root.optJSONObject("parse");
++                if (parseObj != null) {
++                    JSONObject wtObj = parseObj.optJSONObject("wikitext");
++                    if (wtObj != null) {
++                        String wikitext = wtObj.optString("*", "");
++                        int start = wikitext.indexOf("== Sự kiện ==");
++                        if (start == -1) start = wikitext.indexOf("==Sự kiện==");
++                        if (start != -1) {
++                            int end = wikitext.indexOf("\n==", start + 12);
++                            String section = (end != -1) ? wikitext.substring(start, end) : wikitext.substring(start);
++                            String[] lines = section.split("\n");
++                            for (String l : lines) {
++                                l = l.trim();
++                                if (!l.startsWith("*")) continue;
++                                l = l.replaceFirst("^\\*+", "").trim();
++                                Matcher m = YEAR_PATTERN.matcher(l);
++                                if (m.matches()) {
++                                    int year = Integer.parseInt(m.group(1));
++                                    String text = cleanWikiText(m.group(2));
++                                    if (!text.isEmpty() && !GRIM.matcher(text).find()) {
++                                        list.add(new HistoryItem(year, text));
++                                    }
++                                }
++                            }
 +                        }
 +                    }
 +                }
@@ -1094,7 +1136,13 @@ index 00000000..31b51700
 +    }
 +
 +    private static String cleanWikiText(String s) {
-+        return s.replaceAll("<[^>]*>", "").replaceAll("\\s+", " ").trim();
++        if (s == null) return "";
++        s = s.replaceAll("(?s)<ref[^>]*>.*?</ref>", "");
++        s = s.replaceAll("<[^>]*>", "");
++        s = s.replaceAll("\\{\\{[^}]*\\}\\}", "");
++        s = s.replaceAll("\\[\\[(?:[^|\\]]*\\|)?([^\\]]+)\\]\\]", "$1");
++        s = s.replaceAll("^[\\s*–—\\-:]+", "");
++        return s.replaceAll("\\s+", " ").trim();
 +    }
 +
 +    /**
@@ -2731,50 +2779,50 @@ index 00000000..e2037468
 +</shape>
 diff --git a/launcher/app/src/main/res/drawable/bg_event_chip.xml b/launcher/app/src/main/res/drawable/bg_event_chip.xml
 new file mode 100644
-index 00000000..957c3605
+index 00000000..bfcc3ef4
 --- /dev/null
 +++ b/launcher/app/src/main/res/drawable/bg_event_chip.xml
 @@ -0,0 +1,6 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-+    <solid android:color="#57000000" />
-+    <stroke android:width="1.5dp" android:color="#24FFFFFF" />
++    <solid android:color="#2412151C" />
++    <stroke android:width="0.75dp" android:color="#1AFFFFFF" />
 +    <corners android:radius="18dp" />
 +</shape>
 diff --git a/launcher/app/src/main/res/drawable/bg_event_chip_today.xml b/launcher/app/src/main/res/drawable/bg_event_chip_today.xml
 new file mode 100644
-index 00000000..ca4f5cd1
+index 00000000..a25ea3bf
 --- /dev/null
 +++ b/launcher/app/src/main/res/drawable/bg_event_chip_today.xml
 @@ -0,0 +1,6 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-+    <solid android:color="#57000000" />
-+    <stroke android:width="1.5dp" android:color="#B3FFD479" />
++    <solid android:color="#2E261B0E" />
++    <stroke android:width="0.75dp" android:color="#80FFD479" />
 +    <corners android:radius="18dp" />
 +</shape>
 diff --git a/launcher/app/src/main/res/drawable/bg_today_card.xml b/launcher/app/src/main/res/drawable/bg_today_card.xml
 new file mode 100644
-index 00000000..3716ea75
+index 00000000..0d892435
 --- /dev/null
 +++ b/launcher/app/src/main/res/drawable/bg_today_card.xml
 @@ -0,0 +1,6 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-+    <solid android:color="#6B0A0A0E" />
-+    <stroke android:width="1.5dp" android:color="#21FFFFFF" />
++    <gradient android:angle="270" android:startColor="#2D181E2A" android:endColor="#1E11141E" />
++    <stroke android:width="0.75dp" android:color="#1AFFFFFF" />
 +    <corners android:radius="20dp" />
 +</shape>
 diff --git a/launcher/app/src/main/res/drawable/bg_weather_card.xml b/launcher/app/src/main/res/drawable/bg_weather_card.xml
 new file mode 100644
-index 00000000..0dfce1cc
+index 00000000..3fc9d5a3
 --- /dev/null
 +++ b/launcher/app/src/main/res/drawable/bg_weather_card.xml
 @@ -0,0 +1,6 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-+    <solid android:color="#780E0E14" />
-+    <stroke android:width="1.5dp" android:color="#24FFFFFF" />
++    <gradient android:angle="270" android:startColor="#2D181E2A" android:endColor="#1E11141E" />
++    <stroke android:width="0.75dp" android:color="#1AFFFFFF" />
 +    <corners android:radius="22dp" />
 +</shape>
 diff --git a/launcher/app/src/main/res/drawable/cum_bg.xml b/launcher/app/src/main/res/drawable/cum_bg.xml
@@ -7491,7 +7539,7 @@ index b3de8647..245b0be1 100644
              android:id="@+id/animationsChoice"
              style="@style/SettingsRow"
 diff --git a/launcher/app/src/main/res/layout/activity_main.xml b/launcher/app/src/main/res/layout/activity_main.xml
-index 9c071595..78187d71 100644
+index 9c071595..e38b8740 100644
 --- a/launcher/app/src/main/res/layout/activity_main.xml
 +++ b/launcher/app/src/main/res/layout/activity_main.xml
 @@ -146,6 +146,164 @@
@@ -7526,8 +7574,8 @@ index 9c071595..78187d71 100644
 +                android:id="@+id/todayLabel"
 +                android:layout_width="wrap_content"
 +                android:layout_height="wrap_content"
-+                android:fontFamily="@font/outfit_medium"
-+                android:letterSpacing="0.18"
++                android:fontFamily="@font/lexend_medium"
++                android:letterSpacing="0.14"
 +                android:text="CÂU NÓI HAY"
 +                android:textAllCaps="true"
 +                android:textColor="#FFD479"
@@ -7539,18 +7587,18 @@ index 9c071595..78187d71 100644
 +                android:layout_height="wrap_content"
 +                android:layout_marginTop="6dp"
 +                android:ellipsize="end"
-+                android:fontFamily="@font/outfit_regular"
-+                android:lineSpacingExtra="3dp"
++                android:fontFamily="@font/lexend_light"
++                android:lineSpacingExtra="3.5dp"
 +                android:maxLines="2"
-+                android:textColor="#E6FFFFFF"
-+                android:textSize="16sp" />
++                android:textColor="#F2FFFFFF"
++                android:textSize="15.5sp" />
 +
 +            <TextView
 +                android:id="@+id/todayMeta"
 +                android:layout_width="wrap_content"
 +                android:layout_height="wrap_content"
 +                android:layout_marginTop="5dp"
-+                android:fontFamily="@font/outfit_regular"
++                android:fontFamily="@font/lexend"
 +                android:textColor="#8CFFFFFF"
 +                android:textSize="13sp" />
 +        </LinearLayout>
@@ -7585,7 +7633,7 @@ index 9c071595..78187d71 100644
 +                    android:layout_width="wrap_content"
 +                    android:layout_height="wrap_content"
 +                    android:layout_marginStart="10dp"
-+                    android:fontFamily="@string/font_light"
++                    android:fontFamily="@font/lexend_light"
 +                    android:includeFontPadding="false"
 +                    android:textColor="#FFFFFFFF"
 +                    android:textSize="36sp" />
@@ -7602,7 +7650,7 @@ index 9c071595..78187d71 100644
 +                        android:layout_width="wrap_content"
 +                        android:layout_height="wrap_content"
 +                        android:ellipsize="end"
-+                        android:fontFamily="@font/outfit_medium"
++                        android:fontFamily="@font/lexend_medium"
 +                        android:singleLine="true"
 +                        android:textColor="#FFFFFFFF"
 +                        android:textSize="15sp" />
@@ -7613,7 +7661,7 @@ index 9c071595..78187d71 100644
 +                        android:layout_height="wrap_content"
 +                        android:layout_marginTop="2dp"
 +                        android:ellipsize="end"
-+                        android:fontFamily="@font/outfit_regular"
++                        android:fontFamily="@font/lexend"
 +                        android:singleLine="true"
 +                        android:textColor="#99FFFFFF"
 +                        android:textSize="12sp" />
@@ -7639,7 +7687,7 @@ index 9c071595..78187d71 100644
 +                    android:layout_height="wrap_content"
 +                    android:layout_marginStart="8dp"
 +                    android:ellipsize="end"
-+                    android:fontFamily="@font/outfit_regular"
++                    android:fontFamily="@font/lexend"
 +                    android:singleLine="true"
 +                    android:textColor="#D9FFFFFF"
 +                    android:textSize="12sp" />
@@ -7668,7 +7716,12 @@ index 9c071595..78187d71 100644
                          <TextView
                              android:id="@+id/lunarDate"
                              android:gravity="left"
-@@ -287,9 +445,50 @@
+@@ -283,13 +441,54 @@
+                             android:ellipsize="end"
+                             android:textColor="#80FFFFFF"
+                             android:textSize="14sp"
+-                            android:fontFamily="@font/outfit_regular"
++                            android:fontFamily="@font/lexend"
                              android:letterSpacing="0.14"
                              android:textAllCaps="true"
                              android:visibility="gone" />
@@ -7684,7 +7737,7 @@ index 9c071595..78187d71 100644
 +                            android:ellipsize="end"
 +                            android:textColor="#B3FFFFFF"
 +                            android:textSize="14sp"
-+                            android:fontFamily="@font/outfit_regular"
++                            android:fontFamily="@font/lexend"
 +                            android:letterSpacing="0.04"
 +                            android:includeFontPadding="false"
 +                            android:visibility="gone" />
@@ -7700,7 +7753,7 @@ index 9c071595..78187d71 100644
 +                            android:ellipsize="end"
 +                            android:textColor="#FFFFD166"
 +                            android:textSize="12sp"
-+                            android:fontFamily="@font/outfit_regular"
++                            android:fontFamily="@font/lexend"
 +                            android:letterSpacing="0.03"
 +                            android:includeFontPadding="false"
 +                            android:visibility="gone" />
@@ -7761,7 +7814,7 @@ index 9c071595..78187d71 100644
                      android:id="@+id/btnLibraryTop"
                      style="@style/TopButtonIcon"
 diff --git a/launcher/app/src/main/res/layout/dream_clock.xml b/launcher/app/src/main/res/layout/dream_clock.xml
-index b059bfa0..c9df85f7 100644
+index b059bfa0..4a2323ba 100644
 --- a/launcher/app/src/main/res/layout/dream_clock.xml
 +++ b/launcher/app/src/main/res/layout/dream_clock.xml
 @@ -1,10 +1,35 @@
@@ -7833,7 +7886,7 @@ index b059bfa0..c9df85f7 100644
 -                android:fontFamily="@string/font_extralight"
 +                android:textColor="#FFFFFFFF"
 +                android:textSize="100sp"
-+                android:fontFamily="@font/outfit_extralight"
++                android:fontFamily="@font/lexend_extralight"
                  android:letterSpacing="-0.04"
 -                android:includeFontPadding="false" />
 +                android:includeFontPadding="false"
@@ -7855,7 +7908,7 @@ index b059bfa0..c9df85f7 100644
 -                android:fontFamily="@string/font_medium"
 +                android:textColor="#B3FFFFFF"
 +                android:textSize="20sp"
-+                android:fontFamily="@font/outfit_medium"
++                android:fontFamily="@font/lexend_medium"
                  android:letterSpacing="0.08"
 -                android:textAllCaps="true" />
 +                android:textAllCaps="true"
@@ -7874,7 +7927,7 @@ index b059bfa0..c9df85f7 100644
 +            android:layout_marginTop="2dp"
 +            android:textColor="#E6FFFFFF"
 +            android:textSize="16sp"
-+            android:fontFamily="@font/outfit_regular"
++            android:fontFamily="@font/lexend_light"
 +            android:letterSpacing="0.04"
 +            android:shadowColor="#99000000"
 +            android:shadowDx="0"
@@ -7910,7 +7963,7 @@ index b059bfa0..c9df85f7 100644
 +                android:layout_width="wrap_content"
 +                android:layout_height="wrap_content"
 +                android:layout_marginStart="6dp"
-+                android:fontFamily="@font/outfit_regular"
++                android:fontFamily="@font/lexend"
 +                android:textColor="#E6FFFFFF"
 +                android:textSize="15sp"
 +                android:shadowColor="#99000000"
@@ -7930,7 +7983,7 @@ index b059bfa0..c9df85f7 100644
 +                android:layout_width="wrap_content"
 +                android:layout_height="wrap_content"
 +                android:layout_marginStart="6dp"
-+                android:fontFamily="@font/outfit_regular"
++                android:fontFamily="@font/lexend"
 +                android:textColor="#E6FFFFFF"
 +                android:textSize="15sp"
 +                android:shadowColor="#99000000"
@@ -7947,7 +8000,7 @@ index b059bfa0..c9df85f7 100644
 +            android:layout_marginTop="8dp"
 +            android:textColor="#D9FFFFFF"
 +            android:textSize="15sp"
-+            android:fontFamily="@font/outfit_regular"
++            android:fontFamily="@font/lexend"
 +            android:letterSpacing="0.02"
 +            android:shadowColor="#99000000"
 +            android:shadowDx="0"
@@ -7964,7 +8017,7 @@ index b059bfa0..c9df85f7 100644
 +            android:textColor="#B3FFFFFF"
 +            android:textSize="15sp"
 +            android:textStyle="italic"
-+            android:fontFamily="@font/outfit_regular"
++            android:fontFamily="@font/lexend_light"
 +            android:lineSpacingExtra="3dp"
 +            android:shadowColor="#99000000"
 +            android:shadowDx="0"
@@ -7982,7 +8035,7 @@ index b059bfa0..c9df85f7 100644
 +        android:layout_marginBottom="40dp"
 +        android:textColor="#80FFFFFF"
 +        android:textSize="13sp"
-+        android:fontFamily="@font/outfit_regular"
++        android:fontFamily="@font/lexend"
 +        android:shadowColor="#99000000"
 +        android:shadowDx="0"
 +        android:shadowDy="2"
@@ -7992,7 +8045,7 @@ index b059bfa0..c9df85f7 100644
  </FrameLayout>
 diff --git a/launcher/app/src/main/res/layout/item_event_chip.xml b/launcher/app/src/main/res/layout/item_event_chip.xml
 new file mode 100644
-index 00000000..89a2109e
+index 00000000..08ecde97
 --- /dev/null
 +++ b/launcher/app/src/main/res/layout/item_event_chip.xml
 @@ -0,0 +1,43 @@
@@ -8021,7 +8074,7 @@ index 00000000..89a2109e
 +        android:layout_height="wrap_content"
 +        android:layout_marginStart="6dp"
 +        android:ellipsize="end"
-+        android:fontFamily="@font/outfit_regular"
++        android:fontFamily="@font/lexend_medium"
 +        android:includeFontPadding="false"
 +        android:singleLine="true"
 +        android:textColor="#FFFFFFFF"
@@ -8033,7 +8086,7 @@ index 00000000..89a2109e
 +        android:layout_height="wrap_content"
 +        android:layout_marginStart="6dp"
 +        android:ellipsize="end"
-+        android:fontFamily="@font/outfit_regular"
++        android:fontFamily="@font/lexend"
 +        android:includeFontPadding="false"
 +        android:singleLine="true"
 +        android:textColor="#8CFFFFFF"
@@ -8041,7 +8094,7 @@ index 00000000..89a2109e
 +</LinearLayout>
 diff --git a/launcher/app/src/main/res/layout/item_weather_day.xml b/launcher/app/src/main/res/layout/item_weather_day.xml
 new file mode 100644
-index 00000000..a4a158bd
+index 00000000..d339bdc4
 --- /dev/null
 +++ b/launcher/app/src/main/res/layout/item_weather_day.xml
 @@ -0,0 +1,45 @@
@@ -8057,7 +8110,7 @@ index 00000000..a4a158bd
 +        android:id="@+id/wxDayName"
 +        android:layout_width="wrap_content"
 +        android:layout_height="wrap_content"
-+        android:fontFamily="@font/outfit_regular"
++        android:fontFamily="@font/lexend"
 +        android:textColor="#99FFFFFF"
 +        android:textSize="12sp"
 +        android:includeFontPadding="false" />
@@ -8075,7 +8128,7 @@ index 00000000..a4a158bd
 +        android:id="@+id/wxDayMax"
 +        android:layout_width="wrap_content"
 +        android:layout_height="wrap_content"
-+        android:fontFamily="@font/outfit_medium"
++        android:fontFamily="@font/lexend_medium"
 +        android:textColor="#FFFFFFFF"
 +        android:textSize="12sp"
 +        android:includeFontPadding="false" />
@@ -8085,7 +8138,7 @@ index 00000000..a4a158bd
 +        android:layout_width="wrap_content"
 +        android:layout_height="wrap_content"
 +        android:layout_marginStart="3dp"
-+        android:fontFamily="@font/outfit_regular"
++        android:fontFamily="@font/lexend_light"
 +        android:textColor="#80FFFFFF"
 +        android:textSize="12sp"
 +        android:includeFontPadding="false" />
