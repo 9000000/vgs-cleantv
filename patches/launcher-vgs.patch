@@ -1485,6 +1485,32 @@ index 00000000..9b2fd8e3
 +        }
 +    }
 +}
+diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Lunar.java b/launcher/app/src/main/java/com/gathin/tvhome/Lunar.java
+index e926ff8f..330da398 100644
+--- a/launcher/app/src/main/java/com/gathin/tvhome/Lunar.java
++++ b/launcher/app/src/main/java/com/gathin/tvhome/Lunar.java
+@@ -25,12 +25,18 @@ final class Lunar {
+     /** Today's lunar date, formatted with the locale's strings. */
+     static String today(Resources res, int utcOffset) {
+         Calendar c = Calendar.getInstance();
+-        int[] l = fromSolar(c.get(Calendar.DAY_OF_MONTH), c.get(Calendar.MONTH) + 1, c.get(Calendar.YEAR), utcOffset);
++        int dd = c.get(Calendar.DAY_OF_MONTH);
++        int mm = c.get(Calendar.MONTH) + 1;
++        int yy = c.get(Calendar.YEAR);
++        int[] l = fromSolar(dd, mm, yy, utcOffset);
+         String month = l[3] == 1 ? res.getString(R.string.lunar_month_leap, l[1]) : String.valueOf(l[1]);
+         String[] stems = res.getStringArray(R.array.lunar_stems);
+         String[] branches = res.getStringArray(R.array.lunar_branches);
+-        String year = res.getString(R.string.lunar_year, stems[Math.floorMod(l[2] + 6, 10)], branches[Math.floorMod(l[2] + 8, 12)]);
+-        return res.getString(R.string.lunar_date_format, l[0], month, year);
++        long jd = jdFromDate(dd, mm, yy);
++        int dayStemIdx = (int) Math.floorMod(jd + 9, 10);
++        int dayBranchIdx = (int) Math.floorMod(jd + 1, 12);
++        String dayAnimal = res.getString(R.string.lunar_day, stems[dayStemIdx], branches[dayBranchIdx]);
++        return res.getString(R.string.lunar_date_format, l[0], month, dayAnimal);
+     }
+ 
+     /** Gregorian date to {day, month, year, leap (1 = leap month)} of the lunar calendar at UTC+tz. */
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 index 13f181e8..9d90026b 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
@@ -4072,6 +4098,18 @@ index 9e58a7d8..00000000
 -    <string name="font_extralight" translatable="false">sans-serif-thin</string>
 -    <string name="font_medium" translatable="false">sans-serif-medium</string>
 -</resources>
+diff --git a/launcher/app/src/main/res/values-vi/lunar.xml b/launcher/app/src/main/res/values-vi/lunar.xml
+index 98827fea..ee0b19ff 100644
+--- a/launcher/app/src/main/res/values-vi/lunar.xml
++++ b/launcher/app/src/main/res/values-vi/lunar.xml
+@@ -2,6 +2,7 @@
+ <resources>
+     <string name="lunar_date_format">%1$d/%2$s âm lịch · %3$s</string>
+     <string name="lunar_month_leap">%1$d nhuận</string>
++    <string name="lunar_day">ngày %1$s %2$s</string>
+     <string name="lunar_year">%1$s %2$s</string>
+     <string-array name="lunar_stems">
+         <item>Giáp</item><item>Ất</item><item>Bính</item><item>Đinh</item><item>Mậu</item>
 diff --git a/launcher/app/src/main/res/values-vi/strings.xml b/launcher/app/src/main/res/values-vi/strings.xml
 index 48609291..b7f225a8 100644
 --- a/launcher/app/src/main/res/values-vi/strings.xml
@@ -4102,6 +4140,30 @@ index 48609291..b7f225a8 100644
 +    <string name="storage_gb_whole">%1$.0f GB</string>
 +    <string name="storage_gb_decimal">%1$.1f GB</string>
  </resources>
+diff --git a/launcher/app/src/main/res/values-zh-rCN/lunar.xml b/launcher/app/src/main/res/values-zh-rCN/lunar.xml
+index 1d2d9caa..708f4454 100644
+--- a/launcher/app/src/main/res/values-zh-rCN/lunar.xml
++++ b/launcher/app/src/main/res/values-zh-rCN/lunar.xml
+@@ -2,6 +2,7 @@
+ <resources>
+     <string name="lunar_date_format">农历%2$s月%1$d日 · %3$s</string>
+     <string name="lunar_month_leap">闰%1$d</string>
++    <string name="lunar_day">%1$s%2$s日</string>
+     <string name="lunar_year">%1$s%2$s年</string>
+     <string-array name="lunar_stems">
+         <item>甲</item><item>乙</item><item>丙</item><item>丁</item><item>戊</item><item>己</item><item>庚</item><item>辛</item><item>壬</item><item>癸</item>
+diff --git a/launcher/app/src/main/res/values-zh-rTW/lunar.xml b/launcher/app/src/main/res/values-zh-rTW/lunar.xml
+index c3cf9a70..e8a476d2 100644
+--- a/launcher/app/src/main/res/values-zh-rTW/lunar.xml
++++ b/launcher/app/src/main/res/values-zh-rTW/lunar.xml
+@@ -2,6 +2,7 @@
+ <resources>
+     <string name="lunar_date_format">農曆%2$s月%1$d日 · %3$s</string>
+     <string name="lunar_month_leap">閏%1$d</string>
++    <string name="lunar_day">%1$s%2$s日</string>
+     <string name="lunar_year">%1$s%2$s年</string>
+     <string-array name="lunar_stems">
+         <item>甲</item><item>乙</item><item>丙</item><item>丁</item><item>戊</item><item>己</item><item>庚</item><item>辛</item><item>壬</item><item>癸</item>
 diff --git a/launcher/app/src/main/res/values/fonts.xml b/launcher/app/src/main/res/values/fonts.xml
 index adbb30db..02e8afe0 100644
 --- a/launcher/app/src/main/res/values/fonts.xml
@@ -4123,6 +4185,18 @@ index adbb30db..02e8afe0 100644
 +    <string name="font_extralight" translatable="false">@font/lexend_extralight</string>
 +    <string name="font_medium" translatable="false">@font/lexend_medium</string>
  </resources>
+diff --git a/launcher/app/src/main/res/values/lunar.xml b/launcher/app/src/main/res/values/lunar.xml
+index f3570c7d..12ce7dee 100644
+--- a/launcher/app/src/main/res/values/lunar.xml
++++ b/launcher/app/src/main/res/values/lunar.xml
+@@ -4,6 +4,7 @@
+ <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+     <string name="lunar_date_format">Lunar %1$d/%2$s · %3$s</string>
+     <string name="lunar_month_leap">%1$d (leap)</string>
++    <string name="lunar_day">Day of the %2$s</string>
+     <string name="lunar_year">Year of the %2$s</string>
+     <string-array name="lunar_stems">
+         <item>Jia</item><item>Yi</item><item>Bing</item><item>Ding</item><item>Wu</item>
 diff --git a/launcher/app/src/main/res/values/strings.xml b/launcher/app/src/main/res/values/strings.xml
 index c4e5a5a9..b52b3702 100644
 --- a/launcher/app/src/main/res/values/strings.xml
@@ -4213,6 +4287,33 @@ index 00000000..65e6f4a2
 +        }
 +    }
 +}
+diff --git a/launcher/app/src/test/java/com/gathin/tvhome/LunarTest.java b/launcher/app/src/test/java/com/gathin/tvhome/LunarTest.java
+index d88390cd..3ff28a84 100644
+--- a/launcher/app/src/test/java/com/gathin/tvhome/LunarTest.java
++++ b/launcher/app/src/test/java/com/gathin/tvhome/LunarTest.java
+@@ -61,4 +61,22 @@ public class LunarTest {
+         assertArrayEquals(new int[]{1, 1, 1985, 0}, Lunar.fromSolar(21, 1, 1985, 7));
+         assertArrayEquals(new int[]{1, 1, 1985, 0}, Lunar.fromSolar(20, 2, 1985, 8));
+     }
++
++    @Test
++    public void dayStemAndBranch() {
++        // 1/1/2024 is Giap Ty
++        long jd1 = Lunar.jdFromDate(1, 1, 2024);
++        org.junit.Assert.assertEquals(0, Math.floorMod(jd1 + 9, 10)); // Giap
++        org.junit.Assert.assertEquals(0, Math.floorMod(jd1 + 1, 12)); // Ty
++
++        // 10/2/2024 (Tet Giap Thin) is Giap Thin
++        long jd2 = Lunar.jdFromDate(10, 2, 2024);
++        org.junit.Assert.assertEquals(0, Math.floorMod(jd2 + 9, 10)); // Giap
++        org.junit.Assert.assertEquals(4, Math.floorMod(jd2 + 1, 12)); // Thin
++
++        // 26/10/2026 is Quy Dau
++        long jd3 = Lunar.jdFromDate(26, 10, 2026);
++        org.junit.Assert.assertEquals(9, Math.floorMod(jd3 + 9, 10)); // Quy
++        org.junit.Assert.assertEquals(9, Math.floorMod(jd3 + 1, 12)); // Dau
++    }
+ }
 diff --git a/themes/README.md b/themes/README.md
 index 17416623..ab20258f 100644
 --- a/themes/README.md
