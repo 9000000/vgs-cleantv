@@ -401,6 +401,7 @@ private fun ManChinh(vm: PhienLamViec) = Cuon {
             }
         }
     }
+    TheCongDong()
     NutGopY(vm)
     TextButton(onClick = { vm.moGiayPhep() }) { Icon(Icons.Rounded.Gavel, null, Modifier.size(16.dp)); Spacer(Modifier.width(6.dp)); Text(t("Giấy phép mã nguồn mở", "Open-source licenses")) }
     Phu(t("Dựa trên CleanYourTV (github.com/Gathin23/cleanyourtv, MIT) của Gathin và cộng đồng. Danh sách tivi và màn Home sạch là của dự án đó.",
@@ -1284,15 +1285,7 @@ private fun ManXong(vm: PhienLamViec) = Cuon {
         NutPhu(t("Xem màn hình tivi", "View TV screen"), Icons.Rounded.Screenshot) { vm.chupManHinh() }
         NutPhu(t("Khởi động lại tivi", "Reboot the TV"), Icons.Rounded.RestartAlt) { vm.khoiDongLaiTv() }
     }
-    // Mời vào cộng đồng VGS (22/10/2026, anh Alex duyệt): ?tu=cleantv-app để vgs.zone ghi nguồn đăng ký từ app.
-    The(t("Cộng đồng VGS", "The VGS community"), Icons.Rounded.Groups) {
-        Phu(t("CleanTV miễn phí, do cộng đồng VGS làm. Tham gia VGSZone để hỏi đáp, nhận bản mới sớm và săn quà công nghệ.",
-            "CleanTV is free, made by the VGS community. Join VGSZone for help, early builds and tech giveaways."))
-        val uri = androidx.compose.ui.platform.LocalUriHandler.current
-        NutPhu(t("Tham gia cộng đồng VGS", "Join the VGS community"), Icons.Rounded.Groups) {
-            runCatching { uri.openUri("https://vgs.zone/dang-ky?tu=cleantv-app&next=/cleantv") }
-        }
-    }
+    TheCongDong()
     TheKichBan(vm)
     TheGuiDanhSach(vm)
     NutGopY(vm)
@@ -1589,6 +1582,26 @@ private fun HopChonMau(vm: PhienLamViec) {
         },
         containerColor = The1,
     )
+}
+
+/**
+ * Mời vào cộng đồng VGS: màn chính và màn xong (22/10/2026; 26/10/2026 anh Alex thêm nhóm Facebook, nhóm Telegram và đưa ra
+ * màn chính). ?tu=cleantv-app để vgs.zone ghi nguồn đăng ký từ app.
+ */
+@Composable
+private fun TheCongDong() {
+    The(t("Cộng đồng VGS", "The VGS community"), Icons.Rounded.Groups) {
+        Phu(t("CleanTV miễn phí, do cộng đồng VGS làm. Vào nhóm để hỏi đáp, khoe góc máy, nhận bản mới sớm và săn quà công nghệ.",
+            "CleanTV is free, made by the VGS community. Join us for help, setups, early builds and tech giveaways."))
+        val uri = androidx.compose.ui.platform.LocalUriHandler.current
+        NutPhu(t("Nhóm Facebook Vietnam Gaming Setup", "Vietnam Gaming Setup on Facebook"), Icons.Rounded.Groups) {
+            runCatching { uri.openUri("https://www.facebook.com/groups/vietnamgamingsetup") }
+        }
+        NutPhu(t("Nhóm Telegram VGS", "VGS on Telegram"), Icons.Rounded.Forum) { runCatching { uri.openUri("https://vgs.zone/telegram") } }
+        NutPhu(t("Tham gia VGSZone", "Join VGSZone"), Icons.Rounded.Star) {
+            runCatching { uri.openUri("https://vgs.zone/dang-ky?tu=cleantv-app&next=/cleantv") }
+        }
+    }
 }
 
 /** Chọn kênh từ danh sách IPTV (3.1.0), tìm theo tên không dấu. */

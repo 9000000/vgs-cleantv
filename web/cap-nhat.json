@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 86,
-  "versionName": "3.1.1",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.1.1.apk",
+  "versionCode": 87,
+  "versionName": "3.1.2",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.1.2.apk",
   "co": 12048561,
-  "ghiChu": "Dò phím remote: gán nút VTVgo, FPT Play… trên remote cho app bạn muốn.",
-  "ghiChuEn": "Detect a remote button: map the remote's VTVgo, FPT Play… buttons to any app.",
+  "ghiChu": "Thêm lối vào nhóm Facebook Vietnam Gaming Setup và nhóm Telegram VGS ngay ở màn chính.",
+  "ghiChuEn": "Links to the Vietnam Gaming Setup Facebook group and VGS Telegram on the main screen.",
   "ngay": "2026-10-26"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "df0ad3a58f280a1e",
    "url": "/ota/du-lieu.json",
    "co": 1830957,
-   "tuBan": 86
+   "tuBan": 87
   },
   "tvhome.apk": {
    "phienBan": "2cacbfec47a969c7",
    "url": "/ota/tvhome.apk",
    "co": 647941,
-   "tuBan": 86
+   "tuBan": 87
   }
  }
 }
