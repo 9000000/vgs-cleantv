@@ -59,6 +59,26 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         return f.contains("feature:android.software.leanback") || f.contains("feature:android.hardware.type.television")
     }
 
+    /**
+     * Dò một nút remote (3.1.1, "Dò phím remote"): nhờ HomeKeyService của Home sạch học phím kế tiếp (broadcast LEARN_KEY,
+     * nó ghi logcat CleanTVKey "key=… scan=…" rồi nuốt phím), song song đọc getevent làm dự phòng cho tivi chưa lọc phím.
+     * Trả về (keycode, scancode), keycode 0 khi chỉ có getevent; null nếu hết giờ không thấy phím.
+     */
+    fun docPhimRemote(giay: Int = 20, conDung: () -> Boolean = { true }): Pair<Int, Int>? {
+        val tam = "/data/local/tmp/cleantv-phim"
+        sh("logcat -c 2>/dev/null; rm -f $tam; am broadcast -a zone.vgs.cleantv.LEARN_KEY -p $pkgHome >/dev/null 2>&1; " +
+            "(timeout $giay getevent -q 2>/dev/null | grep -m1 -E ' 0001 [0-9a-f]{4} 00000001' > $tam) >/dev/null 2>&1 & true")
+        val het = System.currentTimeMillis() + giay * 1000L
+        while (System.currentTimeMillis() < het && conDung()) {
+            Thread.sleep(800)
+            Regex("""key=(\d+) scan=(\d+)""").find(sh("logcat -d -s CleanTVKey:I 2>/dev/null | tail -1"))?.let {
+                return it.groupValues[1].toInt() to it.groupValues[2].toInt()
+            }
+            Regex(""" 0001 ([0-9a-f]{4}) 00000001""").find(sh("cat $tam 2>/dev/null"))?.let { return 0 to it.groupValues[1].toInt(16) }
+        }
+        return null
+    }
+
     /** Múi giờ tivi đang dùng (vd Asia/Shanghai trên tivi Xiaomi / Redmi nội địa), "" nếu không đọc được. */
     fun muiGioTv(): String = runCatching { sh("getprop persist.sys.timezone").trim() }.getOrDefault("")
 

@@ -265,19 +265,42 @@ index 3632d74b..f5a58933 100644
          if (live == null) return 0xFF444444;
          // Draw a private copy: changing the bounds of the drawable an ImageView shows would blank the tile.
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java b/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
-index 233f9820..548476d3 100644
+index 233f9820..692f0e79 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
-@@ -80,6 +80,8 @@ public class HomeKeyService extends AccessibilityService {
+@@ -80,6 +80,14 @@ public class HomeKeyService extends AccessibilityService {
      private Map<Integer, String> frontAppKeys = Collections.emptyMap();
      private Map<Integer, String> frontAppScancodes = Collections.emptyMap();
      private String frontPackage = "";
 +    /** CleanTV/VGS: wake_open_app, the Open on start app also at every power-on; homeOnWake, power_on_home_always itself. */
 +    private boolean wakeOpenApp, homeOnWake;
++    /** CleanTV/VGS: learn_key, armed until this uptime by the LEARN_KEY broadcast; the key being learned, to swallow its release. */
++    private long learnUntil;
++    private int learnedKey;
++    private BroadcastReceiver learnReceiver;
++    static final String ACTION_LEARN_KEY = "zone.vgs.cleantv.LEARN_KEY";
++
      /** power_on_home_always: Home at every power-on, not only over Live TV. */
      private boolean powerOnAlways;
      /** power_on_home: re-arms after the screen turns on; null unless the key is on. */
-@@ -181,7 +183,11 @@ public class HomeKeyService extends AccessibilityService {
+@@ -97,6 +105,16 @@ public class HomeKeyService extends AccessibilityService {
+     protected void onServiceConnected() {
+         super.onServiceConnected();
+         running = this;
++        // CleanTV/VGS: learn_key, sent from the shell by CleanTV (am broadcast -a zone.vgs.cleantv.LEARN_KEY -p <package>).
++        learnReceiver = new BroadcastReceiver() {
++            @Override
++            public void onReceive(Context context, Intent intent) {
++                learnUntil = SystemClock.elapsedRealtime() + 20_000L;
++                learnedKey = 0;
++            }
++        };
++        if (Build.VERSION.SDK_INT >= 33) registerReceiver(learnReceiver, new IntentFilter(ACTION_LEARN_KEY), Context.RECEIVER_EXPORTED);
++        else registerReceiver(learnReceiver, new IntentFilter(ACTION_LEARN_KEY));
+         settingsScancodes = getResources().getIntArray(R.array.settings_key_scancodes);
+         // The service is directBootAware: Android 11 skips a service that is not while the user is still
+         // locked at boot, writes accessibility_enabled=0 and, on TCL G03 firmware, never binds it after the
+@@ -181,7 +199,11 @@ public class HomeKeyService extends AccessibilityService {
          GuardKeep.stepOut(this);
      }
  
@@ -289,7 +312,7 @@ index 233f9820..548476d3 100644
          // Keycodes and the panel choice can also come from a theme; theme.sh restarts this service.
          Config config = Config.load(this);
          // restore_key_services: note that this helper runs, so Home can put it back after a force stop. Here, not
-@@ -213,6 +219,12 @@ public class HomeKeyService extends AccessibilityService {
+@@ -213,6 +235,12 @@ public class HomeKeyService extends AccessibilityService {
          powerOnLiveTv = config.powerOnHome && !config.bootToLiveTv && !config.liveTvPackage.equals(openOnStart)
                  ? config.liveTvPackage : "";
          powerOnAlways = config.powerOnHomeAlways && !config.bootToLiveTv && openOnStart.isEmpty();
@@ -302,7 +325,29 @@ index 233f9820..548476d3 100644
          if (!powerOnLiveTv.isEmpty() || powerOnAlways) {
              armPowerOnHome();
          } else if (screenOnReceiver != null) {
-@@ -286,7 +298,9 @@ public class HomeKeyService extends AccessibilityService {
+@@ -253,6 +281,21 @@ public class HomeKeyService extends AccessibilityService {
+ 
+     @Override
+     protected boolean onKeyEvent(KeyEvent event) {
++        // CleanTV/VGS: learn_key — CleanTV's "Detect a remote button" armed this; the next key press is logged for the app to
++        // read over ADB (logcat tag CleanTVKey) and swallowed with its release, so it does not also act on the TV.
++        if (learnUntil != 0 && event.getAction() == KeyEvent.ACTION_DOWN) {
++            boolean live = SystemClock.elapsedRealtime() < learnUntil;
++            learnUntil = 0;
++            if (live) {
++                learnedKey = event.getKeyCode();
++                android.util.Log.i("CleanTVKey", "key=" + event.getKeyCode() + " scan=" + event.getScanCode());
++                return true;
++            }
++        }
++        if (learnedKey != 0 && event.getKeyCode() == learnedKey) {
++            if (event.getAction() == KeyEvent.ACTION_UP) learnedKey = 0;
++            return true;
++        }
+         // power_on_home: the first key after power-on hands the TV to the user (power and wake keys don't count).
+         if (powerOnUntil != 0 && event.getAction() == KeyEvent.ACTION_DOWN
+                 && event.getKeyCode() != KeyEvent.KEYCODE_POWER && event.getKeyCode() != KeyEvent.KEYCODE_WAKEUP) {
+@@ -286,7 +329,9 @@ public class HomeKeyService extends AccessibilityService {
              redirectHomeKey(event);
              return false;
          }
@@ -313,7 +358,15 @@ index 233f9820..548476d3 100644
          if (event.getAction() == KeyEvent.ACTION_UP && !event.isCanceled()) openHome();
          return true;
      }
-@@ -347,7 +361,18 @@ public class HomeKeyService extends AccessibilityService {
+@@ -294,6 +339,7 @@ public class HomeKeyService extends AccessibilityService {
+     /** Unbound by Android: the user turned the helper off, so Home doesn't put it back (ServiceRepair). */
+     @Override
+     public boolean onUnbind(Intent intent) {
++        if (learnReceiver != null) { try { unregisterReceiver(learnReceiver); } catch (IllegalArgumentException ignored) { } learnReceiver = null; }
+         if (repairRecord && !steppingOut) ServiceRepair.disconnected(this, getClass());
+         return super.onUnbind(intent);
+     }
+@@ -347,7 +393,18 @@ public class HomeKeyService extends AccessibilityService {
  
      /** power_on_home_always: Home, unless a key was pressed since the screen came on (the user has the TV). */
      private void homeAtPowerOn() {

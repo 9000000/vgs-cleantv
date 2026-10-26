@@ -1,5 +1,15 @@
 [
  {
+  "ban": "3.1.1",
+  "ngay": "2026-10-26",
+  "vi": [
+   "- \"Dò một nút trên remote\" ở Tuỳ chỉnh → Remote: nút app lạ trên remote (VTVgo, FPT Play…) không mở app nữa sau khi đổi Home thì bấm Dò, bấm nút đó trên remote, chọn app cho nó, Áp dụng lên tivi (góp ý Hoàng Hữu, TCL 65C655)."
+  ],
+  "en": [
+   "- \"Detect a remote button\" under Options → Remote: if a remote's own app button (VTVgo, FPT Play…) stopped opening its app after the Home change, tap Detect, press it, pick its app and apply."
+  ]
+ },
+ {
   "ban": "3.1.0",
   "ngay": "2026-10-26",
   "vi": [

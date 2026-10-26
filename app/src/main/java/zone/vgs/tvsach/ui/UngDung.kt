@@ -1060,6 +1060,38 @@ private fun TheTuyChinh(vm: PhienLamViec) {
             if (vm.mauChon?.id == "tcl-g09-google-tv" || vm.laTclGoogleTv) t("YouTube, Netflix, Cài đặt… mở được khi Home gốc tắt. Trên máy này bật thì giữ nút âm lượng chỉ nhảy một nấc", "YouTube, Netflix, Settings… work with the stock Home off. On this set, holding volume then steps only once")
             else t("YouTube, Netflix, Cài đặt… vẫn mở được khi Home gốc tắt", "YouTube, Netflix, Settings… keep working with the stock Home off"),
             vm.nutAppRemote) { vm.nutAppRemoteChon = it }
+        // Dò phím remote (3.1.1): gán nút app lạ của remote (VTVgo, FPT Play…) cho app trên tivi.
+        Text(t("Nút app trên remote tự gán", "Your own remote app buttons"), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+        Phu(t("Nút VTVgo, FPT Play… trên remote không mở app nữa sau khi đổi Home? Bấm Dò, rồi bấm nút đó trên remote, chọn app cho nó, Áp dụng lên tivi.",
+            "A remote's VTVgo / FPT Play… button stopped opening its app after the Home change? Tap Detect, press that button on the remote, pick its app, then apply."))
+        vm.phimGan.toList().forEach { d ->
+            val goi = d.substringAfterLast(':'); val ma = d.removeSuffix(":$goi")
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("${zone.vgs.tvsach.dulieu.tenDep(goi)} · ${ma.replace("scan:", t("mã ", "code "))}", fontSize = 14.sp, modifier = Modifier.weight(1f))
+                TextButton(onClick = { vm.phimGan.remove(d) }) { Text(t("Bỏ", "Remove")) }
+            }
+        }
+        NutPhu(if (vm.dangDoPhim) t("Đang chờ bạn bấm nút trên remote…", "Waiting for a remote button…") else t("Dò một nút trên remote", "Detect a remote button"),
+            Icons.Rounded.SettingsRemote, enabled = !vm.dangBan) { vm.doPhimRemote() }
+        if (vm.giuAmLuong && vm.phimGan.isNotEmpty()) Phu(t("Lưu ý: đang bật \"Giữ nút âm lượng\" nên Home sạch không bắt phím, nút tự gán sẽ không chạy.",
+            "Note: \"Hold volume\" is on, so the clean Home does not catch keys and these buttons won't work."), Cam)
+        vm.phimVuaDo?.let { (key, scan) ->
+            AlertDialog(
+                onDismissRequest = { vm.phimVuaDo = null }, containerColor = The1,
+                confirmButton = { TextButton(onClick = { vm.phimVuaDo = null }) { Text(t("Huỷ", "Cancel")) } },
+                title = { Text(t("Nút này mở app nào?", "Which app should this button open?")) },
+                text = {
+                    Column {
+                        Text(t("Đã bắt được nút (mã ${if (scan > 0) scan else key}).", "Button caught (code ${if (scan > 0) scan else key})."), fontSize = 13.sp, color = ChuPhu)
+                        LazyColumn(Modifier.heightIn(max = 380.dp)) {
+                            items(vm.appGanDuoc, key = { it }) { p ->
+                                Text(zone.vgs.tvsach.dulieu.tenDep(p), fontSize = 15.sp, modifier = Modifier.fillMaxWidth().clickable { vm.ganPhim(p) }.padding(vertical = 11.dp))
+                            }
+                        }
+                    }
+                },
+            )
+        }
         Hang(t("Giữ nút âm lượng để tăng / giảm liên tục", "Hold volume to keep raising / lowering"),
             t("Bật nếu giữ nút chỉ nhảy một nấc (hay gặp trên Sony). Đổi lại, nút Input / Apps / nút app trên remote về như tivi gốc",
                 "Turn on if holding volume only moves one step (common on Sony). In return the remote's Input / Apps / app buttons work as the TV's own"),
