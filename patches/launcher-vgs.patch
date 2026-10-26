@@ -28141,7 +28141,7 @@ index d6bf13a3..330da398 100644
          long b11 = a11;
          int lunarYear;
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index a5acd794..db55c5c7 100644
+index a5acd794..0ab4e303 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -55,6 +55,7 @@ import android.text.style.ForegroundColorSpan;
@@ -28172,7 +28172,7 @@ index a5acd794..db55c5c7 100644
      private TextView shamsiDate;
      /** lunar_date: the lunisolar date under the date line, and the time zone it is computed for. */
      private TextView lunarDate;
-@@ -195,6 +202,41 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -195,6 +202,42 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private TextView raceKicker, raceHeadline, raceSessions;
      /** config.xml show_stats, overridable by a theme. Off: the line is gone and nothing is read. */
      private boolean showStats;
@@ -28186,7 +28186,8 @@ index a5acd794..db55c5c7 100644
 +    private Thread weatherThread;
 +    private long weatherAt;
 +    private static final long WEATHER_MS = 30 * 60 * 1000L;
-+    /** CleanTV/VGS: Today Carousel (Đếm ngược ngày lễ/Tết, Danh ngôn, Ngày này năm xưa). */
++    /** CleanTV/VGS: Today Carousel (Đếm ngược ngày lễ/Tết, Danh ngôn, Ngày này năm xưa - đổi 2h một lần). */
++    private static final long CAROUSEL_INTERVAL_MS = 2 * 60 * 60 * 1000L;
 +    private TextView todayCarouselView;
 +    private int carouselStep = 0;
 +    private boolean carouselEnabled = true;
@@ -28194,7 +28195,7 @@ index a5acd794..db55c5c7 100644
 +        @Override
 +        public void run() {
 +            advanceTodayCarousel();
-+            handler.postDelayed(this, 15000L);
++            handler.postDelayed(this, CAROUSEL_INTERVAL_MS);
 +        }
 +    };
 +    // CleanTV/Samsung Widgets
@@ -28214,7 +28215,7 @@ index a5acd794..db55c5c7 100644
      private boolean shamsi;
      /** greeting_name: said after the greeting, which is shown in capitals. */
      private String greetingName = "";
-@@ -375,14 +417,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -375,14 +418,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // The pill follows the network callbacks and each return to Home; only the diya's flame follows the
              // signal level, so only it needs this minute's binder calls (about 7 ms on the UI thread).
              if (festive) updateWifiLabel();
@@ -28230,7 +28231,7 @@ index a5acd794..db55c5c7 100644
      @Override
      protected void onCreate(Bundle savedInstanceState) {
          super.onCreate(savedInstanceState);
-@@ -390,7 +431,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -390,7 +432,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          density = getResources().getDisplayMetrics().density;
          // config.xml, overlaid by config.json from a pushed theme (see Config and tools/theme.sh).
          Config cfg = Config.load(this);
@@ -28238,7 +28239,7 @@ index a5acd794..db55c5c7 100644
          appLibrarySelection = cfg.appLibrarySelection;
          libraryOkOpens = cfg.libraryOkOpens;
          // restore_key_services: after a force stop, put back the remote's accessibility helpers that Android took
-@@ -501,7 +541,47 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -501,7 +542,50 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          lunarOffset = Lunar.offsetFor(cfg.lunarUtcOffset, Locale.getDefault());
          if (lunar) lunarDate.setVisibility(View.VISIBLE);
          greetingName = cfg.greetingName;
@@ -28281,12 +28282,15 @@ index a5acd794..db55c5c7 100644
 +            if (showToday) {
 +                HistoryProvider.loadToday(null);
 +                advanceTodayCarousel();
++                if (todayCard != null) {
++                    todayCard.setOnClickListener(v -> advanceTodayCarousel());
++                }
 +            }
 +        }
          if (shamsi) {
              shamsiDate.setVisibility(View.VISIBLE);
              TextView date = findViewById(R.id.date);
-@@ -509,6 +589,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -509,6 +593,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              lunarDate.setTextSize(11f);
              date.setPadding(0, (int) (4 * density), 0, 0);
          }
@@ -28300,7 +28304,7 @@ index a5acd794..db55c5c7 100644
          vpnApp = cfg.vpnApp;
          vpnPill = cfg.vpnPill && !cfg.topMenu;
          btnVpn = findViewById(R.id.btnVpn);
-@@ -588,6 +675,21 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -588,6 +679,21 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              public void onChildViewDetachedFromWindow(@NonNull View v) {
              }
          });
@@ -28322,7 +28326,7 @@ index a5acd794..db55c5c7 100644
          if (dockRow) grid.addItemDecoration(new DockDecoration(COLUMNS, density, cinematic, cfg.alwaysShowNames, cfg.dockOpacity, cfg.dockGlass, cfg.dockEvenPadding, cfg.dockBand,
                  singleRow, cfg.dockBandAll));
          if (cfg.fadeRows) TopFade.attach(grid, 48 * density);
-@@ -606,6 +708,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -606,6 +712,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // tvOS layout: push the dock row towards the bottom of the screen, leaving room for
          // rows_below_dock grid rows under it; the rest of the grid stays below until you press Down.
          int rowsBelowDock = cfg.rowsBelowDock;
@@ -28334,7 +28338,7 @@ index a5acd794..db55c5c7 100644
          grid.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
              int h = b - t;
              // Item height follows the tile size, which follows the columns and the rows that must fit (AppAdapter.tileWidthPx).
-@@ -626,6 +733,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -626,6 +737,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // A single row never shows the names under its tiles (the title above the row names the app), so the
              // 7dp gap and 22dp label item_app.xml keeps for them would only lift the row: sit it that much lower.
              if (singleRow && !cfg.alwaysShowNames) want += (int) (29 * density);
@@ -28346,7 +28350,7 @@ index a5acd794..db55c5c7 100644
              if (grid.getPaddingTop() != want) {
                  grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
                  // A vertical grid parks the dock on the new padding line by scrolling (onTileFocused); a sideways
-@@ -793,8 +905,35 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -793,8 +909,35 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -28383,7 +28387,7 @@ index a5acd794..db55c5c7 100644
          btnSettings.setOnKeyListener(pillKeys);
          btnReorder.setOnKeyListener(pillKeys);
          btnLibraryTop.setOnKeyListener(pillKeys);
-@@ -940,6 +1079,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -940,6 +1083,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onResume() {
          super.onResume();
@@ -28391,7 +28395,7 @@ index a5acd794..db55c5c7 100644
          // A festival that started or ended while Home was in the background: rebuild with or without it.
          if (festive != festival.active(LocalDate.now())) {
              recreate();
-@@ -983,9 +1123,20 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -983,9 +1127,20 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -28405,7 +28409,7 @@ index a5acd794..db55c5c7 100644
 +            if (showWeather || showWeatherCorner) updateWeatherCard();
 +            handler.removeCallbacks(carouselTick);
 +            if (showToday) {
-+                handler.postDelayed(carouselTick, 15000L);
++                handler.postDelayed(carouselTick, CAROUSEL_INTERVAL_MS);
 +            }
 +        } else {
 +            handler.removeCallbacks(carouselTick);
@@ -28413,7 +28417,7 @@ index a5acd794..db55c5c7 100644
          if (festive && diya != null) {
              diya.start();
              LocalDate today = LocalDate.now();
-@@ -1151,6 +1302,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1151,6 +1306,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onPause() {
          super.onPause();
@@ -28421,7 +28425,7 @@ index a5acd794..db55c5c7 100644
          root.removeCallbacks(showIdleClock);
          endReorder();   // Home or another app while reordering keeps the order so far
          wallpaperPlayer.stop();
-@@ -1159,6 +1311,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1159,6 +1315,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          ambient.animate().cancel();
          heroArt.animate().cancel();
          handler.removeCallbacks(minuteTick);
@@ -28429,7 +28433,7 @@ index a5acd794..db55c5c7 100644
          stopStats();
          if (diya != null) diya.stop();
          cancelPendingFocusScroll();
-@@ -1256,8 +1409,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1256,8 +1413,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       */
      @Override
      public boolean dispatchKeyEvent(KeyEvent event) {
@@ -28438,7 +28442,7 @@ index a5acd794..db55c5c7 100644
          if (handleSettingsKey(event)) return true;
          if (tileMenuEnabled && !reordering && openPopup == null && cardPrompt == null
                  && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
-@@ -1693,14 +1844,33 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1693,14 +1848,33 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  if (!animations || reducedMotion) grid.scrollBy(0, dy);
                  else grid.smoothScrollBy(0, dy);
              }
@@ -28476,7 +28480,7 @@ index a5acd794..db55c5c7 100644
          }
      }
  
-@@ -1725,17 +1895,80 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1725,17 +1899,80 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private void showHero(int position, float dockTopInRoot) {
          String label = adapter.labelAt(position);
          int color = adapter.ambientColorAt(position);
@@ -28559,7 +28563,7 @@ index a5acd794..db55c5c7 100644
              hero.setTranslationX(0f);
              hero.setAlpha(1f);
              if (ambientGlow) {
-@@ -1751,7 +1984,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1751,7 +1988,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              hero.animate().cancel();
              ambient.animate().cancel();
              fillHero(position, label);
@@ -28568,7 +28572,7 @@ index a5acd794..db55c5c7 100644
              hero.setTranslationX(0f);
              hero.animate().alpha(1f).setDuration(260).start();
              if (ambientGlow) {
-@@ -1763,7 +1996,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1763,7 +2000,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              if (advancedEffects) hero.animate().cancel();
              hero.animate().alpha(0f).translationX(-12 * density).setDuration(120).withEndAction(() -> {
                  fillHero(position, label);
@@ -28577,7 +28581,7 @@ index a5acd794..db55c5c7 100644
                  hero.setTranslationX(12 * density);
                  hero.animate().alpha(1f).translationX(0f).setDuration(200).start();
              }).start();
-@@ -1776,7 +2009,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1776,7 +2013,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  }).start();
              }
          } else {
@@ -28586,7 +28590,7 @@ index a5acd794..db55c5c7 100644
          }
      }
  
-@@ -2001,6 +2234,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2001,6 +2238,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          heroArt.animate().cancel();
          heroArt.setAlpha(0f);
          heroShown = false;
@@ -28596,7 +28600,7 @@ index a5acd794..db55c5c7 100644
          if (!ambientGlow) return;
          if (!animations || reducedMotion) {
              setAmbient(color);
-@@ -2044,6 +2280,246 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2044,6 +2284,246 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -28803,7 +28807,7 @@ index a5acd794..db55c5c7 100644
 +        final String meta;
 +
 +        if (isQuote) {
-+            QuotesProvider.QuoteItem q = QuotesProvider.getNextQuote(carouselStep);
++            QuotesProvider.QuoteItem q = QuotesProvider.getTwoHourQuote(carouselStep);
 +            label = "CÂU NÓI HAY";
 +            text = (q.text.startsWith("“") ? q.text : "“" + q.text + "”");
 +            meta = (q.author != null && !q.author.isEmpty() ? "— " + q.author : "");
@@ -28820,7 +28824,7 @@ index a5acd794..db55c5c7 100644
 +                text = hi.text;
 +                meta = "";
 +            } else {
-+                QuotesProvider.QuoteItem q = QuotesProvider.getNextQuote(carouselStep);
++                QuotesProvider.QuoteItem q = QuotesProvider.getTwoHourQuote(carouselStep);
 +                label = "CÂU NÓI HAY";
 +                text = (q.text.startsWith("“") ? q.text : "“" + q.text + "”");
 +                meta = (q.author != null && !q.author.isEmpty() ? "— " + q.author : "");
@@ -28843,7 +28847,7 @@ index a5acd794..db55c5c7 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2108,13 +2584,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2108,13 +2588,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -28871,7 +28875,7 @@ index a5acd794..db55c5c7 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2309,6 +2796,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2309,6 +2800,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -28882,7 +28886,7 @@ index a5acd794..db55c5c7 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2670,7 +3161,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2670,7 +3165,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -28895,7 +28899,7 @@ index a5acd794..db55c5c7 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2925,7 +3420,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2925,7 +3424,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       *  source number; "HW8=-" leaves that input out of the Inputs menu (a port the board reports but the set
       *  does not have). Returns the number, -1 for a left-out input, or null when the input is not listed. */
      private Integer mappedSource(String inputId) {
@@ -28929,7 +28933,7 @@ index a5acd794..db55c5c7 100644
      }
  
      /** Switches to a passthrough input (HDMI, AV). An input mapped in `input_sources` is opened by sending
-@@ -3267,8 +3787,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3267,8 +3791,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          if (moduleCards) addSettingsMenuRow(rows, popup, R.string.module_cards, this::showModuleCards);
          if (dockRow) addSettingsMenuRow(rows, popup, R.string.dock_edit, this::startDockEdit);
          addSettingsMenuRow(rows, popup, R.string.reorder, this::toggleReorder);
@@ -28938,7 +28942,7 @@ index a5acd794..db55c5c7 100644
          panel.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
          popup.setWidth(Math.max((int) (200 * density), panel.getMeasuredWidth()));
          // Hebrew puts Settings at the left of the header: grow the menu inward from it.
-@@ -3329,10 +3847,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3329,10 +3851,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
@@ -29082,7 +29086,7 @@ index a5acd794..db55c5c7 100644
          View row = getLayoutInflater().inflate(R.layout.item_input, rows, false);
          row.findViewById(R.id.icon).setVisibility(View.GONE);
          row.findViewById(R.id.dot).setVisibility(View.GONE);
-@@ -3381,8 +4032,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3381,8 +4036,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          if (card == null) return;
  
          View panel = getLayoutInflater().inflate(R.layout.dialog_card_prompt, root, false);
@@ -29091,7 +29095,7 @@ index a5acd794..db55c5c7 100644
          ((TextView) panel.findViewById(R.id.title)).setText(getString(R.string.card_prompt_title, card.appLabel));
          ((TextView) panel.findViewById(R.id.body)).setText(card.state == Cards.State.RESIGNED
                  ? getString(R.string.card_prompt_resigned, card.appLabel)
-@@ -3396,16 +4045,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3396,16 +4049,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  getString(R.string.card_prompt_identity, card.pkg, Cards.shortDigest(card.digest)));
          TextView keep = panel.findViewById(R.id.btnKeep);
          TextView show = panel.findViewById(R.id.btnShow);
@@ -29108,7 +29112,7 @@ index a5acd794..db55c5c7 100644
  
          final Dialog dialog = new Dialog(this);
          dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-@@ -3437,10 +4076,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3437,10 +4080,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          View.OnKeyListener keys = (v, keyCode, event) -> {
              if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
              if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN) return true;
@@ -29121,7 +29125,7 @@ index a5acd794..db55c5c7 100644
          };
          keep.setOnKeyListener(keys);
          show.setOnKeyListener(keys);
-@@ -3474,8 +4111,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3474,8 +4115,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private void showModuleCardsNow() {
          View anchor = findViewById(R.id.btnSettings);
          View panel = getLayoutInflater().inflate(R.layout.popup_cards, root, false);
@@ -29130,7 +29134,7 @@ index a5acd794..db55c5c7 100644
          LinearLayout rows = panel.findViewById(R.id.rows);
          final PopupWindow popup = glassPopup(panel, (int) (400 * density));
          List<Cards.Card> listed = new ArrayList<>(cards);
-@@ -3484,12 +4119,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3484,12 +4123,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              View row = getLayoutInflater().inflate(R.layout.item_card_row, rows, false);
              row.setTag(card.pkg);
              ((TextView) row.findViewById(R.id.title)).setText(card.label);
@@ -29279,10 +29283,10 @@ index 53783e6f..a13e0845 100644
          addRow(rows, R.drawable.ic_settings, R.string.tv_settings, 0, SystemSettings.intent(this, Settings.ACTION_SETTINGS));
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/QuotesProvider.java b/launcher/app/src/main/java/com/gathin/tvhome/QuotesProvider.java
 new file mode 100644
-index 00000000..ca0af454
+index 00000000..4f7a4220
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/QuotesProvider.java
-@@ -0,0 +1,118 @@
+@@ -0,0 +1,215 @@
 +package com.gathin.tvhome;
 +
 +import java.util.Calendar;
@@ -29367,7 +29371,94 @@ index 00000000..ca0af454
 +        new QuoteItem("Tiên học lễ, hậu học văn.", "Cổ huấn"),
 +        new QuoteItem("Nuôi con buôn bán cho vừa, chớ để con hư uổng công cha mẹ.", "Ca dao"),
 +        new QuoteItem("Chim khôn kêu tiếng rảnh rang, người khôn nói tiếng dịu dàng dễ nghe.", "Ca dao"),
-+        new QuoteItem("Lửa thử vàng, gian nan thử sức.", "Tục ngữ")
++        new QuoteItem("Lửa thử vàng, gian nan thử sức.", "Tục ngữ"),
++        // Mở rộng kho danh ngôn ý nghĩa cho gia đình & cuộc sống (CleanTV/VGS):
++        new QuoteItem("Công cha như núi ngất trời, nghĩa mẹ như nước ở ngoài biển Đông.", "Ca dao"),
++        new QuoteItem("Bàn tay mẹ dịu dàng sưởi ấm cả một đời con.", "Danh ngôn"),
++        new QuoteItem("Con đi trăm núi ngàn khe, chưa bằng muôn nỗi tái tê lòng mẹ.", "Ca dao"),
++        new QuoteItem("Cơm cha áo mẹ chữ thầy, nghĩ sao cho bõ những ngày ước ao.", "Ca dao"),
++        new QuoteItem("Nhà là nơi bão dừng sau cánh cửa.", "Danh ngôn"),
++        new QuoteItem("Đi khắp thế gian không ai tốt bằng mẹ, gánh nặng cuộc đời không ai khổ bằng cha.", "Ca dao"),
++        new QuoteItem("Gia đình là điểm tựa bình yên nhất của mỗi con người.", "Danh ngôn"),
++        new QuoteItem("Anh em hòa thuận, hai thân vui vầy.", "Gia huấn ca"),
++        new QuoteItem("Dù đi xa đến đâu, bữa cơm gia đình vẫn là nơi ấm áp nhất.", "Danh ngôn"),
++        new QuoteItem("Mẹ là người có thể thay thế tất cả người khác, nhưng không ai có thể thay thế được mẹ.", "Gaspard Mermillod"),
++        new QuoteItem("Hạnh phúc lớn nhất của đời người là có một mái ấm để trở về.", "Danh ngôn"),
++        new QuoteItem("Tình cha ấm áp như vầng thái dương soi đường con đi.", "Danh ngôn"),
++        new QuoteItem("Gia đình là món quà vô giá mà cuộc sống trao tặng cho mỗi chúng ta.", "Danh ngôn"),
++        new QuoteItem("Tâm bất biến giữa dòng đời vạn biến.", "Cổ huấn"),
++        new QuoteItem("Đức năng thắng số.", "Cổ huấn"),
++        new QuoteItem("Người có tâm ắt có tầm, người có đức ắt có phúc.", "Cổ huấn"),
++        new QuoteItem("Lòng tốt là ngôn ngữ mà người điếc có thể nghe và người mù có thể thấy.", "Mark Twain"),
++        new QuoteItem("Hạnh phúc lớn nhất của đời người là sự bình an trong tâm hồn.", "Danh ngôn"),
++        new QuoteItem("Sống đẹp là sống vì người khác.", "Danh ngôn"),
++        new QuoteItem("Người biết ơn luôn tìm thấy niềm vui trong những điều giản dị.", "Danh ngôn"),
++        new QuoteItem("Thẳng thắn thật thà thường thua thiệt, nhưng đổi lại được sự thanh thản trong tâm hồn.", "Danh ngôn"),
++        new QuoteItem("Đừng nói về những điều bạn đã làm, hãy để kết quả lên tiếng.", "Danh ngôn"),
++        new QuoteItem("Trí tuệ bắt đầu từ sự khiêm tốn.", "Socrates"),
++        new QuoteItem("Hành vi là tấm gương phản chiếu nhân cách của mỗi con người.", "Goethe"),
++        new QuoteItem("Sự tha thứ là mùi hương mà bông hoa để lại trên gót chân kẻ đã giẫm đạp lên nó.", "Mark Twain"),
++        new QuoteItem("Người lương thiện có thể chịu thiệt thòi trước mắt, nhưng trời xanh ắt có an bài.", "Cổ huấn"),
++        new QuoteItem("Lời khen ngợi chân thành là món quà tuyệt vời nhất bạn có thể trao tặng.", "Danh ngôn"),
++        new QuoteItem("Đường đi khó, không khó vì ngăn sông cách núi, mà khó vì lòng người ngại núi e sông.", "Nguyễn Bá Học"),
++        new QuoteItem("Thất bại chỉ là cơ hội để bắt đầu lại một cách thông minh hơn.", "Henry Ford"),
++        new QuoteItem("Chớ thấy sóng cả mà ngã tay chèo.", "Tục ngữ"),
++        new QuoteItem("Không có áp lực, không có kim cương.", "Thomas Carlyle"),
++        new QuoteItem("Nếu bạn muốn có được những điều chưa từng có, hãy làm những việc bạn chưa từng làm.", "Danh ngôn"),
++        new QuoteItem("Mỗi ngày mới là một cơ hội để sống tốt hơn ngày hôm qua.", "Danh ngôn"),
++        new QuoteItem("Đừng bao giờ từ bỏ ước mơ chỉ vì cần thời gian để đạt được nó.", "Earl Nightingale"),
++        new QuoteItem("Sau cơn mưa trời lại sáng, qua giông bão hoa lại nở ngát hương.", "Danh ngôn"),
++        new QuoteItem("Người chiến thắng không bao giờ bỏ cuộc, và người bỏ cuộc không bao giờ chiến thắng.", "Vince Lombardi"),
++        new QuoteItem("Thước đo giá trị của một con người là những gì họ cống hiến cho đời.", "Albert Einstein"),
++        new QuoteItem("Khó khăn thử thách con người, như lửa thử vàng.", "Seneca"),
++        new QuoteItem("Muốn ngắm cầu vồng, bạn phải biết chấp nhận những cơn mưa.", "Dolly Parton"),
++        new QuoteItem("Hãy kiên nhẫn, điều tốt đẹp nhất luôn cần thời gian.", "Danh ngôn"),
++        new QuoteItem("Bản lĩnh của con người bộc lộ rõ nhất khi đứng trước nghịch cảnh.", "Danh ngôn"),
++        new QuoteItem("Học, học nữa, học mãi.", "V.I. Lenin"),
++        new QuoteItem("Tri thức là sức mạnh.", "Francis Bacon"),
++        new QuoteItem("Đầu tư vào tri thức mang lại lợi nhuận cao nhất.", "Benjamin Franklin"),
++        new QuoteItem("Người không học như ngọc không mài.", "Cổ huấn"),
++        new QuoteItem("Ngọc bất trác bất thành khí, nhân bất học bất tri đạo.", "Khổng Tử"),
++        new QuoteItem("Sách là ngọn đèn soi sáng con đường tri thức.", "Danh ngôn"),
++        new QuoteItem("Học hỏi là việc cả đời, không bao giờ là quá muộn để bắt đầu.", "Danh ngôn"),
++        new QuoteItem("Đọc một cuốn sách hay giống như trò chuyện với những bộ óc vĩ đại nhất.", "René Descartes"),
++        new QuoteItem("Muốn biết phải hỏi, muốn giỏi phải học.", "Tục ngữ"),
++        new QuoteItem("Biết mình biết ta, trăm trận trăm thắng.", "Tôn Tử"),
++        new QuoteItem("Tri thức là tài sản duy nhất không ai có thể đánh cắp của bạn.", "Danh ngôn"),
++        new QuoteItem("Không có gì quý hơn độc lập, tự do.", "Hồ Chí Minh"),
++        new QuoteItem("Cần, kiệm, liêm, chính, chí công vô tư.", "Hồ Chí Minh"),
++        new QuoteItem("Tuổi nhỏ làm việc nhỏ, tùy theo sức của mình.", "Hồ Chí Minh"),
++        new QuoteItem("Bình tĩnh, tự tin, không tự kiêu, không tự ti.", "Hồ Chí Minh"),
++        new QuoteItem("Non sông Việt Nam có trở nên tươi đẹp hay không... chính là nhờ một phần lớn ở công học tập của các em.", "Hồ Chí Minh"),
++        new QuoteItem("Dân là gốc của nước, gốc có vững thì nước mới yên.", "Nguyễn Trãi"),
++        new QuoteItem("Dĩ bất biến, ứng vạn biến.", "Hồ Chí Minh"),
++        new QuoteItem("Nhân nghĩa là đạo lý sáng ngời của muôn đời.", "Nguyễn Trãi"),
++        new QuoteItem("Tâm an thì vạn sự an, tâm bình thì thế giới bình.", "Cổ huấn"),
++        new QuoteItem("Hạnh phúc không nằm ở đích đến, mà ở trên từng chặng đường ta đi.", "Danh ngôn"),
++        new QuoteItem("Biết đủ là người giàu nhất.", "Lão Tử"),
++        new QuoteItem("Hãy sống trọn vẹn từng khoảnh khắc hiện tại.", "Thích Nhất Hạnh"),
++        new QuoteItem("Tha thứ cho người khác là giải thoát cho chính mình.", "Danh ngôn"),
++        new QuoteItem("Hạnh phúc lớn nhất là làm cho người khác hạnh phúc.", "Danh ngôn"),
++        new QuoteItem("Sống chậm lại, nghĩ khác đi và yêu thương nhiều hơn.", "Danh ngôn"),
++        new QuoteItem("Tâm thanh tịnh thì trí tuệ tự nhiên khai sáng.", "Cổ huấn"),
++        new QuoteItem("Hãy đếm phước lành của bạn thay vì đếm những nỗi phiền muộn.", "Danh ngôn"),
++        new QuoteItem("Mỗi sớm mai thức dậy, hãy biết ơn vì ta có thêm một ngày để yêu thương.", "Danh ngôn"),
++        new QuoteItem("Bình yên không phải là không có bão giông, mà là bình thản ngay giữa cơn bão.", "Danh ngôn"),
++        new QuoteItem("Cuộc sống rất ngắn ngủi, đừng lãng phí thời gian để hối tiếc.", "Danh ngôn"),
++        new QuoteItem("Muốn đi nhanh hãy đi một mình, muốn đi xa hãy đi cùng nhau.", "Ngạn ngữ"),
++        new QuoteItem("Một người bạn chân chính là người bước vào khi cả thế giới bước ra.", "Walter Winchell"),
++        new QuoteItem("Gieo hành vi gặt thói quen, gieo thói quen gặt tính cách, gieo tính cách gặt số phận.", "Danh ngôn"),
++        new QuoteItem("Đối xử với người khác theo cách bạn muốn được đối xử.", "Khổng Tử"),
++        new QuoteItem("Nụ cười là khoảng cách ngắn nhất giữa hai tâm hồn.", "Victor Borge"),
++        new QuoteItem("Hãy lắng nghe nhiều hơn nói, vì ta có hai tai nhưng chỉ có một cái miệng.", "Zeno"),
++        new QuoteItem("Một nụ cười có thể sưởi ấm cả mùa đông lạnh giá.", "Ngạn ngữ"),
++        new QuoteItem("Cho đi mà không mong nhận lại, đó mới là tình yêu thương chân chính.", "Danh ngôn"),
++        new QuoteItem("Lời nói chân thành quý hơn ngàn lời hoa mỹ.", "Danh ngôn"),
++        new QuoteItem("Cây xanh thì lá cũng xanh, cha mẹ hiền lành để đức cho con.", "Ca dao"),
++        new QuoteItem("Kính trên nhường dưới, trong ấm ngoài êm.", "Tục ngữ"),
++        new QuoteItem("Người sống có đức, trời xanh không phụ.", "Cổ huấn"),
++        new QuoteItem("Mỗi vết sẹo đều là một bài học giúp ta mạnh mẽ hơn.", "Danh ngôn"),
++        new QuoteItem("Cuộc đời như một tấm gương, bạn mỉm cười với nó thì nó sẽ mỉm cười lại với bạn.", "Danh ngôn")
 +    };
 +
 +    private static final Random RANDOM = new Random();
@@ -29380,6 +29471,16 @@ index 00000000..ca0af454
 +        int dayOfYear = cal.get(Calendar.DAY_OF_YEAR);
 +        int idx = Math.abs(dayOfYear) % QUOTES.length;
 +        return QUOTES[idx];
++    }
++
++    /**
++     * CleanTV/VGS: Lấy câu danh ngôn theo khung 2 giờ trong ngày (đổi 2h một lần).
++     * 1 ngày có 12 khung giờ (0h-2h, 2h-4h, ...). Kết hợp với ngày trong năm để mỗi khung 2h là một câu khác nhau.
++     */
++    public static QuoteItem getTwoHourQuote(int offset) {
++        Calendar cal = Calendar.getInstance();
++        int slot = cal.get(Calendar.DAY_OF_YEAR) * 12 + (cal.get(Calendar.HOUR_OF_DAY) / 2) + offset;
++        return QUOTES[Math.floorMod(slot, QUOTES.length)];
 +    }
 +
 +    /**
