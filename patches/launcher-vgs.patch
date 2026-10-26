@@ -259,7 +259,7 @@ index eb56debc..ae7e77b8 100644
          if (live == null) return 0xFF444444;
          // Draw a private copy: changing the bounds of the drawable an ImageView shows would blank the tile.
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java b/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
-index dd324c91..3a29dfbb 100644
+index dd324c91..2495b2e8 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
 @@ -5,32 +5,36 @@ import android.content.Context;
@@ -393,7 +393,7 @@ index dd324c91..3a29dfbb 100644
          glow = new GradientDrawable();
          glow.setGradientType(GradientDrawable.RADIAL_GRADIENT);
          ambient.setBackground(glow);
-@@ -69,6 +121,120 @@ final class ClockScene {
+@@ -69,6 +121,124 @@ final class ClockScene {
                  glow.setGradientRadius((r - l) * 0.55f));
          colorIndex = random.nextInt(PALETTE.length);
          setGlow(PALETTE[colorIndex]);
@@ -405,7 +405,11 @@ index dd324c91..3a29dfbb 100644
 +            if (tvWxTempDesc != null) tvWxTempDesc.setTypeface(res.getFont(R.font.lexend));
 +            if (tvAqiText != null) tvAqiText.setTypeface(res.getFont(R.font.lexend));
 +            if (tvEventsLine != null) tvEventsLine.setTypeface(res.getFont(R.font.lexend));
-+            if (tvQuoteLine != null) tvQuoteLine.setTypeface(Typeface.create(res.getFont(R.font.lexend_light), Typeface.ITALIC));
++            if (tvQuoteLine != null) {
++                tvQuoteLine.setTypeface(Typeface.create(res.getFont(R.font.lexend_light), Typeface.ITALIC));
++                float density = res.getDisplayMetrics().density;
++                tvQuoteLine.setPaddingRelative((int) (2 * density), 0, (int) (28 * density), 0);
++            }
 +            if (tvCaption != null) tvCaption.setTypeface(res.getFont(R.font.lexend));
 +        } catch (Exception ignored) {}
 +        initPhotos(ctx);
@@ -514,7 +518,7 @@ index dd324c91..3a29dfbb 100644
      }
  
      void start() {
-@@ -79,67 +245,67 @@ final class ClockScene {
+@@ -79,67 +249,67 @@ final class ClockScene {
          });
          handler.removeCallbacks(tick);
          handler.postDelayed(tick, MOVE_MS);
@@ -623,7 +627,7 @@ index dd324c91..3a29dfbb 100644
      private static Bitmap decode(File file, int screenW, int screenH) {
          try {
              BitmapFactory.Options options = new BitmapFactory.Options();
-@@ -171,23 +337,34 @@ final class ClockScene {
+@@ -171,23 +341,34 @@ final class ClockScene {
          }).start();
      }
  
@@ -2294,7 +2298,7 @@ index 00000000..37668a0f
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/QuotesProvider.java b/launcher/app/src/main/java/com/gathin/tvhome/QuotesProvider.java
 new file mode 100644
-index 00000000..c485236c
+index 00000000..ca0af454
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/QuotesProvider.java
 @@ -0,0 +1,118 @@
@@ -2323,8 +2327,8 @@ index 00000000..c485236c
 +        }
 +
 +        public String getFormatted() {
-+            if (author == null || author.isEmpty()) return "“" + text + "”";
-+            return "“" + text + "” — " + author;
++            if (author == null || author.isEmpty()) return "“" + text + "” ";
++            return "“" + text + "” — " + author + " ";
 +        }
 +    }
 +
@@ -3518,7 +3522,7 @@ index 9c071595..6f92f5dd 100644
                      android:id="@+id/btnLibraryTop"
                      style="@style/TopButtonIcon"
 diff --git a/launcher/app/src/main/res/layout/dream_clock.xml b/launcher/app/src/main/res/layout/dream_clock.xml
-index b059bfa0..ae8f23fd 100644
+index b059bfa0..3ae92e82 100644
 --- a/launcher/app/src/main/res/layout/dream_clock.xml
 +++ b/launcher/app/src/main/res/layout/dream_clock.xml
 @@ -1,10 +1,35 @@
@@ -3558,7 +3562,7 @@ index b059bfa0..ae8f23fd 100644
      <!-- The glow is its background; clock_wallpaper puts the picture in it, cropped like Home's. -->
      <ImageView
          android:id="@+id/dreamAmbient"
-@@ -13,12 +38,17 @@
+@@ -13,12 +38,19 @@
          android:scaleType="centerCrop"
          android:importantForAccessibility="no" />
  
@@ -3570,13 +3574,15 @@ index b059bfa0..ae8f23fd 100644
 +        android:layout_gravity="bottom|start"
 +        android:layout_marginStart="48dp"
 +        android:layout_marginBottom="40dp"
++        android:clipChildren="false"
++        android:clipToPadding="false"
          android:orientation="vertical">
  
 +        <!-- Dòng 1: Đồng hồ lớn (100sp ExtraLight) -->
          <LinearLayout
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
-@@ -26,40 +56,152 @@
+@@ -26,40 +58,159 @@
              android:baselineAligned="true">
  
              <TextClock
@@ -3702,6 +3708,8 @@ index b059bfa0..ae8f23fd 100644
 +            android:layout_width="wrap_content"
 +            android:layout_height="wrap_content"
 +            android:layout_marginTop="8dp"
++            android:paddingEnd="16dp"
++            android:paddingRight="16dp"
 +            android:textColor="#D9FFFFFF"
 +            android:textSize="15sp"
 +            android:fontFamily="@font/lexend"
@@ -3719,6 +3727,11 @@ index b059bfa0..ae8f23fd 100644
 +            android:layout_marginTop="10dp"
 +            android:maxWidth="920dp"
 +            android:maxLines="4"
++            android:paddingStart="2dp"
++            android:paddingLeft="2dp"
++            android:paddingEnd="28dp"
++            android:paddingRight="28dp"
++            android:clipToPadding="false"
 +            android:textColor="#B3FFFFFF"
 +            android:textSize="15sp"
 +            android:textStyle="italic"
