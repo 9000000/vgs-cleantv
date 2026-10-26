@@ -1509,7 +1509,7 @@ index e926ff8f..330da398 100644
  
      /** Gregorian date to {day, month, year, leap (1 = leap month)} of the lunar calendar at UTC+tz. */
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 13f181e8..4dabdec4 100644
+index 13f181e8..a827c748 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -55,6 +55,7 @@ import android.text.style.ForegroundColorSpan;
@@ -1811,7 +1811,7 @@ index 13f181e8..4dabdec4 100644
          }
      }
  
-@@ -1718,19 +1875,103 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1718,19 +1875,109 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      // ---- top shelf -------------------------------------------------------------------------------
  
      private void showHero(int position, float dockTopInRoot) {
@@ -1829,8 +1829,8 @@ index 13f181e8..4dabdec4 100644
 +                && weatherCard != null && weatherCard.getVisibility() == View.VISIBLE;
 +
 +        if (row == 1) {
-+            heroName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f);
-+            heroName.setLetterSpacing(-0.01f);
++            heroName.setTextSize(TypedValue.COMPLEX_UNIT_SP, cinematic ? 44f : 36f);
++            heroName.setLetterSpacing(-0.02f);
 +            if (heroMeta != null) heroMeta.setVisibility(View.GONE);
 +            if (heroDots != null) heroDots.setVisibility(View.GONE);
 +        } else if (compactHero) {
@@ -1882,16 +1882,14 @@ index 13f181e8..4dabdec4 100644
 +
 +        float y;
 +        if (row == 1) {
++            float cinematicY = lastDockTopInRoot - 14 * density - 26 * density - heroH;
 +            RecyclerView.ViewHolder vh0 = grid.findViewHolderForAdapterPosition(0);
 +            float actualDockTop = (vh0 != null) ? (lastDockTopInRoot - (grid.getPaddingTop() - vh0.itemView.getTop())) : lastDockTopInRoot;
 +            if (actualDockTop <= 0) actualDockTop = dockTopInRoot;
 +
-+            float shelfBottom = (shelfCardsContainer != null && shelfCardsContainer.getVisibility() == View.VISIBLE)
-+                    ? (shelfCardsContainer.getBottom() + 6f * density)
-+                    : (24f * density);
-+
-+            float candidateY = actualDockTop - 8f * density - heroH;
-+            y = Math.max(shelfBottom, candidateY);
++            float candidateY = actualDockTop - 14 * density - 26 * density - heroH;
++            float topLimit = (clockBlock != null && clockBlock.getHeight() > 0) ? (clockBlock.getBottom() + 10 * density) : (48 * density);
++            y = Math.max(topLimit, Math.min(cinematicY, candidateY));
 +        } else if (compactHero) {
 +            y = dockTopInRoot - 10f * density - heroH;
 +        } else {
@@ -1903,7 +1901,15 @@ index 13f181e8..4dabdec4 100644
          if (cinematic && heroArtAlpha > 0f) showHeroArt(position);
  
 +        if (shelfCardsContainer != null) {
-+            shelfCardsContainer.animate().alpha(1f).translationY(0f).setDuration(260).start();
++            if (!animations || reducedMotion) {
++                shelfCardsContainer.animate().cancel();
++                shelfCardsContainer.setAlpha(row == 0 ? 1f : 0f);
++                shelfCardsContainer.setTranslationY(row == 0 ? 0f : -20f * density);
++            } else if (row == 0) {
++                shelfCardsContainer.animate().alpha(1f).translationY(0f).setDuration(260).start();
++            } else {
++                shelfCardsContainer.animate().alpha(0f).translationY(-20f * density).setDuration(260).start();
++            }
 +        }
 +
          if (!animations || reducedMotion) {
@@ -1918,7 +1924,7 @@ index 13f181e8..4dabdec4 100644
              hero.setTranslationX(0f);
              hero.setAlpha(1f);
              if (ambientGlow) {
-@@ -1745,8 +1986,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1745,8 +1992,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              stopAmbientAnimation();
              hero.animate().cancel();
              ambient.animate().cancel();
@@ -1929,7 +1935,7 @@ index 13f181e8..4dabdec4 100644
              hero.setTranslationX(0f);
              hero.animate().alpha(1f).setDuration(260).start();
              if (ambientGlow) {
-@@ -1757,8 +1998,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1757,8 +2004,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          } else if (changed) {
              if (advancedEffects) hero.animate().cancel();
              hero.animate().alpha(0f).translationX(-12 * density).setDuration(120).withEndAction(() -> {
@@ -1940,7 +1946,7 @@ index 13f181e8..4dabdec4 100644
                  hero.setTranslationX(12 * density);
                  hero.animate().alpha(1f).translationX(0f).setDuration(200).start();
              }).start();
-@@ -1771,14 +2012,23 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1771,14 +2018,23 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  }).start();
              }
          } else {
@@ -1967,7 +1973,7 @@ index 13f181e8..4dabdec4 100644
          updateHeroMeta(position);
          updateHeroDots(position);
      }
-@@ -1996,6 +2246,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1996,6 +2252,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          heroArt.animate().cancel();
          heroArt.setAlpha(0f);
          heroShown = false;
@@ -1977,7 +1983,7 @@ index 13f181e8..4dabdec4 100644
          if (!ambientGlow) return;
          if (!animations || reducedMotion) {
              setAmbient(color);
-@@ -2039,6 +2292,221 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2039,6 +2298,221 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -2199,7 +2205,7 @@ index 13f181e8..4dabdec4 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2103,13 +2571,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2103,13 +2577,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -2227,7 +2233,7 @@ index 13f181e8..4dabdec4 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2304,6 +2783,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2304,6 +2789,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -2238,7 +2244,7 @@ index 13f181e8..4dabdec4 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2665,7 +3148,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2665,7 +3154,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -2251,7 +2257,7 @@ index 13f181e8..4dabdec4 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2920,7 +3407,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2920,7 +3413,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       *  source number; "HW8=-" leaves that input out of the Inputs menu (a port the board reports but the set
       *  does not have). Returns the number, -1 for a left-out input, or null when the input is not listed. */
      private Integer mappedSource(String inputId) {
@@ -2285,7 +2291,7 @@ index 13f181e8..4dabdec4 100644
      }
  
      /** Switches to a passthrough input (HDMI, AV). An input mapped in `input_sources` is opened by sending
-@@ -3322,10 +3834,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3322,10 +3840,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
