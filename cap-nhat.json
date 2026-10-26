@@ -1,11 +1,11 @@
 {
   "app": {
-    "versionCode": 82,
-    "versionName": "2.10.15",
-    "apk": "https://github.com/9000000/vgs-cleantv/releases/download/v2.10.15/CleanTV-v2.10.15.apk",
-    "co": 13915374,
-    "ghiChu": "CleanTV v2.10.15",
-    "ghiChuEn": "CleanTV v2.10.15 release",
+    "versionCode": 83,
+    "versionName": "3.0.0",
+    "apk": "https://github.com/9000000/vgs-cleantv/releases/download/v3.0.0/CleanTV-v3.0.0.apk",
+    "co": 13913826,
+    "ghiChu": "CleanTV v3.0.0",
+    "ghiChuEn": "CleanTV v3.0.0 release",
     "ngay": "2026-10-26"
   },
   "duLieu": {
