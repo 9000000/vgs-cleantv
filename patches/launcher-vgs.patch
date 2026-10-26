@@ -259,12 +259,14 @@ index eb56debc..ae7e77b8 100644
          if (live == null) return 0xFF444444;
          // Draw a private copy: changing the bounds of the drawable an ImageView shows would blank the tile.
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java b/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
-index dd324c91..13f1493b 100644
+index dd324c91..ab5201b4 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
-@@ -6,31 +6,34 @@ import android.content.res.Resources;
+@@ -5,32 +5,36 @@ import android.content.Context;
+ import android.content.res.Resources;
  import android.graphics.Bitmap;
  import android.graphics.BitmapFactory;
++import android.graphics.Typeface;
  import android.graphics.drawable.BitmapDrawable;
 -import android.graphics.drawable.ColorDrawable;
 -import android.graphics.drawable.Drawable;
@@ -305,7 +307,7 @@ index dd324c91..13f1493b 100644
      private static final int[] PALETTE = {0xFF2B5CFF, 0xFF00A39A, 0xFF8A3FFC, 0xFFE0661B, 0xFFD6336C};
  
      private final Handler handler = new Handler(Looper.getMainLooper());
-@@ -40,28 +43,76 @@ final class ClockScene {
+@@ -40,28 +44,76 @@ final class ClockScene {
      private final GradientDrawable glow;
      private int colorIndex;
      private int glowColor;
@@ -391,12 +393,21 @@ index dd324c91..13f1493b 100644
          glow = new GradientDrawable();
          glow.setGradientType(GradientDrawable.RADIAL_GRADIENT);
          ambient.setBackground(glow);
-@@ -69,6 +120,111 @@ final class ClockScene {
+@@ -69,6 +121,120 @@ final class ClockScene {
                  glow.setGradientRadius((r - l) * 0.55f));
          colorIndex = random.nextInt(PALETTE.length);
          setGlow(PALETTE[colorIndex]);
 +
 +        Context ctx = root.getContext();
++        try {
++            Resources res = ctx.getResources();
++            if (tvDateLunar != null) tvDateLunar.setTypeface(res.getFont(R.font.lexend_light));
++            if (tvWxTempDesc != null) tvWxTempDesc.setTypeface(res.getFont(R.font.lexend));
++            if (tvAqiText != null) tvAqiText.setTypeface(res.getFont(R.font.lexend));
++            if (tvEventsLine != null) tvEventsLine.setTypeface(res.getFont(R.font.lexend));
++            if (tvQuoteLine != null) tvQuoteLine.setTypeface(Typeface.create(res.getFont(R.font.lexend_light), Typeface.ITALIC));
++            if (tvCaption != null) tvCaption.setTypeface(res.getFont(R.font.lexend));
++        } catch (Exception ignored) {}
 +        initPhotos(ctx);
 +        updateLabels();
 +    }
@@ -503,7 +514,7 @@ index dd324c91..13f1493b 100644
      }
  
      void start() {
-@@ -79,67 +235,67 @@ final class ClockScene {
+@@ -79,67 +245,67 @@ final class ClockScene {
          });
          handler.removeCallbacks(tick);
          handler.postDelayed(tick, MOVE_MS);
@@ -612,7 +623,7 @@ index dd324c91..13f1493b 100644
      private static Bitmap decode(File file, int screenW, int screenH) {
          try {
              BitmapFactory.Options options = new BitmapFactory.Options();
-@@ -171,23 +327,34 @@ final class ClockScene {
+@@ -171,23 +337,34 @@ final class ClockScene {
          }).start();
      }
  
@@ -1202,7 +1213,7 @@ index 48bcf21b..29143cdf 100644
          return true;
      }
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/LauncherSettingsActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/LauncherSettingsActivity.java
-index 914f8866..39550d0d 100644
+index 914f8866..17ecb113 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/LauncherSettingsActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/LauncherSettingsActivity.java
 @@ -35,6 +35,9 @@ public final class LauncherSettingsActivity extends Activity {
@@ -1230,9 +1241,9 @@ index 914f8866..39550d0d 100644
          wallpaperChoice = findViewById(R.id.wallpaperChoice);
          wallpaperChoice.setOnClickListener(v -> showWallpaperPicker());
 +
-+        showEvents = choices.getBoolean("show_events", Weather.flag(this, "show_events", true));
-+        showToday = choices.getBoolean("show_today", Weather.flag(this, "show_today", true));
-+        showWeather = choices.getBoolean("show_weather", Weather.flag(this, "show_weather", true));
++        showEvents = Weather.flagOrChoice(this, choices, "show_events", true);
++        showToday = Weather.flagOrChoice(this, choices, "show_today", true);
++        showWeather = Weather.flagOrChoice(this, choices, "show_weather", true);
 +
 +        eventsChoice = findViewById(R.id.eventsChoice);
 +        eventsChoice.setOnClickListener(v -> {
@@ -1468,7 +1479,7 @@ index 00000000..9b2fd8e3
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 13f181e8..92d9beeb 100644
+index 13f181e8..19676e0c 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -55,6 +55,7 @@ import android.text.style.ForegroundColorSpan;
@@ -1537,7 +1548,7 @@ index 13f181e8..92d9beeb 100644
              sky.update();
              wallpaperPlayer.update();
              handler.postDelayed(this, MINUTE_MS);
-@@ -498,7 +536,59 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -498,7 +536,42 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          lunarOffset = Lunar.offsetFor(cfg.lunarUtcOffset, Locale.getDefault());
          if (lunar) lunarDate.setVisibility(View.VISIBLE);
          greetingName = cfg.greetingName;
@@ -1567,24 +1578,7 @@ index 13f181e8..92d9beeb 100644
 +        wxAirText = findViewById(R.id.wxAirText);
 +        wxDaysRow = findViewById(R.id.wxDaysRow);
 +
-+        SharedPreferences choices = getSharedPreferences(Config.SETTINGS_NAME, MODE_PRIVATE);
-+        showEvents = choices.getBoolean("show_events", Weather.flag(this, "show_events", true));
-+        showToday = choices.getBoolean("show_today", Weather.flag(this, "show_today", true));
-+        showWeather = choices.getBoolean("show_weather", Weather.flag(this, "show_weather", true));
-+        carouselEnabled = Weather.flag(this, "today_carousel", true);
-+
-+        if (eventsRow != null) {
-+            eventsRow.setVisibility(showEvents ? View.VISIBLE : View.GONE);
-+        }
-+        if (todayCard != null) {
-+            todayCard.setVisibility(showToday ? View.VISIBLE : View.GONE);
-+        }
-+        if (weatherCard != null) {
-+            weatherCard.setVisibility(showWeather ? View.VISIBLE : View.GONE);
-+        }
-+        if (shelfCardsContainer != null) {
-+            shelfCardsContainer.setVisibility((showToday || showWeather) ? View.VISIBLE : View.GONE);
-+        }
++        updateWidgetsConfig();
 +
 +        if (carouselEnabled) {
 +            if (showEvents) renderEventChips();
@@ -1597,7 +1591,7 @@ index 13f181e8..92d9beeb 100644
          if (shamsi) {
              shamsiDate.setVisibility(View.VISIBLE);
              TextView date = findViewById(R.id.date);
-@@ -506,6 +596,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -506,6 +579,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              lunarDate.setTextSize(11f);
              date.setPadding(0, (int) (4 * density), 0, 0);
          }
@@ -1611,7 +1605,7 @@ index 13f181e8..92d9beeb 100644
          vpnApp = cfg.vpnApp;
          vpnPill = cfg.vpnPill && !cfg.topMenu;
          btnVpn = findViewById(R.id.btnVpn);
-@@ -603,6 +700,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -603,6 +683,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // tvOS layout: push the dock row towards the bottom of the screen, leaving room for
          // rows_below_dock grid rows under it; the rest of the grid stays below until you press Down.
          int rowsBelowDock = cfg.rowsBelowDock;
@@ -1623,7 +1617,7 @@ index 13f181e8..92d9beeb 100644
          grid.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
              int h = b - t;
              // Item height follows the tile size, which follows the columns and the rows that must fit (AppAdapter.tileWidthPx).
-@@ -623,6 +725,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -623,6 +708,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // A single row never shows the names under its tiles (the title above the row names the app), so the
              // 7dp gap and 22dp label item_app.xml keeps for them would only lift the row: sit it that much lower.
              if (singleRow && !cfg.alwaysShowNames) want += (int) (29 * density);
@@ -1635,7 +1629,7 @@ index 13f181e8..92d9beeb 100644
              if (grid.getPaddingTop() != want) {
                  grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
                  // A vertical grid parks the dock on the new padding line by scrolling (onTileFocused); a sideways
-@@ -790,8 +897,35 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -790,8 +880,35 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -1672,7 +1666,7 @@ index 13f181e8..92d9beeb 100644
          btnSettings.setOnKeyListener(pillKeys);
          btnReorder.setOnKeyListener(pillKeys);
          btnLibraryTop.setOnKeyListener(pillKeys);
-@@ -937,6 +1071,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -937,6 +1054,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onResume() {
          super.onResume();
@@ -1680,14 +1674,15 @@ index 13f181e8..92d9beeb 100644
          // A festival that started or ended while Home was in the background: rebuild with or without it.
          if (festive != festival.active(LocalDate.now())) {
              recreate();
-@@ -980,9 +1115,18 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -980,9 +1098,20 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
 +        updateWeather();
          sky.update();
          wallpaperPlayer.start();
-         handler.postDelayed(minuteTick, MINUTE_MS);
+-        handler.postDelayed(minuteTick, MINUTE_MS);
++        updateWidgetsConfig();
 +        if (carouselEnabled) {
 +            if (showEvents) renderEventChips();
 +            if (showWeather) updateWeatherCard();
@@ -1695,11 +1690,13 @@ index 13f181e8..92d9beeb 100644
 +            if (showToday) {
 +                handler.postDelayed(carouselTick, 15000L);
 +            }
++        } else {
++            handler.removeCallbacks(carouselTick);
 +        }
          if (festive && diya != null) {
              diya.start();
              LocalDate today = LocalDate.now();
-@@ -1148,6 +1292,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1148,6 +1277,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onPause() {
          super.onPause();
@@ -1707,7 +1704,7 @@ index 13f181e8..92d9beeb 100644
          root.removeCallbacks(showIdleClock);
          endReorder();   // Home or another app while reordering keeps the order so far
          wallpaperPlayer.stop();
-@@ -1156,6 +1301,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1156,6 +1286,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          ambient.animate().cancel();
          heroArt.animate().cancel();
          handler.removeCallbacks(minuteTick);
@@ -1715,7 +1712,7 @@ index 13f181e8..92d9beeb 100644
          stopStats();
          if (diya != null) diya.stop();
          cancelPendingFocusScroll();
-@@ -1724,6 +1870,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1724,6 +1855,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          boolean changed = !label.contentEquals(heroName.getText());
          if (cinematic && heroArtAlpha > 0f) showHeroArt(position);
  
@@ -1726,7 +1723,7 @@ index 13f181e8..92d9beeb 100644
          if (!animations || reducedMotion) {
              // Snap the shelf instead of sliding and fading it: each of those frames repaints the
              // full-screen panel, and this switch exists for the GPUs that cannot afford it.
-@@ -1996,6 +2146,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1996,6 +2131,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          heroArt.animate().cancel();
          heroArt.setAlpha(0f);
          heroShown = false;
@@ -1736,7 +1733,7 @@ index 13f181e8..92d9beeb 100644
          if (!ambientGlow) return;
          if (!animations || reducedMotion) {
              setAmbient(color);
-@@ -2039,6 +2192,153 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2039,6 +2177,197 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -1781,6 +1778,10 @@ index 13f181e8..92d9beeb 100644
 +            icon.setImageResource(c.iconRes);
 +            title.setText(c.title);
 +            when.setText(c.whenText);
++            try {
++                title.setTypeface(getResources().getFont(R.font.lexend_medium));
++                when.setTypeface(getResources().getFont(R.font.lexend));
++            } catch (Exception ignored) {}
 +            if (c.isToday) {
 +                chipView.setBackgroundResource(R.drawable.bg_event_chip_today);
 +                when.setTextColor(0xFFFFD479);
@@ -1829,10 +1830,50 @@ index 13f181e8..92d9beeb 100644
 +                    ivIcon.setImageResource(df.iconRes);
 +                    tvMax.setText(df.maxTemp + "°");
 +                    tvMin.setText(df.minTemp + "°");
++                    try {
++                        tvName.setTypeface(getResources().getFont(R.font.lexend));
++                        tvMax.setTypeface(getResources().getFont(R.font.lexend_medium));
++                        tvMin.setTypeface(getResources().getFont(R.font.lexend_light));
++                    } catch (Exception ignored) {}
 +                    wxDaysRow.addView(dayView);
 +                }
 +            }
 +        }));
++    }
++
++    private void updateWidgetsConfig() {
++        SharedPreferences choices = getSharedPreferences(Config.SETTINGS_NAME, MODE_PRIVATE);
++        showEvents = Weather.flagOrChoice(this, choices, "show_events", true);
++        showToday = Weather.flagOrChoice(this, choices, "show_today", true);
++        showWeather = Weather.flagOrChoice(this, choices, "show_weather", true);
++        carouselEnabled = Weather.flagOrChoice(this, choices, "today_carousel", true);
++
++        if (eventsRow != null) {
++            eventsRow.setVisibility(showEvents ? View.VISIBLE : View.GONE);
++        }
++        if (todayCard != null) {
++            todayCard.setVisibility(showToday ? View.VISIBLE : View.GONE);
++        }
++        if (weatherCard != null) {
++            weatherCard.setVisibility(showWeather ? View.VISIBLE : View.GONE);
++        }
++        if (shelfCardsContainer != null) {
++            shelfCardsContainer.setVisibility((showToday || showWeather) ? View.VISIBLE : View.GONE);
++        }
++
++        try {
++            Resources res = getResources();
++            if (todayLabel != null) todayLabel.setTypeface(res.getFont(R.font.lexend_medium));
++            if (todayText != null) todayText.setTypeface(res.getFont(R.font.lexend_light));
++            if (todayMeta != null) todayMeta.setTypeface(res.getFont(R.font.lexend));
++            if (wxTemp != null) wxTemp.setTypeface(res.getFont(R.font.lexend_light));
++            if (wxDesc != null) wxDesc.setTypeface(res.getFont(R.font.lexend_medium));
++            if (wxMeta != null) wxMeta.setTypeface(res.getFont(R.font.lexend));
++            if (wxAirText != null) wxAirText.setTypeface(res.getFont(R.font.lexend));
++            if (lunarDate != null) lunarDate.setTypeface(res.getFont(R.font.lexend));
++            if (weatherView != null) weatherView.setTypeface(res.getFont(R.font.lexend));
++            if (todayCarouselView != null) todayCarouselView.setTypeface(res.getFont(R.font.lexend));
++        } catch (Exception ignored) {}
 +    }
 +
 +    private void advanceTodayCarousel() {
@@ -1890,7 +1931,7 @@ index 13f181e8..92d9beeb 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2103,13 +2403,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2103,13 +2432,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -1918,7 +1959,7 @@ index 13f181e8..92d9beeb 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2304,6 +2615,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2304,6 +2644,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -1929,7 +1970,7 @@ index 13f181e8..92d9beeb 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2665,7 +2980,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2665,7 +3009,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -1942,7 +1983,7 @@ index 13f181e8..92d9beeb 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2920,7 +3239,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2920,7 +3268,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       *  source number; "HW8=-" leaves that input out of the Inputs menu (a port the board reports but the set
       *  does not have). Returns the number, -1 for a left-out input, or null when the input is not listed. */
      private Integer mappedSource(String inputId) {
@@ -1976,7 +2017,7 @@ index 13f181e8..92d9beeb 100644
      }
  
      /** Switches to a passthrough input (HDMI, AV). An input mapped in `input_sources` is opened by sending
-@@ -3322,10 +3666,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3322,10 +3695,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
@@ -2386,10 +2427,10 @@ index 18fded94..f6798ffb 100644
                  && (collectionImage(segments.get(1)) || WallpaperCaptions.FILE_NAME.equals(segments.get(1)))) {
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Weather.java b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
 new file mode 100644
-index 00000000..218d217c
+index 00000000..969c1397
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
-@@ -0,0 +1,377 @@
+@@ -0,0 +1,400 @@
 +package com.gathin.tvhome;
 +
 +import android.content.Context;
@@ -2481,6 +2522,29 @@ index 00000000..218d217c
 +        } catch (Exception e) {
 +            return def;
 +        }
++    }
++
++    /**
++     * CleanTV/VGS: Ưu tiên config.json nếu người dùng đặt trong Cài đặt nâng cao / Theme,
++     * đồng thời đồng bộ vào choices để màn Cài đặt Launcher luôn hiển thị đúng trạng thái.
++     */
++    static boolean flagOrChoice(Context ctx, android.content.SharedPreferences choices, String key, boolean def) {
++        File dir = Config.dir(ctx);
++        File f = dir != null ? new File(dir, Config.FILE_NAME) : null;
++        if (f != null && f.isFile() && f.length() <= 64 * 1024) {
++            try (InputStream in = new FileInputStream(f)) {
++                JSONObject j = new JSONObject(new String(readAll(in), "UTF-8"));
++                if (j.has(key)) {
++                    boolean val = j.optBoolean(key, def);
++                    if (choices != null) {
++                        choices.edit().putBoolean(key, val).apply();
++                    }
++                    return val;
++                }
++            } catch (Exception ignored) {
++            }
++        }
++        return choices != null ? choices.getBoolean(key, def) : def;
 +    }
 +
 +    /**
@@ -7539,7 +7603,7 @@ index b3de8647..245b0be1 100644
              android:id="@+id/animationsChoice"
              style="@style/SettingsRow"
 diff --git a/launcher/app/src/main/res/layout/activity_main.xml b/launcher/app/src/main/res/layout/activity_main.xml
-index 9c071595..e38b8740 100644
+index 9c071595..6f92f5dd 100644
 --- a/launcher/app/src/main/res/layout/activity_main.xml
 +++ b/launcher/app/src/main/res/layout/activity_main.xml
 @@ -146,6 +146,164 @@
@@ -7560,7 +7624,7 @@ index 9c071595..e38b8740 100644
 +        <!-- "Hôm nay": Ngày này năm xưa / Danh ngôn carousel -->
 +        <LinearLayout
 +            android:id="@+id/todayCard"
-+            android:layout_width="440dp"
++            android:layout_width="480dp"
 +            android:layout_height="wrap_content"
 +            android:layout_alignParentStart="true"
 +            android:background="@drawable/bg_today_card"
@@ -7589,9 +7653,9 @@ index 9c071595..e38b8740 100644
 +                android:ellipsize="end"
 +                android:fontFamily="@font/lexend_light"
 +                android:lineSpacingExtra="3.5dp"
-+                android:maxLines="2"
++                android:maxLines="5"
 +                android:textColor="#F2FFFFFF"
-+                android:textSize="15.5sp" />
++                android:textSize="15sp" />
 +
 +            <TextView
 +                android:id="@+id/todayMeta"
@@ -7814,7 +7878,7 @@ index 9c071595..e38b8740 100644
                      android:id="@+id/btnLibraryTop"
                      style="@style/TopButtonIcon"
 diff --git a/launcher/app/src/main/res/layout/dream_clock.xml b/launcher/app/src/main/res/layout/dream_clock.xml
-index b059bfa0..4a2323ba 100644
+index b059bfa0..ae8f23fd 100644
 --- a/launcher/app/src/main/res/layout/dream_clock.xml
 +++ b/launcher/app/src/main/res/layout/dream_clock.xml
 @@ -1,10 +1,35 @@
@@ -7872,7 +7936,7 @@ index b059bfa0..4a2323ba 100644
          <LinearLayout
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
-@@ -26,40 +56,151 @@
+@@ -26,40 +56,152 @@
              android:baselineAligned="true">
  
              <TextClock
@@ -8013,7 +8077,8 @@ index b059bfa0..4a2323ba 100644
 +            android:layout_width="wrap_content"
 +            android:layout_height="wrap_content"
 +            android:layout_marginTop="10dp"
-+            android:maxWidth="700dp"
++            android:maxWidth="920dp"
++            android:maxLines="4"
 +            android:textColor="#B3FFFFFF"
 +            android:textSize="15sp"
 +            android:textStyle="italic"
@@ -8189,20 +8254,26 @@ index 48609291..b7f225a8 100644
 +    <string name="storage_gb_decimal">%1$.1f GB</string>
  </resources>
 diff --git a/launcher/app/src/main/res/values/fonts.xml b/launcher/app/src/main/res/values/fonts.xml
-index adbb30db..91098f5c 100644
+index adbb30db..02e8afe0 100644
 --- a/launcher/app/src/main/res/values/fonts.xml
 +++ b/launcher/app/src/main/res/values/fonts.xml
-@@ -1,8 +1,8 @@
+@@ -1,10 +1,10 @@
  <?xml version="1.0" encoding="utf-8"?>
 -<!-- The UI fonts, looked up through these strings so a locale can swap in a system family: Outfit has no
 +<!-- CleanTV/VGS: Lexend thay Outfit (đủ dấu tiếng Việt), nên bỏ values-vi/fonts.xml. The UI fonts, looked up through these strings so a locale can swap in a system family: Outfit has no
       glyphs for most Vietnamese accented letters, so values-vi points them at the system sans-serif (#833). -->
  <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ReferenceType">
 -    <string name="font_body" translatable="false">@font/outfit</string>
+-    <string name="font_regular" translatable="false">@font/outfit_regular</string>
+-    <string name="font_light" translatable="false">@font/outfit_light</string>
+-    <string name="font_extralight" translatable="false">@font/outfit_extralight</string>
+-    <string name="font_medium" translatable="false">@font/outfit_medium</string>
 +    <string name="font_body" translatable="false">@font/lexend</string>
-     <string name="font_regular" translatable="false">@font/outfit_regular</string>
-     <string name="font_light" translatable="false">@font/outfit_light</string>
-     <string name="font_extralight" translatable="false">@font/outfit_extralight</string>
++    <string name="font_regular" translatable="false">@font/lexend</string>
++    <string name="font_light" translatable="false">@font/lexend_light</string>
++    <string name="font_extralight" translatable="false">@font/lexend_extralight</string>
++    <string name="font_medium" translatable="false">@font/lexend_medium</string>
+ </resources>
 diff --git a/launcher/app/src/main/res/values/strings.xml b/launcher/app/src/main/res/values/strings.xml
 index c4e5a5a9..b52b3702 100644
 --- a/launcher/app/src/main/res/values/strings.xml
