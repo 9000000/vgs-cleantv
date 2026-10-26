@@ -406,7 +406,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             }
             return t("Home sạch không mở được, Home gốc vẫn giữ nguyên.\n$start", "The clean Home did not start; the stock Home is untouched.\n$start")
         }
-        sh("pm grant $pkgHome android.permission.ACCESS_FINE_LOCATION 2>/dev/null; true")
+        sh("pm grant $pkgHome android.permission.ACCESS_FINE_LOCATION 2>/dev/null; appops set $pkgHome SCHEDULE_EXACT_ALARM allow 2>/dev/null; true")
         bao(t("Tối ưu cho tivi yếu…", "Optimising for slow TVs…"))
         runCatching { sh("cmd package compile -m speed -f $pkgHome") }
 
@@ -555,17 +555,31 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
      * sạch đọc (log "TvHome.Config: ignoring … EACCES"), theme/dock người dùng chọn không được áp sau lần cài đầu hoặc
      * sau khi gỡ-cài lại Home. File cũ của shell phải xoá trước, không thì provider cũng không ghi đè được.
      */
-    private fun ghiFileTheme(ten: String, du: ByteArray) {
+    /** Cỡ file của Home sạch trên tivi: đọc thẳng thư mục, không được (Android 11+ chặn shell) thì đọc qua ThemeProvider. */
+    private fun coFileTheme(dir: String, ten: String): Int? =
+        sh("wc -c < $dir/$ten 2>/dev/null").trim().toIntOrNull()
+            ?: sh("content read --uri content://$pkgHome.theme/$ten 2>/dev/null | wc -c").trim().toIntOrNull()?.takeIf { it > 0 }
+
+    /**
+     * Ghi một file cho Home sạch và kiểm nó tới nơi đủ cỡ. Trả về false nếu sau hai lượt vẫn sai.
+     * 25/10/2026 (Sony 2015 Android 8): `content write` có thể chưa có mà vẫn trả mã 0. 26/10/2026 (TCL C06, hộp hx322x,
+     * Xiaomi Android 11: ảnh nền riêng không lên, phải áp dụng vài lần): shell không đọc được Android/data nên lượt kiểm cũ
+     * luôn "sai cỡ" rồi chép thẳng (cũng không được), ảnh hỏng nửa chừng vẫn nằm đó. Giờ kiểm qua ThemeProvider và ghi lại.
+     */
+    private fun ghiFileTheme(ten: String, du: ByteArray): Boolean {
         val dir = "/sdcard/Android/data/$pkgHome/files"
         val tam = "/data/local/tmp/cyt-${ten.replace('/', '-')}"
         adb.ghiFile(tam, du)
         if (ten.contains('/')) sh("mkdir -p $dir/${ten.substringBeforeLast('/')} 2>/dev/null; true")
-        sh("rm -f $dir/$ten 2>/dev/null; content write --uri content://$pkgHome.theme/$ten < $tam 2>/dev/null || cp $tam $dir/$ten 2>/dev/null")
-        // Kiểm file thật sự tới nơi (25/10/2026, Sony 2015 Android 8: đổi theme không ăn — `content write` có thể chưa có
-        // mà vẫn trả mã 0, file cũ đã xoá). Sai cỡ thì chép thẳng và mở quyền đọc cho Home sạch.
-        val co = sh("wc -c < $dir/$ten 2>/dev/null").trim().toIntOrNull()
-        if (co != du.size) sh("cp $tam $dir/$ten 2>/dev/null; chmod 666 $dir/$ten 2>/dev/null; true")
+        var ok = false
+        for (luot in 1..2) {
+            sh("rm -f $dir/$ten 2>/dev/null; content write --uri content://$pkgHome.theme/$ten < $tam 2>/dev/null || cp $tam $dir/$ten 2>/dev/null")
+            if (coFileTheme(dir, ten) == du.size) { ok = true; break }
+            sh("cp $tam $dir/$ten 2>/dev/null; chmod 666 $dir/$ten 2>/dev/null; true")
+            if (coFileTheme(dir, ten) == du.size) { ok = true; break }
+        }
         sh("rm -f $tam")
+        return ok
     }
 
     /**
@@ -605,13 +619,18 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         val moi = runCatching { org.json.JSONObject(json) }.getOrNull()
         val khoiPhucPhim = moi?.optBoolean("restore_key_services") ?: false
         sh("pm ${if (khoiPhucPhim) "grant" else "revoke"} $pkgHome android.permission.WRITE_SECURE_SETTINGS 2>/dev/null; true")
+        // Nút hẹn giờ tắt (sleep_timer_button) cần báo thức đúng giờ: cấp sẵn, máy cũ không có lệnh thì thôi.
+        sh("appops set $pkgHome SCHEDULE_EXACT_ALARM allow 2>/dev/null; true")
         // Khoá chuyển đè Home cũ do damBaoPhimHome gắn (tivi không cho tắt Home gốc): đổi giao diện không được làm mất nó.
         val ghi = moi?.takeIf { !it.has("stock_home_redirect") }?.let { m ->
             docCauHinhTv()?.optString("stock_home_redirect")?.takeIf { it.isNotBlank() }?.let { m.put("stock_home_redirect", it).toString() }
         } ?: json
         ghiFileTheme("config.json", ghi.toByteArray())
-        if (anhNen != null) ghiFileTheme("wallpaper.jpg", anhNen)
-        else sh("rm -f $dir/wallpaper.jpg 2>/dev/null; content delete --uri $uri/wallpaper.jpg 2>/dev/null; true")
+        if (anhNen != null) {
+            if (!ghiFileTheme("wallpaper.jpg", anhNen)) throw java.io.IOException(
+                t("Ảnh nền chưa sang được tivi (tivi chặn ghi file của Home sạch). Bấm Áp dụng lên tivi lại; vẫn không được thì gửi góp ý kèm model tivi.",
+                    "The wallpaper did not reach the TV (it blocks writing the clean Home's files). Apply again; if it still fails, send feedback with the TV model."))
+        } else sh("rm -f $dir/wallpaper.jpg 2>/dev/null; content delete --uri $uri/wallpaper.jpg 2>/dev/null; true")
         // Bộ ảnh xoay vòng (wallpapers/): xoá bộ cũ trước, theme không có bộ ảnh thì chỉ xoá.
         sh("rm -rf $dir/wallpapers 2>/dev/null; content delete --uri $uri/wallpapers 2>/dev/null; true")
         boAnh?.forEach { (ten, du) -> ghiFileTheme("wallpapers/$ten", du) }

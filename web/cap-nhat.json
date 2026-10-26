@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 87,
-  "versionName": "3.1.2",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.1.2.apk",
-  "co": 12048561,
-  "ghiChu": "Thêm lối vào nhóm Facebook Vietnam Gaming Setup và nhóm Telegram VGS ngay ở màn chính.",
-  "ghiChuEn": "Links to the Vietnam Gaming Setup Facebook group and VGS Telegram on the main screen.",
+  "versionCode": 88,
+  "versionName": "3.2.0",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.2.0.apk",
+  "co": 12053981,
+  "ghiChu": "Nút hẹn giờ tắt tivi; chữ đồng hồ có bóng mờ trên ảnh nền riêng; sửa ảnh nền riêng không lên trên một số tivi.",
+  "ghiChuEn": "Sleep timer button; clock text shadow over your own picture; fixes your wallpaper not showing on some TVs.",
   "ngay": "2026-10-26"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "df0ad3a58f280a1e",
+   "phienBan": "2ba61ec539fb474a",
    "url": "/ota/du-lieu.json",
    "co": 1830957,
-   "tuBan": 87
+   "tuBan": 88
   },
   "tvhome.apk": {
-   "phienBan": "2cacbfec47a969c7",
+   "phienBan": "cdaa26e92b151637",
    "url": "/ota/tvhome.apk",
-   "co": 647941,
-   "tuBan": 87
+   "co": 650633,
+   "tuBan": 88
   }
  }
 }

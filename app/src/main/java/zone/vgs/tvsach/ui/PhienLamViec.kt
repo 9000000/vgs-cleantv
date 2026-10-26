@@ -186,6 +186,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var chuTrang by mutableStateOf(false)
     /** Bật tivi luôn về Home sạch (power_on_home_always của launcher, cần HomeKeyService). 3.0.0, góp ý caibangddd, huyenson91. */
     var luonVeHome by mutableStateOf(false)
+    /** Nút hẹn giờ tắt tivi trên Home sạch (sleep_timer_button, cần HomeKeyService). 3.2.0, góp ý duongghoangg1103. */
+    var nutHenTat by mutableStateOf(false)
     /**
      * Nút remote người dùng tự gán (3.1.1, "Dò phím remote"; góp ý Hoàng Hữu: nút VTVgo của remote TCL 65C655 chết sau khi
      * tắt Home gốc). Mỗi dòng là một mục app_keys: "scan:<mã quét>:<gói>" hoặc "<keycode>:<gói>". Cần HomeKeyService lọc phím.
@@ -214,7 +216,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     val appGanDuoc: List<String> get() = trangThai?.let { tt -> tt.coBieuTuong.filter { it in tt.caiDat && it !in tt.daTat }.sortedBy { zone.vgs.tvsach.dulieu.tenDep(it).lowercase() } } ?: emptyList()
 
     /** HomeKeyService cần bật: phím Home lạ, phím app remote, hoặc mở app khi bật từ chế độ chờ. */
-    val canDichVuPhim get() = nutHome || dungPhimRemote || (moKhiBat && moKhiThuc) || luonVeHome || phimGan.isNotEmpty()
+    val canDichVuPhim get() = nutHome || dungPhimRemote || (moKhiBat && moKhiThuc) || luonVeHome || phimGan.isNotEmpty() || nutHenTat
     /**
      * Ô kênh đặt ở đầu dock, theo thứ tự chọn: VTVgo (3.0.0, mọi kênh), FPT Play và IPTV (3.1.0). Tối đa 12 (link_tiles).
      */
@@ -883,6 +885,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         moKhiBat = j.optBoolean("open_on_start_choice", false)
         moKhiThuc = j.optBoolean("wake_open_app", false)
         luonVeHome = j.optBoolean("power_on_home_always", false)
+        nutHenTat = j.optBoolean("sleep_timer_button", false)
         phimGan.clear(); j.optJSONArray("vgs_phim_gan")?.let { a -> (0 until a.length()).map { a.optString(it) }.filter { it.isNotBlank() }.forEach { phimGan.add(it) } }
         chuTrang = !cuaTheme("header_white") && j.optBoolean("header_white", false)
         // Chỉ nạp số cột do người dùng chọn ở đây (vgs_so_cot), không lấy columns của theme.
@@ -1036,6 +1039,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (moKhiBat) put("open_on_start_choice", true)
         if (moKhiBat && moKhiThuc) put("wake_open_app", true)
         if (luonVeHome) put("power_on_home_always", true)
+        if (nutHenTat) put("sleep_timer_button", true)
         if (chuTrang) put("header_white", true)
         if (soCot > 0) { put("columns", soCot); put("vgs_so_cot", true) }
         // Phím APPS (KEYCODE_ALL_APPS) chỉ là nút Home với que / tivi Xiaomi hoặc khi bật "Remote gửi phím Home lạ";
@@ -1046,7 +1050,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (anhNenRieng != null) put("ambient_glow", false)
         // Ảnh riêng hiện đúng như ảnh (25/10/2026, góp ý ảnh bị phủ mờ, loang màu): bỏ lớp phủ bầu trời theo giờ của theme,
         // giải mã màu 32-bit thay vì RGB_565. Nâng cao ghi sau nên vẫn đổi lại được.
-        if (anhNenRieng != null) { put("sky_intensity", 0); put("wallpaper_true_color", true) }
+        // Ảnh riêng sáng làm chìm chữ trắng (26/10/2026, Sony VH22): bóng mờ sau chữ đồng hồ, ngày, thời tiết.
+        if (anhNenRieng != null) { put("sky_intensity", 0); put("wallpaper_true_color", true); put("header_shadow", true) }
         // Tivi Xiaomi bản Trung Quốc không có tiếng Việt: Home sạch hiện chữ Trung (25/10/2026). Tivi đang để tiếng Trung mà
         // app dùng tiếng Việt thì ép Home sạch sang tiếng Việt (locale của bản vá launcher).
         if (zone.vgs.tvsach.NgonNgu.tiengViet && Regex("""\[(persist\.sys\.locale|ro\.product\.locale)\]: \[zh""").containsMatchIn(getprop)) put("locale", "vi")
@@ -1216,7 +1221,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val bo = boAnhTheme()
         if (bo != null) thongBao = t("Đang gửi ${bo.size} ảnh phong cảnh…", "Sending ${bo.size} landscape pictures…")
         io { tv.dayCauHinh(json, anh, bo) }
-        if (dungPhimRemote || (moKhiBat && moKhiThuc) || luonVeHome || phimGan.isNotEmpty()) io { tv.batBatPhimHome() }
+        if (dungPhimRemote || (moKhiBat && moKhiThuc) || luonVeHome || phimGan.isNotEmpty() || nutHenTat) io { tv.batBatPhimHome() }
         // Đổi giao diện cũng bật / tắt DNS AdGuard theo công tắc (trước 2.7.3 chỉ lúc cài Home sạch mới đặt).
         val dangChan = io { tv.dnsDangChan() }
         if (dnsChanQc && !dangChan) saoLuu?.let { sl -> io { tv.batDnsChanQc(sl) } }
