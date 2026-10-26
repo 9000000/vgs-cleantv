@@ -1486,7 +1486,7 @@ index 00000000..9b2fd8e3
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 13f181e8..3c4b441c 100644
+index 13f181e8..cba72b8b 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -55,6 +55,7 @@ import android.text.style.ForegroundColorSpan;
@@ -1719,7 +1719,83 @@ index 13f181e8..3c4b441c 100644
          stopStats();
          if (diya != null) diya.stop();
          cancelPendingFocusScroll();
-@@ -1724,6 +1855,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1720,17 +1851,92 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+     private void showHero(int position, float dockTopInRoot) {
+         String label = adapter.labelAt(position);
+         int color = adapter.ambientColorAt(position);
+-        float y = dockTopInRoot - 14 * density - 26 * density - hero.getHeight();
++
++        boolean compactHero = cinematic && showToday && showWeather
++                && todayCard != null && todayCard.getVisibility() == View.VISIBLE
++                && weatherCard != null && weatherCard.getVisibility() == View.VISIBLE;
++
++        if (compactHero) {
++            heroName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 28f);
++            heroName.setLetterSpacing(-0.01f);
++            if (heroMeta != null) {
++                heroMeta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
++                ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) heroMeta.getLayoutParams();
++                if (mlp != null && mlp.topMargin != (int) (4 * density)) {
++                    mlp.topMargin = (int) (4 * density);
++                    heroMeta.setLayoutParams(mlp);
++                }
++            }
++            if (heroDots != null) {
++                ViewGroup.MarginLayoutParams dlp = (ViewGroup.MarginLayoutParams) heroDots.getLayoutParams();
++                if (dlp != null && dlp.topMargin != (int) (8 * density)) {
++                    dlp.topMargin = (int) (8 * density);
++                    heroDots.setLayoutParams(dlp);
++                }
++            }
++        } else if (cinematic) {
++            heroName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 68f);
++            heroName.setLetterSpacing(-0.025f);
++            if (heroMeta != null) {
++                heroMeta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
++                ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) heroMeta.getLayoutParams();
++                if (mlp != null && mlp.topMargin != (int) (12 * density)) {
++                    mlp.topMargin = (int) (12 * density);
++                    heroMeta.setLayoutParams(mlp);
++                }
++            }
++            if (heroDots != null) {
++                ViewGroup.MarginLayoutParams dlp = (ViewGroup.MarginLayoutParams) heroDots.getLayoutParams();
++                if (dlp != null && dlp.topMargin != (int) (16 * density)) {
++                    dlp.topMargin = (int) (16 * density);
++                    heroDots.setLayoutParams(dlp);
++                }
++            }
++        } else {
++            heroName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 48f);
++            heroName.setLetterSpacing(-0.02f);
++        }
++
++        hero.measure(
++            View.MeasureSpec.makeMeasureSpec(root != null && root.getWidth() > 0 ? root.getWidth() : 1920, View.MeasureSpec.AT_MOST),
++            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
++        );
++        int heroH = hero.getMeasuredHeight() > 0 ? hero.getMeasuredHeight() : hero.getHeight();
++
++        float y;
++        if (compactHero) {
++            float containerTop = (shelfCardsContainer != null && shelfCardsContainer.getTop() > 0)
++                    ? shelfCardsContainer.getTop()
++                    : 160f * density;
++            int cardH = (todayCard != null && todayCard.getHeight() > 0)
++                    ? todayCard.getHeight()
++                    : (todayCard != null && todayCard.getMeasuredHeight() > 0 ? todayCard.getMeasuredHeight() : (int) (120f * density));
++            float cardBottom = containerTop + cardH;
++            float yBelow = cardBottom + 10f * density;
++            float maxDockY = dockTopInRoot - 10f * density - heroH;
++            y = Math.min(yBelow, maxDockY);
++            if (y < cardBottom + 4f * density) {
++                y = cardBottom + 4f * density;
++            }
++        } else {
++            y = dockTopInRoot - 14 * density - 26 * density - heroH;
++        }
++        final float finalY = y;
++
          boolean changed = !label.contentEquals(heroName.getText());
          if (cinematic && heroArtAlpha > 0f) showHeroArt(position);
  
@@ -1730,7 +1806,42 @@ index 13f181e8..3c4b441c 100644
          if (!animations || reducedMotion) {
              // Snap the shelf instead of sliding and fading it: each of those frames repaints the
              // full-screen panel, and this switch exists for the GPUs that cannot afford it.
-@@ -1996,6 +2131,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+             hero.animate().cancel();
+             ambient.animate().cancel();
+             fillHero(position, label);
+-            hero.setY(y);
++            hero.setY(finalY);
+             hero.setTranslationX(0f);
+             hero.setAlpha(1f);
+             if (ambientGlow) {
+@@ -1746,7 +1952,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+             hero.animate().cancel();
+             ambient.animate().cancel();
+             fillHero(position, label);
+-            hero.setY(y);
++            hero.setY(finalY);
+             hero.setTranslationX(0f);
+             hero.animate().alpha(1f).setDuration(260).start();
+             if (ambientGlow) {
+@@ -1758,7 +1964,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+             if (advancedEffects) hero.animate().cancel();
+             hero.animate().alpha(0f).translationX(-12 * density).setDuration(120).withEndAction(() -> {
+                 fillHero(position, label);
+-                hero.setY(y);
++                hero.setY(finalY);
+                 hero.setTranslationX(12 * density);
+                 hero.animate().alpha(1f).translationX(0f).setDuration(200).start();
+             }).start();
+@@ -1771,7 +1977,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+                 }).start();
+             }
+         } else {
+-            hero.setY(y);
++            hero.setY(finalY);
+         }
+     }
+ 
+@@ -1996,6 +2202,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          heroArt.animate().cancel();
          heroArt.setAlpha(0f);
          heroShown = false;
@@ -1740,7 +1851,7 @@ index 13f181e8..3c4b441c 100644
          if (!ambientGlow) return;
          if (!animations || reducedMotion) {
              setAmbient(color);
-@@ -2039,6 +2177,221 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2039,6 +2248,221 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -1962,7 +2073,7 @@ index 13f181e8..3c4b441c 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2103,13 +2456,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2103,13 +2527,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -1990,7 +2101,7 @@ index 13f181e8..3c4b441c 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2304,6 +2668,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2304,6 +2739,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -2001,7 +2112,7 @@ index 13f181e8..3c4b441c 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2665,7 +3033,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2665,7 +3104,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -2014,7 +2125,7 @@ index 13f181e8..3c4b441c 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2920,7 +3292,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2920,7 +3363,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       *  source number; "HW8=-" leaves that input out of the Inputs menu (a port the board reports but the set
       *  does not have). Returns the number, -1 for a left-out input, or null when the input is not listed. */
      private Integer mappedSource(String inputId) {
@@ -2048,7 +2159,7 @@ index 13f181e8..3c4b441c 100644
      }
  
      /** Switches to a passthrough input (HDMI, AV). An input mapped in `input_sources` is opened by sending
-@@ -3322,10 +3719,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3322,10 +3790,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
@@ -2458,10 +2569,10 @@ index 18fded94..f6798ffb 100644
                  && (collectionImage(segments.get(1)) || WallpaperCaptions.FILE_NAME.equals(segments.get(1)))) {
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Weather.java b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
 new file mode 100644
-index 00000000..969c1397
+index 00000000..739ef671
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
-@@ -0,0 +1,400 @@
+@@ -0,0 +1,405 @@
 +package com.gathin.tvhome;
 +
 +import android.content.Context;
@@ -2733,6 +2844,11 @@ index 00000000..969c1397
 +                            int dCode = codeArr.optInt(i, 0);
 +                            int dMax = maxArr != null ? (int) Math.round(maxArr.optDouble(i, 30.0)) : 30;
 +                            int dMin = minArr != null ? (int) Math.round(minArr.optDouble(i, 24.0)) : 24;
++                            if (dMax < dMin) {
++                                int t = dMax;
++                                dMax = dMin;
++                                dMin = t;
++                            }
 +                            int nextDowIdx = (todayDow + i) % 7;
 +                            String dDow = DOW_NAMES[nextDowIdx];
 +                            String dIcon = icon(dCode, true);
@@ -3256,7 +3372,7 @@ index b3de8647..245b0be1 100644
              android:id="@+id/animationsChoice"
              style="@style/SettingsRow"
 diff --git a/launcher/app/src/main/res/layout/activity_main.xml b/launcher/app/src/main/res/layout/activity_main.xml
-index 9c071595..b04a41f7 100644
+index 9c071595..77d38d89 100644
 --- a/launcher/app/src/main/res/layout/activity_main.xml
 +++ b/launcher/app/src/main/res/layout/activity_main.xml
 @@ -146,6 +146,164 @@
@@ -3323,13 +3439,13 @@ index 9c071595..b04a41f7 100644
 +        <!-- Weather Widget (Current + AQI + 4-day forecast) -->
 +        <LinearLayout
 +            android:id="@+id/weatherCard"
-+            android:layout_width="350dp"
++            android:layout_width="360dp"
 +            android:layout_height="wrap_content"
 +            android:layout_alignParentEnd="true"
 +            android:background="@drawable/bg_weather_card"
 +            android:orientation="vertical"
-+            android:paddingStart="20dp"
-+            android:paddingEnd="20dp"
++            android:paddingStart="18dp"
++            android:paddingEnd="18dp"
 +            android:paddingTop="14dp"
 +            android:paddingBottom="14dp">
 +
@@ -3414,8 +3530,8 @@ index 9c071595..b04a41f7 100644
 +                android:id="@+id/wxDaysRow"
 +                android:layout_width="match_parent"
 +                android:layout_height="wrap_content"
-+                android:layout_marginTop="8dp"
-+                android:paddingTop="6dp"
++                android:layout_marginTop="12dp"
++                android:paddingTop="8dp"
 +                android:orientation="horizontal"
 +                android:gravity="center_vertical" />
 +        </LinearLayout>
@@ -3821,54 +3937,71 @@ index 00000000..08ecde97
 +</LinearLayout>
 diff --git a/launcher/app/src/main/res/layout/item_weather_day.xml b/launcher/app/src/main/res/layout/item_weather_day.xml
 new file mode 100644
-index 00000000..d339bdc4
+index 00000000..c9fc96ff
 --- /dev/null
 +++ b/launcher/app/src/main/res/layout/item_weather_day.xml
-@@ -0,0 +1,45 @@
+@@ -0,0 +1,62 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 +    android:layout_width="0dp"
 +    android:layout_weight="1"
 +    android:layout_height="wrap_content"
-+    android:gravity="center_vertical"
-+    android:orientation="horizontal">
++    android:gravity="center_horizontal"
++    android:orientation="vertical">
 +
 +    <TextView
 +        android:id="@+id/wxDayName"
 +        android:layout_width="wrap_content"
 +        android:layout_height="wrap_content"
-+        android:fontFamily="@font/lexend"
-+        android:textColor="#99FFFFFF"
++        android:fontFamily="@font/lexend_medium"
++        android:textColor="#B3FFFFFF"
 +        android:textSize="12sp"
 +        android:includeFontPadding="false" />
 +
 +    <ImageView
 +        android:id="@+id/wxDayIcon"
-+        android:layout_width="16dp"
-+        android:layout_height="16dp"
-+        android:layout_marginStart="4dp"
-+        android:layout_marginEnd="4dp"
++        android:layout_width="22dp"
++        android:layout_height="22dp"
++        android:layout_marginTop="6dp"
++        android:layout_marginBottom="6dp"
 +        android:contentDescription="Day forecast"
 +        android:src="@drawable/ic_weather_clear_day" />
 +
-+    <TextView
-+        android:id="@+id/wxDayMax"
++    <LinearLayout
 +        android:layout_width="wrap_content"
 +        android:layout_height="wrap_content"
-+        android:fontFamily="@font/lexend_medium"
-+        android:textColor="#FFFFFFFF"
-+        android:textSize="12sp"
-+        android:includeFontPadding="false" />
++        android:gravity="center_vertical"
++        android:orientation="horizontal">
 +
-+    <TextView
-+        android:id="@+id/wxDayMin"
-+        android:layout_width="wrap_content"
-+        android:layout_height="wrap_content"
-+        android:layout_marginStart="3dp"
-+        android:fontFamily="@font/lexend_light"
-+        android:textColor="#80FFFFFF"
-+        android:textSize="12sp"
-+        android:includeFontPadding="false" />
++        <TextView
++            android:id="@+id/wxDayMax"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:fontFamily="@font/lexend_medium"
++            android:textColor="#FFFFFFFF"
++            android:textSize="12sp"
++            android:includeFontPadding="false" />
++
++        <TextView
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_marginStart="2dp"
++            android:layout_marginEnd="2dp"
++            android:fontFamily="@font/lexend"
++            android:textColor="#66FFFFFF"
++            android:textSize="11sp"
++            android:text="/"
++            android:includeFontPadding="false" />
++
++        <TextView
++            android:id="@+id/wxDayMin"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:fontFamily="@font/lexend_light"
++            android:textColor="#8CFFFFFF"
++            android:textSize="12sp"
++            android:includeFontPadding="false" />
++    </LinearLayout>
 +</LinearLayout>
 diff --git a/launcher/app/src/main/res/values-vi/fonts.xml b/launcher/app/src/main/res/values-vi/fonts.xml
 deleted file mode 100644
