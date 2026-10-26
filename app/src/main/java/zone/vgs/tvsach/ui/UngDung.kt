@@ -529,6 +529,16 @@ private fun ManThongTin(vm: PhienLamViec) = Cuon {
             }
         }
     }
+    if (vm.khongPhaiTivi) Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color(0xFF4A1414)).padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row {
+            Icon(Icons.Rounded.Warning, null, tint = Color(0xFFFF8A80)); Spacer(Modifier.width(8.dp))
+            Phu(t("Máy này không khai là tivi Android (có thể là điện thoại hoặc máy tính bảng). CleanTV chỉ dành cho tivi: dọn nhầm gói của điện thoại có thể làm máy không khởi động được.",
+                "This device does not report itself as an Android TV (it may be a phone or tablet). CleanTV is only for TVs: disabling a phone's packages can stop it from booting."), Color.White)
+        }
+        Hang(t("Tôi chắc đây là tivi / hộp tivi / máy chiếu", "I am sure this is a TV / TV box / projector"),
+            t("Chỉ bật nếu đúng là thiết bị xem tivi", "Only if it really is a TV device"), vm.xacNhanLaTivi) { vm.xacNhanLaTivi = it }
+    }
     if (vm.laAndroidCu && !vm.laFireTv) Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color(0xFF3A2A10)).padding(12.dp)) {
         Icon(Icons.Rounded.Warning, null, tint = Cam); Spacer(Modifier.width(8.dp))
         Phu(t("Máy này chạy Android ${vm.thongTin?.android}: CleanTV dọn được quảng cáo, theo dõi và app rác, nhưng KHÔNG cài được Home sạch (cần Android 8 trở lên).",
@@ -568,7 +578,7 @@ private fun ManThongTin(vm: PhienLamViec) = Cuon {
     }
     if (vm.moChonMau) HopChonMau(vm)
     TheMayChieu(vm)
-    NutChinh(t("Xem danh sách gói", "See packages"), enabled = !vm.dangBan, icon = Icons.AutoMirrored.Rounded.ArrowForward) { vm.lapKeHoach() }
+    NutChinh(t("Xem danh sách gói", "See packages"), enabled = !vm.dangBan && !vm.chanKhongPhaiTivi, icon = Icons.AutoMirrored.Rounded.ArrowForward) { vm.lapKeHoach() }
     NutPhu(t("Xem màn hình tivi", "View TV screen"), Icons.Rounded.Screenshot) { vm.chupManHinh() }
     if (vm.daCoHomeSach) NutPhu(t("Đổi giao diện Home sạch", "Change the clean Home theme"), Icons.Rounded.Palette) { vm.moDoiTheme() }
     NutPhu(t("Khoá trẻ em (hẹn giờ + mã PIN)", "Kids lock (schedule + PIN)"), Icons.Rounded.Lock) { vm.moKhoaTre() }
@@ -973,6 +983,7 @@ private fun TheHomeNoiDung(vm: PhienLamViec) {
     The(t("Đồng hồ & lời chào", "Clock & greeting"), Icons.Rounded.Schedule) {
         OutlinedTextField(vm.tenChao, { vm.tenChao = it }, label = { Text(t("Tên chào (vd: Nhà bác Hùng)", "Greeting name (e.g. The Smiths)")) },
             singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
+        Hang(t("Chữ giờ, ngày trắng sáng", "Bright white clock and date"), t("Dòng ngày tháng trắng hẳn thay vì xám nhạt, dễ đọc từ xa", "The date line in full white instead of soft grey, easier to read from afar"), vm.chuTrang) { vm.chuTrang = it }
         Hang(t("Ẩn lời chào", "Hide the greeting"), t("Bỏ dòng \"Chào buổi tối\" phía trên đồng hồ", "Drops the \"Good evening\" line above the clock"), vm.anLoiChao) { vm.anLoiChao = it }
         Hang(t("Âm lịch dưới ngày dương", "Lunar date under the date"), t("Ví dụ: 2/9 âm lịch · Bính Ngọ", "e.g. Lunar 2/9 · Year of the Horse"), vm.amLich) { vm.amLich = it }
         Text(t("Đồng hồ khi để yên", "Clock when idle"), fontSize = 14.sp)
@@ -1012,6 +1023,9 @@ private fun TheTuyChinh(vm: PhienLamViec) {
             }
         }
         Hang(t("Mở một app khi bật tivi", "Open an app at power-on"), t("Bật, Áp dụng lên tivi, rồi bấm nút bên dưới để chọn app ngay trên tivi", "Turn on, apply to the TV, then use the button below to pick the app on the TV"), vm.moKhiBat) { vm.moKhiBat = it }
+        if (vm.moKhiBat) Hang(t("Cả khi bật lại từ chế độ chờ", "Also when waking from standby"),
+            t("Bấm nút nguồn remote để bật là mở app luôn, không chỉ lúc khởi động lại tivi", "Turning the TV on with the remote opens the app too, not only after a restart"),
+            vm.moKhiThuc) { vm.moKhiThuc = it }
         if (vm.moKhiBat) NutPhu(t("Mở màn chọn app trên tivi", "Open the app picker on the TV"), Icons.Rounded.Tv) { vm.moChonAppKhiBat() }
         if (vm.moKhiBat && vm.baoChonApp.isNotEmpty()) Phu(vm.baoChonApp, Xanh)
         Hang(t("Nút Đang phát", "Now playing button"), t("Hiện khi có app đang phát nhạc / video: tạm dừng từng app hay dừng tất cả", "Shows while apps play: pause each or stop them all"), vm.nutDangPhat) { vm.nutDangPhat = it }
@@ -1026,6 +1040,10 @@ private fun TheTuyChinh(vm: PhienLamViec) {
             if (vm.mauChon?.id == "tcl-g09-google-tv" || vm.laTclGoogleTv) t("YouTube, Netflix, Cài đặt… mở được khi Home gốc tắt. Trên máy này bật thì giữ nút âm lượng chỉ nhảy một nấc", "YouTube, Netflix, Settings… work with the stock Home off. On this set, holding volume then steps only once")
             else t("YouTube, Netflix, Cài đặt… vẫn mở được khi Home gốc tắt", "YouTube, Netflix, Settings… keep working with the stock Home off"),
             vm.nutAppRemote) { vm.nutAppRemoteChon = it }
+        Hang(t("Giữ nút âm lượng để tăng / giảm liên tục", "Hold volume to keep raising / lowering"),
+            t("Bật nếu giữ nút chỉ nhảy một nấc (hay gặp trên Sony). Đổi lại, nút Input / Apps / nút app trên remote về như tivi gốc",
+                "Turn on if holding volume only moves one step (common on Sony). In return the remote's Input / Apps / app buttons work as the TV's own"),
+            vm.giuAmLuong) { vm.giuAmLuong = it }
     }
     The(t("File cấu hình", "Settings file"), Icons.Rounded.Save) {
         Phu(t("Lưu mọi lựa chọn (theme, dock, thời tiết, tuỳ chỉnh, Nâng cao, ảnh nền riêng) ra một file để giữ lại hoặc mang sang tivi khác.",

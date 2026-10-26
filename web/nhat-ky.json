@@ -1,5 +1,43 @@
 [
  {
+  "ban": "2.10.12",
+  "ngay": "2026-10-26",
+  "vi": [
+   "- Kết nối vào máy không phải tivi (điện thoại, máy tính bảng) thì app cảnh báo đỏ và khoá nút dọn, tránh dọn nhầm làm máy không khởi động được.",
+   "- \"Mở một app khi bật tivi\" có thêm lựa chọn \"Cả khi bật lại từ chế độ chờ\": bấm nút nguồn remote để bật là mở app luôn (góp ý dmenh568, quan1sd1998).",
+   "- Thêm \"Chữ giờ, ngày trắng sáng\" ở Tuỳ chỉnh → Hiển thị (góp ý tranhoangnt555).",
+   "- Home sạch theo bản gốc CleanYourTV mới nhất; danh sách 307 mẫu tivi."
+  ],
+  "en": [
+   "- Connecting to a device that is not a TV (phone, tablet) now shows a red warning and locks cleaning, so a phone cannot be cleaned into a boot loop.",
+   "- \"Open an app at power-on\" gains \"Also when waking from standby\": turning the TV on with the remote opens the app too.",
+   "- New \"Bright white clock and date\" under Customize → Display.",
+   "- Home sạch follows the latest CleanYourTV; 307 TV models."
+  ]
+ },
+ {
+  "ban": "2.10.11",
+  "ngay": "2026-10-25",
+  "vi": [
+   "- Danh sách mẫu tivi lên 300 mẫu, 86 hãng (thêm Sony KD-55X75K có phím app trên remote, Philips, TCL, Skyworth, máy chiếu HY320…).",
+   "- Home sạch dựa trên bản gốc CleanYourTV 3.0."
+  ],
+  "en": [
+   "- TV list now has 300 models from 86 brands (adds Sony KD-55X75K remote app keys, Philips, TCL, Skyworth, HY320 projectors…).",
+   "- Home sạch is based on CleanYourTV 3.0."
+  ]
+ },
+ {
+  "ban": "2.10.10",
+  "ngay": "2026-10-25",
+  "vi": [
+   "- Thêm công tắc \"Giữ nút âm lượng để tăng / giảm liên tục\" ở Đổi giao diện → Tuỳ chỉnh → Remote: dành cho tivi giữ nút chỉ nhảy một nấc sau khi cài Home sạch (hay gặp trên Sony). Đổi lại, nút Input / Apps / nút app trên remote về như tivi gốc."
+  ],
+  "en": [
+   "- New \"Hold volume to keep raising / lowering\" switch under Change Home look → Customize → Remote, for TVs where holding volume moves only one step after Home sạch (common on Sony). In return the remote's Input / Apps / app buttons work as the TV's own."
+  ]
+ },
+ {
   "ban": "2.10.9",
   "ngay": "2026-10-25",
   "vi": [

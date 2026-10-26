@@ -259,10 +259,10 @@ index eb56debc..ae7e77b8 100644
          if (live == null) return 0xFF444444;
          // Draw a private copy: changing the bounds of the drawable an ImageView shows would blank the tile.
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java b/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
-index 111304c6..38240df8 100644
+index dd324c91..e3bd1cae 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
-@@ -6,30 +6,33 @@ import android.content.res.Resources;
+@@ -6,31 +6,33 @@ import android.content.res.Resources;
  import android.graphics.Bitmap;
  import android.graphics.BitmapFactory;
  import android.graphics.drawable.BitmapDrawable;
@@ -274,7 +274,7 @@ index 111304c6..38240df8 100644
  import android.os.Looper;
  import android.util.DisplayMetrics;
  import android.view.View;
-+import android.widget.ImageView;
+ import android.widget.ImageView;
 +import android.widget.TextView;
  
  import java.io.File;
@@ -304,7 +304,7 @@ index 111304c6..38240df8 100644
      private static final int[] PALETTE = {0xFF2B5CFF, 0xFF00A39A, 0xFF8A3FFC, 0xFFE0661B, 0xFFD6336C};
  
      private final Handler handler = new Handler(Looper.getMainLooper());
-@@ -39,28 +42,68 @@ final class ClockScene {
+@@ -40,28 +42,68 @@ final class ClockScene {
      private final GradientDrawable glow;
      private int colorIndex;
      private int glowColor;
@@ -382,7 +382,7 @@ index 111304c6..38240df8 100644
          glow = new GradientDrawable();
          glow.setGradientType(GradientDrawable.RADIAL_GRADIENT);
          ambient.setBackground(glow);
-@@ -68,6 +111,100 @@ final class ClockScene {
+@@ -69,6 +111,100 @@ final class ClockScene {
                  glow.setGradientRadius((r - l) * 0.55f));
          colorIndex = random.nextInt(PALETTE.length);
          setGlow(PALETTE[colorIndex]);
@@ -483,7 +483,7 @@ index 111304c6..38240df8 100644
      }
  
      void start() {
-@@ -78,64 +215,73 @@ final class ClockScene {
+@@ -79,67 +215,63 @@ final class ClockScene {
          });
          handler.removeCallbacks(tick);
          handler.postDelayed(tick, MOVE_MS);
@@ -568,7 +568,10 @@ index 111304c6..38240df8 100644
                      return;
                  }
 -                wallpaperShown = true;
--                ambient.setBackground(new LayerDrawable(new Drawable[]{
+-                // As the image, not the background: a background is stretched to the view, so a picture of
+-                // another shape than the screen would be distorted. centerCrop scales and crops it like Home.
+-                ambient.setBackground(null);
+-                ambient.setImageDrawable(new LayerDrawable(new Drawable[]{
 -                        new BitmapDrawable(res, bmp), new ColorDrawable(shade)}));
 +                incoming.setImageDrawable(new BitmapDrawable(res, bmp));
 +                incoming.setAlpha(0f);
@@ -576,16 +579,6 @@ index 111304c6..38240df8 100644
 +                    isBg1Active = !isBg1Active;
 +                }).start();
 +                outgoing.animate().alpha(0f).setDuration(1500).start();
-+
-+                // Đổi câu danh ngôn mới đồng bộ với ảnh
-+                if (tvQuoteLine != null) {
-+                    quoteIdx++;
-+                    tvQuoteLine.animate().alpha(0f).setDuration(600).withEndAction(() -> {
-+                        QuotesProvider.QuoteItem q = QuotesProvider.getNextQuote(quoteIdx);
-+                        tvQuoteLine.setText(q.getFormatted());
-+                        tvQuoteLine.animate().alpha(1f).setDuration(800).start();
-+                    }).start();
-+                }
              });
 -        }, "clock-wallpaper").start();
 +        }, "screensaver-crossfade").start();
@@ -595,7 +588,7 @@ index 111304c6..38240df8 100644
      private static Bitmap decode(File file, int screenW, int screenH) {
          try {
              BitmapFactory.Options options = new BitmapFactory.Options();
-@@ -167,23 +313,34 @@ final class ClockScene {
+@@ -171,23 +303,34 @@ final class ClockScene {
          }).start();
      }
  
@@ -1134,10 +1127,10 @@ index 00000000..31b51700
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java b/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
-index 016d41d4..3e57a1e5 100644
+index 48bcf21b..29143cdf 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
-@@ -167,7 +167,11 @@ public class HomeKeyService extends AccessibilityService {
+@@ -176,7 +176,11 @@ public class HomeKeyService extends AccessibilityService {
          GuardKeep.stepOut(this);
      }
  
@@ -1149,7 +1142,7 @@ index 016d41d4..3e57a1e5 100644
          // Keycodes and the panel choice can also come from a theme; theme.sh restarts this service.
          Config config = Config.load(this);
          // restore_key_services: note that this helper runs, so Home can put it back after a force stop. Here, not
-@@ -255,7 +259,9 @@ public class HomeKeyService extends AccessibilityService {
+@@ -271,7 +275,9 @@ public class HomeKeyService extends AccessibilityService {
              redirectHomeKey(event);
              return false;
          }
@@ -1161,10 +1154,10 @@ index 016d41d4..3e57a1e5 100644
          return true;
      }
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/LauncherSettingsActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/LauncherSettingsActivity.java
-index 93dc758b..668bcdad 100644
+index 914f8866..39550d0d 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/LauncherSettingsActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/LauncherSettingsActivity.java
-@@ -30,6 +30,9 @@ public final class LauncherSettingsActivity extends Activity {
+@@ -35,6 +35,9 @@ public final class LauncherSettingsActivity extends Activity {
      private TextView wallpaperChoice;
      private TextView animationsChoice;
      private TextView advancedChoice;
@@ -1174,22 +1167,17 @@ index 93dc758b..668bcdad 100644
      private TextView followThemeChoice;
      private TextView openOnStartChoice;
      private int columns;
-@@ -37,6 +40,14 @@ public final class LauncherSettingsActivity extends Activity {
+@@ -42,6 +45,9 @@ public final class LauncherSettingsActivity extends Activity {
      private int dockOpacity;
      private boolean animations;
      private boolean advancedEffects;
 +    private boolean showEvents;
 +    private boolean showToday;
 +    private boolean showWeather;
-+
-+    @Override
-+    protected void attachBaseContext(android.content.Context base) {
-+        super.attachBaseContext(Weather.ngonNgu(base));   // CleanTV/VGS: config.json locale
-+    }
  
      @Override
      protected void onCreate(Bundle state) {
-@@ -101,6 +112,35 @@ public final class LauncherSettingsActivity extends Activity {
+@@ -106,6 +112,35 @@ public final class LauncherSettingsActivity extends Activity {
          }
          wallpaperChoice = findViewById(R.id.wallpaperChoice);
          wallpaperChoice.setOnClickListener(v -> showWallpaperPicker());
@@ -1225,7 +1213,7 @@ index 93dc758b..668bcdad 100644
          animationsChoice = findViewById(R.id.animationsChoice);
          animationsChoice.setOnClickListener(v -> {
              animations = !animations;
-@@ -133,13 +173,17 @@ public final class LauncherSettingsActivity extends Activity {
+@@ -138,13 +173,17 @@ public final class LauncherSettingsActivity extends Activity {
              if (!hasOnTvChoices()) return;
              choices.edit().remove("columns").remove(Config.ROWS_BELOW_DOCK_KEY).remove("animations")
                      .remove("advanced_effects").remove(Config.WALLPAPER_CHOICE_KEY)
@@ -1244,7 +1232,7 @@ index 93dc758b..668bcdad 100644
              changed();
              refresh();
          });
-@@ -285,6 +329,18 @@ public final class LauncherSettingsActivity extends Activity {
+@@ -290,6 +329,18 @@ public final class LauncherSettingsActivity extends Activity {
                  getString(advancedEffects ? R.string.on : R.string.off)));
          advancedChoice.setEnabled(animations);
          advancedChoice.setAlpha(animations ? 1f : 0.5f);
@@ -1263,7 +1251,7 @@ index 93dc758b..668bcdad 100644
          String wallpaperCurrent = choices.getString(Config.WALLPAPER_CHOICE_KEY, null);
          wallpaperChoice.setText(getString(R.string.wallpaper_state,
                  "none".equals(wallpaperCurrent) ? getString(R.string.wallpaper_none)
-@@ -298,7 +354,8 @@ public final class LauncherSettingsActivity extends Activity {
+@@ -303,7 +354,8 @@ public final class LauncherSettingsActivity extends Activity {
          return choices.contains("columns") || choices.contains(Config.ROWS_BELOW_DOCK_KEY)
                  || choices.contains("animations") || choices.contains("advanced_effects")
                  || choices.contains(Config.WALLPAPER_CHOICE_KEY) || choices.contains(Config.DOCK_OPACITY_KEY)
@@ -1432,7 +1420,7 @@ index 00000000..9b2fd8e3
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 880d15fc..47260b4a 100644
+index 13f181e8..92d9beeb 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -55,6 +55,7 @@ import android.text.style.ForegroundColorSpan;
@@ -1443,7 +1431,7 @@ index 880d15fc..47260b4a 100644
  import android.view.View;
  import android.view.SoundEffectConstants;
  import android.view.ViewGroup;
-@@ -178,6 +179,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -184,6 +185,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private int wifiIcon;
      /** The pills have been filled in once; later resumes refresh them after the first frame. */
      private boolean pillsShown;
@@ -1455,7 +1443,7 @@ index 880d15fc..47260b4a 100644
      private TextView shamsiDate;
      /** lunar_date: the lunisolar date under the date line, and the time zone it is computed for. */
      private TextView lunarDate;
-@@ -189,6 +195,37 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -195,6 +201,37 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private TextView raceKicker, raceHeadline, raceSessions;
      /** config.xml show_stats, overridable by a theme. Off: the line is gone and nothing is read. */
      private boolean showStats;
@@ -1493,7 +1481,7 @@ index 880d15fc..47260b4a 100644
      private boolean shamsi;
      /** greeting_name: said after the greeting, which is shown in capitals. */
      private String greetingName = "";
-@@ -364,12 +401,19 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -375,6 +412,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // The pill follows the network callbacks and each return to Home; only the diya's flame follows the
              // signal level, so only it needs this minute's binder calls (about 7 ms on the UI thread).
              if (festive) updateWifiLabel();
@@ -1501,19 +1489,7 @@ index 880d15fc..47260b4a 100644
              sky.update();
              wallpaperPlayer.update();
              handler.postDelayed(this, MINUTE_MS);
-         }
-     };
- 
-+    /** CleanTV/VGS: config.json locale (Weather.ngonNgu). */
-+    @Override
-+    protected void attachBaseContext(Context base) {
-+        super.attachBaseContext(Weather.ngonNgu(base));
-+    }
-+
-     @Override
-     protected void onCreate(Bundle savedInstanceState) {
-         super.onCreate(savedInstanceState);
-@@ -486,7 +530,59 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -498,7 +536,59 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          lunarOffset = Lunar.offsetFor(cfg.lunarUtcOffset, Locale.getDefault());
          if (lunar) lunarDate.setVisibility(View.VISIBLE);
          greetingName = cfg.greetingName;
@@ -1573,7 +1549,7 @@ index 880d15fc..47260b4a 100644
          if (shamsi) {
              shamsiDate.setVisibility(View.VISIBLE);
              TextView date = findViewById(R.id.date);
-@@ -494,6 +590,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -506,6 +596,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              lunarDate.setTextSize(11f);
              date.setPadding(0, (int) (4 * density), 0, 0);
          }
@@ -1585,9 +1561,9 @@ index 880d15fc..47260b4a 100644
 +            phongChu(stats, coChu / 100f);
 +        }
          vpnApp = cfg.vpnApp;
-         moduleCards = cfg.moduleCards;
-         hiddenApps = new HashSet<>(cfg.hiddenApps);
-@@ -589,6 +692,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+         vpnPill = cfg.vpnPill && !cfg.topMenu;
+         btnVpn = findViewById(R.id.btnVpn);
+@@ -603,6 +700,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // tvOS layout: push the dock row towards the bottom of the screen, leaving room for
          // rows_below_dock grid rows under it; the rest of the grid stays below until you press Down.
          int rowsBelowDock = cfg.rowsBelowDock;
@@ -1599,7 +1575,7 @@ index 880d15fc..47260b4a 100644
          grid.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
              int h = b - t;
              // Item height follows the tile size, which follows the columns and the rows that must fit (AppAdapter.tileWidthPx).
-@@ -609,6 +717,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -623,6 +725,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // A single row never shows the names under its tiles (the title above the row names the app), so the
              // 7dp gap and 22dp label item_app.xml keeps for them would only lift the row: sit it that much lower.
              if (singleRow && !cfg.alwaysShowNames) want += (int) (29 * density);
@@ -1611,7 +1587,7 @@ index 880d15fc..47260b4a 100644
              if (grid.getPaddingTop() != want) {
                  grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
                  // A vertical grid parks the dock on the new padding line by scrolling (onTileFocused); a sideways
-@@ -775,7 +888,34 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -790,8 +897,35 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -1627,6 +1603,8 @@ index 880d15fc..47260b4a 100644
 +            });
 +        }
          btnWifi.setOnKeyListener(pillKeys);
+-        btnVpn.setOnKeyListener(pillKeys);
++btnVpn.setOnKeyListener(pillKeys);
 +        // CleanTV/VGS: screensaver button and the compact icon-only cluster.
 +        View btnDream = findViewById(R.id.btnDream);
 +        if (Weather.flag(this, "dream_button", true)) {
@@ -1646,7 +1624,7 @@ index 880d15fc..47260b4a 100644
          btnSettings.setOnKeyListener(pillKeys);
          btnReorder.setOnKeyListener(pillKeys);
          btnLibraryTop.setOnKeyListener(pillKeys);
-@@ -916,6 +1056,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -937,6 +1071,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onResume() {
          super.onResume();
@@ -1654,7 +1632,7 @@ index 880d15fc..47260b4a 100644
          // A festival that started or ended while Home was in the background: rebuild with or without it.
          if (festive != festival.active(LocalDate.now())) {
              recreate();
-@@ -959,9 +1100,18 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -980,9 +1115,18 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -1673,7 +1651,7 @@ index 880d15fc..47260b4a 100644
          if (festive && diya != null) {
              diya.start();
              LocalDate today = LocalDate.now();
-@@ -1127,6 +1277,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1148,6 +1292,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onPause() {
          super.onPause();
@@ -1681,7 +1659,7 @@ index 880d15fc..47260b4a 100644
          root.removeCallbacks(showIdleClock);
          endReorder();   // Home or another app while reordering keeps the order so far
          wallpaperPlayer.stop();
-@@ -1135,6 +1286,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1156,6 +1301,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          ambient.animate().cancel();
          heroArt.animate().cancel();
          handler.removeCallbacks(minuteTick);
@@ -1689,7 +1667,7 @@ index 880d15fc..47260b4a 100644
          stopStats();
          if (diya != null) diya.stop();
          cancelPendingFocusScroll();
-@@ -1695,6 +1847,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1724,6 +1870,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          boolean changed = !label.contentEquals(heroName.getText());
          if (cinematic && heroArtAlpha > 0f) showHeroArt(position);
  
@@ -1700,7 +1678,7 @@ index 880d15fc..47260b4a 100644
          if (!animations || reducedMotion) {
              // Snap the shelf instead of sliding and fading it: each of those frames repaints the
              // full-screen panel, and this switch exists for the GPUs that cannot afford it.
-@@ -1967,6 +2123,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1996,6 +2146,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          heroArt.animate().cancel();
          heroArt.setAlpha(0f);
          heroShown = false;
@@ -1710,7 +1688,7 @@ index 880d15fc..47260b4a 100644
          if (!ambientGlow) return;
          if (!animations || reducedMotion) {
              setAmbient(color);
-@@ -2010,6 +2169,153 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2039,6 +2192,153 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -1864,7 +1842,7 @@ index 880d15fc..47260b4a 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2074,13 +2380,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2103,13 +2403,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -1892,7 +1870,7 @@ index 880d15fc..47260b4a 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2275,6 +2592,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2304,6 +2615,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -1903,7 +1881,7 @@ index 880d15fc..47260b4a 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2629,7 +2950,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2665,7 +2980,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -1916,10 +1894,13 @@ index 880d15fc..47260b4a 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2844,6 +3169,29 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
-             if (v.equals("-")) return -1;
-             try { return Integer.parseInt(v); } catch (NumberFormatException e) { return null; }
-         }
+@@ -2920,7 +3239,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+      *  source number; "HW8=-" leaves that input out of the Inputs menu (a port the board reports but the set
+      *  does not have). Returns the number, -1 for a left-out input, or null when the input is not listed. */
+     private Integer mappedSource(String inputId) {
+-        return InputSources.mapped(inputSources, inputId);
++        Integer mapped = InputSources.mapped(inputSources, inputId);
++        if (mapped != null) return mapped;
 +        return xiaomiSource(inputId);
 +    }
 +
@@ -1943,10 +1924,11 @@ index 880d15fc..47260b4a 100644
 +        } catch (RuntimeException e) {
 +            // no label: the standard way
 +        }
-         return null;
++        return null;
      }
  
-@@ -3246,10 +3594,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+     /** Switches to a passthrough input (HDMI, AV). An input mapped in `input_sources` is opened by sending
+@@ -3322,10 +3666,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
@@ -7462,7 +7444,7 @@ index 1550b02e..c7b78eaf 100644
          tools:targetApi="28" />
  </font-family>
 diff --git a/launcher/app/src/main/res/layout-iw/activity_main.xml b/launcher/app/src/main/res/layout-iw/activity_main.xml
-index 6b61aa40..70c21fde 100644
+index a70f261d..93aa0085 100644
 --- a/launcher/app/src/main/res/layout-iw/activity_main.xml
 +++ b/launcher/app/src/main/res/layout-iw/activity_main.xml
 @@ -216,7 +216,7 @@
@@ -7509,7 +7491,7 @@ index b3de8647..245b0be1 100644
              android:id="@+id/animationsChoice"
              style="@style/SettingsRow"
 diff --git a/launcher/app/src/main/res/layout/activity_main.xml b/launcher/app/src/main/res/layout/activity_main.xml
-index 39805803..2e19f24c 100644
+index 9c071595..78187d71 100644
 --- a/launcher/app/src/main/res/layout/activity_main.xml
 +++ b/launcher/app/src/main/res/layout/activity_main.xml
 @@ -146,6 +146,164 @@
@@ -7753,7 +7735,7 @@ index 39805803..2e19f24c 100644
                  <TextView
                      android:id="@+id/btnWifi"
                      style="@style/TopButton"
-@@ -346,6 +554,24 @@
+@@ -354,6 +562,24 @@
                      android:drawableStart="@drawable/ic_swap_vert"
                      android:nextFocusDown="@+id/grid" />
  
@@ -7779,10 +7761,10 @@ index 39805803..2e19f24c 100644
                      android:id="@+id/btnLibraryTop"
                      style="@style/TopButtonIcon"
 diff --git a/launcher/app/src/main/res/layout/dream_clock.xml b/launcher/app/src/main/res/layout/dream_clock.xml
-index 540a2b73..087517f2 100644
+index b059bfa0..c9df85f7 100644
 --- a/launcher/app/src/main/res/layout/dream_clock.xml
 +++ b/launcher/app/src/main/res/layout/dream_clock.xml
-@@ -1,21 +1,52 @@
+@@ -1,10 +1,35 @@
  <?xml version="1.0" encoding="utf-8"?>
 -<!-- Screensaver (ClockDream): clock and date that drift around a black screen over an ambient glow. -->
 +<!-- CleanTV/Samsung: Màn hình chờ gia đình (Family Ambient Screensaver)
@@ -7816,11 +7798,12 @@ index 540a2b73..087517f2 100644
 +        android:background="#4D000000"
 +        android:visibility="gone" />
 +
-+    <!-- Hiệu ứng quầng sáng nhẹ nhàng (Ambient Glow khi không có ảnh) -->
-     <View
+     <!-- The glow is its background; clock_wallpaper puts the picture in it, cropped like Home's. -->
+     <ImageView
          android:id="@+id/dreamAmbient"
-         android:layout_width="match_parent"
-         android:layout_height="match_parent" />
+@@ -13,12 +38,17 @@
+         android:scaleType="centerCrop"
+         android:importantForAccessibility="no" />
  
 +    <!-- Cụm nội dung chính góc dưới bên trái (Chuẩn Samsung The Frame) -->
      <LinearLayout
@@ -7836,7 +7819,7 @@ index 540a2b73..087517f2 100644
          <LinearLayout
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
-@@ -23,40 +54,151 @@
+@@ -26,40 +56,151 @@
              android:baselineAligned="true">
  
              <TextClock
@@ -7886,17 +7869,8 @@ index 540a2b73..087517f2 100644
 +        <!-- Dòng 2: Ngày dương lịch & Âm lịch ("Thứ Bảy, 24 tháng 10 · Rằm tháng Chín âm lịch") -->
 +        <TextView
 +            android:id="@+id/dreamDateLunar"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
--            android:layout_marginStart="6dp"
--            android:layout_marginTop="4dp"
--            android:format12Hour="@string/date_format"
--            android:format24Hour="@string/date_format"
--            android:textColor="#8CFFFFFF"
--            android:textSize="18sp"
--            android:fontFamily="@string/font_regular"
--            android:letterSpacing="0.14"
--            android:textAllCaps="true" />
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
 +            android:layout_marginTop="2dp"
 +            android:textColor="#E6FFFFFF"
 +            android:textSize="16sp"
@@ -7910,8 +7884,17 @@ index 540a2b73..087517f2 100644
 +        <!-- Dòng 3: Thời tiết & AQI ("🌙 28° Trời quang  ● AQI 84 · Trung bình") -->
 +        <LinearLayout
 +            android:id="@+id/dreamWeatherLayout"
-+            android:layout_width="wrap_content"
-+            android:layout_height="wrap_content"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+-            android:layout_marginStart="6dp"
+-            android:layout_marginTop="4dp"
+-            android:format12Hour="@string/date_format"
+-            android:format24Hour="@string/date_format"
+-            android:textColor="#8CFFFFFF"
+-            android:textSize="18sp"
+-            android:fontFamily="@string/font_regular"
+-            android:letterSpacing="0.14"
+-            android:textAllCaps="true" />
 +            android:layout_marginTop="6dp"
 +            android:gravity="center_vertical"
 +            android:orientation="horizontal">
@@ -8258,10 +8241,10 @@ index 00000000..65e6f4a2
 +    }
 +}
 diff --git a/themes/README.md b/themes/README.md
-index d080af63..4c9c0bd0 100644
+index 17416623..ab20258f 100644
 --- a/themes/README.md
 +++ b/themes/README.md
-@@ -142,6 +142,10 @@ A new key needs one there in the same pull request.
+@@ -147,6 +147,10 @@ A new key needs one there in the same pull request.
  | `ambient_glow` | bool | The glow behind the dock in the focused app's colour (`true` by default); `false` keeps only `background_color` or the wallpaper, e.g. for a calm photo background |
  | `app_glow` | bool | The focus highlight glows in the focused app's colour on every tile, as `cinematic_home` does for the dock (`false` by default) |
  | `fade_rows` | bool | The rows fade out as they scroll up under the clock instead of being cut off at a hard line; the wallpaper or sky shows through. The grid then draws into a hardware layer (about 6 MB of graphics memory at 1080p) (`false` by default) |

@@ -323,6 +323,46 @@
     "ten": "Dải nền chạy suốt hàng",
     "moTa": "Khi bật một hàng: dải nền sau dock chạy sau mọi app trong hàng, không chỉ app dock (mặc định tắt)."
   },
+  "show_library_pill": {
+    "ten": "Viên Thư viện cuối hàng app",
+    "moTa": "Viên \"Thư viện ứng dụng\" sau hàng app cuối (mặc định bật). Tắt thì chỉ còn nút thư viện trên thanh trên cùng (cần bật nút đó)."
+  },
+  "library_ok_opens": {
+    "ten": "Bấm OK trong thư viện là mở app",
+    "moTa": "Trong Thư viện ứng dụng, bấm OK là mở luôn app thay vì đánh dấu thêm / bớt khỏi Home (mặc định tắt)."
+  },
+  "date_below_clock": {
+    "ten": "Ngày nằm dưới đồng hồ",
+    "moTa": "Ngày (kèm âm lịch) xuống dòng riêng dưới đồng hồ thay vì đứng bên cạnh, hợp khi thanh trên cùng có nhiều nút (mặc định tắt)."
+  },
+  "dock_band": {
+    "ten": "Dải nền thanh dock",
+    "moTa": "Hiện dải màu nền đen phía sau thanh dock (mặc định tắt). Bật để hiện dải màu đen, tắt để dock trong suốt hoàn toàn giữ nguyên hàng app dock."
+  },
+  "power_on_home": {
+    "ten": "Về Home khi bật tivi",
+    "moTa": "Tivi tự mở Live TV / kênh truyền hình mỗi khi bật nguồn thì Home sạch đưa về màn Home (mặc định tắt)."
+  },
+  "input_sources": {
+    "ten": "Bảng số nguồn HDMI/AV",
+    "moTa": "Ghép mỗi cổng vào (ví dụ HW5=23) với số nguồn của hãng; HW8=- để ẩn cổng tivi không có. Chỉ dùng cho firmware cần (Xiaomi bản Trung Quốc)."
+  },
+  "locale": {
+    "ten": "Ngôn ngữ của Home sạch",
+    "moTa": "Mã ngôn ngữ (vi, en…) cho riêng Home sạch, dùng khi tivi không có ngôn ngữ đó trong cài đặt. Để trống là theo tivi."
+  },
+  "vpn_pill": {
+    "ten": "Nút VPN riêng",
+    "moTa": "VPN thành một nút riêng cạnh nút mạng: xanh khi đang bật, đỏ \"VPN off\" khi tắt mà có app VPN. Bấm để mở app VPN."
+  },
+  "home_long_press_home": {
+    "ten": "Giữ nút Home vẫn về Home",
+    "moTa": "Bấm giữ nút Home cũng về Home sạch (remote bấm chậm trên Philips không làm gì). Cần lọc phím, nên giữ nút âm lượng có thể chỉ nhảy một nấc."
+  },
+  "power_on_home_always": {
+    "ten": "Bật tivi luôn về Home",
+    "moTa": "Mỗi lần bật tivi đều về Home sạch, dù tivi mở lại HDMI, truyền hình hay app cũ. Bấm phím trước đó thì thôi. Không chạy khi đã chọn app mở lúc bật."
+  },
   "wallpaper_rotation_minutes": {
     "ten": "Thời gian đổi ảnh nền (phút)",
     "moTa": "Tự động đổi ảnh trong thư mục wallpapers/ sau số phút này (ví dụ 60). Đặt 0 để không tự đổi."
@@ -334,10 +374,6 @@
   "dock_glass": {
     "ten": "Dock kính mờ",
     "moTa": "Dải dock dạng kính mờ mờ nhẹ như các nút trên cùng (mặc định bật). Rất hợp khi dùng kèm ảnh nền."
-  },
-  "dock_band": {
-    "ten": "Dải nền thanh dock",
-    "moTa": "Hiện dải màu nền đen phía sau thanh dock (mặc định tắt). Bật để hiện dải màu đen, tắt để dock trong suốt hoàn toàn giữ nguyên hàng app dock."
   },
   "rows_offset_dp": {
     "ten": "Vị trí hàng app (dp)",
@@ -378,22 +414,6 @@
   "media_bar": {
     "ten": "Thanh phát nhạc (Mini Player)",
     "moTa": "Hiện thanh điều khiển bài hát đang phát (Spotify, YouTube Music...) trên thanh trên cùng (mặc định bật)."
-  },
-  "show_library_pill": {
-    "ten": "Viên Thư viện cuối hàng app",
-    "moTa": "Viên \"Thư viện ứng dụng\" sau hàng app cuối (mặc định bật). Tắt thì chỉ còn nút thư viện trên thanh trên cùng (cần bật nút đó)."
-  },
-  "library_ok_opens": {
-    "ten": "Bấm OK trong thư viện là mở app",
-    "moTa": "Trong Thư viện ứng dụng, bấm OK là mở luôn app thay vì đánh dấu thêm / bớt khỏi Home (mặc định tắt)."
-  },
-  "date_below_clock": {
-    "ten": "Ngày nằm dưới đồng hồ",
-    "moTa": "Ngày (kèm âm lịch) xuống dòng riêng dưới đồng hồ thay vì đứng bên cạnh, hợp khi thanh trên cùng có nhiều nút (mặc định tắt)."
-  },
-  "power_on_home": {
-    "ten": "Về Home khi bật tivi",
-    "moTa": "Tivi tự mở Live TV / kênh truyền hình mỗi khi bật nguồn thì Home sạch đưa về màn Home (mặc định tắt)."
   },
   "dock_apps": {
     "ten": "Danh sách app thanh dock",

@@ -1,25 +1,25 @@
 {
   "app": {
-    "versionCode": 80,
-    "versionName": "2.10.13",
-    "apk": "https://github.com/9000000/vgs-cleantv/releases/download/v2.10.13/CleanTV-v2.10.13.apk",
+    "versionCode": 81,
+    "versionName": "2.10.14",
+    "apk": "https://github.com/9000000/vgs-cleantv/releases/download/v2.10.14/CleanTV-v2.10.14.apk",
     "co": 13882494,
-    "ghiChu": "CleanTV v2.10.13",
-    "ghiChuEn": "CleanTV v2.10.13 release",
+    "ghiChu": "CleanTV v2.10.14: Hợp nhất CleanYourTV 3.0 & 300 mẫu TV; Chặn dọn nhầm điện thoại; Mở app khi bật từ chế độ chờ; Chữ giờ ngày trắng sáng; Bật/tắt độc lập Widget Sự kiện, Hôm nay, Thời tiết.",
+    "ghiChuEn": "CleanTV v2.10.14: Merged CleanYourTV 3.0 & 300 TV models; Not-a-TV guard; Open app on wake; White header; Independent toggles for Events, Today and Weather widgets.",
     "ngay": "2026-10-26"
   },
   "duLieu": {
     "du-lieu.json": {
-      "phienBan": "54f00bfcd0441cc7",
+      "phienBan": "b6384b8a5240f008",
       "url": "/ota/du-lieu.json",
-      "co": 1682380,
-      "tuBan": 77
+      "co": 1774491,
+      "tuBan": 80
     },
     "tvhome.apk": {
-      "phienBan": "87e58c21171ddde8",
+      "phienBan": "138e85b5f0e51939",
       "url": "/ota/tvhome.apk",
-      "co": 640841,
-      "tuBan": 77
+      "co": 644249,
+      "tuBan": 80
     }
   }
 }
