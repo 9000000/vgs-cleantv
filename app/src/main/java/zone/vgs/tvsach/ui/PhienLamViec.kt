@@ -332,9 +332,32 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var hienThoiTiet by mutableStateOf(true)
     var tuXoayHomNay by mutableStateOf(true)
 
-    /** Mục Nâng cao: toàn bộ danh sách tuỳ chọn của launcher + giá trị người dùng đặt (khoá → chữ; thiếu = mặc định). */
+    /** Các tuỳ chọn đã có giao diện riêng trong Home, Tuỳ chỉnh hoặc Giao diện -> không hiện lặp lại trong Nâng cao. */
+    val KHOA_DA_CO = setOf(
+        // 1. Giao diện (TheGiaoDien)
+        "wallpaper", "wallpaper_dim", "wallpaper_rotation_minutes", "wallpaper_order", "wallpaper_fit",
+        // 2. Home (TheHomeNoiDung)
+        "vtv_channels", "link_tiles", "dock_apps",
+        "weather", "weather_lat", "weather_lon", "weather_place", "weather_provider", "weather_api_key",
+        "greeting", "show_greeting", "greeting_name",
+        "header_white", "lunar_date", "lunar_utc_offset", "home_idle_clock_minutes",
+        "projector_actions", "shamsi_date", "race_calendar",
+        // 3. Tuỳ chỉnh (TheTuyChinh)
+        "dock_title", "dock_band", "always_show_names", "icon_tile_color",
+        "rows_below_dock", "single_row", "dock_row", "uniform_tiles",
+        "top_compact", "top_menu", "header_size", "header_scale",
+        "columns", "rows_offset_dp", "rows_middle",
+        "open_on_start_choice", "open_on_start", "boot_to_app", "wake_open_app", "wake_to_app", "power_on_home_always",
+        "weather_corner", "show_events", "show_today", "show_weather", "today_carousel", "countdown_events",
+        "input_action", "input_uri_scheme", "input_key_keycodes", "handle_view_inputs",
+        "key_filter", "home_key", "app_keys", "all_apps_home",
+        "restore_key_services", "consume_volume_keys", "hold_volume_continuous",
+        "reduced_motion", "dock_glass", "app_glow", "show_stats", "dream_button"
+    )
+
+    /** Mục Nâng cao: danh sách tuỳ chọn chuyên sâu của launcher đã lọc bỏ các mục trùng lặp. */
     val dsNangCao: List<zone.vgs.tvsach.dulieu.TuyChon> by lazy {
-        zone.vgs.tvsach.dulieu.NangCao.nap(ctx)
+        zone.vgs.tvsach.dulieu.NangCao.nap(ctx).filter { it.khoa !in KHOA_DA_CO }
     }
     val nangCao = androidx.compose.runtime.mutableStateMapOf<String, String>()
     var homeXong by mutableStateOf(false)
@@ -1157,11 +1180,12 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (trangThai?.caiDat?.contains("com.xiaomi.mitv.tvplayer") == true) put("input_action", "com.xiaomi.mitv.tvplayer.EXTSRC_PLAY")
         put("dream_button", nutManCho)
         put("top_compact", gonNut)
-        if (thoiTietGoc) put("weather_corner", true)
-        if (!hienSuKien) put("show_events", false)
-        if (!hienHomNay) put("show_today", false)
-        if (!hienThoiTiet) put("show_weather", false)
-        if (!tuXoayHomNay) put("today_carousel", false)
+        put("weather_corner", thoiTietGoc)
+        put("show_events", hienSuKien)
+        if (!hienSuKien) put("countdown_events", false)
+        put("show_today", hienHomNay)
+        put("show_weather", hienThoiTiet)
+        put("today_carousel", tuXoayHomNay)
         thanhPho?.let { put("weather_lat", it.lat); put("weather_lon", it.lon); put("weather_place", it.ten) }
         if (ghimMayChieu.isNotEmpty()) put("projector_actions", JSONArray(ghimMayChieu.map { (comp, nhan) -> "$nhan=$comp" }))
         put("lunar_date", amLich)
@@ -1170,16 +1194,18 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (amLich) (java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 3_600_000).takeIf { it == 7 || it == 8 }?.let { put("lunar_utc_offset", it) }
         // Launcher 2.6: nút Input trên remote (VIEW_INPUTS) mở bảng chọn nguồn của Home sạch — đi cùng công tắc nút Input.
         if (nutInput) put("handle_view_inputs", true)
-        if (tenDuoiApp) put("always_show_names", true)
-        if (!tenToTrenDock) put("dock_title", false)
-        if (!toMauOApp) put("icon_tile_color", false)
+        put("always_show_names", tenDuoiApp)
+        put("dock_title", tenToTrenDock)
+        put("icon_tile_color", toMauOApp)
         put("dock_band", daiNenDock)
         if (thuVienApp) { put("app_library", true); put("library_button", true) }
-        if (dongHoKhiYen > 0) put("home_idle_clock_minutes", dongHoKhiYen)
-        if (tiviYeu) put("reduced_motion", true)
-        if (hieuUngKinh) { put("dock_glass", true); put("app_glow", true) }
-        if (lamToiNen > 0) put("wallpaper_dim", lamToiNen)
-        if (hienThongSo) put("show_stats", true)
+        if (dongHoKhiYen > 0) put("home_idle_clock_minutes", dongHoKhiYen) else remove("home_idle_clock_minutes")
+        put("reduced_motion", tiviYeu)
+        if (tiviYeu) put("animations", false)
+        put("dock_glass", hieuUngKinh)
+        put("app_glow", hieuUngKinh)
+        if (lamToiNen > 0) put("wallpaper_dim", lamToiNen) else remove("wallpaper_dim")
+        put("show_stats", hienThongSo)
         // Giữ OK trên ô app: menu Di chuyển / Thêm vào dock / Bỏ khỏi Home / Thông tin (upstream #464, #746; tắt mặc định
         // ở upstream). CleanTV bật sẵn vì người dùng xin đổi chỗ dock ngay trên tivi (22/10/2026); Nâng cao vẫn tắt được.
         put("tile_menu", true)
@@ -1187,15 +1213,15 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (doiHang == HANG_GIUA) { put("rows_middle", true); put("rows_offset_dp", 0) } else if (doiHang != 0) put("rows_offset_dp", doiHang)
         if (!nutDangPhat) put("now_playing", false)
         if (coChuDau != 100) put("header_scale", coChuDau)
-        if (motHang) { put("dock_row", true); put("single_row", true) }
+        if (motHang) { put("dock_row", true); put("single_row", true); put("rows_below_dock", 0) } else { put("single_row", false) }
         // Một hàng + thư viện app: viên Thư viện chen vào hàng app, đã có nút trên thanh trên cùng (góp ý Giun2911 25/10/2026).
         if (motHang && thuVienApp) put("show_library_pill", false)
-        if (anLoiChao) put("show_greeting", false)
+        put("show_greeting", !anLoiChao)
         put("uniform_tiles", oDeuNhau)
-        if (moKhiBat) put("open_on_start_choice", true)
-        if (moKhiBat && moKhiThuc) put("wake_open_app", true)
-        if (luonVeHome) put("power_on_home_always", true)
-        if (chuTrang) put("header_white", true)
+        put("open_on_start_choice", moKhiBat)
+        put("wake_open_app", moKhiBat && moKhiThuc)
+        put("power_on_home_always", luonVeHome)
+        put("header_white", chuTrang)
         if (soCot > 0) { put("columns", soCot); put("vgs_so_cot", true) }
         // Phím APPS (KEYCODE_ALL_APPS) chỉ là nút Home với que / tivi Xiaomi hoặc khi bật "Remote gửi phím Home lạ";
         // tivi khác (Sony VH2: nút Apps mở Home sạch như Back, abc999roses 24/10/2026) để phím cho tivi.
@@ -1231,9 +1257,10 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             put("app_keys", JSONArray(phimGan.toList() + (0 until (cu?.length() ?: 0)).map { cu!!.optString(it) }))
             put("vgs_phim_gan", JSONArray(phimGan.toList()))
         }
-        // Nâng cao ghi sau cùng: người dùng đã chủ động đặt thì đè lên giá trị theme.
+        // Nâng cao ghi sau cùng: người dùng đã chủ động đặt thì đè lên giá trị theme (chỉ các mục chưa có ở Home / Tuỳ chỉnh).
         val daDat = mutableListOf<String>()
         nangCao.forEach { (k, chu) ->
+            if (k in KHOA_DA_CO) return@forEach
             val tc = dsNangCao.firstOrNull { it.khoa == k }
             val v = if (tc != null) zone.vgs.tvsach.dulieu.NangCao.giaTri(tc, chu)
                     else when {

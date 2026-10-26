@@ -1164,34 +1164,34 @@ private data class NhomNangCao(
 
 private val NHOM_NANG_CAO = listOf(
     NhomNangCao(
-        "look", "Giao diện", "Look",
-        "Hình nền, quầng sáng, chuyển động", "Wallpaper, glow, colours and motion",
-        Regex("^(background_color|sky_intensity|wallpaper_.*|glow_style|ambient_glow|app_glow|cinematic_.*|fade_rows|animations|advanced_effects|reduced_motion|focus_overshoot|festival.*|accent_color)$")
+        "look", "Giao diện & Hiệu ứng", "Look & Effects",
+        "Hình nền, quầng sáng, chuyển động và phong cách hiển thị", "Wallpaper, glow, colours, cinematic and motion",
+        Regex("^(background_color|sky_intensity|wallpaper_.*|glow_style|glass_style|ambient_glow|cinematic_.*|fade_rows|animations|advanced_effects|focus_overshoot|festival.*|accent_color)$")
     ),
     NhomNangCao(
-        "dock", "Dock & ứng dụng", "Dock & apps",
+        "dock", "Dock & Ứng dụng", "Dock & apps",
         "Dải dock, lưới app và thư viện ứng dụng", "The dock, the grid of tiles and the App library",
-        Regex("^(fill_dock|hidden_apps|columns|rows_below_dock|rows_offset_dp|dock_.*|icon_tile_color|always_show_names|app_labels|app_banners|launch_actions|app_library_selection|library_apps|tile_menu|module_cards|show_home_settings_shortcut)$")
+        Regex("^(fill_dock|hidden_apps|dock_.*|app_labels|app_banners|launch_actions|app_library_selection|library_.*|tile_menu|module_cards|show_home_settings_shortcut)$")
     ),
     NhomNangCao(
-        "remote", "Remote & phím bấm", "Remote & buttons",
-        "Nút thanh trên cùng và phím remote", "The top bar's pills and what the remote's keys open",
-        Regex("^(show_.*_pill|icon_only_.*|top_menu|top_compact|dream_button|launcher_settings_button|reorder_button|wifi_.*|vpn_app|settings_key_.*|input_key_keycodes|app_keys|key_filter|restore_key_services|gamepad_passthrough|media_bar)$")
+        "remote", "Thanh trên cùng & Remote", "Top bar & Remote",
+        "Nút thanh trên cùng và phím điều khiển chuyên sâu", "The top bar's pills, buttons and advanced keys",
+        Regex("^(show_.*_pill|icon_only_.*|top_bar_apps|launcher_settings_button|reorder_button|wifi_.*|vpn_.*|settings_key_.*|gamepad_passthrough|media_bar)$")
     ),
     NhomNangCao(
-        "clock", "Đồng hồ & thông tin", "Clock & info",
-        "Lời chào, ngày tháng và nội dung đồng hồ", "The greeting, dates and what shows under the clock",
-        Regex("^(home_idle_clock_minutes|show_stats|shamsi_date|greeting|show_events|show_today|show_weather|today_carousel|weather_corner|countdown_events)$")
+        "clock", "Đồng hồ & Ngôn ngữ", "Clock & Locale",
+        "Vị trí ngày, ngôn ngữ riêng và nền đồng hồ màn chờ", "Date position, custom locale and clock screensaver background",
+        Regex("^(clock_.*|date_below_clock|locale)$")
     ),
     NhomNangCao(
-        "behaviour", "Hành vi", "Behaviour",
-        "Hành vi tự động khi mở Home", "What Home does on its own",
-        Regex("^(boot_to_live_tv|live_tv_package|stock_home_redirect)$")
+        "behaviour", "Hành vi khởi động & TV", "Behaviour",
+        "Hành vi tự động khi mở Home và truyền hình trực tiếp", "What Home does on boot and live TV integration",
+        Regex("^(boot_to_live_tv|live_tv_.*|stock_home_redirect|power_on_home|home_long_press_home)$")
     ),
     NhomNangCao(
-        "more", "Nâng cao & nguồn vào", "More",
-        "Nguồn vào HDMI, menu hãng và tiện ích khác", "Inputs and menus for particular TVs, and anything new",
-        Regex("^(live_tv_.*|source_panel_.*|coocaa_sources|input_.*|race_calendar|settings_fallback_components)$")
+        "more", "Nguồn vào & Menu hãng", "Inputs & Maker menus",
+        "Nguồn vào HDMI, menu hãng và tiện ích khác", "Inputs and menus for particular TVs",
+        Regex("^(source_panel_.*|coocaa_sources|input_sources|settings_fallback_components)$")
     )
 )
 
