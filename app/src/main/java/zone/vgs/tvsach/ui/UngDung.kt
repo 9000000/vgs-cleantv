@@ -1199,11 +1199,24 @@ private fun ManXong(vm: PhienLamViec) = Cuon {
         if (vm.homeXong && vm.phimHomeOk) t("Home sạch đang chạy. Bấm Home trên remote để xem.", "The clean Home is running — press Home on the remote.")
         else if (vm.homeXong) t("Home sạch đã cài nhưng nút Home trên remote vẫn mở Home cũ (xem lời báo bên dưới).", "The clean Home is installed, but the remote's Home button still opens the old Home (see the note below).")
         else null)
+    // Hỏi thẳng hai lựa chọn (26/10/2026, anh Alex duyệt): trước đây chỉ có công tắc "Giữ ADB" dễ bị bỏ qua, nhiều người
+    // muốn chỉnh tiếp lại phải bật gỡ lỗi trên tivi từ đầu. Chưa chọn mà rời app quá 1 phút thì vẫn tự tắt cho an toàn.
+    The(t("Gỡ lỗi (ADB) trên tivi", "Debugging (ADB) on the TV"), Icons.Rounded.Lock) {
+        if (vm.giuAdb) {
+            Phu(t("Đang giữ ADB: lần sau đổi giao diện, khôi phục không phải bật lại gỡ lỗi trên tivi. Ai cùng mạng Wi-Fi cũng điều khiển được tivi, nên chỉnh xong hẳn thì nhớ tắt.",
+                "ADB stays on: next time you change the look or restore, no need to turn debugging on again. Anyone on your Wi-Fi can control the TV, so turn it off once you are done for good."), Xanh)
+            NutPhu(t("Đổi ý: tắt ADB ngay", "Changed my mind: turn ADB off"), Icons.Rounded.Lock) { vm.tatAdbVaKetThuc() }
+        } else {
+            Phu(t("Để gỡ lỗi bật thì ai cùng mạng Wi-Fi cũng điều khiển được tivi. Tắt đi thì lần sau muốn chỉnh giao diện phải bật lại gỡ lỗi trên tivi.",
+                "With debugging on, anyone on your Wi-Fi can control the TV. Turn it off and you must enable debugging on the TV again to change anything later."))
+            NutChinh(t("Tắt ADB (an toàn hơn)", "Turn ADB off (safer)"), enabled = !vm.dangBan, icon = Icons.Rounded.Lock) { vm.tatAdbVaKetThuc() }
+            NutPhu(t("Giữ ADB để chỉnh tiếp", "Keep ADB on to tweak later"), Icons.Rounded.LockOpen) { vm.giuAdb = true }
+            Phu(t("Chưa chọn mà rời app quá 1 phút thì tivi tự tắt ADB.", "Leave the app for over a minute without choosing and the TV turns ADB off itself."))
+        }
+    }
     The(t("Trước khi về", "Before you leave"), Icons.Rounded.Checklist) {
         BuocSo(1, t("Thử lại YouTube, Netflix, HDMI, Cài đặt, remote.", "Try YouTube, Netflix, HDMI, Settings and the remote."))
         BuocSo(2, t("Khởi động lại một lần xem gói nào tự bật lại.", "Reboot once to see if anything re-enables itself."))
-        BuocSo(3, t("Tắt ADB: để mở là ai cùng mạng cũng điều khiển được tivi. Rời app quá 1 phút thì tivi tự tắt.", "Turn ADB off: left on, anyone on the network can control the TV. Leave the app for over a minute and the TV turns ADB off itself."))
-        Hang(t("Giữ ADB bật cho lần sau", "Keep ADB on for next time"), t("Lần sau đổi giao diện / khôi phục không phải bật lại gỡ lỗi trên tivi", "Next time you change the look or restore, no need to turn debugging on again"), vm.giuAdb) { vm.giuAdb = it }
         NutPhu(t("Xem màn hình tivi", "View TV screen"), Icons.Rounded.Screenshot) { vm.chupManHinh() }
         NutPhu(t("Khởi động lại tivi", "Reboot the TV"), Icons.Rounded.RestartAlt) { vm.khoiDongLaiTv() }
     }
@@ -1219,9 +1232,8 @@ private fun ManXong(vm: PhienLamViec) = Cuon {
     TheKichBan(vm)
     TheGuiDanhSach(vm)
     NutGopY(vm)
-    NutChinh(t("Tắt ADB & kết thúc", "Turn off ADB & finish"), enabled = !vm.dangBan, icon = Icons.Rounded.Lock) { vm.tatAdbVaKetThuc() }
-    Phu(t("Sau đó trên tivi: Tuỳ chọn nhà phát triển → tắt Gỡ lỗi USB, chọn \"Thu hồi uỷ quyền gỡ lỗi USB\". Bản sao lưu vẫn trong điện thoại để khôi phục.",
-        "Then on the TV: Developer options → turn off USB debugging and \"Revoke USB debugging authorisations\". The backup stays on this phone for restoring."))
+    Phu(t("Muốn chắc hơn nữa, trên tivi: Tuỳ chọn nhà phát triển → \"Thu hồi uỷ quyền gỡ lỗi USB\". Bản sao lưu vẫn trong điện thoại để khôi phục.",
+        "To be extra safe, on the TV: Developer options → \"Revoke USB debugging authorisations\". The backup stays on this phone for restoring."))
 }
 
 // ---------------- Khôi phục ----------------

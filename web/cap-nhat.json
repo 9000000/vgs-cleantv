@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 82,
-  "versionName": "3.0.1",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.0.1.apk",
+  "versionCode": 83,
+  "versionName": "3.0.2",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.0.2.apk",
   "co": 12012465,
-  "ghiChu": "Sửa giờ tivi lệch (tivi Xiaomi / Redmi nội địa nhanh 1 tiếng): một nút đặt giờ tivi theo điện thoại.",
-  "ghiChuEn": "Fixes a TV clock in the wrong time zone (China-market Xiaomi / Redmi): one button sets the phone's time zone on the TV.",
+  "ghiChu": "Màn cuối hỏi rõ: Tắt ADB (an toàn hơn) hay Giữ ADB để chỉnh tiếp.",
+  "ghiChuEn": "The last screen now asks: turn ADB off (safer) or keep it on to tweak later.",
   "ngay": "2026-10-26"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "b6384b8a5240f008",
    "url": "/ota/du-lieu.json",
    "co": 1774491,
-   "tuBan": 82
+   "tuBan": 83
   },
   "tvhome.apk": {
    "phienBan": "138e85b5f0e51939",
    "url": "/ota/tvhome.apk",
    "co": 644249,
-   "tuBan": 82
+   "tuBan": 83
   }
  }
 }

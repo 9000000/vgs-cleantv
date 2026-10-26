@@ -1,5 +1,15 @@
 [
  {
+  "ban": "3.0.2",
+  "ngay": "2026-10-26",
+  "vi": [
+   "- Màn \"Tivi đã sạch!\" hỏi rõ hai lựa chọn: \"Tắt ADB (an toàn hơn)\" hoặc \"Giữ ADB để chỉnh tiếp\" (lần sau đổi giao diện không phải bật lại gỡ lỗi trên tivi). Chưa chọn mà rời app quá 1 phút thì tivi vẫn tự tắt ADB cho an toàn."
+  ],
+  "en": [
+   "- The \"TV is clean!\" screen asks: \"Turn ADB off (safer)\" or \"Keep ADB on to tweak later\" (no need to enable debugging again next time). Leave without choosing for over a minute and the TV still turns ADB off."
+  ]
+ },
+ {
   "ban": "3.0.1",
   "ngay": "2026-10-26",
   "vi": [
