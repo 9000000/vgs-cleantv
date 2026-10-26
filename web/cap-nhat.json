@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 83,
-  "versionName": "3.0.2",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.0.2.apk",
-  "co": 12012465,
-  "ghiChu": "Màn cuối hỏi rõ: Tắt ADB (an toàn hơn) hay Giữ ADB để chỉnh tiếp.",
-  "ghiChuEn": "The last screen now asks: turn ADB off (safer) or keep it on to tweak later.",
+  "versionCode": 84,
+  "versionName": "3.0.3",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.0.3.apk",
+  "co": 12031201,
+  "ghiChu": "316 mẫu tivi; Home sạch theo bản gốc mới: sửa âm lịch, nút Netflix TCL, mục Khởi động lại.",
+  "ghiChuEn": "316 TV models; Home sạch on the latest CleanYourTV: lunar date fix, TCL Netflix key, Restart menu item.",
   "ngay": "2026-10-26"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "b6384b8a5240f008",
+   "phienBan": "b0696337651e380f",
    "url": "/ota/du-lieu.json",
-   "co": 1774491,
-   "tuBan": 83
+   "co": 1830957,
+   "tuBan": 84
   },
   "tvhome.apk": {
-   "phienBan": "138e85b5f0e51939",
+   "phienBan": "c2463fef2922f34d",
    "url": "/ota/tvhome.apk",
-   "co": 644249,
-   "tuBan": 83
+   "co": 647481,
+   "tuBan": 84
   }
  }
 }

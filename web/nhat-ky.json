@@ -1,5 +1,17 @@
 [
  {
+  "ban": "3.0.3",
+  "ngay": "2026-10-26",
+  "vi": [
+   "- Danh sách mẫu tivi lên 316 mẫu, 90 hãng.",
+   "- Home sạch theo bản gốc CleanYourTV mới: âm lịch không còn hiện \"ngày 0\" sát ngày sóc, nút Netflix trên remote TCL mở đúng app, menu Cài đặt có mục Khởi động lại, màn hình chờ dùng cùng hình nền với Home."
+  ],
+  "en": [
+   "- TV list now has 316 models from 90 brands.",
+   "- Home sạch follows the latest CleanYourTV: no lunar \"day 0\" just before a new moon, the TCL Netflix key opens Netflix, a Restart item in the Settings menu, the screensaver uses Home's wallpaper."
+  ]
+ },
+ {
   "ban": "3.0.2",
   "ngay": "2026-10-26",
   "vi": [
