@@ -601,8 +601,11 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
     }.getOrNull()
 
     /** Ảnh nền đang có trên tivi (wallpaper.jpg của Home sạch), qua base64 trong shell; null nếu không có / lỗi. */
-    fun docAnhNenTv(): ByteArray? = runCatching {
-        val b64 = sh("content read --uri content://$pkgHome.theme/wallpaper.jpg 2>/dev/null | base64 | tr -d '\\n'").trim()
+    fun docAnhNenTv(): ByteArray? = docFileTheme("wallpaper.jpg")
+
+    /** Một file của Home sạch qua ThemeProvider (vd wallpapers/r02.jpg của bộ ảnh riêng); null nếu không có / lỗi. */
+    fun docFileTheme(ten: String): ByteArray? = runCatching {
+        val b64 = sh("content read --uri content://$pkgHome.theme/$ten 2>/dev/null | base64 | tr -d '\\n'").trim()
         if (b64.length < 100) null else java.util.Base64.getDecoder().decode(b64)
     }.getOrNull()
 

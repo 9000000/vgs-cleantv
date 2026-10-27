@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 90,
-  "versionName": "3.4.0",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.4.0.apk",
-  "co": 12195965,
-  "ghiChu": "Giao diện mới Kiểu macOS (thanh menu mờ, Dock kính nhỏ ở giữa, nền logo VGS) và chọn màu chữ cho đồng hồ, thời tiết.",
-  "ghiChuEn": "New macOS style (translucent menu bar, small centred glass Dock, VGS logo wallpaper) and a colour choice for the clock and weather text.",
+  "versionCode": 91,
+  "versionName": "3.4.1",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.4.1.apk",
+  "co": 12212349,
+  "ghiChu": "Ảnh nền riêng tự đổi: chọn nhiều ảnh, tivi đổi lần lượt sau 5, 15, 30 hoặc 60 phút.",
+  "ghiChuEn": "Your own wallpapers can rotate: pick several pictures, the TV changes them every 5, 15, 30 or 60 minutes.",
   "ngay": "2026-10-27"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "2c3b25d3f4ab7170",
    "url": "/ota/du-lieu.json",
    "co": 1917629,
-   "tuBan": 90
+   "tuBan": 91
   },
   "tvhome.apk": {
    "phienBan": "dcce03dda96ec2c1",
    "url": "/ota/tvhome.apk",
    "co": 654305,
-   "tuBan": 90
+   "tuBan": 91
   }
  }
 }

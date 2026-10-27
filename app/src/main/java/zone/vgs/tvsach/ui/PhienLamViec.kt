@@ -50,6 +50,8 @@ const val DOCK_TOI_DA = 8
  */
 /** doiHang đặc biệt: hàng dock nằm giữa màn hình (rows_middle của bản vá launcher), góp ý 24/10/2026. */
 const val HANG_GIUA = Int.MIN_VALUE
+/** Số ảnh thêm tối đa sau ảnh riêng chính trong bộ ảnh tự đổi (cả bộ 20 ảnh, gửi qua ADB vẫn nhanh). */
+const val ANH_XOAY_TOI_DA = 19
 
 /**
  * Ô kênh VTV trên Home sạch (góp ý khoald92vn, trananhht9 23/10/2026: bố mẹ bấm thẳng vào kênh). Mỗi ô mở thẳng kênh
@@ -856,6 +858,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
                 }
                 if (!laAnhTheme) anhNenRieng = anh
             }
+            // Bộ ảnh riêng tự đổi (3.5.0): ảnh 2 trở đi nằm ở wallpapers/r02.jpg…, đọc lại để Áp dụng lần sau không mất.
+            val soAnh = j.optInt("vgs_bo_rieng", 0)
+            if (anhNenRieng != null && soAnh > 1) anhXoay = io { (2..minOf(soAnh, ANH_XOAY_TOI_DA + 1)).mapNotNull { tv.docFileTheme("wallpapers/r%02d.jpg".format(it)) } }
         }
     }
 
@@ -890,6 +895,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         nutHenTat = j.optBoolean("sleep_timer_button", false)
         phimGan.clear(); j.optJSONArray("vgs_phim_gan")?.let { a -> (0 until a.length()).map { a.optString(it) }.filter { it.isNotBlank() }.forEach { phimGan.add(it) } }
         chuTrang = !cuaTheme("header_white") && j.optBoolean("header_white", false)
+        if (j.optInt("vgs_bo_rieng", 0) > 1) phutDoiAnh = j.optInt("wallpaper_rotation_minutes", 15)
         mauChu = j.optString("header_color").takeIf { Regex("#[0-9A-Fa-f]{6}").matches(it) }
         // Chỉ nạp số cột do người dùng chọn ở đây (vgs_so_cot), không lấy columns của theme.
         soCot = if (j.optBoolean("vgs_so_cot", false)) j.optInt("columns", 0) else 0
@@ -1005,6 +1011,10 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (tenChao.isNotBlank()) put("greeting_name", tenChao.trim())
         themeChon.ghiVao(this)
         if (anhNenRieng != null) { put("wallpaper", true); put("vgs_anh_rieng", true) }
+        // Bộ ảnh riêng tự đổi (góp ý build.dng 27/10/2026): ảnh chính + ảnh thêm thành wallpapers/, đổi theo thứ tự.
+        if (anhNenRieng != null && anhXoay.isNotEmpty()) {
+            put("wallpaper_rotation_minutes", phutDoiAnh); put("wallpaper_order", "sequential"); put("vgs_bo_rieng", anhXoay.size + 1)
+        }
         // Tivi Xiaomi bản Trung Quốc chỉ chuyển nguồn qua trình phát Xiaomi (upstream examples/xiaomi-mitv-astp0): Home sạch
         // (bản vá CleanTV) đổi tên dòng HDMI1-3 / AV ra số cổng 23-25 / 2 khi input_action là EXTSRC_PLAY (23/10/2026).
         if (trangThai?.caiDat?.contains("com.xiaomi.mitv.tvplayer") == true) put("input_action", "com.xiaomi.mitv.tvplayer.EXTSRC_PLAY")
@@ -1186,6 +1196,18 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** Ảnh thêm sau ảnh riêng chính, cùng xoay vòng trên tivi (wallpapers/); rỗng = một ảnh đứng yên. */
+    var anhXoay by mutableStateOf<List<ByteArray>>(emptyList())
+    /** Mấy phút đổi ảnh một lần khi có bộ ảnh riêng (wallpaper_rotation_minutes). */
+    var phutDoiAnh by mutableStateOf(15)
+
+    fun themAnhXoay(uris: List<android.net.Uri>) = chay(t("Đang chuẩn bị ${uris.size} ảnh…", "Preparing ${uris.size} pictures…")) {
+        val moi = io { uris.mapNotNull { zone.vgs.tvsach.dulieu.AnhNen.chuanBi(ctx, it, anhVuaKhung) } }
+        anhXoay = (anhXoay + moi).take(ANH_XOAY_TOI_DA)
+    }
+
+    fun boAnhRieng() { anhNenRieng = null; anhXoay = emptyList() }
+
     /** Danh sách ảnh trên tivi / USB (null = chưa mở hộp chọn). */
     var anhTrenTv by mutableStateOf<List<String>?>(null)
 
@@ -1206,7 +1228,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     }
 
     /** Bộ ảnh xoay vòng của theme: mọi file ảnh trong thư mục assets boAnh. */
-    private suspend fun boAnhTheme(): List<Pair<String, ByteArray>>? = if (anhNenRieng != null) null else themeChon.boAnh?.let { thu ->
+    private suspend fun boAnhTheme(): List<Pair<String, ByteArray>>? = anhNenRieng?.let { chinh ->
+        if (anhXoay.isEmpty()) null else (listOf(chinh) + anhXoay).mapIndexed { i, b -> "r%02d.jpg".format(i + 1) to b }
+    } ?: if (anhNenRieng != null) null else themeChon.boAnh?.let { thu ->
         io { (ctx.assets.list(thu) ?: emptyArray()).sorted().map { it to ctx.assets.open("$thu/$it").readBytes() } }
     }
 
@@ -1223,7 +1247,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         }
         if (anh != null) thongBao = t("Đang gửi ảnh nền (${anh.size / 1024} KB)…", "Sending the wallpaper (${anh.size / 1024} KB)…")
         val bo = boAnhTheme()
-        if (bo != null) thongBao = t("Đang gửi ${bo.size} ảnh phong cảnh…", "Sending ${bo.size} landscape pictures…")
+        if (bo != null) thongBao = t("Đang gửi ${bo.size} ảnh nền…", "Sending ${bo.size} wallpaper pictures…")
         io { tv.dayCauHinh(json, anh, bo) }
         if (dungPhimRemote || (moKhiBat && moKhiThuc) || luonVeHome || phimGan.isNotEmpty() || nutHenTat) io { tv.batBatPhimHome() }
         // Đổi giao diện cũng bật / tắt DNS AdGuard theo công tắc (trước 2.7.3 chỉ lúc cài Home sạch mới đặt).

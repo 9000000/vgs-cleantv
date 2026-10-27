@@ -843,6 +843,9 @@ private fun TheGiaoDien(vm: PhienLamViec) {
             THEMES.forEach { th -> TheTheme(th, th == vm.themeChon) { vm.chonTheme(th) } }
         }
         // Ảnh của chính mình làm hình nền (góp ý 23/10/2026): thay ảnh / bộ ảnh của theme, giữ màu và hiệu ứng theme.
+        val chonNhieuAnh = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.PickMultipleVisualMedia(ANH_XOAY_TOI_DA)) { uris ->
+            if (uris.isNotEmpty()) vm.themAnhXoay(uris)
+        }
         val chonAnh = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) vm.chonAnhNen(uri)
         }
@@ -880,7 +883,22 @@ private fun TheGiaoDien(vm: PhienLamViec) {
             )
         }
         if (vm.anhNenRieng == null) Unit
-        else NutPhu(t("Bỏ ảnh riêng (${vm.anhNenRieng!!.size / 1024} KB), dùng ảnh của theme", "Remove your picture (${vm.anhNenRieng!!.size / 1024} KB)"), Icons.Rounded.Close) { vm.anhNenRieng = null }
+        else {
+            // Bộ ảnh riêng tự đổi (3.5.0, góp ý build.dng): thêm ảnh sau ảnh chính, tivi đổi lần lượt theo số phút chọn.
+            if (!trenTv && vm.anhXoay.size < ANH_XOAY_TOI_DA) NutPhu(
+                if (vm.anhXoay.isEmpty()) t("Thêm ảnh để hình nền tự đổi", "Add pictures to rotate the wallpaper")
+                else t("Thêm ảnh (đang có ${vm.anhXoay.size + 1} ảnh tự đổi)", "Add pictures (${vm.anhXoay.size + 1} rotating)"), Icons.Rounded.Image) {
+                runCatching { chonNhieuAnh.launch(androidx.activity.result.PickVisualMediaRequest(androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly)) }
+            }
+            if (vm.anhXoay.isNotEmpty()) {
+                Text(t("Đổi ảnh sau", "Change picture every"), fontSize = 14.sp)
+                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(5, 15, 30, 60).forEach { p -> ChonChip(t("$p phút", "$p min"), vm.phutDoiAnh == p) { vm.phutDoiAnh = p } }
+                }
+                NutPhu(t("Bỏ ${vm.anhXoay.size} ảnh thêm, giữ một ảnh", "Remove the ${vm.anhXoay.size} extra pictures"), Icons.Rounded.Close) { vm.anhXoay = emptyList() }
+            }
+            NutPhu(t("Bỏ ảnh riêng (${vm.anhNenRieng!!.size / 1024} KB), dùng ảnh của theme", "Remove your picture (${vm.anhNenRieng!!.size / 1024} KB)"), Icons.Rounded.Close) { vm.boAnhRieng() }
+        }
         Text(t("Làm tối hình nền", "Dim the wallpaper"), fontSize = 14.sp)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(0, 20, 40).forEach { p -> ChonChip(if (p == 0) t("Không", "None") else "$p%", vm.lamToiNen == p) { vm.lamToiNen = p } }
