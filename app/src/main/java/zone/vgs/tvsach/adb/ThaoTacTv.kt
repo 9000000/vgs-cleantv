@@ -1145,6 +1145,80 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
 
     fun huyTatAdbTrenTv() { sh("rm -f $HEN_TAT_ADB") }
 
+    // ---- Remote trên điện thoại (3.5.0, góp ý build.dng 27/10/2026) ----
+
+    /** Một phím remote (KeyEvent.KEYCODE_*). */
+    fun phim(ma: Int) { sh("input keyevent $ma") }
+
+    /** Dịch vụ bắt phím của Home sạch đang bật: gõ chữ có dấu đi qua nó (TYPE_TEXT của bản vá). */
+    fun coGoCoDau(): Boolean = sh("settings get secure enabled_accessibility_services").contains("$pkgHome/") &&
+        sh("settings get secure enabled_accessibility_services").contains("HomeKeyService")
+
+    /**
+     * Gõ chữ vào ô đang chọn trên tivi. Có Home sạch + dịch vụ bắt phím: đặt nguyên văn (tiếng Việt có dấu) qua trợ năng.
+     * Không thì `input text`, chỉ gõ được chữ không dấu: trả false để màn remote báo.
+     */
+    fun goChu(chu: String): Boolean {
+        if (chu.isEmpty()) return true
+        val b64 = java.util.Base64.getEncoder().encodeToString(chu.toByteArray(Charsets.UTF_8))
+        val ra = runCatching { sh("am broadcast -a zone.vgs.cleantv.TYPE_TEXT -p $pkgHome --es b64 '$b64' 2>/dev/null") }.getOrDefault("")
+        if (ra.contains("result=1")) return true
+        val khongDau = java.text.Normalizer.normalize(chu.replace('đ', 'd').replace('Đ', 'D'), java.text.Normalizer.Form.NFD)
+            .replace(Regex("\\p{M}"), "").filter { it.code in 32..126 }
+        // input text: dấu cách là %s; phần còn lại đặt trong nháy đơn cho shell.
+        khongDau.chunked(80).forEach { phan -> sh("input text '${phan.replace(" ", "%s").replace("'", "'\\''")}'") }
+        return khongDau == chu
+    }
+
+    /** Bật dịch vụ bắt phím (bật lại nếu đang bật, để Android nạp quyền đọc ô chữ của bản Home sạch mới). */
+    fun batGoCoDau() = batBatPhimHome()
+
+    /**
+     * Hẹn giờ tắt tivi: tivi tự đếm bằng lệnh nền (không cần Home sạch, điện thoại tắt app vẫn chạy), hết giờ bấm phím
+     * Ngủ (223). File hẹn giữ giờ kết thúc; hẹn lại / huỷ là đổi / xoá file, lượt đếm cũ thấy khác thì thôi.
+     */
+    fun henTatTivi(phut: Int) {
+        if (phut <= 0) { sh("rm -f $HEN_TAT_TV"); return }
+        val het = System.currentTimeMillis() / 1000 + phut * 60L
+        sh("echo $het > $HEN_TAT_TV; (setsid sh -c 'sleep ${phut * 60}; [ \"\$(cat $HEN_TAT_TV 2>/dev/null)\" = \"$het\" ] && { rm -f $HEN_TAT_TV; input keyevent 223; }' </dev/null >/dev/null 2>&1 &); sleep 1")
+    }
+
+    /** Giờ hẹn tắt (giây epoch) đang chờ, null nếu không có. */
+    fun docHenTatTivi(): Long? = runCatching { sh("cat $HEN_TAT_TV 2>/dev/null").trim().toLongOrNull() }.getOrNull()
+        ?.takeIf { it > System.currentTimeMillis() / 1000 }
+
+    /** App người dùng tự cài (gỡ được). */
+    fun appTuCai(): Set<String> = sh("pm list packages -3").lines().map { it.substringAfter("package:").trim() }.filter { it.isNotBlank() }.toSet()
+
+    /** Mở một app trên tivi (màn chính kiểu tivi, không có thì kiểu điện thoại). */
+    fun moApp(pkg: String): Boolean {
+        if (!TEN_GOI.matches(pkg)) return false
+        val ra = sh("monkey -p $pkg -c android.intent.category.LEANBACK_LAUNCHER 1 2>&1")
+        if (!ra.contains("No activities")) return true
+        return !sh("monkey -p $pkg -c android.intent.category.LAUNCHER 1 2>&1").contains("No activities")
+    }
+
+    /** Gỡ hẳn một app người dùng tự cài. */
+    fun goApp(pkg: String): Boolean = TEN_GOI.matches(pkg) && pkg !in HOME_SACH && sh("pm uninstall $pkg").contains("Success")
+
+    /** Cài một file APK từ điện thoại (đè bản cũ nếu có); trả dòng kết quả của pm. */
+    fun caiApkTuDienThoai(apk: ByteArray): String {
+        // Chọn file làm app nằm nền một lúc; kết nối có thể đã rớt (máy ảo 27/10/2026: lần đầu báo mất kết nối, tivi
+        // không nhận phiên cài nào). Thử một lệnh, hỏng thì nối lại trước khi gửi.
+        if (runCatching { sh("echo ok") }.isFailure) adb.ketNoiLai()
+        return voiHan(300) { adb.caiApk(apk) }.trim().lines().lastOrNull() ?: ""
+    }
+
+    /**
+     * Màn chờ động (dream_motion của bản vá): đặt màn chờ đồng hồ của Home sạch làm màn chờ hệ thống (tivi tự bật theo
+     * giờ chờ của nó). Không đổi screen_off_timeout: vài tivi hiểu đó là tắt màn. Tắt thì trả màn chờ về màn của Google
+     * nếu đang là của Home sạch.
+     */
+    fun datManChoDong(bat: Boolean, sl: BanSaoLuu?) {
+        if (bat) sh("settings put secure screensaver_components $pkgHome/$NS_HOME.ClockDream; settings put secure screensaver_enabled 1")
+        else if (sh("settings get secure screensaver_components").contains("$NS_HOME.ClockDream")) chuanBiManCho(sl)
+    }
+
     /** Tắt ADB qua mạng trên tivi. Lệnh cuối làm rớt kết nối này, nên lỗi ở đây là bình thường. */
     fun tatAdb() {
         runCatching { sh("settings put global adb_wifi_enabled 0") }
@@ -1194,6 +1268,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         const val TEP_SAO_LUU_TV = "/data/local/tmp/cleantv-sao-luu.json"
         const val GAC = "/data/local/tmp/cleantv-gac"
         const val HEN_TAT_ADB = "/data/local/tmp/cleantv-tat-adb"
+        const val HEN_TAT_TV = "/data/local/tmp/cleantv-hen-tat"
         const val GAC_GIAY = 180
         /** Kịch bản canh gác chạy trên tivi: `sh cleantv-gac.sh <token>`. Token đổi / mất thì tự thoát. */
         val KICH_BAN_GAC = """

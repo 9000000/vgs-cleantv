@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 92,
-  "versionName": "3.4.2",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.4.2.apk",
-  "co": 12213981,
-  "ghiChu": "61 kênh FPT Play chọn sẵn, Home sạch tự lên sau khi rút điện (TCL), sửa lỗi hộp RockChip và màn nhỏ",
-  "ghiChuEn": "61 ready FPT Play channels, the clean Home comes back after a power cut (TCL), fixes for RockChip boxes and small screens",
+  "versionCode": 93,
+  "versionName": "3.5.0",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.0.apk",
+  "co": 12232769,
+  "ghiChu": "Remote trên điện thoại (phím, gõ và nói tiếng Việt có dấu, hẹn giờ tắt, mở/gỡ/cài app), màn chờ động",
+  "ghiChuEn": "Phone remote (keys, typing and voice, sleep timer, open/uninstall/install apps), moving screensaver",
   "ngay": "2026-10-27"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "a1a3f6d76e6a7ef7",
+   "phienBan": "4ef502a669640665",
    "url": "/ota/du-lieu.json",
    "co": 1917629,
-   "tuBan": 92
+   "tuBan": 93
   },
   "tvhome.apk": {
-   "phienBan": "986ff5e3d0d4e430",
+   "phienBan": "ed4648b8840d2b23",
    "url": "/ota/tvhome.apk",
-   "co": 655125,
-   "tuBan": 92
+   "co": 656321,
+   "tuBan": 93
   }
  }
 }

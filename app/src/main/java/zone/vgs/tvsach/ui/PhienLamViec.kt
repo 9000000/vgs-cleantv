@@ -39,7 +39,7 @@ import java.net.Inet4Address
 import java.net.InetSocketAddress
 import java.net.Socket
 
-enum class Man { CHINH, KET_NOI, THONG_TIN, CHON_GOI, DANG_TAT, HOME_SACH, XONG, KHOI_PHUC, HUONG_DAN, GIAY_PHEP, KHOA_TRE }
+enum class Man { CHINH, KET_NOI, THONG_TIN, CHON_GOI, DANG_TAT, HOME_SACH, XONG, KHOI_PHUC, HUONG_DAN, GIAY_PHEP, KHOA_TRE, REMOTE }
 
 /** Số app tối đa trong dock: bằng số cột lớn nhất của Home sạch (columns 1–8); dock dài hơn số cột thì tràn xuống hàng sau (22/10/2026, góp ý muốn hàng đầu nhiều app hơn). */
 const val DOCK_TOI_DA = 8
@@ -156,6 +156,10 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var nutHome by mutableStateOf(false)
     var dnsChanQc by mutableStateOf(false)
     var nutManCho by mutableStateOf(true)
+    /** Màn chờ động (3.5.0): màn chờ đồng hồ của Home sạch trên ảnh nền trôi chậm, đổi ảnh 20 giây (dream_motion). */
+    var manChoDong by mutableStateOf(false)
+    /** Đồng hồ động hiện sau bao nhiêu phút để yên ở Home sạch (home_idle_clock_minutes); 0 = chỉ màn chờ của tivi. */
+    var phutManCho by mutableStateOf(10)
     var gonNut by mutableStateOf(true)
     /** Dời khối dock + hàng app lên (âm) / xuống (dương), dp — rows_offset_dp của bản vá launcher (góp ý 24/10/2026). */
     var doiHang by mutableStateOf(0)
@@ -484,6 +488,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         dangBan = true; loi = ""; thongBao = viec
         viewModelScope.launch {
             try { khoi() } catch (e: Throwable) {
+                android.util.Log.w("CleanTV", viec, e)
                 loi = moTaLoi(e)
             } finally { dangBan = false; thongBao = "" }
         }
@@ -823,6 +828,86 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             ?: error(t("Không chụp được (một số tivi cấm chụp khi đang xem HDMI, bấm Home trên remote rồi thử lại).", "Could not capture (some TVs block it on an HDMI input — press Home on the remote and retry)."))
     }
 
+    // ---------- Remote trên điện thoại (3.5.0, góp ý build.dng 27/10/2026) ----------
+
+    /** Phím gửi lần lượt từng cái, không chặn màn (không qua chay: bấm nhanh không bị "đang bận"). */
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    private val hangPhim = Dispatchers.IO.limitedParallelism(1)
+    var remoteBao by mutableStateOf("")
+    var chuGo by mutableStateOf("")
+    var goCoDau by mutableStateOf(false)
+    var henTatLuc by mutableStateOf<Long?>(null)
+    var appTuCai by mutableStateOf<Set<String>>(emptySet())
+    var hoiGo by mutableStateOf<String?>(null)
+    val appTrenTv: List<String> get() = trangThai?.let { tt -> tt.coBieuTuong.filter { it in tt.caiDat && it !in tt.daTat && it !in zone.vgs.tvsach.adb.ThaoTacTv.HOME_SACH } }
+        ?.sortedWith(compareBy({ it !in appTuCai }, { zone.vgs.tvsach.dulieu.tenDep(it).lowercase() })) ?: emptyList()
+
+    fun moRemote() = chay(t("Đang mở remote…", "Opening the remote…")) {
+        remoteBao = ""
+        goCoDau = daCoHomeSach && io { tv.coGoCoDau() }
+        henTatLuc = io { tv.docHenTatTivi() }
+        appTuCai = io { tv.appTuCai() }
+        man = Man.REMOTE
+    }
+
+    private fun guiRemote(viec: () -> Unit) {
+        viewModelScope.launch(hangPhim) {
+            runCatching(viec).onFailure { e -> withContext(Dispatchers.Main) { remoteBao = moTaLoi(e) } }
+        }
+    }
+
+    fun bamPhim(ma: Int) = guiRemote { tv.phim(ma) }
+
+    fun guiChu(xuongDong: Boolean = false) {
+        val chu = chuGo
+        if (chu.isEmpty() && !xuongDong) return
+        chuGo = ""
+        guiRemote {
+            val du = tv.goChu(chu)
+            if (xuongDong) tv.phim(66)
+            viewModelScope.launch {
+                remoteBao = if (du) "" else t("Tivi chỉ nhận chữ không dấu. Bấm \"Bật gõ tiếng Việt có dấu\" bên dưới.", "The TV only took the plain letters. Turn on accented typing below.")
+            }
+        }
+    }
+
+    fun batGoCoDau() = chay(t("Đang bật gõ có dấu…", "Turning on accented typing…")) {
+        io { tv.batGoCoDau() }
+        kotlinx.coroutines.delay(1500)
+        goCoDau = io { tv.coGoCoDau() }
+        remoteBao = if (goCoDau) t("Đã bật. Chọn ô chữ trên tivi rồi gõ ở đây.", "On. Pick a text field on the TV, then type here.")
+        else t("Tivi không bật được dịch vụ này.", "The TV did not turn it on.")
+    }
+
+    fun henTat(phut: Int) = chay(if (phut > 0) t("Đang hẹn giờ tắt…", "Setting the sleep timer…") else t("Đang huỷ hẹn giờ…", "Cancelling the timer…")) {
+        io { tv.henTatTivi(phut) }
+        henTatLuc = io { tv.docHenTatTivi() }
+        remoteBao = if (phut > 0) t("Tivi sẽ tự tắt sau $phut phút, kể cả khi bạn đóng app.", "The TV will switch off in $phut minutes, even if you close the app.")
+        else t("Đã huỷ hẹn giờ tắt.", "Sleep timer cancelled.")
+    }
+
+    fun moAppTv(pkg: String) = guiRemote {
+        if (!tv.moApp(pkg)) viewModelScope.launch { remoteBao = t("App này không có màn mở được.", "This app has nothing to open.") }
+    }
+
+    fun goAppTv(pkg: String) = chay(t("Đang gỡ ${zone.vgs.tvsach.dulieu.tenDep(pkg)}…", "Uninstalling ${zone.vgs.tvsach.dulieu.tenDep(pkg)}…")) {
+        if (!io { tv.goApp(pkg) }) error(t("Tivi không cho gỡ app này.", "The TV refused to uninstall this app."))
+        trangThai = io { tv.docTrangThai() }
+        appTuCai = io { tv.appTuCai() }
+        remoteBao = t("Đã gỡ ${zone.vgs.tvsach.dulieu.tenDep(pkg)}.", "Uninstalled ${zone.vgs.tvsach.dulieu.tenDep(pkg)}.")
+    }
+
+    fun caiApkLenTv(uri: android.net.Uri) = chay(t("Đang gửi APK sang tivi…", "Sending the APK to the TV…")) {
+        val du = io { ctx.contentResolver.openInputStream(uri)?.use { it.readBytes() } } ?: error(t("Không đọc được file.", "Couldn't read the file."))
+        if (du.size < 4 || du[0] != 'P'.code.toByte() || du[1] != 'K'.code.toByte()) error(t("File này không phải APK.", "This isn't an APK file."))
+        val ra = io { tv.caiApkTuDienThoai(du) }
+        if (!ra.contains("Success")) error(t("Tivi không cài được: $ra", "The TV couldn't install it: $ra"))
+        trangThai = io { tv.docTrangThai() }
+        appTuCai = io { tv.appTuCai() }
+        remoteBao = t("Đã cài xong.", "Installed.")
+    }
+
+
     // ---------- Home sạch ----------
 
     /** App có biểu tượng còn bật, để chọn vào dock. */
@@ -906,6 +991,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val daDat = j.optJSONArray("vgs_nang_cao")?.let { a -> (0 until a.length()).map { a.optString(it) }.toSet() } ?: emptySet()
         dsNangCao.filter { it.khoa in daDat }.forEach { tc -> zone.vgs.tvsach.dulieu.NangCao.docChu(tc, j)?.let { nangCao[tc.khoa] = it } }
         nutManCho = j.optBoolean("dream_button", nutManCho)
+        manChoDong = j.optBoolean("dream_motion", false)
+        phutManCho = j.optInt("home_idle_clock_minutes", 10)
         gonNut = j.optBoolean("top_compact", gonNut)
         j.optJSONArray("dock_apps")?.let { a -> val ds = (0 until a.length()).map { a.optString(it) }.filter { it.isNotBlank() && !it.startsWith(GOI_KENH) }; if (ds.isNotEmpty()) { dock.clear(); dock.addAll(ds.take(DOCK_TOI_DA)) } }
         kenhChon.clear()
@@ -951,6 +1038,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (nutDangPhat) io { tv.choPhepDangPhat() }
         if (dnsChanQc) io { tv.batDnsChanQc(sl) }
         if (nutManCho) io { tv.chuanBiManCho(sl) }
+        io { tv.datManChoDong(manChoDong, sl) }
         thuPhimHome(sl)
         zone.vgs.tvsach.Dem.gui(ctx, "home", tenTiviDem(), dock.size, "theme:${themeChon.id}")
         if (ghimMayChieu.isNotEmpty()) zone.vgs.tvsach.Dem.gui(ctx, "may-chieu", tenTiviDem(), ghimMayChieu.size, ghimMayChieu.keys.joinToString(",").take(110))
@@ -1019,6 +1107,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // (bản vá CleanTV) đổi tên dòng HDMI1-3 / AV ra số cổng 23-25 / 2 khi input_action là EXTSRC_PLAY (23/10/2026).
         if (trangThai?.caiDat?.contains("com.xiaomi.mitv.tvplayer") == true) put("input_action", "com.xiaomi.mitv.tvplayer.EXTSRC_PLAY")
         put("dream_button", nutManCho)
+        if (manChoDong) { put("dream_motion", true); put("clock_wallpaper", true); if (phutManCho > 0) put("home_idle_clock_minutes", phutManCho) }
         put("top_compact", gonNut)
         thanhPho?.let { put("weather_lat", it.lat); put("weather_lon", it.lon); put("weather_place", it.ten) }
         if (ghimMayChieu.isNotEmpty()) put("projector_actions", JSONArray(ghimMayChieu.map { (comp, nhan) -> "$nhan=$comp" }))
@@ -1256,6 +1345,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (!dnsChanQc && dangChan) io { tv.tatDnsChanQc(saoLuu) }
         if (nutDangPhat) io { tv.choPhepDangPhat() }
         if (nutManCho) io { tv.chuanBiManCho(saoLuu) }
+        io { tv.datManChoDong(manChoDong, saoLuu) }
         thongBao = t("Đang thử nút Home trên tivi…", "Testing the TV's Home button…")
         val sl = saoLuu ?: thongTin?.let { tt -> runCatching { io { tv.damBaoSaoLuu(tt, getprop, ip) } }.getOrNull() }?.also { saoLuu = it }
         thuPhimHome(sl)

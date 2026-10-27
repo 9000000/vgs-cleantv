@@ -377,6 +377,127 @@ index 00000000..66c90b59
 +        }
 +    }
 +}
+diff --git a/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java b/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
+index dcae93ad..c0afe8a2 100644
+--- a/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
++++ b/launcher/app/src/main/java/com/gathin/tvhome/ClockScene.java
+@@ -58,6 +58,17 @@ final class ClockScene {
+     private List<File> rotation;
+     private long rotationMs;
+     private long shownMs;
++    /** CleanTV/VGS: dream_motion — the picture zooms and pans slowly (Ken Burns) and a collection changes every
++     *  SLIDE_MS with a fade, instead of standing still for wallpaper_rotation_minutes (góp ý build.dng 27/10/2026). */
++    private boolean motion;
++    private static final long SLIDE_MS = 20_000L;
++    private final Runnable slide = new Runnable() {
++        @Override
++        public void run() {
++            nextPicture();
++            handler.postDelayed(this, SLIDE_MS);
++        }
++    };
+     private String order;
+     private Map<String, Set<String>> moods;
+     private String latitude, longitude;
+@@ -93,12 +104,15 @@ final class ClockScene {
+         });
+         handler.removeCallbacks(tick);
+         handler.postDelayed(tick, MOVE_MS);
++        handler.removeCallbacks(slide);
++        if (motion && rotation != null && rotation.size() > 1) handler.postDelayed(slide, SLIDE_MS);
+         if (wallpaperFile != null && !wallpaperShown) loadWallpaper();
+     }
+ 
+     void stop() {
+         handler.removeCallbacksAndMessages(null);   // the tick and any glow steps still queued
+         content.animate().cancel();
++        ambient.animate().cancel();
+         wallpaperGeneration++;   // a decode still running must not attach its picture to a stopped scene
+     }
+ 
+@@ -124,6 +138,7 @@ final class ClockScene {
+             }
+             return;
+         }
++        motion = Weather.flag(ctx, "dream_motion", false);
+         // What Home plays, and Config puts the single wallpaper in it when a theme has no collection.
+         // Reading cfg.wallpaper first held the screensaver on wallpaper.jpg while Home rotated.
+         if (cfg.wallpapers.isEmpty()) {
+@@ -167,8 +182,7 @@ final class ClockScene {
+                 // As the image, not the background: a background is stretched to the view, so a picture of
+                 // another shape than the screen would be distorted. centerCrop scales and crops it like Home.
+                 ambient.setBackground(null);
+-                ambient.setImageDrawable(new LayerDrawable(new Drawable[]{
+-                        new BitmapDrawable(res, bmp), new ColorDrawable(shade)}));
++                show(new LayerDrawable(new Drawable[]{new BitmapDrawable(res, bmp), new ColorDrawable(shade)}));
+             });
+         }, "clock-wallpaper").start();
+     }
+@@ -200,6 +214,7 @@ final class ClockScene {
+ 
+     /** Step to the next picture once its turn is up; the tick already runs every minute. */
+     private void advanceWallpaper() {
++        if (motion) return;   // the slide runnable changes pictures
+         if (rotation == null || rotationMs <= 0 || rotation.size() < 2) return;
+         shownMs += MOVE_MS;
+         if (shownMs < rotationMs) return;
+@@ -213,6 +228,56 @@ final class ClockScene {
+         loadWallpaper();
+     }
+ 
++    /** dream_motion: the next picture of the collection, picked like Home's. */
++    private void nextPicture() {
++        if (rotation == null || rotation.size() < 2) return;
++        File next = WallpaperRotation.pick(playable(), wallpaperFile.getName(), order, random);
++        if (next.equals(wallpaperFile)) return;
++        wallpaperFile = next;
++        wallpaperShown = false;
++        loadWallpaper();
++    }
++
++    /** Puts the picture up; with dream_motion it fades over the last one and starts drifting. */
++    private void show(Drawable picture) {
++        if (!motion) {
++            ambient.setImageDrawable(picture);
++            return;
++        }
++        if (ambient.getDrawable() == null) {
++            ambient.setAlpha(0f);
++            ambient.setImageDrawable(picture);
++            ambient.animate().alpha(1f).setDuration(1500).start();
++            drift();
++            return;
++        }
++        ambient.animate().alpha(0f).setDuration(800).withEndAction(() -> {
++            ambient.setImageDrawable(picture);
++            ambient.animate().alpha(1f).setDuration(1200).start();
++            drift();
++        }).start();
++    }
++
++    /** Ken Burns: from a slight zoom to a deeper one toward a random side, over a slide (or again and again with one picture). */
++    private void drift() {
++        View parent = (View) ambient.getParent();
++        float w = parent.getWidth(), h = parent.getHeight();
++        float from = 1.04f + 0.04f * random.nextFloat(), to = 1.14f + 0.06f * random.nextFloat();
++        ambient.setScaleX(from);
++        ambient.setScaleY(from);
++        ambient.setTranslationX(0f);
++        ambient.setTranslationY(0f);
++        boolean single = rotation == null || rotation.size() < 2;
++        ambient.animate().scaleX(to).scaleY(to)
++                .translationX(w * 0.05f * (random.nextFloat() * 2 - 1))
++                .translationY(h * 0.04f * (random.nextFloat() * 2 - 1))
++                .setDuration(single ? 30_000L : SLIDE_MS + 2_000L)
++                .setInterpolator(new android.view.animation.LinearInterpolator())
++                .withLayer()
++                .withEndAction(single ? (Runnable) this::drift : null)
++                .start();
++    }
++
+     /** WallpaperPlayer's filter: the pictures wallpaper_moods allows at this hour, or all of them. */
+     private List<File> playable() {
+         if (moods.isEmpty()) return rotation;
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Config.java b/launcher/app/src/main/java/com/gathin/tvhome/Config.java
 index 5d4b78fb..acb03b72 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/Config.java
@@ -392,10 +513,10 @@ index 5d4b78fb..acb03b72 100644
              animations = bool(json, "animations", animations);
              advancedEffects = bool(json, "advanced_effects", advancedEffects);
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java b/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
-index 233f9820..4b26fa1f 100644
+index 233f9820..cc92efaf 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
-@@ -80,6 +80,25 @@ public class HomeKeyService extends AccessibilityService {
+@@ -80,6 +80,57 @@ public class HomeKeyService extends AccessibilityService {
      private Map<Integer, String> frontAppKeys = Collections.emptyMap();
      private Map<Integer, String> frontAppScancodes = Collections.emptyMap();
      private String frontPackage = "";
@@ -404,6 +525,34 @@ index 233f9820..4b26fa1f 100644
 +    /** CleanTV/VGS: sleep_timer_button — whether standby is possible now (the helper is bound, Android 9 or later). */
 +    static boolean canSleep() {
 +        return running != null && Build.VERSION.SDK_INT >= 28;
++    }
++
++    /** CleanTV/VGS: TYPE_TEXT — append (or replace) the text of the field that has input focus; false when none is editable. */
++    private boolean typeText(String text, boolean replace) {
++        android.view.accessibility.AccessibilityNodeInfo field = editableFocus();
++        android.util.Log.i("CleanTVType", "field=" + (field == null ? "none" : field.getClassName()));
++        if (field == null) return false;
++        CharSequence now = field.isShowingHintText() ? null : field.getText();
++        android.os.Bundle args = new android.os.Bundle();
++        args.putCharSequence(android.view.accessibility.AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,
++                replace || now == null ? text : now + text);
++        return field.performAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_SET_TEXT, args);
++    }
++
++    /** The editable field with input focus: the service-wide lookup, then the active window's tree, then every window. */
++    private android.view.accessibility.AccessibilityNodeInfo editableFocus() {
++        int input = android.view.accessibility.AccessibilityNodeInfo.FOCUS_INPUT;
++        android.view.accessibility.AccessibilityNodeInfo n = findFocus(input);
++        if (n != null && n.isEditable()) return n;
++        android.view.accessibility.AccessibilityNodeInfo root = getRootInActiveWindow();
++        n = root == null ? null : root.findFocus(input);
++        if (n != null && n.isEditable()) return n;
++        for (android.view.accessibility.AccessibilityWindowInfo w : getWindows()) {
++            root = w.getRoot();
++            n = root == null ? null : root.findFocus(input);
++            if (n != null && n.isEditable()) return n;
++        }
++        return null;
 +    }
 +
 +    /** CleanTV/VGS: the sleep timer's alarm — put the TV in standby, as the "sleep" action word does. */
@@ -417,11 +566,15 @@ index 233f9820..4b26fa1f 100644
 +    private int learnedKey;
 +    private BroadcastReceiver learnReceiver;
 +    static final String ACTION_LEARN_KEY = "zone.vgs.cleantv.LEARN_KEY";
++    /** CleanTV/VGS: the phone remote's typing, sent from the shell (am broadcast -a … --es b64 <UTF-8 text in base64>).
++     *  Only the shell holds DUMP, so no app on the TV can type through this. Result code 1 when the text went in. */
++    static final String ACTION_TYPE_TEXT = "zone.vgs.cleantv.TYPE_TEXT";
++    private BroadcastReceiver typeReceiver;
 +
      /** power_on_home_always: Home at every power-on, not only over Live TV. */
      private boolean powerOnAlways;
      /** power_on_home: re-arms after the screen turns on; null unless the key is on. */
-@@ -97,6 +116,16 @@ public class HomeKeyService extends AccessibilityService {
+@@ -97,6 +148,26 @@ public class HomeKeyService extends AccessibilityService {
      protected void onServiceConnected() {
          super.onServiceConnected();
          running = this;
@@ -435,10 +588,20 @@ index 233f9820..4b26fa1f 100644
 +        };
 +        if (Build.VERSION.SDK_INT >= 33) registerReceiver(learnReceiver, new IntentFilter(ACTION_LEARN_KEY), Context.RECEIVER_EXPORTED);
 +        else registerReceiver(learnReceiver, new IntentFilter(ACTION_LEARN_KEY));
++        typeReceiver = new BroadcastReceiver() {
++            @Override
++            public void onReceive(Context context, Intent intent) {
++                String b64 = intent.getStringExtra("b64");
++                String text = b64 == null ? "" : new String(android.util.Base64.decode(b64, android.util.Base64.DEFAULT), java.nio.charset.StandardCharsets.UTF_8);
++                setResultCode(typeText(text, intent.getBooleanExtra("replace", false)) ? 1 : 0);
++            }
++        };
++        if (Build.VERSION.SDK_INT >= 33) registerReceiver(typeReceiver, new IntentFilter(ACTION_TYPE_TEXT), android.Manifest.permission.DUMP, null, Context.RECEIVER_EXPORTED);
++        else registerReceiver(typeReceiver, new IntentFilter(ACTION_TYPE_TEXT), android.Manifest.permission.DUMP, null);
          settingsScancodes = getResources().getIntArray(R.array.settings_key_scancodes);
          // The service is directBootAware: Android 11 skips a service that is not while the user is still
          // locked at boot, writes accessibility_enabled=0 and, on TCL G03 firmware, never binds it after the
-@@ -181,7 +210,11 @@ public class HomeKeyService extends AccessibilityService {
+@@ -181,7 +252,11 @@ public class HomeKeyService extends AccessibilityService {
          GuardKeep.stepOut(this);
      }
  
@@ -450,7 +613,7 @@ index 233f9820..4b26fa1f 100644
          // Keycodes and the panel choice can also come from a theme; theme.sh restarts this service.
          Config config = Config.load(this);
          // restore_key_services: note that this helper runs, so Home can put it back after a force stop. Here, not
-@@ -213,6 +246,12 @@ public class HomeKeyService extends AccessibilityService {
+@@ -213,6 +288,12 @@ public class HomeKeyService extends AccessibilityService {
          powerOnLiveTv = config.powerOnHome && !config.bootToLiveTv && !config.liveTvPackage.equals(openOnStart)
                  ? config.liveTvPackage : "";
          powerOnAlways = config.powerOnHomeAlways && !config.bootToLiveTv && openOnStart.isEmpty();
@@ -463,7 +626,7 @@ index 233f9820..4b26fa1f 100644
          if (!powerOnLiveTv.isEmpty() || powerOnAlways) {
              armPowerOnHome();
          } else if (screenOnReceiver != null) {
-@@ -253,6 +292,21 @@ public class HomeKeyService extends AccessibilityService {
+@@ -253,6 +334,21 @@ public class HomeKeyService extends AccessibilityService {
  
      @Override
      protected boolean onKeyEvent(KeyEvent event) {
@@ -485,7 +648,7 @@ index 233f9820..4b26fa1f 100644
          // power_on_home: the first key after power-on hands the TV to the user (power and wake keys don't count).
          if (powerOnUntil != 0 && event.getAction() == KeyEvent.ACTION_DOWN
                  && event.getKeyCode() != KeyEvent.KEYCODE_POWER && event.getKeyCode() != KeyEvent.KEYCODE_WAKEUP) {
-@@ -286,7 +340,9 @@ public class HomeKeyService extends AccessibilityService {
+@@ -286,7 +382,9 @@ public class HomeKeyService extends AccessibilityService {
              redirectHomeKey(event);
              return false;
          }
@@ -496,15 +659,16 @@ index 233f9820..4b26fa1f 100644
          if (event.getAction() == KeyEvent.ACTION_UP && !event.isCanceled()) openHome();
          return true;
      }
-@@ -294,6 +350,7 @@ public class HomeKeyService extends AccessibilityService {
+@@ -294,6 +392,8 @@ public class HomeKeyService extends AccessibilityService {
      /** Unbound by Android: the user turned the helper off, so Home doesn't put it back (ServiceRepair). */
      @Override
      public boolean onUnbind(Intent intent) {
 +        if (learnReceiver != null) { try { unregisterReceiver(learnReceiver); } catch (IllegalArgumentException ignored) { } learnReceiver = null; }
++        if (typeReceiver != null) { try { unregisterReceiver(typeReceiver); } catch (IllegalArgumentException ignored) { } typeReceiver = null; }
          if (repairRecord && !steppingOut) ServiceRepair.disconnected(this, getClass());
          return super.onUnbind(intent);
      }
-@@ -347,7 +404,18 @@ public class HomeKeyService extends AccessibilityService {
+@@ -347,7 +447,18 @@ public class HomeKeyService extends AccessibilityService {
  
      /** power_on_home_always: Home, unless a key was pressed since the screen came on (the user has the TV). */
      private void homeAtPowerOn() {
@@ -6304,6 +6468,25 @@ index ca006552..8be60909 100644
 +    <string name="sleep_timer_off">Sleep timer off</string>
 +    <string name="sleep_timer_no_helper">Timer set for %1$d min, but the TV can only turn itself off with CleanTV\'s key helper on (Android 9 or later)</string>
  </resources>
+diff --git a/launcher/app/src/main/res/xml/home_key_service.xml b/launcher/app/src/main/res/xml/home_key_service.xml
+index 49565e22..5cc8f023 100644
+--- a/launcher/app/src/main/res/xml/home_key_service.xml
++++ b/launcher/app/src/main/res/xml/home_key_service.xml
+@@ -2,9 +2,12 @@
+ <!-- Keys only: no accessibilityEventTypes (0), so the system never calls into the launcher for
+      accessibility events, which both services ignore. Key filtering depends only on
+      flagRequestFilterKeyEvents and canRequestFilterKeyEvents, not on the event types.
+-     stock_home_redirect is the exception: with it set, HomeKeyService adds typeWindowStateChanged at runtime. -->
++     stock_home_redirect is the exception: with it set, HomeKeyService adds typeWindowStateChanged at runtime.
++     CleanTV/VGS: canRetrieveWindowContent for the phone remote's typing (TYPE_TEXT): it sets the text of the focused
++     field, still with no events. -->
+ <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+     android:accessibilityFeedbackType="feedbackGeneric"
+-    android:accessibilityFlags="flagRequestFilterKeyEvents"
++    android:accessibilityFlags="flagRequestFilterKeyEvents|flagRetrieveInteractiveWindows"
+     android:canRequestFilterKeyEvents="true"
++    android:canRetrieveWindowContent="true"
+     android:description="@string/home_key_description" />
 diff --git a/launcher/app/src/test/java/com/gathin/tvhome/SleepTimerTest.java b/launcher/app/src/test/java/com/gathin/tvhome/SleepTimerTest.java
 new file mode 100644
 index 00000000..fcf5287b

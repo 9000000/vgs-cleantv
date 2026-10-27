@@ -1,5 +1,23 @@
 [
  {
+  "ban": "3.5.0",
+  "ngay": "2026-10-27",
+  "vi": [
+   "Remote trên điện thoại: kết nối tivi → Remote trên điện thoại. Phím điều hướng, OK, Home, quay lại, âm lượng, nguồn",
+   "Gõ hoặc nói để điền chữ vào ô đang chọn trên tivi (tìm YouTube, mật khẩu Wi-Fi), tiếng Việt có dấu",
+   "Hẹn giờ tắt tivi 15–120 phút, tivi tự đếm nên đóng app vẫn tắt đúng hẹn",
+   "Mở, gỡ app trên tivi; cài file APK từ điện thoại sang tivi",
+   "Màn chờ động (Tuỳ chỉnh): đồng hồ trên ảnh nền trôi chậm, nhiều ảnh thì 20 giây đổi một ảnh, hiện khi để yên ở Home sạch và làm màn chờ của tivi"
+  ],
+  "en": [
+   "Phone remote: connect a TV → Phone remote. D-pad, OK, Home, Back, volume, power",
+   "Type or speak into the field selected on the TV (YouTube search, Wi-Fi password), accents included",
+   "Sleep timer 15–120 minutes; the TV counts down itself, so closing the app is fine",
+   "Open and uninstall TV apps; install an APK from the phone onto the TV",
+   "Moving screensaver (Options): a clock over your wallpaper drifting slowly, a new picture every 20 s, shown when Home is idle and as the TV screensaver"
+  ]
+ },
+ {
   "ban": "3.4.2",
   "ngay": "2026-10-27",
   "vi": [
