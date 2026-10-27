@@ -1,5 +1,17 @@
 [
  {
+  "ban": "3.5.5",
+  "ngay": "2026-10-27",
+  "vi": [
+   "Home sạch ghi lại những gì chạy lúc tivi khởi động vào cài đặt của tivi (không mất như nhật ký), gửi kèm khi bấm Gửi danh sách gói",
+   "Tivi khởi động nhanh (không báo khởi động đủ) cũng được tự mở Home sạch"
+  ],
+  "en": [
+   "The clean Home keeps a record of what ran at boot in the TV settings (it does not rotate away like the log) and sends it with the package list",
+   "TVs with fast boot (no full boot signal) also get the clean Home opened"
+  ]
+ },
+ {
   "ban": "3.5.4",
   "ngay": "2026-10-27",
   "vi": [

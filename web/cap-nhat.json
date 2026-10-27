@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 97,
-  "versionName": "3.5.4",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.4.apk",
-  "co": 12256021,
-  "ghiChu": "Logo app to rõ trong ô màu; dòng Mở lần cuối cập nhật ngay",
-  "ghiChuEn": "Bigger app logos in colour tiles; Last opened updates right away",
+  "versionCode": 98,
+  "versionName": "3.5.5",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.5.apk",
+  "co": 12256721,
+  "ghiChu": "Home sạch ghi lại lúc khởi động để sửa lỗi về Home gốc sau khi rút điện",
+  "ghiChuEn": "The clean Home keeps a boot record, to fix TVs that go back to the stock Home after a power cut",
   "ngay": "2026-10-27"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "35ef6bd502955116",
+   "phienBan": "a6b8497a9247fc28",
    "url": "/ota/du-lieu.json",
    "co": 1954504,
-   "tuBan": 97
+   "tuBan": 98
   },
   "tvhome.apk": {
-   "phienBan": "572ff07ff61a90ab",
+   "phienBan": "30743d69ac855353",
    "url": "/ota/tvhome.apk",
-   "co": 663365,
-   "tuBan": 97
+   "co": 663709,
+   "tuBan": 98
   }
  }
 }

@@ -15,7 +15,7 @@
    * lời: gửi kiểu no-cors (multipart là "simple request", máy chủ vẫn nhận và lưu), không đọc được lỗi máy chủ.
    * Khi máy chủ thêm Access-Control-Allow-Origin: https://cleantv.alexvgs.tech thì đổi thành true để hiện đúng lỗi.
    */
-  var GOP_Y_DOC_DUOC = false;
+  var GOP_Y_DOC_DUOC = true;
 
   function $(sel, goc) { return (goc || document).querySelector(sel); }
   function $$(sel, goc) { return Array.prototype.slice.call((goc || document).querySelectorAll(sel)); }

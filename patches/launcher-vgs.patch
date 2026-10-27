@@ -98,7 +98,7 @@ index 00000000..b1477aae
 +FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 +OTHER DEALINGS IN THE FONT SOFTWARE.
 diff --git a/launcher/app/src/main/AndroidManifest.xml b/launcher/app/src/main/AndroidManifest.xml
-index 701b5feb..8baaa7ba 100644
+index 701b5feb..4e22d871 100644
 --- a/launcher/app/src/main/AndroidManifest.xml
 +++ b/launcher/app/src/main/AndroidManifest.xml
 @@ -8,6 +8,11 @@
@@ -152,7 +152,7 @@ index 701b5feb..8baaa7ba 100644
          <service
              android:name=".ClockDream"
              android:label="@string/dream_name"
-@@ -224,6 +247,13 @@
+@@ -224,6 +247,16 @@
                  <action android:name="android.service.notification.NotificationListenerService" />
              </intent-filter>
          </service>
@@ -161,12 +161,15 @@ index 701b5feb..8baaa7ba 100644
 +            android:exported="true">
 +            <intent-filter>
 +                <action android:name="android.intent.action.BOOT_COMPLETED" />
++                <!-- Fast-boot firmware that skips BOOT_COMPLETED on a warm power-on (3.5.5). -->
++                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
++                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
 +            </intent-filter>
 +        </receiver>
          <receiver
              android:name=".GuardConfig"
              android:exported="true"
-@@ -245,5 +275,7 @@
+@@ -245,5 +278,7 @@
                  android:name="android.accessibilityservice"
                  android:resource="@xml/input_key_service" />
          </service>
@@ -330,10 +333,10 @@ index 41825a1a..f5b1f644 100644
          // Draw a private copy: changing the bounds of the drawable an ImageView shows would blank the tile.
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/BootHome.java b/launcher/app/src/main/java/com/gathin/tvhome/BootHome.java
 new file mode 100644
-index 00000000..0f263796
+index 00000000..b1b043f7
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/BootHome.java
-@@ -0,0 +1,76 @@
+@@ -0,0 +1,109 @@
 +package com.gathin.tvhome;
 +
 +import android.Manifest;
@@ -363,7 +366,14 @@ index 00000000..0f263796
 +
 +    @Override
 +    public void onReceive(Context context, Intent intent) {
-+        if (!Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) return;
++        String action = intent.getAction();
++        if (!Intent.ACTION_BOOT_COMPLETED.equals(action) && (action == null || !action.endsWith("QUICKBOOT_POWERON"))) return;
++        // Once per boot: firmware that sends both would open Home twice.
++        int boot = Settings.Global.getInt(context.getContentResolver(), Settings.Global.BOOT_COUNT, -1);
++        android.content.SharedPreferences prefs = context.getSharedPreferences("boot", Context.MODE_PRIVATE);
++        if (boot >= 0 && prefs.getInt("boot_home", -1) == boot) return;
++        prefs.edit().putInt("boot_home", boot).apply();
++        note(context, action.endsWith("QUICKBOOT_POWERON") ? "q" : "b");
 +        Config config = Config.load(context);
 +        boolean redirect = !config.stockHomeRedirect.isEmpty();
 +        Log.i(TAG, "boot redirect=" + redirect + " always=" + config.powerOnHomeAlways + " liveTv=" + config.bootToLiveTv);
@@ -378,12 +388,37 @@ index 00000000..0f263796
 +                        .addCategory(Intent.CATEGORY_HOME)
 +                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED));
 +                Log.i(TAG, "boot open sent");
++                note(context, "o");
 +            } catch (RuntimeException refused) {
 +                // no SYSTEM_ALERT_WINDOW: the helper, if it binds, still covers the stock home
 +                Log.w(TAG, "boot open refused: " + refused);
++                note(context, "r");
 +            }
 +            pending.finish();
 +        }, OPEN_DELAY_MS);
++    }
++
++    /** Settings.Global key CleanTV reads in its Home diagnosis (3.5.5). */
++    static final String NOTE_KEY = "cleantv_boot";
++
++    /**
++     * CleanTV/VGS 3.5.5: logcat on a TCL 43P618 had rotated the boot lines away nine minutes after boot (Võ Thái,
++     * 27/10/2026), so what ran at boot is also kept in Settings.Global, which CleanTV can read at any time:
++     * "boot 7: b12 h14 o16 s20" = boot count, then event + seconds since boot (b BOOT_COMPLETED, q QUICKBOOT,
++     * h helper connected, o Home opened, r open refused, s stock home seen, x helper turned back on).
++     * Needs WRITE_SECURE_SETTINGS, which CleanTV grants; without it nothing is noted.
++     */
++    static void note(Context context, String event) {
++        if (context.checkSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS) != PackageManager.PERMISSION_GRANTED) return;
++        try {
++            android.content.ContentResolver cr = context.getContentResolver();
++            String head = "boot " + Settings.Global.getInt(cr, Settings.Global.BOOT_COUNT, -1) + ":";
++            String old = Settings.Global.getString(cr, NOTE_KEY);
++            String line = old != null && old.startsWith(head) ? old : head;
++            if (line.length() > 200) return;
++            Settings.Global.putString(cr, NOTE_KEY, line + " " + event + android.os.SystemClock.elapsedRealtime() / 1000);
++        } catch (RuntimeException ignored) {
++        }
 +    }
 +
 +    /** HomeKeyService back on the enabled list (and accessibility on), as CleanTV turned it on. */
@@ -405,6 +440,7 @@ index 00000000..0f263796
 +                    list.isEmpty() ? me : list + ":" + me);
 +            Settings.Secure.putInt(context.getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, 1);
 +            Log.i(TAG, "helper was " + (on ? "on" : "off, turned on"));
++            if (!on) note(context, "x");
 +        } catch (RuntimeException failed) {
 +            Log.w(TAG, "helper: " + failed);
 +        }
@@ -606,7 +642,7 @@ index 5d4b78fb..1e703377 100644
          if (file == null || !file.isFile()) return null;
          if (file.length() > 64 * 1024) {
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java b/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
-index 233f9820..7380531a 100644
+index 233f9820..dc52fa1a 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
 @@ -80,6 +80,72 @@ public class HomeKeyService extends AccessibilityService {
@@ -682,11 +718,12 @@ index 233f9820..7380531a 100644
      /** power_on_home_always: Home at every power-on, not only over Live TV. */
      private boolean powerOnAlways;
      /** power_on_home: re-arms after the screen turns on; null unless the key is on. */
-@@ -97,6 +163,37 @@ public class HomeKeyService extends AccessibilityService {
+@@ -97,6 +163,38 @@ public class HomeKeyService extends AccessibilityService {
      protected void onServiceConnected() {
          super.onServiceConnected();
          running = this;
 +        android.util.Log.i(BootHome.TAG, "helper connected " + SystemClock.elapsedRealtime() / 1000 + "s after boot");
++        BootHome.note(this, "h");
 +        // CleanTV/VGS: learn_key, sent from the shell by CleanTV (am broadcast -a zone.vgs.cleantv.LEARN_KEY -p <package>).
 +        learnReceiver = new BroadcastReceiver() {
 +            @Override
@@ -720,7 +757,7 @@ index 233f9820..7380531a 100644
          settingsScancodes = getResources().getIntArray(R.array.settings_key_scancodes);
          // The service is directBootAware: Android 11 skips a service that is not while the user is still
          // locked at boot, writes accessibility_enabled=0 and, on TCL G03 firmware, never binds it after the
-@@ -181,7 +278,11 @@ public class HomeKeyService extends AccessibilityService {
+@@ -181,7 +279,11 @@ public class HomeKeyService extends AccessibilityService {
          GuardKeep.stepOut(this);
      }
  
@@ -732,7 +769,7 @@ index 233f9820..7380531a 100644
          // Keycodes and the panel choice can also come from a theme; theme.sh restarts this service.
          Config config = Config.load(this);
          // restore_key_services: note that this helper runs, so Home can put it back after a force stop. Here, not
-@@ -213,6 +314,12 @@ public class HomeKeyService extends AccessibilityService {
+@@ -213,6 +315,12 @@ public class HomeKeyService extends AccessibilityService {
          powerOnLiveTv = config.powerOnHome && !config.bootToLiveTv && !config.liveTvPackage.equals(openOnStart)
                  ? config.liveTvPackage : "";
          powerOnAlways = config.powerOnHomeAlways && !config.bootToLiveTv && openOnStart.isEmpty();
@@ -745,7 +782,7 @@ index 233f9820..7380531a 100644
          if (!powerOnLiveTv.isEmpty() || powerOnAlways) {
              armPowerOnHome();
          } else if (screenOnReceiver != null) {
-@@ -253,6 +360,21 @@ public class HomeKeyService extends AccessibilityService {
+@@ -253,6 +361,21 @@ public class HomeKeyService extends AccessibilityService {
  
      @Override
      protected boolean onKeyEvent(KeyEvent event) {
@@ -767,7 +804,7 @@ index 233f9820..7380531a 100644
          // power_on_home: the first key after power-on hands the TV to the user (power and wake keys don't count).
          if (powerOnUntil != 0 && event.getAction() == KeyEvent.ACTION_DOWN
                  && event.getKeyCode() != KeyEvent.KEYCODE_POWER && event.getKeyCode() != KeyEvent.KEYCODE_WAKEUP) {
-@@ -286,7 +408,9 @@ public class HomeKeyService extends AccessibilityService {
+@@ -286,7 +409,9 @@ public class HomeKeyService extends AccessibilityService {
              redirectHomeKey(event);
              return false;
          }
@@ -778,7 +815,7 @@ index 233f9820..7380531a 100644
          if (event.getAction() == KeyEvent.ACTION_UP && !event.isCanceled()) openHome();
          return true;
      }
-@@ -294,6 +418,8 @@ public class HomeKeyService extends AccessibilityService {
+@@ -294,6 +419,8 @@ public class HomeKeyService extends AccessibilityService {
      /** Unbound by Android: the user turned the helper off, so Home doesn't put it back (ServiceRepair). */
      @Override
      public boolean onUnbind(Intent intent) {
@@ -787,7 +824,7 @@ index 233f9820..7380531a 100644
          if (repairRecord && !steppingOut) ServiceRepair.disconnected(this, getClass());
          return super.onUnbind(intent);
      }
-@@ -347,7 +473,18 @@ public class HomeKeyService extends AccessibilityService {
+@@ -347,7 +474,18 @@ public class HomeKeyService extends AccessibilityService {
  
      /** power_on_home_always: Home, unless a key was pressed since the screen came on (the user has the TV). */
      private void homeAtPowerOn() {
@@ -807,11 +844,12 @@ index 233f9820..7380531a 100644
      }
  
      static boolean stillArmed(long now, long armedUntil) {
-@@ -413,6 +550,7 @@ public class HomeKeyService extends AccessibilityService {
+@@ -413,6 +551,8 @@ public class HomeKeyService extends AccessibilityService {
      }
  
      private void openHome() {
 +        android.util.Log.i(BootHome.TAG, "stock home seen, opening this one");
++        BootHome.note(this, "s");
          Intent open = stockHomeStays() ? new Intent(this, MainActivity.class)
                  : new Intent(Intent.ACTION_MAIN).setPackage(getPackageName());
          startActivity(open.addCategory(Intent.CATEGORY_HOME)

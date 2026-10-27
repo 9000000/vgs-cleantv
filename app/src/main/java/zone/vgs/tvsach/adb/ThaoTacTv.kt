@@ -114,9 +114,10 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
     /** Vài dòng chẩn đoán Home (gửi kèm danh sách khi người dùng bấm gửi, 23/10/2026): Home mặc định, app nhận Home, màn đang hiện. */
     /** 3.5.3 (Võ Thái TCL 43P618, Đức Anh Google TV, 27/10/2026): thêm "# boot" — tivi lên bao lâu, Home sạch có bị buộc dừng
      *  (stopped=true thì không nhận BOOT_COMPLETED), quyền mở đè / ghi cài đặt, và log CleanTVBoot của launcher lúc khởi động.
-     *  Người dùng rút điện bật lại rồi kết nối và gửi ngay, không bấm Áp dụng, thì đây là trạng thái thật sau khởi động. */
+     *  Người dùng rút điện bật lại rồi kết nối và gửi ngay, không bấm Áp dụng, thì đây là trạng thái thật sau khởi động.
+     *  3.5.5: log TCL bị xoay mất sau 9 phút, nên launcher ghi thêm dấu vào settings global cleantv_boot (BootHome.note). */
     fun chanDoanHome(goi: String = PKG_HOME): String = runCatching {
-        sh("echo '# boot'; cat /proc/uptime | cut -d' ' -f1; dumpsys package $goi 2>/dev/null | grep -m1 -o 'stopped=[a-z]*'; " +
+        sh("echo '# boot'; cat /proc/uptime | cut -d' ' -f1; settings get global cleantv_boot; settings get global boot_count; dumpsys package $goi 2>/dev/null | grep -m1 -o 'stopped=[a-z]*'; " +
             "appops get $goi SYSTEM_ALERT_WINDOW 2>&1 | head -1; dumpsys package $goi 2>/dev/null | grep -m1 -o 'WRITE_SECURE_SETTINGS: granted=[a-z]*'; " +
             "logcat -d -v brief -s CleanTVBoot:* 2>/dev/null | grep CleanTVBoot | tail -6 | cut -c1-120; " +
             "echo '# resolve'; $HOME_QUERY 2>&1 | tail -2; echo '# query'; cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME 2>&1 | grep '/' | head -8; " +
