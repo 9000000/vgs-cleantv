@@ -1,5 +1,31 @@
 [
  {
+  "ban": "3.3.0",
+  "ngay": "2026-10-27",
+  "vi": [
+   "- Danh sách mẫu tivi lên 332 mẫu, 93 hãng.",
+   "- Home sạch theo bản gốc CleanYourTV mới: app có ảnh banner bị cắt xấu được vẽ từ icon, bảng chọn nguồn có thể chỉ hiện cổng đang cắm thiết bị (Nâng cao), sửa vài lỗi hiệu ứng."
+  ],
+  "en": [
+   "- TV list now has 332 models from 93 brands.",
+   "- Home sạch follows the latest CleanYourTV: apps whose banner crops badly are drawn from their icon, the Inputs list can show connected ports only (Advanced), a few effect fixes."
+  ]
+ },
+ {
+  "ban": "3.2.0",
+  "ngay": "2026-10-26",
+  "vi": [
+   "- \"Nút hẹn giờ tắt tivi\" (Tuỳ chỉnh → Hiển thị): một nút trên cùng của Home sạch, bấm lần lượt 15, 30, 60, 90 phút, bấm nữa là huỷ (góp ý duongghoangg1103).",
+   "- Dùng ảnh nền riêng thì chữ đồng hồ, ngày, thời tiết có bóng mờ phía sau, không bị chìm trên ảnh sáng (góp ý losphets).",
+   "- Sửa ảnh nền riêng không lên hoặc phải áp dụng vài lần trên một số tivi Android 11: app kiểm ảnh đã sang tivi chưa, ghi lại nếu thiếu và báo rõ nếu tivi chặn."
+  ],
+  "en": [
+   "- \"Sleep timer button\" (Options → Display): a top button on the clean Home, each press sets 15, 30, 60, 90 minutes, then off.",
+   "- With your own picture, the clock, date and weather get a soft shadow so they stay readable on bright photos.",
+   "- Fixes your wallpaper not showing (or needing several applies) on some Android 11 TVs: the app checks it reached the TV, writes it again if not, and says so if the TV blocks it."
+  ]
+ },
+ {
   "ban": "3.1.2",
   "ngay": "2026-10-26",
   "vi": [

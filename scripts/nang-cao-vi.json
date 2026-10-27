@@ -478,5 +478,9 @@
   "race_calendar": {
     "ten": "Lịch đua xe F1 & Motorsport",
     "moTa": "Chế độ cuối tuần đua xe. Tự động đổi hình nền trường đua vào cuối tuần và cập nhật bảng xếp hạng các giải đua (f1, motogp, wec, indycar, nascar...)."
+  },
+  "inputs_connected_only": {
+    "ten": "Chỉ hiện cổng đang cắm thiết bị",
+    "moTa": "Bảng chọn nguồn (HDMI, AV) chỉ hiện cổng có thiết bị đang cắm, các cổng trống gom vào \"Thêm cổng vào\"."
   }
 }

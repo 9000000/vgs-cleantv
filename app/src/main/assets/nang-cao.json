@@ -648,6 +648,14 @@
 "moTaVi": "Mỗi lần bật tivi đều về Home sạch, dù tivi mở lại HDMI, truyền hình hay app cũ. Bấm phím trước đó thì thôi. Không chạy khi đã chọn app mở lúc bật."
 },
 {
+"khoa": "inputs_connected_only",
+"kieu": "bool",
+"moTa": "The Inputs list shows only HDMI ports and CEC devices that report connected; empty ports, the AV jacks and devices asleep in standby fold behind a \"More inputs\" row that expands them. Some TVs (TCL) report an empty HDMI port as connected-standby, the same state a sleeping device has, so a device in standby is folded too. An HDMI row whose state the TV cannot be trusted with stays (false by default)",
+"canThan": false,
+"ten": "Chỉ hiện cổng đang cắm thiết bị",
+"moTaVi": "Bảng chọn nguồn (HDMI, AV) chỉ hiện cổng có thiết bị đang cắm, các cổng trống gom vào \"Thêm cổng vào\"."
+},
+{
 "khoa": "home_idle_clock_minutes",
 "kieu": "so",
 "min": 0,

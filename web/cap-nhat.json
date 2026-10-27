@@ -11,15 +11,15 @@
   },
   "duLieu": {
     "du-lieu.json": {
-      "phienBan": "df0ad3a58f280a1e",
+      "phienBan": "cf3df720ed6c1c61",
       "url": "/ota/du-lieu.json",
-      "co": 1830957,
+      "co": 1917629,
       "tuBan": 80
     },
     "tvhome.apk": {
-      "phienBan": "f13b1b79ea56ffd5",
+      "phienBan": "b1cc2e18cb013156",
       "url": "/ota/tvhome.apk",
-      "co": 678553,
+      "co": 681125,
       "tuBan": 80
     }
   }
