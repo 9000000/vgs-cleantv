@@ -1,5 +1,21 @@
 [
  {
+  "ban": "3.4.2",
+  "ngay": "2026-10-27",
+  "vi": [
+   "Thêm 61 kênh FPT Play chọn sẵn (toàn quốc, HTV, địa phương), không cần dán link",
+   "Tivi TCL rút điện bật lại: Home sạch tự lên, tự bật lại nút Home",
+   "Hộp RockChip: sửa lỗi không cài được Home sạch (màn cài đặt lần đầu tranh Home)",
+   "Màn nhỏ: nút trên cùng tự thu thành icon để không che đồng hồ, lời chào, thời tiết"
+  ],
+  "en": [
+   "61 ready FPT Play channels (national, HTV, local), no link pasting needed",
+   "TCL TVs after a power cut: the clean Home comes up and the Home key works again",
+   "RockChip boxes: fixed the clean Home failing to install (first-run setup screen claimed Home)",
+   "Small screens: top buttons shrink to icons so the clock, greeting and weather fit"
+  ]
+ },
+ {
   "ban": "3.4.1",
   "ngay": "2026-10-27",
   "vi": [

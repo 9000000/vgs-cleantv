@@ -450,6 +450,18 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
                 bayGio = homeHienTai()
             }
         }
+        // Màn cài đặt lần đầu của AOSP (com.android.provision/.DefaultActivity) còn bật và nhận Home khi Home gốc vừa tắt
+        // (góp ý anhht87vn, RockChip TV98 27/10/2026). Tivi đã dùng rồi nên đánh dấu cài xong như chính màn đó làm, tắt nó
+        // (Khôi phục bật lại), đặt lại Home sạch.
+        if (bayGio.startsWith("com.android.provision/") && !giuHomeGoc) {
+            bao(t("Màn cài đặt lần đầu của Android tranh Home, tắt nó…", "Android's first-run setup screen claims Home, disabling it…"))
+            sh("settings put global device_provisioned 1; settings put secure user_setup_complete 1; pm disable-user --user 0 com.android.provision")
+            if ("com.android.provision" !in sl.daTatTruoc && "com.android.provision" !in sl.daTatBoiApp) sl.daTatBoiApp += "com.android.provision"
+            luuSaoLuu(sl)
+            sh("cmd package set-home-activity --user 0 $cmpHome")
+            Thread.sleep(800)
+            bayGio = homeHienTai()
+        }
         if (!bayGio.startsWith("$pkgHome/") && giuHomeGoc) {
             traHomeGoc(sl)
             return t("Tivi bo mạch CVTE ('${bayGio.ifBlank { "không rõ" }}' vẫn nhận Home). Với loại bo này app không tắt Home gốc vì đã có tivi treo ở màn khởi động sau khi tắt. Tivi vẫn như cũ; Home sạch vẫn mở được từ danh sách ứng dụng.",
@@ -620,14 +632,20 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         // restore_key_services (Nâng cao) chỉ chạy khi Home sạch có WRITE_SECURE_SETTINGS (upstream build-and-install.sh
         // RESTORE_KEY_SERVICES=1). Tắt thì thu lại quyền cho gọn.
         val moi = runCatching { org.json.JSONObject(json) }.getOrNull()
-        val khoiPhucPhim = moi?.optBoolean("restore_key_services") ?: false
-        sh("pm ${if (khoiPhucPhim) "grant" else "revoke"} $pkgHome android.permission.WRITE_SECURE_SETTINGS 2>/dev/null; true")
-        // Nút hẹn giờ tắt (sleep_timer_button) cần báo thức đúng giờ: cấp sẵn, máy cũ không có lệnh thì thôi.
-        sh("appops set $pkgHome SCHEDULE_EXACT_ALARM allow 2>/dev/null; true")
         // Khoá chuyển đè Home cũ do damBaoPhimHome gắn (tivi không cho tắt Home gốc): đổi giao diện không được làm mất nó.
         val ghi = moi?.takeIf { !it.has("stock_home_redirect") }?.let { m ->
             docCauHinhTv()?.optString("stock_home_redirect")?.takeIf { it.isNotBlank() }?.let { m.put("stock_home_redirect", it).toString() }
         } ?: json
+        val cuoi = runCatching { org.json.JSONObject(ghi) }.getOrNull()
+        val khoiPhucPhim = cuoi?.optBoolean("restore_key_services") ?: false
+        // BootHome của bản vá (3.4.2, TCL 43P618 về Home gốc sau khi rút điện): lúc khởi động, Home sạch tự bật lại dịch vụ
+        // bắt phím mà hãng gỡ mất (cần WRITE_SECURE_SETTINGS) và tự mở lên (cần quyền hiện trên app khác).
+        val luonVe = cuoi?.optBoolean("power_on_home_always") == true
+        val canQuyen = khoiPhucPhim || luonVe || !cuoi?.optString("stock_home_redirect").isNullOrBlank()
+        sh("pm ${if (canQuyen) "grant" else "revoke"} $pkgHome android.permission.WRITE_SECURE_SETTINGS 2>/dev/null; true")
+        sh("appops set $pkgHome SYSTEM_ALERT_WINDOW ${if (luonVe) "allow" else "default"} 2>/dev/null; true")
+        // Nút hẹn giờ tắt (sleep_timer_button) cần báo thức đúng giờ: cấp sẵn, máy cũ không có lệnh thì thôi.
+        sh("appops set $pkgHome SCHEDULE_EXACT_ALARM allow 2>/dev/null; true")
         ghiFileTheme("config.json", ghi.toByteArray())
         if (anhNen != null) {
             if (!ghiFileTheme("wallpaper.jpg", anhNen)) throw java.io.IOException(

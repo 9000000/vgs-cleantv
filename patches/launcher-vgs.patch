@@ -98,19 +98,22 @@ index 00000000..b1477aae
 +FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 +OTHER DEALINGS IN THE FONT SOFTWARE.
 diff --git a/launcher/app/src/main/AndroidManifest.xml b/launcher/app/src/main/AndroidManifest.xml
-index 701b5feb..5e70a9f6 100644
+index 701b5feb..8baaa7ba 100644
 --- a/launcher/app/src/main/AndroidManifest.xml
 +++ b/launcher/app/src/main/AndroidManifest.xml
-@@ -8,6 +8,8 @@
+@@ -8,6 +8,11 @@
      <uses-feature android:name="android.hardware.location.gps" android:required="false" />
  
      <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
++    <!-- CleanTV/VGS: BootHome, power_on_home_always after a real power-off (CleanTV sets the overlay app op over ADB). -->
++    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
++    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 +    <!-- CleanTV/VGS: only for the optional weather line (Open-Meteo). -->
 +    <uses-permission android:name="android.permission.INTERNET" />
      <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
      <!-- Needed since Android 10 to read the Wi-Fi network name for the network pill. Never requested at
           runtime: build-and-install grants it with pm grant, so lint's Android 12 "ask for COARSE with
-@@ -25,6 +27,11 @@
+@@ -25,6 +30,11 @@
      <!-- Android 11+ package visibility: lets the launcher list the TV apps it shows as tiles, and the
           apps that declare a module card (docs/specs/card.md). -->
      <queries>
@@ -122,7 +125,7 @@ index 701b5feb..5e70a9f6 100644
          <!-- The standard settings handlers, so package visibility doesn't hide them and send the pills to a vendor fallback by mistake. -->
          <intent>
              <action android:name="android.settings.SETTINGS" />
-@@ -70,6 +77,8 @@
+@@ -70,6 +80,8 @@
          <provider android:authorities="com.skyworth.tv.sdk.provider" />
      </queries>
  
@@ -131,7 +134,7 @@ index 701b5feb..5e70a9f6 100644
      <application
          android:label="@string/app_name"
          android:icon="@mipmap/ic_launcher"
-@@ -190,6 +199,17 @@
+@@ -190,6 +202,17 @@
  
          <!-- Screensaver: pick it in Settings, or `settings put secure screensaver_components
               com.gathin.tvhome/.ClockDream` over adb. -->
@@ -149,7 +152,21 @@ index 701b5feb..5e70a9f6 100644
          <service
              android:name=".ClockDream"
              android:label="@string/dream_name"
-@@ -245,5 +265,7 @@
+@@ -224,6 +247,13 @@
+                 <action android:name="android.service.notification.NotificationListenerService" />
+             </intent-filter>
+         </service>
++        <receiver
++            android:name=".BootHome"
++            android:exported="true">
++            <intent-filter>
++                <action android:name="android.intent.action.BOOT_COMPLETED" />
++            </intent-filter>
++        </receiver>
+         <receiver
+             android:name=".GuardConfig"
+             android:exported="true"
+@@ -245,5 +275,7 @@
                  android:name="android.accessibilityservice"
                  android:resource="@xml/input_key_service" />
          </service>
@@ -291,6 +308,75 @@ index 41825a1a..5b01ca52 100644
      private static int vividColor(Drawable live) {
          if (live == null) return 0xFF444444;
          // Draw a private copy: changing the bounds of the drawable an ImageView shows would blank the tile.
+diff --git a/launcher/app/src/main/java/com/gathin/tvhome/BootHome.java b/launcher/app/src/main/java/com/gathin/tvhome/BootHome.java
+new file mode 100644
+index 00000000..66c90b59
+--- /dev/null
++++ b/launcher/app/src/main/java/com/gathin/tvhome/BootHome.java
+@@ -0,0 +1,63 @@
++package com.gathin.tvhome;
++
++import android.Manifest;
++import android.content.BroadcastReceiver;
++import android.content.ComponentName;
++import android.content.Context;
++import android.content.Intent;
++import android.content.pm.PackageManager;
++import android.os.Handler;
++import android.os.Looper;
++import android.provider.Settings;
++
++/**
++ * CleanTV/VGS: power_on_home_always without the helper. On TCL (43P618, Smart TV Pro, 27/10/2026) the TV came back on the
++ * stock home after a real power-off: the firmware drops HomeKeyService from the accessibility list at boot (or binds it
++ * after the stock home is already up), so nothing redirected. At BOOT_COMPLETED this puts HomeKeyService back on the list
++ * when CleanTV granted WRITE_SECURE_SETTINGS, then opens this Home once the firmware has brought up its own. Starting an
++ * activity from a receiver needs the SYSTEM_ALERT_WINDOW app op, which CleanTV sets over ADB; without it the start is
++ * just refused.
++ */
++public class BootHome extends BroadcastReceiver {
++    /** After the firmware's own home or last source is up (TCL Google TV: about 3 s after BOOT_COMPLETED). */
++    static final long OPEN_DELAY_MS = 4000L;
++
++    @Override
++    public void onReceive(Context context, Intent intent) {
++        if (!Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) return;
++        Config config = Config.load(context);
++        boolean redirect = !config.stockHomeRedirect.isEmpty();
++        if (redirect || config.powerOnHomeAlways) enableHelper(context);
++        if (!config.powerOnHomeAlways || config.bootToLiveTv) return;
++        PendingResult pending = goAsync();
++        new Handler(Looper.getMainLooper()).postDelayed(() -> {
++            try {
++                context.startActivity(new Intent(context, MainActivity.class)
++                        .addCategory(Intent.CATEGORY_HOME)
++                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED));
++            } catch (RuntimeException refused) {
++                // no SYSTEM_ALERT_WINDOW: the helper, if it binds, still covers the stock home
++            }
++            pending.finish();
++        }, OPEN_DELAY_MS);
++    }
++
++    /** HomeKeyService back on the enabled list (and accessibility on), as CleanTV turned it on. */
++    static void enableHelper(Context context) {
++        if (context.checkSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS) != PackageManager.PERMISSION_GRANTED) return;
++        try {
++            String me = new ComponentName(context, HomeKeyService.class).flattenToShortString();
++            String list = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
++            if (list == null || list.equals("null")) list = "";
++            boolean on = false;
++            for (String entry : list.split(":")) {
++                ComponentName name = ComponentName.unflattenFromString(entry);
++                if (name != null && name.flattenToShortString().equals(me)) on = true;
++            }
++            if (!on) Settings.Secure.putString(context.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
++                    list.isEmpty() ? me : list + ":" + me);
++            Settings.Secure.putInt(context.getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, 1);
++        } catch (RuntimeException ignored) {
++        }
++    }
++}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Config.java b/launcher/app/src/main/java/com/gathin/tvhome/Config.java
 index 5d4b78fb..acb03b72 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/Config.java
@@ -597,7 +683,7 @@ index 00000000..9b2fd8e3
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 17961443..ef2708dd 100644
+index 17961443..3d404ca2 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -184,6 +184,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
@@ -756,7 +842,32 @@ index 17961443..ef2708dd 100644
              if (grid.getPaddingTop() != want) {
                  grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
                  // A vertical grid parks the dock on the new padding line by scrolling (onTileFocused); a sideways
-@@ -796,8 +889,42 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -773,6 +866,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+             makeIconOnly((TextView) btnSettings);
+         }
+         if (cfg.iconOnlyInputs) makeIconOnly((TextView) btnInputs);
++        // CleanTV/VGS: on a narrow screen (VNPT SmartBox 2x, 27/10/2026) four labelled pills squeezed the clock block until
++        // the greeting, date and weather were cut. When the block gets less than 380dp, the pills drop their labels.
++        View fitBlock = findViewById(R.id.leftBlock);
++        LinearLayout fitButtons = findViewById(R.id.topButtons);
++        fitBlock.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
++            @Override
++            public void onLayoutChange(View v, int l, int t, int r, int b, int ol, int ot, int or, int ob) {
++                if (r - l <= 0 || r - l >= 380 * density) return;
++                v.removeOnLayoutChangeListener(this);
++                for (int i = 0; i < fitButtons.getChildCount(); i++) {
++                    View c = fitButtons.getChildAt(i);
++                    if (!(c instanceof TextView) || c.getVisibility() != View.VISIBLE || TextUtils.isEmpty(((TextView) c).getText())) continue;
++                    if (c == btnWifi) wifiIconOnly = true;
++                    makeIconOnly((TextView) c);
++                }
++                fitButtons.requestLayout();
++            }
++        });
+         btnSettings.setOnLongClickListener(v -> {
+             showSettingsMenu();
+             return true;
+@@ -796,8 +907,42 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -799,7 +910,7 @@ index 17961443..ef2708dd 100644
          btnSettings.setOnKeyListener(pillKeys);
          btnReorder.setOnKeyListener(pillKeys);
          btnLibraryTop.setOnKeyListener(pillKeys);
-@@ -943,6 +1070,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -943,6 +1088,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onResume() {
          super.onResume();
@@ -807,7 +918,7 @@ index 17961443..ef2708dd 100644
          // A festival that started or ended while Home was in the background: rebuild with or without it.
          if (festive != festival.active(LocalDate.now())) {
              recreate();
-@@ -986,6 +1114,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -986,6 +1132,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -815,7 +926,7 @@ index 17961443..ef2708dd 100644
          sky.update();
          wallpaperPlayer.start();
          handler.postDelayed(minuteTick, MINUTE_MS);
-@@ -1154,6 +1283,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1154,6 +1301,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onPause() {
          super.onPause();
@@ -823,7 +934,7 @@ index 17961443..ef2708dd 100644
          root.removeCallbacks(showIdleClock);
          endReorder();   // Home or another app while reordering keeps the order so far
          wallpaperPlayer.stop();
-@@ -2053,6 +2183,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2053,6 +2201,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -854,7 +965,7 @@ index 17961443..ef2708dd 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2117,13 +2271,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2117,13 +2289,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -882,7 +993,7 @@ index 17961443..ef2708dd 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2318,6 +2483,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2318,6 +2501,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -893,7 +1004,7 @@ index 17961443..ef2708dd 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2679,7 +2848,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2679,7 +2866,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -906,7 +1017,7 @@ index 17961443..ef2708dd 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2934,7 +3107,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2934,7 +3125,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       *  source number; "HW8=-" leaves that input out of the Inputs menu (a port the board reports but the set
       *  does not have). Returns the number, -1 for a left-out input, or null when the input is not listed. */
      private Integer mappedSource(String inputId) {
@@ -940,7 +1051,7 @@ index 17961443..ef2708dd 100644
      }
  
      /** Switches to a passthrough input (HDMI, AV). An input mapped in `input_sources` is opened by sending
-@@ -3371,10 +3569,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3371,10 +3587,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }

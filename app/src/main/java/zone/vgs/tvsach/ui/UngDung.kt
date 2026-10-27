@@ -975,8 +975,11 @@ private fun TheHomeNoiDung(vm: PhienLamViec) {
         // FPT Play (3.1.0): kênh có sẵn + dán link chia sẻ (kênh, trận đấu, phim).
         Text("FPT Play", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
         if (vm.coFpt) {
-            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                zone.vgs.tvsach.dulieu.FptPlay.KENH.forEach { (ten, slug) -> ChonChip(ten, vm.coO(zone.vgs.tvsach.dulieu.FptPlay.linkKenh(slug))) { vm.batTatKenhFpt(ten, slug) } }
+            listOf("qg" to t("Toàn quốc, HTV", "National, HTV"), "dp" to t("Địa phương", "Local")).forEach { (nhom, tenNhom) ->
+                Text(tenNhom, fontSize = 13.sp, color = ChuPhu)
+                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    zone.vgs.tvsach.dulieu.FptPlay.KENH.filter { it.third == nhom }.forEach { (ten, slug) -> ChonChip(ten, vm.coO(zone.vgs.tvsach.dulieu.FptPlay.linkKenh(slug))) { vm.batTatKenhFpt(ten, slug) } }
+                }
             }
             OutlinedTextField(vm.linkFpt, { vm.linkFpt = it }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp),
                 label = { Text(t("Dán link FPT Play (kênh, trận đấu, phim)", "Paste an FPT Play link (channel, match, film)")) },

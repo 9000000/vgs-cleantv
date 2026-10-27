@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 91,
-  "versionName": "3.4.1",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.4.1.apk",
-  "co": 12212349,
-  "ghiChu": "Ảnh nền riêng tự đổi: chọn nhiều ảnh, tivi đổi lần lượt sau 5, 15, 30 hoặc 60 phút.",
-  "ghiChuEn": "Your own wallpapers can rotate: pick several pictures, the TV changes them every 5, 15, 30 or 60 minutes.",
+  "versionCode": 92,
+  "versionName": "3.4.2",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.4.2.apk",
+  "co": 12213981,
+  "ghiChu": "61 kênh FPT Play chọn sẵn, Home sạch tự lên sau khi rút điện (TCL), sửa lỗi hộp RockChip và màn nhỏ",
+  "ghiChuEn": "61 ready FPT Play channels, the clean Home comes back after a power cut (TCL), fixes for RockChip boxes and small screens",
   "ngay": "2026-10-27"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "2c3b25d3f4ab7170",
+   "phienBan": "a1a3f6d76e6a7ef7",
    "url": "/ota/du-lieu.json",
    "co": 1917629,
-   "tuBan": 91
+   "tuBan": 92
   },
   "tvhome.apk": {
-   "phienBan": "dcce03dda96ec2c1",
+   "phienBan": "986ff5e3d0d4e430",
    "url": "/ota/tvhome.apk",
-   "co": 654305,
-   "tuBan": 91
+   "co": 655125,
+   "tuBan": 92
   }
  }
 }
