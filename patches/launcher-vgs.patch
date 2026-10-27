@@ -175,7 +175,7 @@ index 701b5feb..8baaa7ba 100644
      </application>
  </manifest>
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
-index 41825a1a..5b01ca52 100644
+index 41825a1a..f5b1f644 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 @@ -64,7 +64,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -222,7 +222,15 @@ index 41825a1a..5b01ca52 100644
          Collections.sort(fresh, (a, b) -> {
              // The owner's own order first; tiles it does not know (new installs) follow by the rule below.
              int saved = Order.compare(savedRanks, a.component.flattenToShortString(), b.component.flattenToShortString());
-@@ -503,6 +515,13 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -414,6 +426,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+         int width = parent.getWidth() > 0 ? parent.getWidth() : parent.getMeasuredWidth();
+         int inner = width - parent.getPaddingLeft() - parent.getPaddingRight();
+         int w = tileWidthPx(inner, parent.getHeight(), dockSize, rowsBelowDock, dockTitle, dockRow, density), h = tileHeightPx(w);
++        tilePx = h;
+         View card = v.findViewById(R.id.card);
+         ViewGroup.LayoutParams cardLp = card.getLayoutParams();
+         cardLp.width = w;
+@@ -503,6 +516,16 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
              h.icon.setVisibility(View.VISIBLE);
              h.label.setText(e.label);
              h.label.setVisibility(uniformTiles ? View.GONE : View.VISIBLE);
@@ -231,12 +239,15 @@ index 41825a1a..5b01ca52 100644
 +            float dp = ctx.getResources().getDisplayMetrics().density;
 +            ViewGroup.LayoutParams lp = h.icon.getLayoutParams();
 +            int size = Math.round((iconTileColor() ? 60 : 48) * dp);
++            // Big tiles (2–3 columns): 60 dp sat small in the middle of the colour (hp4440s, 27/10/2026), so the
++            // icon takes half the tile's height there; normal tiles keep 60 dp.
++            if (iconTileColor()) size = Math.max(size, Math.round(tilePx * 0.5f));
 +            if (!uniformTiles && lp.width != size) { lp.width = size; lp.height = size; h.icon.setLayoutParams(lp); }
 +            if (!uniformTiles && iconTileColor()) h.card.setBackground(new android.graphics.drawable.ColorDrawable(tileColor(ambientColorAt(position))));
          }
          h.card.setOnClickListener(v -> launch(e));
          h.card.setOnLongClickListener(v -> {
-@@ -511,7 +530,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -511,7 +534,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                  if (pos != RecyclerView.NO_POSITION) listener.onTileLongPress(pos, v);
                  return true;
              }
@@ -245,7 +256,7 @@ index 41825a1a..5b01ca52 100644
              i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
              try {
                  ctx.startActivity(i);
-@@ -523,6 +542,10 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -523,6 +546,10 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
  
      /** Opens the tile's activity by explicit component, with no extras: a card can name nothing else. */
      private void launch(Entry e) {
@@ -256,7 +267,7 @@ index 41825a1a..5b01ca52 100644
          if (e.kind == Entry.HOME_SETTINGS) {
              ctx.startActivity(new Intent(ctx, HomeSettingsActivity.class)
                      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-@@ -552,6 +575,27 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -552,6 +579,27 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
          }
      }
  
@@ -284,7 +295,16 @@ index 41825a1a..5b01ca52 100644
      @Override
      public int getItemCount() {
          return items.size() + (showLibrary ? 1 : 0);
-@@ -823,6 +867,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -681,6 +729,8 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+ 
+     /** Share of the tile height the icon takes in uniform_tiles mode (onCreateViewHolder). */
+     private static final float ICON_SHARE = 0.62f;
++    /** CleanTV/VGS: the last tile height laid out, so a colour-filled icon tile grows its icon with the tile. */
++    private int tilePx;
+ 
+     /**
+      * The colour covering most of an icon, for a card that should read as that app: a small saturated badge
+@@ -823,6 +873,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
          return Math.max(0, Math.min(255, Math.round(v)));
      }
  
@@ -954,7 +974,7 @@ index 00000000..067f64b5
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 17961443..c1878783 100644
+index 17961443..62e4bf56 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -184,6 +184,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
@@ -1231,7 +1251,17 @@ index 17961443..c1878783 100644
          // A festival that started or ended while Home was in the background: rebuild with or without it.
          if (festive != festival.active(LocalDate.now())) {
              recreate();
-@@ -986,6 +1164,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -974,6 +1152,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+         if (openLiveTvAfterBoot()) return;
+         updateGreeting();
+         updateRace();
++        // CleanTV/VGS: back from an app opened on the shelf, focus is still on its tile, so the "Last opened" line
++        // kept the time from before this launch ("2 days ago" right after opening it). Refresh it (ngoctrung, 27/10/2026).
++        if (cinematic && heroMeta != null && lastFocused < adapter.appCount()) updateHeroMeta(lastFocused);
+         // The network and Inputs pills keep their state while Home is in the background, and callbacks update them
+         // when the network or the inputs change, so this refresh only catches anything missed. Its binder calls
+         // (about 7 ms on a TCL C755, most of it WifiManager.getConnectionInfo) would hold up the first frame back
+@@ -986,6 +1167,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -1239,7 +1269,7 @@ index 17961443..c1878783 100644
          sky.update();
          wallpaperPlayer.start();
          handler.postDelayed(minuteTick, MINUTE_MS);
-@@ -1154,6 +1333,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1154,6 +1336,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onPause() {
          super.onPause();
@@ -1247,7 +1277,7 @@ index 17961443..c1878783 100644
          root.removeCallbacks(showIdleClock);
          endReorder();   // Home or another app while reordering keeps the order so far
          wallpaperPlayer.stop();
-@@ -2053,6 +2233,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2053,6 +2236,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -1278,7 +1308,7 @@ index 17961443..c1878783 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2117,13 +2321,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2117,13 +2324,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -1306,7 +1336,7 @@ index 17961443..c1878783 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2318,6 +2533,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2318,6 +2536,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -1317,7 +1347,7 @@ index 17961443..c1878783 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2679,7 +2898,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2679,7 +2901,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -1330,7 +1360,7 @@ index 17961443..c1878783 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2934,7 +3157,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2934,7 +3160,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       *  source number; "HW8=-" leaves that input out of the Inputs menu (a port the board reports but the set
       *  does not have). Returns the number, -1 for a left-out input, or null when the input is not listed. */
      private Integer mappedSource(String inputId) {
@@ -1364,7 +1394,7 @@ index 17961443..c1878783 100644
      }
  
      /** Switches to a passthrough input (HDMI, AV). An input mapped in `input_sources` is opened by sending
-@@ -3310,7 +3558,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3310,7 +3561,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          if (dockRow) addSettingsMenuRow(rows, popup, R.string.dock_edit, this::startDockEdit);
          addSettingsMenuRow(rows, popup, R.string.reorder, this::toggleReorder);
          // A launcher may not restart the TV itself; the Home key helper can open the system power menu instead.
@@ -1375,7 +1405,7 @@ index 17961443..c1878783 100644
          panel.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
          popup.setWidth(Math.max((int) (200 * density), panel.getMeasuredWidth()));
          // Hebrew puts Settings at the left of the header: grow the menu inward from it.
-@@ -3371,10 +3621,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3371,10 +3624,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }

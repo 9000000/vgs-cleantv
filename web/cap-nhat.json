@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 96,
-  "versionName": "3.5.3",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.3.apk",
-  "co": 12255789,
-  "ghiChu": "Tìm thành phố thời tiết báo rõ khi lỗi mạng; chẩn đoán Home sau khi rút điện",
-  "ghiChuEn": "Weather city search tells you when the network fails; Home diagnosis after a power cut",
+  "versionCode": 97,
+  "versionName": "3.5.4",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.4.apk",
+  "co": 12256021,
+  "ghiChu": "Logo app to rõ trong ô màu; dòng Mở lần cuối cập nhật ngay",
+  "ghiChuEn": "Bigger app logos in colour tiles; Last opened updates right away",
   "ngay": "2026-10-27"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "90fcd6a660c26647",
+   "phienBan": "35ef6bd502955116",
    "url": "/ota/du-lieu.json",
    "co": 1954504,
-   "tuBan": 96
+   "tuBan": 97
   },
   "tvhome.apk": {
-   "phienBan": "871dfb3b946f5924",
+   "phienBan": "572ff07ff61a90ab",
    "url": "/ota/tvhome.apk",
-   "co": 663241,
-   "tuBan": 96
+   "co": 663365,
+   "tuBan": 97
   }
  }
 }

@@ -1,5 +1,17 @@
 [
  {
+  "ban": "3.5.4",
+  "ngay": "2026-10-27",
+  "vi": [
+   "Ô app tô màu (YouTube, TV360…): logo to theo cỡ ô, không còn bé tí ở giữa khi ô lớn",
+   "Dòng \"Mở lần cuối\" trên Home cập nhật ngay khi quay về từ app, không còn hiện \"Hôm kia\" lúc vừa mở"
+  ],
+  "en": [
+   "Colour app tiles (YouTube, TV360…): the logo grows with the tile instead of sitting tiny in the middle of big tiles",
+   "The \"Last opened\" line on Home updates as soon as you come back from the app, no more \"2 days ago\" right after opening it"
+  ]
+ },
+ {
   "ban": "3.5.3",
   "ngay": "2026-10-27",
   "vi": [

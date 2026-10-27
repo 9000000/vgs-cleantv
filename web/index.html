@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CleanTV — Dọn quảng cáo tivi Android</title>
+<meta name="description" content="App Android miễn phí của VGS: tắt quảng cáo, theo dõi và app rác trên Android TV / Google TV qua Wi-Fi theo danh sách đã thử của hàng trăm mẫu tivi, thay màn Home bằng Home sạch có lịch âm, thời tiết, kênh VTVgo / FPT Play, 9 giao diện; điện thoại thành remote gõ được tiếng Việt, hẹn giờ tắt, Khoá trẻ em. Không root, khôi phục một chạm.">
+<meta name="theme-color" content="#0b0a1a">
+<link rel="canonical" href="https://cleantv.alexvgs.tech/">
+<link rel="alternate" hreflang="vi" href="https://cleantv.alexvgs.tech/">
+<link rel="alternate" hreflang="en" href="https://cleantv.alexvgs.tech/en">
+<link rel="icon" href="/cleantv/logo.png" type="image/png">
+<link rel="apple-touch-icon" href="/cleantv/logo-512.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CleanTV">
+<meta property="og:locale" content="vi_VN">
+<meta property="og:url" content="https://cleantv.alexvgs.tech/">
+<meta property="og:title" content="CleanTV — Tivi sạch quảng cáo trong 10 phút">
+<meta property="og:description" content="Dọn Android TV / Google TV bằng điện thoại. Home sạch có kênh truyền hình, 9 giao diện, điện thoại thành remote, khôi phục một chạm.">
+<meta property="og:image" content="https://cleantv.alexvgs.tech/cleantv/og-1021.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="CleanTV — Tivi sạch quảng cáo">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CleanTV — Tivi sạch quảng cáo trong 10 phút">
+<meta name="twitter:description" content="Dọn Android TV / Google TV bằng điện thoại. Home sạch có kênh truyền hình, 9 giao diện, điện thoại thành remote, khôi phục một chạm.">
+<meta name="twitter:image" content="https://cleantv.alexvgs.tech/cleantv/og-1021.jpg">
+<link rel="preload" as="image" href="/cleantv/tv-vgs.webp" fetchpriority="high">
+<link rel="stylesheet" href="/cleantv/trang.css?v=2">
+<script defer src="/cleantv/trang.js?v=2"></script>
+</head>
+<body>
+
+<nav class="thanhMuc" aria-label="CleanTV">
+  <div class="thanhMucTrong">
+    <a class="thanhMucTen" href="#"><img src="/cleantv/logo.png" alt="" width="28" height="28">CleanTV</a>
+    <a class="thanhMucMuc" href="#remote">Remote</a>
+    <a class="thanhMucMuc" href="#kenh">Kênh</a>
+    <a class="thanhMucMuc" href="#tinh-nang">Tính năng</a>
+    <a class="thanhMucMuc" href="#home">Home sạch</a>
+    <a class="thanhMucMuc" href="#chuan-bi">Cách dùng</a>
+    <a class="thanhMucMuc" href="#tivi">Tivi đã thử</a>
+    <a class="thanhMucMuc" href="#hoi-dap">Hỏi đáp</a>
+    <a class="thanhMucTai" href="https://cleantv-dem.vgszone.workers.dev/tai?tu=vgszone" data-tai>Tải APK</a>
+  </div>
+</nav>
+
+<main>
+  <!-- HERO — tivi đã dọn + điện thoại chạy app -->
+  <section class="khoi toi hero">
+    <a href="#remote" class="nhanMoi"><b>Mới · 3.5</b> Điện thoại thành remote, gõ được tiếng Việt →</a>
+    <p class="nhanNho">App miễn phí từ VGS</p>
+    <h1 class="tieuDeLon">CleanTV<br><span class="chuChuyen">Tivi hết quảng cáo.</span></h1>
+    <p class="phuLon">Tivi nhà bạn mở lên toàn quảng cáo với app rác của hãng? Cài CleanTV lên điện thoại, kết nối tivi qua Wi-Fi, dọn theo danh sách đã thử của <span data-so-mau>243</span> mẫu tivi rồi thay màn Home bằng Home sạch có lịch âm, thời tiết, kênh VTV, HTV, đài địa phương ngay màn chính. Điện thoại kiêm luôn remote, gõ tiếng Việt lên tivi. Muốn trả lại như cũ thì bấm Khôi phục.</p>
+    <p class="soNguoi" id="so-nguoi" hidden><span class="soDem" aria-hidden="true"></span><span class="soNhan">người đã dùng app</span></p>
+    <div class="nutHang">
+      <a class="nut" href="https://cleantv-dem.vgszone.workers.dev/tai?tu=vgszone" download data-tai><svg class="ic" width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M3 14.25C3.41421 14.25 3.75 14.5858 3.75 15C3.75 16.4354 3.75159 17.4365 3.85315 18.1919C3.9518 18.9257 4.13225 19.3142 4.40901 19.591C4.68577 19.8678 5.07435 20.0482 5.80812 20.1469C6.56347 20.2484 7.56459 20.25 9 20.25H15C16.4354 20.25 17.4365 20.2484 18.1919 20.1469C18.9257 20.0482 19.3142 19.8678 19.591 19.591C19.8678 19.3142 20.0482 18.9257 20.1469 18.1919C20.2484 17.4365 20.25 16.4354 20.25 15C20.25 14.5858 20.5858 14.25 21 14.25C21.4142 14.25 21.75 14.5858 21.75 15V15.0549C21.75 16.4225 21.75 17.5248 21.6335 18.3918C21.5125 19.2919 21.2536 20.0497 20.6517 20.6516C20.0497 21.2536 19.2919 21.5125 18.3918 21.6335C17.5248 21.75 16.4225 21.75 15.0549 21.75H8.94513C7.57754 21.75 6.47522 21.75 5.60825 21.6335C4.70814 21.5125 3.95027 21.2536 3.34835 20.6517C2.74643 20.0497 2.48754 19.2919 2.36652 18.3918C2.24996 17.5248 2.24998 16.4225 2.25 15.0549C2.25 15.0366 2.25 15.0183 2.25 15C2.25 14.5858 2.58579 14.25 3 14.25Z" opacity=".5"/><path d="M12 16.75C12.2106 16.75 12.4114 16.6615 12.5535 16.5061L16.5535 12.1311C16.833 11.8254 16.8118 11.351 16.5061 11.0715C16.2004 10.792 15.726 10.8132 15.4465 11.1189L12.75 14.0682V3C12.75 2.58579 12.4142 2.25 12 2.25C11.5858 2.25 11.25 2.58579 11.25 3V14.0682L8.55353 11.1189C8.27403 10.8132 7.79963 10.792 7.49393 11.0715C7.18823 11.351 7.16698 11.8254 7.44648 12.1311L11.4465 16.5061C11.5886 16.6615 11.7894 16.75 12 16.75Z"/></g></svg> Tải APK</a>
+      <a class="nut nutVien" href="#cach-dung">Xem cách dùng</a>
+    </div>
+    <p class="nho" data-ban hidden></p>
+    <p class="nho">Android 8 trở lên · Android TV &amp; Google TV · tiếng Việt và English · <a href="/en">English page</a></p>
+    <p class="nho">Trước khi dùng: bật chế độ nhà phát triển trên tivi — <a href="#chuan-bi">xem hướng dẫn 7 bước</a>.</p>
+    <p class="nho">Dùng iPhone? <a href="#tren-tivi">Cài thẳng CleanTV lên tivi</a> (thử nghiệm).</p>
+    <div class="heroCanh">
+      <div class="tivi"><img src="/cleantv/tv-vgs.webp" alt="Home sạch theme VGS trên tivi: đồng hồ, lịch âm, thời tiết Hà Nội, ô kênh VTV1, VTV2, VTV3, THVL1" width="1600" height="900" fetchpriority="high" decoding="async"></div>
+      <div class="may mayHero"><img src="/cleantv/remote.webp" alt="Remote trên điện thoại của CleanTV: nút nguồn, Home, vòng điều hướng, âm lượng, ô gõ chữ lên tivi" width="660" height="1467" decoding="async"></div>
+    </div>
+  </section>
+
+  <!-- TRƯỚC & SAU -->
+  <section id="truoc-sau" class="khoi sang">
+    <div class="giua hien">
+      <p class="nhanMau">Trước &amp; sau</p>
+      <h2 class="tieuDe">Trước và sau khi dọn</h2>
+      <p class="phuGiua">Kéo thanh ở giữa để so. Bên trái là Home gốc của tivi, bên phải là sau khi dọn.</p>
+    </div>
+    <div class="hien">
+      <div class="soSanh" id="so-sanh">
+        <img src="/cleantv/tv-truoc.webp" alt="Home gốc của tivi, đầy hàng quảng cáo" width="1600" height="900" loading="lazy" decoding="async">
+        <img class="sau" src="/cleantv/tv-vgs.webp" alt="Home sạch sau khi dọn bằng CleanTV" width="1600" height="900" loading="lazy" decoding="async">
+        <span class="vach" aria-hidden="true"></span>
+        <span class="nhan nhanTruoc">Trước</span>
+        <span class="nhan nhanSau">Sau</span>
+        <input type="range" min="0" max="100" value="50" aria-label="Kéo để so trước và sau">
+      </div>
+    </div>
+  </section>
+
+  <!-- REMOTE TRÊN ĐIỆN THOẠI — bản 3.5 -->
+  <section id="remote" class="khoi toi">
+    <div class="hai">
+      <div class="chu hien">
+        <p class="nhanMau">Mới · Remote trên điện thoại</p>
+        <h2 class="tieuDe">Điện thoại<br>làm remote</h2>
+        <p class="phu">Remote hết pin, lạc dưới gối, hay bấm từng chữ để tìm YouTube? Mở CleanTV, kết nối tivi, bấm “Remote trên điện thoại”.</p>
+        <ul class="ds">
+          <li>Phím điều hướng, OK, Home, quay lại, menu, âm lượng, tắt tiếng, phát/dừng, nguồn</li>
+          <li>Gõ hoặc bấm micro để nói, chữ điền thẳng vào ô đang chọn trên tivi: ô tìm YouTube, mật khẩu Wi-Fi… Tiếng Việt có dấu đầy đủ</li>
+          <li>Hẹn giờ tắt tivi 15 tới 120 phút; tivi tự đếm nên đóng app vẫn tắt đúng giờ</li>
+          <li>Mở app trên tivi, gỡ app đã cài, cài file APK từ điện thoại sang tivi</li>
+        </ul>
+        <p class="nho nhoTrai">Remote đi qua Wi-Fi bằng gỡ lỗi (ADB), nên ở màn cuối chọn “Giữ ADB và dùng remote”. Gõ có dấu cần Home sạch.</p>
+      </div>
+      <div class="cap hien">
+        <div class="may"><img src="/cleantv/remote.webp" alt="Remote trên điện thoại: nút nguồn, Home, quay lại, vòng điều hướng có OK, âm lượng, ô gõ chữ lên tivi có micro" width="660" height="1467" loading="lazy" decoding="async"></div>
+        <div class="may mayLech"><img src="/cleantv/remote-app.webp" alt="Hẹn giờ tắt tivi 15 tới 120 phút và danh sách app trên tivi với nút Mở, Gỡ, cài APK từ điện thoại" width="660" height="1467" loading="lazy" decoding="async"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KÊNH TRUYỀN HÌNH -->
+  <section id="kenh" class="khoi sang">
+    <div class="hai">
+      <div class="chu hien">
+        <p class="nhanMau">Kênh truyền hình</p>
+        <h2 class="tieuDe">Kênh VTV, HTV<br>ngay màn chính</h2>
+        <p class="phu">Ông bà muốn xem thời sự mà không phải mò vào app? Mỗi kênh thành một ô có logo đầu dock, bấm là xem luôn.</p>
+        <ul class="ds">
+          <li>VTVgo: VTV1 tới VTV9 và kênh địa phương (Vĩnh Long, Quảng Ngãi…), không cần đăng nhập</li>
+          <li>FPT Play: 61 kênh chọn sẵn (VTV, HTV, HTVC, ANTV, Vĩnh Long, Cần Thơ, Đà Nẵng, Hải Phòng, Nghệ An…); trận đấu, phim thì dán link chia sẻ</li>
+          <li>Danh sách IPTV (m3u) của bạn: mỗi kênh một ô, mở bằng VLC, MX Player hay Kodi</li>
+          <li>Tối đa 12 ô kênh, chọn và bỏ ngay trên điện thoại</li>
+        </ul>
+      </div>
+      <div class="khoaCanh hien">
+        <div class="tivi"><img src="/cleantv/tv-kenh.webp" alt="Home sạch Kiểu Apple TV với ô kênh VTV1, VTV3, HTV9, VTV2 đầu dock" width="1600" height="900" loading="lazy" decoding="async"></div>
+        <div class="may mayKhoa"><img src="/cleantv/kenh.webp" alt="Chọn kênh trong app: VTVgo, FPT Play hàng Toàn quốc và Địa phương, đã chọn Vĩnh Long 1" width="660" height="1467" loading="lazy" decoding="async"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TÍNH NĂNG -->
+  <section id="tinh-nang" class="khoi xam">
+    <div class="giua hien">
+      <p class="nhanMau">Tính năng</p>
+      <h2 class="tieuDe">Mọi thứ CleanTV làm</h2>
+      <p class="phuGiua">Từ dọn gói, giữ an toàn cho tivi tới một màn Home mới hoàn toàn. Miễn phí, không quảng cáo, không cần tài khoản.</p>
+    </div>
+    <div class="nhomTn hien">
+      <div class="theTn">
+        <span class="oIcon"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><path d="M16 6V22H8C5.17157 22 3.75759 21.9998 2.87891 21.1211C2.00023 20.2424 2 18.8284 2 16V12C2 9.17157 2.00023 7.75759 2.87891 6.87891C3.75759 6.00023 5.17157 6 8 6H16Z"/><path d="M19 15C19.5523 15 20 15.4477 20 16C20 16.5523 19.5523 17 19 17C18.4477 17 18 16.5523 18 16C18 15.4477 18.4477 15 19 15Z"/><path d="M19 11C19.5523 11 20 11.4477 20 12C20 12.5523 19.5523 13 19 13C18.4477 13 18 12.5523 18 12C18 11.4477 18.4477 11 19 11Z"/><g opacity=".5"><path d="M16.5 5.99996C18.9982 6.00301 20.2958 6.05357 21.1211 6.87887C21.9996 7.75756 22 9.17164 22 12V16C22 18.8283 21.9997 20.2424 21.1211 21.1211C20.2958 21.9463 18.9981 21.9969 16.5 22H16V5.99996H16.5Z"/><path d="M14.4306 2.51168C14.7002 2.19734 15.1738 2.16111 15.4882 2.43063C15.8026 2.70022 15.8388 3.1738 15.5693 3.48824L13.416 5.99996H10.5839L8.43063 3.48824C8.16111 3.1738 8.19734 2.70022 8.51168 2.43063C8.82612 2.16111 9.29971 2.19735 9.5693 2.51168L12 5.34762L14.4306 2.51168Z"/></g></g></svg></span>
+        <h3>Dọn đúng gói</h3>
+        <ul>
+          <li>Đọc model tivi, so với <span data-so-mau>243</span> danh sách đã thử của <span data-so-hang>70</span> hãng</li>
+          <li>Gói an toàn được tích sẵn, app có biểu tượng thì bạn tự chọn</li>
+          <li>Tivi lạ: chỉ tắt gói đã tắt yên ổn trên nhiều tivi khác</li>
+          <li>Chưa khớp mẫu: gợi ý mẫu gần giống cùng hãng, hoặc gõ tìm trong cả danh sách</li>
+          <li>Nhóm Google Home, trợ lý giọng nói để riêng, không tự tích</li>
+          <li>Chỉ tắt, không gỡ: bật lại lúc nào cũng được</li>
+        </ul>
+      </div>
+      <div class="theTn">
+        <span class="oIcon"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><path d="M3.37752 5.08241C3 5.62028 3 7.21907 3 10.4167V11.9914C3 17.6294 7.23896 20.3655 9.89856 21.5273C10.62 21.8424 10.9807 22 12 22C13.0193 22 13.38 21.8424 14.1014 21.5273C16.761 20.3655 21 17.6294 21 11.9914V10.4167C21 7.21907 21 5.62028 20.6225 5.08241C20.245 4.54454 18.7417 4.02996 15.7351 3.00079L15.1623 2.80472C13.595 2.26824 12.8114 2 12 2C11.1886 2 10.405 2.26824 8.83772 2.80472L8.26491 3.00079C5.25832 4.02996 3.75503 4.54454 3.37752 5.08241Z" opacity=".5"/><path d="M15.0595 10.4995C15.3353 10.1905 15.3085 9.71643 14.9995 9.44055C14.6905 9.16468 14.2164 9.19152 13.9406 9.5005L10.9286 12.8739L10.0595 11.9005C9.78359 11.5915 9.30947 11.5647 9.0005 11.8406C8.69152 12.1164 8.66468 12.5905 8.94055 12.8995L10.3691 14.4995C10.5114 14.6589 10.7149 14.75 10.9286 14.75C11.1422 14.75 11.3457 14.6589 11.488 14.4995L15.0595 10.4995Z"/></g></svg></span>
+        <h3>Tự giữ thứ quan trọng</h3>
+        <ul>
+          <li>Gói chạy cổng HDMI, AV, ăng-ten không bao giờ bị tắt</li>
+          <li>Hỏi chính tivi app nào mở HDMI, mở Cài đặt rồi giữ lại</li>
+          <li>Remote, bàn phím, CH Play, gói lấy nét máy chiếu luôn còn</li>
+          <li>Mạng Wi-Fi đang dùng thuộc trình cài đặt Google thì không tắt, tránh rớt mạng</li>
+          <li>Gói lõi Android và Home đang dùng không bao giờ bị tắt, kể cả khi danh sách có ghi</li>
+          <li>Tivi tắt máy hay khởi động lại giữa chừng: app tự dừng, báo đã tắt tới đâu</li>
+        </ul>
+      </div>
+      <div class="theTn">
+        <span class="oIcon"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><path d="M2 12.2039C2 9.91549 2 8.77128 2.5192 7.82274C3.0384 6.87421 3.98695 6.28551 5.88403 5.10813L7.88403 3.86687C9.88939 2.62229 10.8921 2 12 2C13.1079 2 14.1106 2.62229 16.116 3.86687L18.116 5.10812C20.0131 6.28551 20.9616 6.87421 21.4808 7.82274C22 8.77128 22 9.91549 22 12.2039V13.725C22 17.6258 22 19.5763 20.8284 20.7881C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.7881C2 19.5763 2 17.6258 2 13.725V12.2039Z" opacity=".5"/><path d="M11.25 18C11.25 18.4142 11.5858 18.75 12 18.75C12.4142 18.75 12.75 18.4142 12.75 18V15C12.75 14.5858 12.4142 14.25 12 14.25C11.5858 14.25 11.25 14.5858 11.25 15V18Z"/></g></svg></span>
+        <h3>Home sạch</h3>
+        <ul>
+          <li>Đồng hồ, ngày dương, lịch âm (can chi) ngay dưới</li>
+          <li>Thời tiết theo phường/xã: gõ tìm trong 3.321 phường, xã sau sáp nhập</li>
+          <li>Lời chào theo tên nhà, dock 8 app có tên to</li>
+          <li>Cụm nút gọn: Máy chiếu, Mạng, Màn hình chờ, Cài đặt</li>
+          <li>Giữ OK trên một ô để dời chỗ, gỡ khỏi Home, xem thông tin app</li>
+          <li>App bấm thử nút Home thật trên remote; tivi giữ Home gốc (Google TV…) thì Home sạch tự mở đè lên</li>
+          <li>Nút YouTube, Netflix, Prime, Cài đặt trên remote vẫn chạy sau khi thay Home</li>
+        </ul>
+      </div>
+      <div class="theTn">
+        <span class="oIcon"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><g opacity=".5"><path fill-rule="evenodd" d="M6 2C7.39998 2 8.10001 2.00007 8.63477 2.27246C9.10517 2.51214 9.48786 2.89483 9.72754 3.36523C9.99993 3.89999 10 4.60002 10 6V8.24316L13 5.24316L13.7139 4.62988C14.7181 3.86213 15.2207 3.4783 15.7676 3.36035C16.2176 3.26335 16.6856 3.29231 17.1201 3.44434C17.6481 3.62917 18.0988 4.07275 19 4.95898C19.9993 5.95828 20.4992 6.45808 20.6846 7.03027C20.8426 7.51842 20.8469 8.04369 20.6963 8.53418C20.5197 9.10932 20.0329 9.61085 19.0596 10.6143L13.2217 16.7041L9.92285 20.0029C9.92502 19.9898 9.92569 19.9763 9.92773 19.9629C9.8876 20.2254 9.82622 20.441 9.72754 20.6348C9.48786 21.1052 9.10517 21.4879 8.63477 21.7275C8.10001 21.9999 7.39998 22 6 22C4.60002 22 3.89999 21.9999 3.36523 21.7275C2.89483 21.4879 2.51214 21.1052 2.27246 20.6348C2.00007 20.1 2 19.4 2 18V6C2 4.60002 2.00007 3.89999 2.27246 3.36523C2.51214 2.89483 2.89483 2.51214 3.36523 2.27246C3.89999 2.00007 4.60002 2 6 2Z" clip-rule="evenodd"/><path d="M8 21.9258V21.9238L8.00293 21.9229L8 21.9258Z"/></g><g opacity=".5"><path d="M8.00293 21.9233L8 21.9262V21.9233H8.00293Z"/><path d="M15.7676 3.36079C16.2176 3.26375 16.6856 3.29269 17.1201 3.44477C17.6481 3.62958 18.099 4.07238 19 4.95844C19.9995 5.95797 20.4993 6.45835 20.6846 7.03071C20.8426 7.51886 20.8469 8.04411 20.6963 8.53461C20.5196 9.1096 20.0326 9.61151 19.0596 10.6147L13.2217 16.7045L9.92285 20.0024C9.99973 19.5356 10 18.9185 10 18.0004V8.24262L13 5.24262L13.7139 4.63032C14.7181 3.86257 15.2207 3.47873 15.7676 3.36079Z"/></g><path d="M17.8994 14C19.2994 14 19.9994 14.0001 20.5342 14.2725C21.0046 14.5121 21.3873 14.8948 21.627 15.3652C21.8993 15.9 21.8994 16.6 21.8994 18C21.8994 19.4 21.8993 20.1 21.627 20.6348C21.3873 21.1052 21.0046 21.4879 20.5342 21.7275C19.9994 21.9999 19.2994 22 17.8994 22H6C6.91721 22 7.53428 22.0004 8.00098 21.9238L8 21.9258L8.00293 21.9229C8.24756 21.8825 8.45093 21.8212 8.63477 21.7275C9.10517 21.4879 9.48786 21.1052 9.72754 20.6348C9.82118 20.4509 9.88253 20.2476 9.92285 20.0029L13.2217 16.7041L15.8145 14H17.8994Z"/><path d="M7 18.25C7.41421 18.25 7.75 18.5858 7.75 19C7.75 19.4142 7.41421 19.75 7 19.75H5C4.58579 19.75 4.25 19.4142 4.25 19C4.25 18.5858 4.58579 18.25 5 18.25H7Z"/></g></svg></span>
+        <h3>Giao diện tuỳ ý</h3>
+        <ul>
+          <li>9 giao diện: VGS, Kiểu Apple TV, Kiểu macOS, Phong cảnh, Điện ảnh, Cực quang, Bầu trời, Tối giản, Nhiều app</li>
+          <li>Ảnh xem trước Home ngay trên điện thoại, đổi gì thấy nấy</li>
+          <li>Ảnh trong điện thoại, hoặc ảnh có trên tivi / USB, làm hình nền; app tự cắt vừa 16:9; chọn tới 20 ảnh thì hình nền tự đổi theo phút</li>
+          <li>Chọn màu chữ đồng hồ, ngày, thời tiết cho hợp ảnh nền</li>
+          <li>Màn chờ động: đồng hồ trên ảnh nền trôi chậm, 20 giây đổi một ảnh</li>
+          <li>65 tuỳ chọn Nâng cao có giải thích tiếng Việt, ô tìm, lọc mục đã đổi</li>
+          <li>Đổi lại lúc nào cũng được, không phải dọn lại</li>
+        </ul>
+      </div>
+      <div class="theTn">
+        <span class="oIcon"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><path d="M12.0789 2.25C7.2854 2.25 3.34478 5.913 2.96055 10.5833H2.00002C1.69614 10.5833 1.42229 10.7667 1.30655 11.0477C1.19081 11.3287 1.25606 11.6517 1.47178 11.8657L3.15159 13.5324C3.444 13.8225 3.91567 13.8225 4.20808 13.5324L5.88789 11.8657C6.10361 11.6517 6.16886 11.3287 6.05312 11.0477C5.93738 10.7667 5.66353 10.5833 5.35965 10.5833H4.4668C4.84652 6.75167 8.10479 3.75 12.0789 3.75C14.8484 3.75 17.2727 5.20845 18.6156 7.39279C18.8325 7.74565 19.2944 7.85585 19.6473 7.63892C20.0002 7.42199 20.1104 6.96007 19.8934 6.60721C18.2871 3.99427 15.3873 2.25 12.0789 2.25Z"/><path d="M20.8412 10.4666C20.5491 10.1778 20.0789 10.1778 19.7868 10.4666L18.1005 12.1333C17.8842 12.3471 17.8185 12.6703 17.934 12.9517C18.0496 13.233 18.3236 13.4167 18.6278 13.4167H19.5269C19.1456 17.2462 15.876 20.25 11.8828 20.25C9.10034 20.25 6.66595 18.7903 5.31804 16.6061C5.10051 16.2536 4.63841 16.1442 4.28591 16.3618C3.93342 16.5793 3.82401 17.0414 4.04154 17.3939C5.65416 20.007 8.56414 21.75 11.8828 21.75C16.6907 21.75 20.6476 18.0892 21.0332 13.4167H22.0002C22.3044 13.4167 22.5784 13.233 22.694 12.9517C22.8096 12.6703 22.7438 12.3471 22.5275 12.1333L20.8412 10.4666Z" opacity=".5"/></g></svg></span>
+        <h3>Sao lưu · Khôi phục</h3>
+        <ul>
+          <li>Lưu trạng thái tivi trước lệnh đầu tiên, trên điện thoại và cả trên tivi</li>
+          <li>Bấm Khôi phục là tivi về như lúc chưa dọn</li>
+          <li>Tivi tự canh gác: rớt Wi-Fi, hết pin giữa lúc thay Home thì 3 phút sau tivi tự trả Home cũ</li>
+          <li>Lưu kịch bản khôi phục, dùng bằng máy tính kể cả khi mất điện thoại</li>
+          <li>Xem trước các lệnh app sẽ chạy trên tivi</li>
+          <li>Xong việc rời app thì tivi tự tắt ADB, người cùng mạng không điều khiển được</li>
+        </ul>
+      </div>
+      <div class="theTn">
+        <span class="oIcon"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><path d="M12.0516 2C13.7318 1.99999 15.0627 1.99997 16.1043 2.14245C17.1762 2.28908 18.0438 2.59803 18.728 3.29418C19.4122 3.99033 19.7159 4.87308 19.86 5.9637C20 7.02342 20 8.37752 20 10.087V10.0871V13.913V13.913C20 15.6225 20 16.9766 19.86 18.0363C19.7159 19.1269 19.4122 20.0097 18.728 20.7058C18.0438 21.402 17.1762 21.7109 16.1043 21.8575C15.0627 22 13.7318 22 12.0517 22H12.0516H11.9484H11.9483C10.2681 22 8.93729 22 7.89575 21.8575C6.82382 21.7109 5.95621 21.402 5.27199 20.7058C4.58778 20.0097 4.28413 19.1269 4.14001 18.0363C3.99998 16.9766 3.99999 15.6225 4 13.913V13.9129V10.087V10.087C3.99999 8.3775 3.99998 7.02343 4.14001 5.9637C4.28413 4.87308 4.58778 3.99033 5.27199 3.29418C5.95621 2.59803 6.82382 2.28908 7.89575 2.14245C8.93731 1.99997 10.2682 1.99999 11.9484 2H11.9484H12.0516H12.0516Z" opacity=".5"/><path d="M8.57129 18.5112C8.57129 18.1258 8.87829 17.8135 9.257 17.8135H14.7427C15.1214 17.8135 15.4284 18.1258 15.4284 18.5112C15.4284 18.8965 15.1214 19.2088 14.7427 19.2088H9.257C8.87829 19.2088 8.57129 18.8965 8.57129 18.5112Z"/></g></svg></span>
+        <h3>Kết nối dễ</h3>
+        <ul>
+          <li>Quét mạng tìm tivi, hoặc gõ IP</li>
+          <li>Google TV đời mới: ghép bằng mã 6 số (Gỡ lỗi qua Wi-Fi), app tự dò cổng</li>
+          <li>Dùng iPhone: cài thẳng lên tivi, đi bằng remote</li>
+          <li>Xem màn hình tivi ngay trên điện thoại</li>
+          <li>Nhớ danh sách tivi đã dọn, nhà nhiều tivi vẫn gọn</li>
+        </ul>
+      </div>
+      <div class="theTn">
+        <span class="oIcon"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><path d="M5.17157 3.17157C4 4.34315 4 6.22876 4 10V14C4 17.7712 4 19.6569 5.17157 20.8284C6.34315 22 8.22876 22 12 22C15.7712 22 17.6569 22 18.8284 20.8284C20 19.6569 20 17.7712 20 14V10C20 6.22876 20 4.34315 18.8284 3.17157C17.6569 2 15.7712 2 12 2C8.22876 2 6.34315 2 5.17157 3.17157Z" opacity=".5"/><path d="M9 4.25C8.58579 4.25 8.25 4.58579 8.25 5C8.25 5.41421 8.58579 5.75 9 5.75H15C15.4142 5.75 15.75 5.41421 15.75 5C15.75 4.58579 15.4142 4.25 15 4.25H9Z"/><path d="M12 19C13.1046 19 14 18.1046 14 17C14 15.8954 13.1046 15 12 15C10.8954 15 10 15.8954 10 17C10 18.1046 10.8954 19 12 19Z"/></g></svg></span>
+        <h3>Remote trên điện thoại</h3>
+        <ul>
+          <li>Phím điều hướng, OK, Home, quay lại, âm lượng, nguồn ngay trên điện thoại</li>
+          <li>Gõ hoặc nói để điền chữ vào ô đang chọn trên tivi, tiếng Việt có dấu</li>
+          <li>Hẹn giờ tắt tivi 15–120 phút, tivi tự đếm nên đóng app vẫn tắt đúng hẹn</li>
+          <li>Mở, gỡ app trên tivi; cài file APK từ điện thoại sang tivi</li>
+          <li>Ô kênh VTVgo, 61 kênh FPT Play chọn sẵn, danh sách IPTV mở bằng VLC</li>
+        </ul>
+      </div>
+      <div class="theTn">
+        <span class="oIcon"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><path d="M10 2H14C17.7712 2 19.6569 2 20.8284 3.17157C22 4.34315 22 6.22876 22 10V11C22 11.5516 22 12.5494 21.9935 13H2.00652C2 12.5494 2 11.5516 2 11V10C2 6.22876 2 4.34315 3.17157 3.17157C4.34315 2 6.22876 2 10 2Z" opacity=".5"/><path d="M7.9846 17.5C5.14528 17.5 3.72562 17.5 2.84356 16.6213C2.27207 16.052 2.07085 15.2579 2 14V13H22V14C21.9292 15.2579 21.7279 16.052 21.1564 16.6213C20.2744 17.5 18.8547 17.5 16.0154 17.5H12.7529V21.5H16.0154C16.4312 21.5 16.7683 21.8358 16.7683 22.25C16.7683 22.6642 16.4312 23 16.0154 23H7.9846C7.56879 23 7.23171 22.6642 7.23171 22.25C7.23171 21.8358 7.56879 21.5 7.9846 21.5H11.2471V17.5H7.9846Z"/></g></svg></span>
+        <h3>Máy chiếu &amp; hãng riêng</h3>
+        <ul>
+          <li>Máy chiếu (Formovie, XGIMI, JMGO…): dò màn lấy nét, chỉnh hình rồi ghim vào nút Máy chiếu</li>
+          <li>Tivi Xiaomi bản Trung Quốc: bản Home sạch riêng được hãng cho phép, chuyển cổng HDMI</li>
+          <li>TCL: nút YouTube, Netflix, Web trên remote vẫn chạy; Google TV giữ âm lượng vẫn tăng giảm liên tục</li>
+          <li>Bo mạch CVTE (JVC, Vision…): giữ Home hãng để tivi không kẹt khởi động</li>
+          <li>Fire TV, box Android 7: dọn được, app nói trước là không thay Home</li>
+        </ul>
+      </div>
+      <div class="theTn">
+        <span class="oIcon"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><path d="M2 16C2 13.1716 2 11.7574 2.87868 10.8787C3.75736 10 5.17157 10 8 10H16C18.8284 10 20.2426 10 21.1213 10.8787C22 11.7574 22 13.1716 22 16C22 18.8284 22 20.2426 21.1213 21.1213C20.2426 22 18.8284 22 16 22H8C5.17157 22 3.75736 22 2.87868 21.1213C2 20.2426 2 18.8284 2 16Z" opacity=".5"/><path d="M12 14C13.1046 14 14 14.8954 14 16C14 17.1046 13.1046 18 12 18C10.8954 18 10 17.1046 10 16C10 14.8954 10.8954 14 12 14Z"/><path d="M12 1.25C15.7279 1.25 18.75 4.27208 18.75 8V10.0547C18.3135 10.0221 17.8174 10.0092 17.25 10.0039V8C17.25 5.10051 14.8995 2.75 12 2.75C9.10051 2.75 6.75 5.10051 6.75 8V10.0039C6.18264 10.0092 5.68651 10.0221 5.25 10.0547V8C5.25 4.27208 8.27208 1.25 12 1.25Z"/></g></svg></span>
+        <h3>Khoá trẻ em</h3>
+        <ul>
+          <li>Đặt khung giờ khoá (tối, giờ học, giờ trưa) theo ngày trong tuần, ngay trên điện thoại</li>
+          <li>Tới giờ, màn khoá che mọi thứ, kể cả HDMI, YouTube, và chặn phím remote</li>
+          <li>Nhập đúng mã PIN 4 số trên tivi thì mở 60 phút; sai 5 lần phải chờ 1 phút</li>
+          <li>Tắt tivi bật lại vẫn khoá; từ điện thoại mở tạm, khoá ngay hay gỡ hẳn</li>
+        </ul>
+      </div>
+      <div class="theTn">
+        <span class="oIcon"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><path d="M18.7491 9V9.7041C18.7491 10.5491 18.9903 11.3752 19.4422 12.0782L20.5496 13.8012C21.5612 15.3749 20.789 17.5139 19.0296 18.0116C14.4273 19.3134 9.57274 19.3134 4.97036 18.0116C3.21105 17.5139 2.43882 15.3749 3.45036 13.8012L4.5578 12.0782C5.00972 11.3752 5.25087 10.5491 5.25087 9.7041V9C5.25087 5.13401 8.27256 2 12 2C15.7274 2 18.7491 5.13401 18.7491 9Z" opacity=".5"/><path d="M7.24316 18.5454C7.8941 20.5506 9.77767 22.0002 11.9998 22.0002C14.222 22.0002 16.1055 20.5506 16.7565 18.5454C13.611 19.1357 10.3886 19.1357 7.24316 18.5454Z"/></g></svg></span>
+        <h3>Còn nữa</h3>
+        <ul>
+          <li>Tuỳ chọn DNS chặn quảng cáo AdGuard cho cả tivi</li>
+          <li>Tự báo bản mới, danh sách tivi và Home sạch tự cập nhật</li>
+          <li>Tiếng Việt và English, Home sạch hiện đủ dấu</li>
+          <li>Mã nguồn mở (MIT), bản dựng tái tạo được, số liệu ẩn danh, không cần tài khoản</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- KHOÁ TRẺ EM -->
+  <section id="khoa-tre-em" class="khoi toi">
+    <div class="hai">
+      <div class="chu hien">
+        <p class="nhanMau">Khoá trẻ em</p>
+        <h2 class="tieuDe">Tới giờ tivi tự nghỉ.<br>Có PIN mới mở.</h2>
+        <p class="phu">Con mở tivi xem tới khuya, giờ học vẫn lén bật YouTube? Đặt giờ khoá ngay trên điện thoại, tới giờ tivi tự khoá, không cần ai canh.</p>
+        <ul class="ds">
+          <li>Khung giờ theo ngày trong tuần: tối 21:00–06:00, giờ học, giờ trưa hoặc tự đặt</li>
+          <li>Màn khoá che mọi thứ, kể cả HDMI, YouTube; chặn phím remote và tắt tiếng</li>
+          <li>Nhập đúng mã PIN 4 số trên tivi thì mở 60 phút; sai 5 lần phải chờ 1 phút</li>
+          <li>Tắt tivi bật lại vẫn khoá; từ điện thoại mở tạm, khoá ngay hay gỡ hẳn</li>
+        </ul>
+        <p class="nho nhoTrai">Không chống được khôi phục cài đặt gốc; hộp Android cắm vào tivi thì vẫn đổi nguồn tivi được.</p>
+      </div>
+      <div class="khoaCanh hien">
+        <div class="tivi"><img src="/cleantv/tv-khoa.webp" alt="Màn khoá trên tivi: Tivi đang nghỉ, mở lại lúc 17:34, bàn phím số nhập mã PIN" width="1600" height="900" loading="lazy" decoding="async"></div>
+        <div class="may mayKhoa"><img src="/cleantv/khoa-tre.webp" alt="Màn Khoá trẻ em trong app CleanTV: trạng thái tivi đang khoá, khung giờ khoá, mã PIN" width="660" height="1467" loading="lazy" decoding="async"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOME SẠCH -->
+  <section id="home" class="khoi sang">
+    <div class="hai">
+      <div class="chu hien">
+        <p class="nhanMau">Home sạch</p>
+        <h2 class="tieuDe">Màn Home mới,<br>chỉ còn app bạn dùng</h2>
+        <p class="phu">Home sạch thay màn chính đầy quảng cáo của hãng. Không hàng gợi ý, không khuyến mãi, mở lên là thấy app quen.</p>
+        <ul class="ds">
+          <li>Đồng hồ to, ngày dương và lịch âm có can chi</li>
+          <li>Thời tiết theo đúng phường/xã nhà bạn, nửa giờ cập nhật một lần (<a href="https://open-meteo.com" rel="noopener">Open-Meteo</a>)</li>
+          <li>Dock tối đa 8 app chọn trên điện thoại, tên app hiện to</li>
+          <li>Cụm nút Máy chiếu, Mạng, Màn hình chờ, Cài đặt; giữ OK trên ô app để dời chỗ hay gỡ khỏi Home</li>
+          <li>Nút Home trên remote về đúng Home sạch: app bấm thử thật trên tivi. Google TV, tivi không cho tắt Home gốc: Home sạch tự mở đè lên, không phải quên Wi-Fi</li>
+          <li>Nút YouTube, Netflix, Prime, bánh răng Cài đặt trên remote vẫn mở đúng app</li>
+        </ul>
+      </div>
+      <div class="hien">
+        <div class="tivi"><img src="/cleantv/tv-am-lich.webp" alt="Home sạch theme VGS: đồng hồ, ngày dương, 14/9 âm lịch Bính Ngọ, cụm nút, dock app" width="1600" height="900" loading="lazy" decoding="async"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GIAO DIỆN -->
+  <section id="giao-dien" class="khoi toi">
+    <div class="giua hien">
+      <p class="nhanMau">Giao diện Home</p>
+      <h2 class="tieuDe">Chọn giao diện ngay trên điện thoại</h2>
+      <p class="phuGiua">Chín giao diện, hoặc lấy ảnh trong điện thoại, ảnh trên tivi hay USB làm hình nền (app tự cắt vừa 16:9). Thích tỉ mỉ thì mục Nâng cao có 65 tuỳ chọn của Home sạch, mô tả tiếng Việt. Đổi lúc nào cũng được, không phải dọn lại từ đầu.</p>
+    </div>
+    <div class="luoiTheme hien">
+      <figure class="theme"><div class="tivi"><img src="/cleantv/tv-vgs.webp" alt="Theme VGS" width="1600" height="900" loading="lazy" decoding="async"></div><figcaption><b>VGS</b><span>Logo VGS tím, nền đổi sắc theo giờ trong ngày</span></figcaption></figure>
+      <figure class="theme"><div class="tivi"><img src="/cleantv/tv-macos.webp" alt="Theme Kiểu macOS" width="1600" height="900" loading="lazy" decoding="async"></div><figcaption><b>Kiểu macOS</b><span>Thanh menu mờ, Dock kính ô nhỏ giữa đáy, nền lượn tím hồng</span></figcaption></figure>
+      <figure class="theme"><div class="tivi"><img src="/cleantv/tv-apple-tv.webp" alt="Theme Kiểu Apple TV" width="1600" height="900" loading="lazy" decoding="async"></div><figcaption><b>Kiểu Apple TV</b><span>Nền theo màu app đang chọn, dock kính mờ, ô đều nhau</span></figcaption></figure>
+      <figure class="theme"><div class="tivi"><img src="/cleantv/tv-phong-canh.webp" alt="Theme Phong cảnh" width="1600" height="900" loading="lazy" decoding="async"></div><figcaption><b>Phong cảnh</b><span>14 tranh phong cảnh, mỗi giờ tự đổi một bức</span></figcaption></figure>
+      <figure class="theme"><div class="tivi"><img src="/cleantv/tv-dien-anh.webp" alt="Theme Điện ảnh" width="1600" height="900" loading="lazy" decoding="async"></div><figcaption><b>Điện ảnh</b><span>Ảnh của app đang chọn phủ kín nửa trên màn hình</span></figcaption></figure>
+      <figure class="theme"><div class="tivi"><img src="/cleantv/tv-cuc-quang.webp" alt="Theme Cực quang" width="1600" height="900" loading="lazy" decoding="async"></div><figcaption><b>Cực quang</b><span>Dải xanh ngọc và tím trên nền navy</span></figcaption></figure>
+      <figure class="theme"><div class="tivi"><img src="/cleantv/tv-bau-troi.webp" alt="Theme Bầu trời theo giờ" width="1600" height="900" loading="lazy" decoding="async"></div><figcaption><b>Bầu trời theo giờ</b><span>Sáng xanh, chiều cam, tối tím, chạy theo đồng hồ</span></figcaption></figure>
+      <figure class="theme"><div class="tivi"><img src="/cleantv/tv-toi-gian.webp" alt="Theme Tối giản" width="1600" height="900" loading="lazy" decoding="async"></div><figcaption><b>Tối giản</b><span>Nền đen tuyền, dock kiểu Apple TV</span></figcaption></figure>
+    </div>
+  </section>
+
+  <!-- ĐỔI GIAO DIỆN TRÊN ĐIỆN THOẠI -->
+  <section id="tren-dien-thoai" class="khoi xam">
+    <div class="giua hien">
+      <p class="nhanMau">Chỉnh trên điện thoại</p>
+      <h2 class="tieuDe">Đổi gì, thấy ngay</h2>
+      <p class="phuGiua">Ảnh xem trước Home nằm ngay đầu màn hình, đổi theme, hình nền hay lời chào là ảnh đổi theo. Mọi thứ chia ba thẻ gọn, nút Áp dụng lúc nào cũng ở dưới tay.</p>
+    </div>
+    <div class="baMay hien">
+      <figure><div class="may"><img src="/cleantv/giao-dien.webp" alt="Màn Giao diện của CleanTV: Theme, ảnh của bạn, làm tối nền" width="660" height="1467" loading="lazy" decoding="async"></div><figcaption><b>Giao diện</b><span>Theme, ảnh của bạn, làm tối nền</span></figcaption></figure>
+      <figure><div class="may"><img src="/cleantv/home.webp" alt="Màn Home của CleanTV: Dock, thời tiết theo xã, lời chào, lịch âm" width="660" height="1467" loading="lazy" decoding="async"></div><figcaption><b>Home</b><span>Dock, thời tiết theo xã, lời chào, lịch âm</span></figcaption></figure>
+      <figure><div class="may"><img src="/cleantv/nang-cao.webp" alt="Màn Nâng cao của CleanTV: 65 tuỳ chọn, có ô tìm, lọc mục đã đổi và nhãn Cẩn thận" width="660" height="1467" loading="lazy" decoding="async"></div><figcaption><b>Nâng cao</b><span>65 tuỳ chọn, có ô tìm, lọc mục đã đổi và nhãn Cẩn thận</span></figcaption></figure>
+    </div>
+  </section>
+
+  <!-- MÁY CHIẾU & MÀN CHỜ -->
+  <section id="may-chieu" class="khoi sang">
+    <div class="hai">
+      <div class="chu hien">
+        <p class="nhanMau">Màn chờ động · Máy chiếu</p>
+        <h2 class="tieuDe">Tivi thành<br>khung ảnh</h2>
+        <p class="phu">Bật Màn chờ động (thẻ Tuỳ chỉnh): để yên ở Home sạch vài phút, đồng hồ hiện trên ảnh nền đang trôi chậm, nhiều ảnh thì 20 giây đổi một ảnh. Cũng là màn chờ của tivi.</p>
+        <ul class="ds">
+          <li>Ảnh nền của bạn: chọn tới 20 ảnh trong điện thoại, Home sạch tự đổi sau 5, 15, 30 hoặc 60 phút</li>
+          <li>Chọn màu chữ đồng hồ, ngày, thời tiết (trắng, vàng, xanh, hồng, đen…) cho dễ đọc trên ảnh sáng</li>
+          <li>Cụm nút góc trên: Máy chiếu, Mạng, Màn hình chờ, Hẹn giờ tắt, Cài đặt</li>
+          <li>Máy chiếu (Formovie, XGIMI, JMGO…): app dò màn lấy nét, chỉnh hình của hãng, mở thử rồi ghim vào nút Máy chiếu</li>
+          <li>Gói lo lấy nét, chỉnh hình không bao giờ bị tắt, tự lấy nét khi bật máy vẫn chạy</li>
+        </ul>
+      </div>
+      <div class="hien">
+        <div class="tivi"><img src="/cleantv/tv-man-cho.webp" alt="Màn chờ động: đồng hồ 14:06, Thứ Ba 27 tháng 10 trên ảnh núi lúc hoàng hôn" width="1600" height="900" loading="lazy" decoding="async"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DỌN ĐÚNG GÓI -->
+  <section id="don" class="khoi xam">
+    <div class="hai">
+      <div class="chu hien">
+        <p class="nhanMau"><span data-so-mau>243</span> mẫu tivi đã thử</p>
+        <h2 class="tieuDe">Tivi nào tắt gói nấy</h2>
+        <p class="phu">App đọc model tivi rồi so với <span data-so-mau>243</span> danh sách người dùng đã thử trên TCL, Sony, Xiaomi, Philips, Hisense… Gói an toàn được chọn sẵn, còn app có biểu tượng thì bạn tự chọn cái nào không dùng. Tivi chưa có trong danh sách thì app chỉ tắt những gói đã tắt trên nhiều tivi khác.</p>
+        <ul class="ds">
+          <li>Không đụng cổng HDMI, remote, bàn phím, CH Play; app mở HDMI và Cài đặt của tivi được giữ lại</li>
+          <li>Giữ trình cài đặt Google khi mạng Wi-Fi đang dùng thuộc về nó, để tivi không rớt mạng</li>
+          <li>Chưa khớp mẫu nào? App gợi ý mẫu gần giống cùng hãng, hoặc bấm Chọn mẫu khác để gõ tìm</li>
+          <li>Chỉ muốn Home sạch? Bấm “Bỏ qua, chỉ cài Home sạch”</li>
+          <li>Xem màn hình tivi ngay trên điện thoại để kiểm tra</li>
+        </ul>
+      </div>
+      <div class="cap hien">
+        <div class="may"><img src="/cleantv/chon-mau.webp" alt="Chọn mẫu tivi: gõ tìm trong toàn bộ danh sách" width="660" height="1467" loading="lazy" decoding="async"></div>
+        <div class="may mayLech"><img src="/cleantv/chon.webp" alt="Danh sách gói sẽ tắt: tích sẵn gói an toàn, nhóm Google Home để riêng, nút Bỏ qua chỉ cài Home sạch" width="660" height="1467" loading="lazy" decoding="async"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CÁCH DÙNG -->
+  <section id="cach-dung" class="khoi sang">
+    <div class="giua hien">
+      <p class="nhanMau">Cách dùng</p>
+      <h2 class="tieuDe">Khoảng mười phút một tivi</h2>
+      <p class="phuGiua">Cầm remote với điện thoại là làm được. Dọn cho nhà mình hay nhà người quen đều được.</p>
+    </div>
+    <ol class="buoc hien">
+      <li><b>Bật gỡ lỗi trên tivi</b><span>Cài đặt → Giới thiệu → bấm Bản dựng 7 lần → Tùy chọn nhà phát triển → Gỡ lỗi qua USB. <a href="#chuan-bi">Xem hướng dẫn có hình</a>.</span></li>
+      <li><b>Kết nối</b><span>Điện thoại chung Wi-Fi, bấm Quét mạng, chọn tivi, bấm Cho phép trên tivi.</span></li>
+      <li><b>Chọn và dọn</b><span>Xem danh sách, bỏ tích app chủ nhà còn dùng, bấm Sao lưu &amp; dọn.</span></li>
+      <li><b>Home sạch rồi khoá lại</b><span>Chọn theme, dock, kênh, thời tiết theo phường/xã, cài Home sạch. Xong rời app là tivi tự tắt ADB; muốn dùng remote trên điện thoại thì chọn Giữ ADB.</span></li>
+    </ol>
+  </section>
+
+  <!-- CÀI THẲNG LÊN TIVI (thử nghiệm) -->
+  <section id="tren-tivi" class="khoi toi">
+    <div class="giua hien">
+      <p class="nhanMau">Không có điện thoại Android?</p>
+      <h2 class="tieuDe">Cài thẳng lên tivi <span class="nhanThu">Thử nghiệm</span></h2>
+      <p class="phuGiua">Dùng iPhone, hoặc không muốn cầm điện thoại? Cài CleanTV lên chính chiếc tivi, đi bằng remote. Cùng một app, mọi bước y như trên điện thoại.</p>
+    </div>
+    <ol class="trenTivi hien">
+      <li>
+        <div class="tivi"><img src="/cleantv/tv-tren-tivi-1.webp" alt="CleanTV trên tivi: màn Dọn chính tivi này" width="1600" height="900" loading="lazy" decoding="async"></div>
+        <b>Tải app về tivi</b>
+        <span>Bật Gỡ lỗi USB (<a href="#chuan-bi">hướng dẫn</a>). Trên tivi cài app <b>Downloader</b> từ CH Play, gõ <code>cleantv.alexvgs.tech/tv</code>, tải xong bấm Cài đặt.</span>
+      </li>
+      <li>
+        <div class="tivi"><img src="/cleantv/tv-tren-tivi-2.webp" alt="CleanTV trên tivi báo Tivi đã sạch" width="1600" height="900" loading="lazy" decoding="async"></div>
+        <b>Kết nối chính tivi này</b>
+        <span>Mở CleanTV → Dọn một tivi → <b>Kết nối tivi này</b>. Tivi hỏi thì tích Luôn cho phép rồi bấm Cho phép. Sau đó chọn gói, dọn, cài Home sạch như bình thường.</span>
+      </li>
+      <li>
+        <div class="tivi"><img src="/cleantv/tv-tren-tivi-3.webp" alt="Home sạch có ô CleanTV để mở lại app" width="1600" height="900" loading="lazy" decoding="async"></div>
+        <b>Mở lại từ Home sạch</b>
+        <span>CleanTV nằm ngay trên Home sạch: muốn đổi giao diện hay Khôi phục thì mở lại là xong. Ảnh nền thì chép ảnh JPG vào USB, cắm vào tivi rồi bấm “Chọn ảnh có trên tivi / USB”.</span>
+      </li>
+    </ol>
+    <p class="nho hien">Đang thử nghiệm: tivi Google TV đời mới chỉ có "Gỡ lỗi qua Wi-Fi" (ghép mã) có thể chưa kết nối được, khi đó dùng điện thoại Android. Gặp lỗi thì <a href="#gop-y" data-gop-y-tu="CleanTV trên tivi">báo ở đây</a>.</p>
+  </section>
+
+  <!-- CHUẨN BỊ TIVI — bắt buộc trước khi dùng app -->
+  <section id="chuan-bi" class="khoi xam">
+    <div class="giua hien">
+      <p class="nhanMau">Bước 0 · bắt buộc</p>
+      <h2 class="tieuDe">Bật chế độ nhà phát triển trên tivi trước</h2>
+      <p class="phuGiua">Chưa bật thì app không kết nối được tivi. Làm một lần là xong, chỉ cần remote. Ảnh chụp trên Android TV, tivi hãng khác tên mục có thể hơi khác (Hệ thống, Thông tin…).</p>
+    </div>
+    <ol class="huongDan hien">
+      <li><img src="/cleantv/hd/1-caidat.webp" alt="Mở Cài đặt của tivi" width="720" height="1080" loading="lazy" decoding="async"><div><b><span>1</span>Mở Cài đặt của tivi</b><p>Nút bánh răng trên remote hoặc biểu tượng Cài đặt góc trên phải. Chọn “Lựa chọn ưu tiên về thiết bị” (Google TV: “Hệ thống”).</p></div></li>
+      <li><img src="/cleantv/hd/2-tuychon.webp" alt="Vào Giới thiệu" width="720" height="1080" loading="lazy" decoding="async"><div><b><span>2</span>Vào Giới thiệu</b><p>Chọn “Giới thiệu” (có hãng ghi “Thông tin”).</p></div></li>
+      <li><img src="/cleantv/hd/3-bandung.webp" alt="Bấm OK vào Bản dựng 7 lần" width="720" height="1080" loading="lazy" decoding="async"><div><b><span>3</span>Bấm OK vào Bản dựng 7 lần</b><p>Đứng ở “Bản dựng hệ điều hành Android TV”, bấm OK 7 lần tới khi hiện “Bạn đã là nhà phát triển!”. Hỏi PIN thì nhập mã tivi.</p></div></li>
+      <li><img src="/cleantv/hd/4-tuychonnpt.webp" alt="Mở Tùy chọn nhà phát triển" width="720" height="1080" loading="lazy" decoding="async"><div><b><span>4</span>Mở Tùy chọn nhà phát triển</b><p>Bấm Back. Cuối danh sách có thêm “Tùy chọn nhà phát triển”.</p></div></li>
+      <li><img src="/cleantv/hd/5-goloi.webp" alt="Bật Gỡ lỗi qua USB" width="720" height="1080" loading="lazy" decoding="async"><div><b><span>5</span>Bật Gỡ lỗi qua USB</b><p>Bật “Gỡ lỗi qua USB” (có “Gỡ lỗi qua mạng” thì bật luôn). Không cần cắm dây — app kết nối qua Wi-Fi.</p></div></li>
+      <li><img src="/cleantv/hd/6-goloiwifi.webp" alt="Google TV đời mới: Gỡ lỗi qua Wi-Fi" width="720" height="1080" loading="lazy" decoding="async"><div><b><span>6</span>Google TV đời mới: Gỡ lỗi qua Wi-Fi</b><p>App quét không thấy tivi thì bật “Gỡ lỗi qua Wi-Fi” → “Ghép nối thiết bị bằng mã”, nhập IP:cổng và mã 6 số vào app.</p></div></li>
+      <li><img src="/cleantv/hd/7-chophep.webp" alt="Bấm Cho phép trên tivi" width="720" height="1080" loading="lazy" decoding="async"><div><b><span>7</span>Bấm Cho phép trên tivi</b><p>Lần đầu kết nối, tích “Luôn cho phép từ máy tính này” rồi bấm “Cho phép”.</p></div></li>
+    </ol>
+    <p class="chuThich hien">Dọn xong, app tắt ADB ở bước cuối. Cho chắc, vào lại Tùy chọn nhà phát triển: tắt Gỡ lỗi qua USB và chọn “Thu hồi các lượt ủy quyền gỡ lỗi qua USB”.</p>
+  </section>
+
+  <!-- AN TOÀN -->
+  <section id="an-toan" class="khoi toi">
+    <div class="hai daoChieu">
+      <div class="chu hien">
+        <p class="nhanMau">Sao lưu · Khôi phục</p>
+        <h2 class="tieuDe">Không gỡ gì, trả lại được</h2>
+        <p class="phu">Trước lệnh đầu tiên, app lưu trạng thái tivi trên điện thoại và một bản ngay trên tivi. Các gói chỉ bị tắt chứ không bị gỡ. Bấm Khôi phục là tivi về như lúc chưa dọn.</p>
+        <ul class="ds">
+          <li>Tivi tự canh gác: đang thay Home mà rớt Wi-Fi, hết pin hay tắt app thì 3 phút sau tivi tự bật lại Home cũ</li>
+          <li>Thay Home không thành thì app tự trả Home của hãng, không để tivi màn đen</li>
+          <li>Lưu kịch bản khôi phục: một file lệnh đưa tivi về như cũ từ máy tính, kể cả khi mất điện thoại</li>
+          <li>Đổi điện thoại hay cài lại app: kết nối lại tivi là lấy được bản sao lưu trên tivi</li>
+          <li>Bấm “Xem lệnh sẽ chạy trên tivi” để biết từng lệnh trước khi dọn hay cài Home</li>
+          <li>Xong việc rời app thì tivi tự tắt ADB; muốn giữ cho lần sau thì bật “Giữ ADB bật”</li>
+        </ul>
+      </div>
+      <div class="cap hien">
+        <div class="may"><img src="/cleantv/xong.webp" alt="Màn tivi đã sạch: kiểm tra, khởi động lại, cộng đồng VGS, tắt ADB" width="660" height="1467" loading="lazy" decoding="async"></div>
+        <div class="may mayLech"><img src="/cleantv/thongtin.webp" alt="Tivi đã kết nối: bản sao lưu, danh sách mẫu, xem màn hình tivi, đổi giao diện, khôi phục" width="660" height="1467" loading="lazy" decoding="async"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIVI ĐÃ THỬ — đọc /tivi.json -->
+  <section id="tivi" class="khoi sang">
+    <div class="giua hien">
+      <p class="nhanMau">Tivi đã thử</p>
+      <h2 class="tieuDe"><span data-so-mau>243</span> mẫu, <span data-so-hang>70</span> hãng</h2>
+      <p class="phuGiua">Mỗi mẫu là một danh sách gói do người dùng thật đã tắt và chạy ổn, từ cộng đồng <a href="https://github.com/Gathin23/cleanyourtv/tree/main/examples" rel="noopener">CleanYourTV</a>. Tivi không có tên ở đây vẫn dùng được: app áp luật chung an toàn.</p>
+    </div>
+    <div class="dsTivi" id="ds-tivi">
+      <div class="dsLoc">
+        <input class="dsTim" type="search" placeholder="Tìm hãng, model… (vd: TCL C725, Mi Box, Sony X80J)" aria-label="Tìm tivi" autocomplete="off">
+        <div class="dsChip" role="group" aria-label="Loại thiết bị">
+          <button type="button" data-loai="" aria-pressed="true">Tất cả</button>
+          <button type="button" data-loai="tivi" aria-pressed="false">Tivi</button>
+          <button type="button" data-loai="box" aria-pressed="false">Box, que</button>
+          <button type="button" data-loai="may-chieu" aria-pressed="false">Máy chiếu</button>
+        </div>
+      </div>
+      <p class="dsDem" aria-live="polite">Đang tải danh sách…</p>
+      <div class="dsCuon"></div>
+    </div>
+  </section>
+
+  <!-- HỎI ĐÁP -->
+  <section id="hoi-dap" class="khoi sang">
+    <div class="giua hien">
+      <h2 class="tieuDe">Hỏi đáp</h2>
+    </div>
+    <div class="hoiDap hien">
+      <details><summary>Tivi nào dùng được?</summary><p>Mọi tivi chạy Android TV hoặc Google TV, kể cả box (Mi Box, Chromecast, Shield) và máy chiếu Android (Formovie, XGIMI, JMGO…). Samsung (Tizen) và LG (webOS) không làm được.</p></details>
+      <details><summary>Máy chiếu chỉnh nét, chỉnh hình ở đâu sau khi thay Home?</summary><p>Lúc cài Home sạch, ở mục “Máy chiếu” bấm Dò màn lấy nét / chỉnh hình. App liệt kê các màn chỉnh của hãng, bấm Mở thử để xem đúng chưa rồi Ghim. Home sạch sẽ có icon Máy chiếu mở thẳng các màn đó. Không thấy màn nào thì bấm Gửi danh sách cho VGS để bọn mình thêm hỗ trợ.</p></details>
+      <details><summary>Điều khiển tivi bằng điện thoại được không?</summary><p>Được, từ bản 3.5. Kết nối tivi trong app → “Remote trên điện thoại”: có phím điều hướng, OK, Home, quay lại, âm lượng, nguồn; ô gõ chữ (có micro để nói) điền vào ô đang chọn trên tivi; hẹn giờ tắt; mở, gỡ, cài app. Gõ tiếng Việt có dấu thì tivi cần có Home sạch, bấm “Bật gõ tiếng Việt có dấu” một lần. Remote đi qua ADB nên phải để ADB bật: ở màn cuối chọn “Giữ ADB và dùng remote”.</p></details>
+      <details><summary>Đưa kênh VTV, HTV, đài tỉnh ra màn chính thế nào?</summary><p>Kết nối tivi → “Đổi giao diện Home sạch” → thẻ Home → mục “Kênh truyền hình trên màn chính”. Chọn kênh VTVgo (bấm “Thêm kênh khác” để tìm kênh địa phương), hoặc 61 kênh FPT Play ở hai hàng Toàn quốc và Địa phương, rồi Áp dụng lên tivi. Tivi cần có app VTVgo hoặc FPT Play for Android TV; kênh FPT cần gói thì tivi phải đăng nhập FPT Play.</p></details>
+      <details><summary>Làm sao để màn hình chờ hiện ảnh của mình?</summary><p>Chọn ảnh làm hình nền (thêm tới 20 ảnh để tự đổi), rồi bật “Màn chờ động” ở thẻ Tuỳ chỉnh và Áp dụng: để yên ở Home sạch 5–30 phút là đồng hồ hiện trên ảnh của bạn, ảnh trôi chậm và đổi mỗi 20 giây. Muốn dùng album Google Photos thì mở app Google Home trên điện thoại → chọn tivi → Ambient mode / Backdrop.</p></details>
+      <details><summary>Bấm Home trên remote lại về màn cũ?</summary><p>Cập nhật app bản mới, kết nối lại tivi rồi bấm “Đổi giao diện Home sạch” → Áp dụng. App bấm thử nút Home thật trên tivi; tivi không cho tắt Home gốc (Google TV, một số box nhà mạng) thì Home sạch tự mở đè lên Home gốc. Không được thì app để tivi như cũ và báo rõ lý do. Vẫn không được thì gửi góp ý kèm hãng, model.</p></details>
+      <details><summary>Không có điện thoại Android, dùng iPhone thì sao?</summary><p>Cài CleanTV thẳng lên tivi (đang thử nghiệm): trên tivi cài app Downloader, gõ cleantv.alexvgs.tech/tv, cài xong mở CleanTV → Dọn một tivi → Kết nối tivi này. Mọi bước còn lại giống trên điện thoại, đi bằng remote. Ảnh nền thì chép ảnh vào USB rồi chọn “Chọn ảnh có trên tivi / USB”. Xem mục <a href="#tren-tivi">Cài thẳng lên tivi</a>.</p></details>
+      <details><summary>Khoá trẻ em hoạt động thế nào?</summary><p>Kết nối tivi trong app → “Khoá trẻ em (hẹn giờ + mã PIN)”: chọn khung giờ khoá (ví dụ 21:00–06:00, giờ học 14:00–16:30 từ thứ Hai tới thứ Sáu) và đặt mã PIN 4 số, bấm Lưu. App cài một app nhỏ lên tivi. Tới giờ, tivi hiện màn “Tivi đang nghỉ” che mọi thứ, chặn phím remote; nhập đúng PIN thì mở 60 phút. Tắt tivi bật lại vẫn khoá. Quên PIN thì kết nối lại tivi trong app và đặt PIN mới. Khoá không chống được khôi phục cài đặt gốc; với hộp Android cắm vào tivi, trẻ vẫn đổi nguồn tivi được.</p></details>
+      <details><summary>Có làm hỏng tivi không?</summary><p>Không gỡ gì, chỉ tắt. Gói chạy cổng HDMI, remote, bàn phím, CH Play không bao giờ bị đụng, app mở HDMI và Cài đặt của tivi cũng được giữ. Bản sao lưu nằm trên điện thoại và trên tivi trước lệnh đầu tiên; tivi khởi động lại giữa chừng thì app dừng và báo rõ. Đang thay Home mà mất kết nối thì 3 phút sau tivi tự trả Home cũ. Bấm Khôi phục là tivi về như cũ, hoặc dùng kịch bản khôi phục bằng máy tính.</p></details>
+      <details><summary>Đã dọn rồi, muốn đổi giao diện thì sao?</summary><p>Không phải dọn lại. Trên tivi bật lại Gỡ lỗi qua USB (Tùy chọn nhà phát triển vẫn còn, không phải bấm Bản dựng nữa). Mở app → Dọn một tivi → kết nối lại tivi đó → bấm “Đổi giao diện Home sạch”, chọn theme, dock, thời tiết rồi Áp dụng. Các gói đã tắt giữ nguyên. Xong rời app là tivi tự tắt ADB. Muốn chỉnh nhanh số cột hay thứ tự app thì trên tivi giữ OK ở nút Cài đặt của Home sạch, khỏi cần điện thoại.</p></details>
+      <details><summary>Tivi kẹt ở màn khởi động sau khi dọn?</summary><p>Không có gì bị gỡ nên cứu được. Thử theo thứ tự: chờ 10 phút một lần. Vào chế độ an toàn (nhiều tivi: giữ nút Nguồn trên remote lúc đang hiện logo khởi động) rồi bật lại Home của hãng trong Cài đặt → Ứng dụng → hiện ứng dụng hệ thống. Ngay sau khi bật nguồn, bấm Khôi phục trong app CleanTV liên tục vài phút: ADB đôi khi lên được một lúc. Xoá phân vùng cache trong menu recovery. Khôi phục cài đặt gốc cũng được nhưng mất hết dữ liệu nên để cuối cùng. Từ bản 1.9.1 app không bao giờ tắt Home gốc trên tivi bo mạch CVTE (JVC, Vision…), loại đã gặp lỗi này.</p></details>
+      <details><summary>Bấm Home vẫn về Home Google?</summary><p>Từ bản 2.6.4 không phải quên Wi-Fi nữa: app để Home Google nguyên đó và cho Home sạch tự mở đè lên mỗi khi Home Google hiện ra. Cập nhật app, kết nối lại tivi, bấm “Đổi giao diện Home sạch” → Áp dụng. Nếu vẫn về Home Google: trên tivi vào Cài đặt → Mạng, quên mạng Wi-Fi đang dùng rồi kết nối lại (hoặc cắm dây LAN), kết nối lại CleanTV, tích setupwraith ở nhóm Google Home và dọn lại.</p></details>
+      <details><summary>Nút YouTube trên remote không chạy, hay giữ âm lượng chỉ nhảy một nấc (TCL)?</summary><p>Cập nhật app, kết nối lại tivi → Đổi giao diện Home sạch → Áp dụng. Nút YouTube, Netflix, Prime, Cài đặt trên remote sẽ mở đúng app. Riêng TCL Google TV: bật “Nút app trên remote” (Tuỳ chỉnh → Remote) thì giữ âm lượng chỉ nhảy một nấc do giới hạn của tivi; tắt đi thì âm lượng tăng giảm liên tục, nút app vẫn chạy khi Home Google còn bật.</p></details>
+      <details><summary>Tivi Xiaomi bản Trung Quốc (PatchWall) có thay Home được không?</summary><p>Được. Xiaomi bản nội địa chỉ cho Home có tên gói trong danh sách của hãng, nên CleanTV tự cài bản Home sạch mang tên gói được phép. Ô HDMI trên Home sạch chuyển cổng qua trình phát của Xiaomi. Cổng nào chưa chuyển được thì gửi góp ý kèm model để bọn mình sửa.</p></details>
+      <details><summary>Có dùng được cho Fire TV / Fire TV Stick không?</summary><p>Được một phần. Trên Fire TV, CleanTV tắt được quảng cáo, theo dõi và app rác của Amazon, nhưng không thay được màn Home: Fire OS giữ Home cho launcher của Amazon (đặt Home khác bị bỏ qua, không tắt được launcher, không bắt được nút Home). Home sạch vẫn mở được từ danh sách ứng dụng.</p></details>
+      <details><summary>Có chặn quảng cáo trong YouTube không?</summary><p>Không. CleanTV bỏ quảng cáo của chính tivi (hàng gợi ý trên Home, khuyến mãi, theo dõi); quảng cáo bên trong app như YouTube thì không đụng tới.</p></details>
+      <details><summary>Sao không có trên Google Play?</summary><p>Hiện tải APK thẳng từ trang này (máy sẽ hỏi cho phép cài từ trình duyệt). App tự cập nhật khi có bản mới.</p></details>
+      <details><summary>App có thu thập gì không?</summary><p>Chỉ số liệu ẩn danh để biết app được dùng bao nhiêu và tivi nào hay lỗi: một mã máy ngẫu nhiên do app tự sinh, số bản app, tên mẫu tivi và số gói đã tắt, gửi khi mở app (mỗi ngày một lần), cập nhật, dọn tivi xong, cài Home sạch. Không gửi email, tên, danh sách app, địa chỉ IP hay vị trí. Lượt tải APK chỉ được đếm. Riêng nút “Gửi danh sách gói cho VGS” ở màn cuối thì chỉ chạy khi bạn tự bấm: gửi model tivi, danh sách gói đang tắt, đánh giá và ghi chú của bạn, để làm mẫu cho người dùng cùng dòng tivi. Chi tiết trong màn Giấy phép của app.</p></details>
+      <details><summary>Bảo hành và trách nhiệm</summary><p>CleanTV miễn phí, cung cấp nguyên trạng, không kèm bảo hành. App chỉ thay đổi tivi khi chủ tivi tự bật gỡ lỗi và bấm Cho phép. Mọi thay đổi đều khôi phục được, người dùng tự chịu trách nhiệm khi dùng. CleanTV không liên quan Google, Apple, Sony, TCL hay hãng tivi nào; tên hãng chỉ dùng để nói tivi nào chạy được.</p></details>
+      <details><summary>Ai làm?</summary><p>CleanTV do VGS làm, dựa trên dự án mã nguồn mở <a href="https://github.com/Gathin23/cleanyourtv" rel="noopener">CleanYourTV</a> (MIT) của Gathin và cộng đồng — họ làm <span data-so-mau>243</span> danh sách tivi và màn Home sạch. Mã nguồn CleanTV: <a href="https://github.com/vgscity/vgs-cleantv" rel="noopener">github.com/vgscity/vgs-cleantv</a>. <a href="/giay-phep.txt">Giấy phép</a>.</p></details>
+      <details><summary>Làm sao biết APK tải về là bản thật?</summary><p>Mọi bản CleanTV ký cùng một khoá, dấu SHA-256 của chứng chỉ là <code>ab94764d…ad8b3046</code> (đầy đủ trong <a href="https://github.com/vgscity/vgs-cleantv#kiểm-tra-bản-tải-về" rel="noopener">README</a>). Mỗi bản trên GitHub Releases có kèm mã SHA-256 của file. Bản dựng tái tạo được: tự dựng lại từ mã nguồn ra đúng từng file.</p></details>
+    </div>
+  </section>
+
+  <!-- NHẬT KÝ CẬP NHẬT — đọc /nhat-ky.json -->
+  <section id="cap-nhat" class="khoi sang">
+    <div class="giua hien">
+      <p class="nhanMau">Nhật ký cập nhật</p>
+      <h2 class="tieuDe">Bản mới có gì</h2>
+      <p class="phuGiua">App tự báo khi có bản mới. Đang dùng bản cũ thì mở app bấm Cập nhật.</p>
+    </div>
+    <ol class="nhatKy" id="nhat-ky"></ol>
+    <details class="nkCu" id="nhat-ky-cu" hidden>
+      <summary></summary>
+      <ol class="nhatKy"></ol>
+    </details>
+  </section>
+
+  <!-- GÓP Ý -->
+  <section id="gop-y" class="khoi xam">
+    <div class="giua hien">
+      <p class="nhanMau">Góp ý &amp; báo lỗi</p>
+      <h2 class="tieuDe">Tivi nhà bạn chưa chạy?</h2>
+      <p class="phuGiua">Gặp lỗi hay muốn app hỗ trợ tivi nhà bạn thì gửi ở đây, nhớ ghi hãng và model tivi. CleanTV trả lời qua email.</p>
+    </div>
+    <form class="gopY" id="form-gop-y" novalidate>
+      <fieldset class="loaiGopY">
+        <legend>Loại</legend>
+        <label><input type="radio" name="loai" value="loi" checked> Báo lỗi</label>
+        <label><input type="radio" name="loai" value="gop-y"> Góp ý</label>
+      </fieldset>
+      <label>Nội dung (hãng, model tivi, lỗi gì, bạn đã làm gì trước đó)
+        <textarea name="chu" maxlength="2000" required placeholder="VD: TCL 55C725, bấm Home vẫn về Home Google sau khi cài Home sạch…"></textarea>
+      </label>
+      <label>Email để CleanTV trả lời
+        <input type="email" name="lienHe" maxlength="120" required autocomplete="email" inputmode="email" placeholder="ban@email.com">
+      </label>
+      <p class="gopYBao" role="status" aria-live="polite"></p>
+      <div class="gopYNut">
+        <button class="nut" type="submit">Gửi báo lỗi</button>
+      </div>
+      <p class="gopYPhu">Muốn kèm ảnh chụp màn hình? Gửi ở <a href="https://vgs.zone/gop-y?tu=CleanTV%20%C2%B7%20cleantv.alexvgs.tech" rel="noopener">hộp góp ý của VGS</a> hoặc email <a href="mailto:cleantv@alexvgs.tech">cleantv@alexvgs.tech</a>.</p>
+    </form>
+  </section>
+
+  <!-- Mời vào cộng đồng VGS -->
+  <section class="khoi sang">
+    <div class="giua hien" style="margin-bottom:28px">
+      <h2 class="tieuDe">CleanTV là app của cộng đồng VGS</h2>
+      <p class="phuGiua">VGS – Vietnam Gaming Setup là cộng đồng 180.000+ anh em mê góc máy và đồ công nghệ. Có tài khoản VGSZone (miễn phí) là hỏi được khi tivi gặp lỗi, theo dõi bản CleanTV mới, khoe góc máy, góc giải trí và tham gia giveaway đồ công nghệ hằng tháng.</p>
+    </div>
+    <div class="nutHang hien">
+      <a class="nut" href="https://vgs.zone/dang-ky?next=/cleantv&amp;tu=cleantv">Tạo tài khoản VGSZone</a>
+      <a class="nut nutVien" href="https://t.me/vietnamgamingsetup" target="_blank" rel="noopener">Vào nhóm Telegram</a>
+    </div>
+  </section>
+
+  <!-- CTA CUỐI -->
+  <section class="khoi toi cuoi">
+    <div class="hien">
+      <img class="icon" src="/cleantv/logo.png" alt="" width="96" height="96" loading="lazy">
+      <h2 class="tieuDeLon">Dọn tivi của bạn<br>ngay hôm nay.</h2>
+      <p class="phuLon">Miễn phí. Tải APK về điện thoại Android, máy hỏi thì cho phép cài từ trình duyệt.</p>
+      <div class="nutHang">
+        <a class="nut" href="https://cleantv-dem.vgszone.workers.dev/tai?tu=vgszone" download data-tai><svg class="ic" width="19" height="19" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"><path d="M3 14.25C3.41421 14.25 3.75 14.5858 3.75 15C3.75 16.4354 3.75159 17.4365 3.85315 18.1919C3.9518 18.9257 4.13225 19.3142 4.40901 19.591C4.68577 19.8678 5.07435 20.0482 5.80812 20.1469C6.56347 20.2484 7.56459 20.25 9 20.25H15C16.4354 20.25 17.4365 20.2484 18.1919 20.1469C18.9257 20.0482 19.3142 19.8678 19.591 19.591C19.8678 19.3142 20.0482 18.9257 20.1469 18.1919C20.2484 17.4365 20.25 16.4354 20.25 15C20.25 14.5858 20.5858 14.25 21 14.25C21.4142 14.25 21.75 14.5858 21.75 15V15.0549C21.75 16.4225 21.75 17.5248 21.6335 18.3918C21.5125 19.2919 21.2536 20.0497 20.6517 20.6516C20.0497 21.2536 19.2919 21.5125 18.3918 21.6335C17.5248 21.75 16.4225 21.75 15.0549 21.75H8.94513C7.57754 21.75 6.47522 21.75 5.60825 21.6335C4.70814 21.5125 3.95027 21.2536 3.34835 20.6517C2.74643 20.0497 2.48754 19.2919 2.36652 18.3918C2.24996 17.5248 2.24998 16.4225 2.25 15.0549C2.25 15.0366 2.25 15.0183 2.25 15C2.25 14.5858 2.58579 14.25 3 14.25Z" opacity=".5"/><path d="M12 16.75C12.2106 16.75 12.4114 16.6615 12.5535 16.5061L16.5535 12.1311C16.833 11.8254 16.8118 11.351 16.5061 11.0715C16.2004 10.792 15.726 10.8132 15.4465 11.1189L12.75 14.0682V3C12.75 2.58579 12.4142 2.25 12 2.25C11.5858 2.25 11.25 2.58579 11.25 3V14.0682L8.55353 11.1189C8.27403 10.8132 7.79963 10.792 7.49393 11.0715C7.18823 11.351 7.16698 11.8254 7.44648 12.1311L11.4465 16.5061C11.5886 16.6615 11.7894 16.75 12 16.75Z"/></g></svg> Tải APK</a>
+        <a class="nut nutVien" href="#cach-dung">Xem cách dùng</a>
+      </div>
+      <p class="nho" data-ban data-ghi-chu hidden></p>
+      <p class="nho"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor"><path d="M12.0516 2C13.7318 1.99999 15.0627 1.99997 16.1043 2.14245C17.1762 2.28908 18.0438 2.59803 18.728 3.29418C19.4122 3.99033 19.7159 4.87308 19.86 5.9637C20 7.02342 20 8.37752 20 10.087V10.0871V13.913V13.913C20 15.6225 20 16.9766 19.86 18.0363C19.7159 19.1269 19.4122 20.0097 18.728 20.7058C18.0438 21.402 17.1762 21.7109 16.1043 21.8575C15.0627 22 13.7318 22 12.0517 22H12.0516H11.9484H11.9483C10.2681 22 8.93729 22 7.89575 21.8575C6.82382 21.7109 5.95621 21.402 5.27199 20.7058C4.58778 20.0097 4.28413 19.1269 4.14001 18.0363C3.99998 16.9766 3.99999 15.6225 4 13.913V13.9129V10.087V10.087C3.99999 8.3775 3.99998 7.02343 4.14001 5.9637C4.28413 4.87308 4.58778 3.99033 5.27199 3.29418C5.95621 2.59803 6.82382 2.28908 7.89575 2.14245C8.93731 1.99997 10.2682 1.99999 11.9484 2H11.9484H12.0516H12.0516Z" opacity=".5"/><path d="M8.57129 18.5112C8.57129 18.1258 8.87829 17.8135 9.257 17.8135H14.7427C15.1214 17.8135 15.4284 18.1258 15.4284 18.5112C15.4284 18.8965 15.1214 19.2088 14.7427 19.2088H9.257C8.87829 19.2088 8.57129 18.8965 8.57129 18.5112Z"/></g></svg> App chạy trên điện thoại, không cài gì lên tivi ngoài Home sạch.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="chan">
+  <nav aria-label="Liên kết">
+    <a href="https://vgs.zone">VGS.zone</a>
+    <a href="/en">English</a>
+    <a href="https://github.com/vgscity/vgs-cleantv" rel="noopener">Mã nguồn</a>
+    <a href="/giay-phep.txt">Giấy phép</a>
+    <a href="#gop-y">Góp ý</a>
+    <a href="mailto:cleantv@alexvgs.tech">cleantv@alexvgs.tech</a>
+  </nav>
+  <p>CleanTV · app miễn phí của VGS – Vietnam Gaming Setup</p>
+</footer>
+
+<div class="moiThe" id="moi-the" role="dialog" aria-label="Mời vào cộng đồng VGS" hidden>
+  <button type="button" class="moiDong" aria-label="Đóng">×</button>
+  <b>Đang tải CleanTV ✓</b>
+  <p>Trong lúc chờ: CleanTV là app miễn phí của cộng đồng <b>VGS – Vietnam Gaming Setup</b>. Có tài khoản VGSZone là hỏi được khi tivi gặp lỗi, theo dõi bản mới và tham gia giveaway đồ công nghệ hằng tháng.</p>
+  <div class="moiNut">
+    <a class="moiChinh" href="https://vgs.zone/dang-ky?next=/cleantv&amp;tu=cleantv">Tạo tài khoản miễn phí</a>
+    <a class="moiPhu" href="https://t.me/vietnamgamingsetup" target="_blank" rel="noopener">Nhóm Telegram VGS</a>
+  </div>
+</div>
+
+</body>
+</html>
