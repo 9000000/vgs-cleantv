@@ -1,5 +1,17 @@
 [
  {
+  "ban": "3.5.3",
+  "ngay": "2026-10-27",
+  "vi": [
+   "Ô tìm thời tiết: báo \"Đang tìm…\", báo không thấy hoặc điện thoại không vào được dịch vụ tìm địa danh, tự thử lại một lần khi mạng chậm",
+   "Gửi danh sách gói kèm chẩn đoán lúc khởi động (Home sạch có được gọi dậy không), để sửa lỗi tivi về Home gốc sau khi rút điện trên TCL và Google TV"
+  ],
+  "en": [
+   "Weather search: shows \"Searching…\", says when nothing is found or the phone cannot reach the place search, and retries once on a slow network",
+   "Sending the package list now includes a boot diagnosis (did the clean Home wake up), to fix TVs that go back to the stock Home after a power cut on TCL and Google TV"
+  ]
+ },
+ {
   "ban": "3.5.2",
   "ngay": "2026-10-27",
   "vi": [

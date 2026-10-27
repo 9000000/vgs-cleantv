@@ -1127,6 +1127,7 @@ private fun TheHomeNoiDung(vm: PhienLamViec) {
             Text("${x.ten} · ${x.tinh}", fontSize = 14.sp, modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp))
                 .clickable { vm.chonXa(x) }.padding(horizontal = 12.dp, vertical = 10.dp))
         }
+        if (vm.baoTimXa.isNotEmpty()) Phu(vm.baoTimXa)
         Phu(t("Hoặc chọn nhanh thành phố:", "Or pick a city:"))
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             ChonChip(t("Không hiện", "Off"), vm.thanhPho == null) { vm.thanhPho = null }

@@ -401,6 +401,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var ketQuaXa by mutableStateOf<List<zone.vgs.tvsach.dulieu.XaPhuong.Xa>>(emptyList())
         private set
     private var viecTimXa: kotlinx.coroutines.Job? = null
+    /** Dòng báo dưới ô tìm: "Đang tìm…", không thấy, hay lỗi mạng (3.5.3, trước đây lỗi chỉ để trống). Rỗng là không báo. */
+    var baoTimXa by mutableStateOf("")
+        private set
     /** Mở thẳng màn chọn app "Mở khi khởi động" trên tivi (25/10/2026: dmenh568 không tìm thấy chỗ chọn trên Xiaomi). */
     var baoChonApp by mutableStateOf("")
     fun moChonAppKhiBat() = chay(t("Đang mở trên tivi…", "Opening on the TV…")) {
@@ -411,6 +414,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     fun doiTimXa(q: String) {
         timXa = q
         viecTimXa?.cancel()
+        baoTimXa = ""
         if (q.trim().length < 2) { ketQuaXa = emptyList(); return }
         viecTimXa = viewModelScope.launch {
             kotlinx.coroutines.delay(350)
@@ -418,9 +422,21 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             ketQuaXa = vn
             // Ít kết quả trong nước thì tìm thêm thành phố khắp thế giới (người dùng ở Bali, Osaka…).
             if (vn.size < 3 && q.trim().length >= 3) {
-                val theGioi = withContext(Dispatchers.IO) { zone.vgs.tvsach.dulieu.XaPhuong.timTheGioi(q, zone.vgs.tvsach.NgonNgu.tiengViet) }
-                if (timXa == q) ketQuaXa = vn + theGioi.take(8 - vn.size)
-            }
+                baoTimXa = t("Đang tìm thêm thành phố trên thế giới…", "Searching cities worldwide…")
+                val vi = zone.vgs.tvsach.NgonNgu.tiengViet
+                // Mạng chậm: thử lại một lần, chờ lâu hơn.
+                val theGioi = withContext(Dispatchers.IO) {
+                    zone.vgs.tvsach.dulieu.XaPhuong.timTheGioi(q, vi) ?: zone.vgs.tvsach.dulieu.XaPhuong.timTheGioi(q, vi, choMs = 12000)
+                }
+                if (timXa != q) return@launch
+                ketQuaXa = vn + (theGioi ?: emptyList()).take(8 - vn.size)
+                baoTimXa = when {
+                    theGioi == null -> t("Không tìm được thành phố ngoài Việt Nam: điện thoại chưa vào được dịch vụ tìm địa danh (mạng, VPN hoặc chặn quảng cáo?). Thử đổi Wi-Fi/4G rồi gõ lại.",
+                        "Couldn't search cities outside Vietnam: the phone can't reach the place search (network, VPN or ad blocker?). Try another Wi-Fi or mobile data, then type again.")
+                    ketQuaXa.isEmpty() -> t("Không thấy nơi nào tên như vậy. Thử gõ tên tiếng Anh, không dấu.", "No place found with that name. Try the English spelling.")
+                    else -> ""
+                }
+            } else if (vn.isEmpty()) baoTimXa = t("Không thấy phường/xã nào như vậy.", "No ward found with that name.")
         }
     }
     fun chonXa(x: zone.vgs.tvsach.dulieu.XaPhuong.Xa) { thanhPho = zone.vgs.tvsach.dulieu.ThanhPho(x.tenNgan, x.lat, x.lon); doiTimXa("") }
@@ -816,7 +832,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             .put("danhGia", dsDanhGia).put("ghiChu", dsGhiChu.trim()).put("lienHe", dsLienHe.trim())
             .put("goi", org.json.JSONArray(tt.daTat.sorted()))
             .put("giu", org.json.JSONArray((ketQua?.boQua ?: emptyList()).map { it.first }))
-        du.put("chanDoan", (io { tv.chanDoanHome() } + "\n# phim-home " + phimHomeGhi).take(3000))
+        du.put("chanDoan", (io { tv.chanDoanHome(goiHome) } + "\n# phim-home " + phimHomeGhi).take(3000))
         val ok = io { zone.vgs.tvsach.Dem.guiDanhSach(ctx, du) }
         if (!ok) error(t("Chưa gửi được (mạng?). Thử lại sau nhé.", "Couldn't send (network?). Try again later."))
         dsDaGui = true
