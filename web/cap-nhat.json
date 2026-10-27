@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 88,
-  "versionName": "3.2.0",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.2.0.apk",
-  "co": 12053981,
-  "ghiChu": "Nút hẹn giờ tắt tivi; chữ đồng hồ có bóng mờ trên ảnh nền riêng; sửa ảnh nền riêng không lên trên một số tivi.",
-  "ghiChuEn": "Sleep timer button; clock text shadow over your own picture; fixes your wallpaper not showing on some TVs.",
-  "ngay": "2026-10-26"
+  "versionCode": 89,
+  "versionName": "3.3.0",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.3.0.apk",
+  "co": 12079225,
+  "ghiChu": "332 mẫu tivi; Home sạch theo bản gốc mới (ô icon cho app có ảnh banner xấu, lọc cổng vào trống).",
+  "ghiChuEn": "332 TV models; Home sạch on the latest CleanYourTV (icon tiles for bad banners, hide empty inputs).",
+  "ngay": "2026-10-27"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "2ba61ec539fb474a",
+   "phienBan": "cf3df720ed6c1c61",
    "url": "/ota/du-lieu.json",
-   "co": 1830957,
-   "tuBan": 88
+   "co": 1917629,
+   "tuBan": 89
   },
   "tvhome.apk": {
-   "phienBan": "cdaa26e92b151637",
+   "phienBan": "141cd062f85177bc",
    "url": "/ota/tvhome.apk",
-   "co": 650633,
-   "tuBan": 88
+   "co": 653501,
+   "tuBan": 89
   }
  }
 }

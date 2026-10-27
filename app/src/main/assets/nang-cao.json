@@ -298,7 +298,7 @@
 "kieu": "so",
 "min": 0,
 "max": 14,
-"moTa": "Hours east of UTC the lunar calendar is computed for: 7 is the Vietnamese calendar, 8 the Chinese one; they differ by a day now and then (and by a month in 1985). Unset: 7 when the TV is in Vietnamese, 8 otherwise",
+"moTa": "Hours east of UTC the lunar calendar is computed for: 7 is the Vietnamese calendar, 8 the Chinese one, 9 the Korean one; they differ by a day now and then (and by a month in 1985). Unset: 7 when the TV is in Vietnamese, 9 in Korean, 8 otherwise",
 "canThan": false,
 "ten": "Múi giờ tính âm lịch",
 "moTaVi": "Số giờ lệch UTC dùng để tính âm lịch: 7 là lịch Việt Nam, 8 là lịch Trung Quốc; thỉnh thoảng lệch nhau một ngày. Để trống: 7 khi tivi tiếng Việt, 8 khi khác."
@@ -314,7 +314,7 @@
 {
 "khoa": "locale",
 "kieu": "chu",
-"moTa": "The language the launcher shows itself in, as a language tag (\"vi\", \"pt-BR\"), instead of the TV's: for firmware with no menu entry for a language the launcher speaks (a China-market Xiaomi offers Chinese and English only). Empty by default, which follows the TV",
+"moTa": "The language the launcher shows itself in, as a language tag (\"vi\", \"pt-BR\", \"ar-EG-u-nu-latn\" for Arabic with Western digits), instead of the TV's: for firmware with no menu entry for a language the launcher speaks (a China-market Xiaomi offers Chinese and English only). Empty by default, which follows the TV",
 "canThan": false,
 "ten": "Ngôn ngữ của Home sạch",
 "moTaVi": "Mã ngôn ngữ (vi, en…) cho riêng Home sạch, dùng khi tivi không có ngôn ngữ đó trong cài đặt. Để trống là theo tivi."
@@ -602,6 +602,14 @@
 "canThan": false,
 "ten": "Bật tivi luôn về Home",
 "moTaVi": "Mỗi lần bật tivi đều về Home sạch, dù tivi mở lại HDMI, truyền hình hay app cũ. Bấm phím trước đó thì thôi. Không chạy khi đã chọn app mở lúc bật."
+},
+{
+"khoa": "inputs_connected_only",
+"kieu": "bool",
+"moTa": "The Inputs list shows only HDMI ports and CEC devices that report connected; empty ports, the AV jacks and devices asleep in standby fold behind a \"More inputs\" row that expands them. Some TVs (TCL) report an empty HDMI port as connected-standby, the same state a sleeping device has, so a device in standby is folded too. An HDMI row whose state the TV cannot be trusted with stays (false by default",
+"canThan": false,
+"ten": "Chỉ hiện cổng đang cắm thiết bị",
+"moTaVi": "Bảng chọn nguồn (HDMI, AV) chỉ hiện cổng có thiết bị đang cắm, các cổng trống gom vào \"Thêm cổng vào\"."
 },
 {
 "khoa": "clock_wallpaper",

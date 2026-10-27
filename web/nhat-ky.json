@@ -1,5 +1,17 @@
 [
  {
+  "ban": "3.3.0",
+  "ngay": "2026-10-27",
+  "vi": [
+   "- Danh sách mẫu tivi lên 332 mẫu, 93 hãng.",
+   "- Home sạch theo bản gốc CleanYourTV mới: app có ảnh banner bị cắt xấu được vẽ từ icon, bảng chọn nguồn có thể chỉ hiện cổng đang cắm thiết bị (Nâng cao), sửa vài lỗi hiệu ứng."
+  ],
+  "en": [
+   "- TV list now has 332 models from 93 brands.",
+   "- Home sạch follows the latest CleanYourTV: apps whose banner crops badly are drawn from their icon, the Inputs list can show connected ports only (Advanced), a few effect fixes."
+  ]
+ },
+ {
   "ban": "3.2.0",
   "ngay": "2026-10-26",
   "vi": [

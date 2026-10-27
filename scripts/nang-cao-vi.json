@@ -362,5 +362,9 @@
  "power_on_home_always": {
   "ten": "Bật tivi luôn về Home",
   "moTa": "Mỗi lần bật tivi đều về Home sạch, dù tivi mở lại HDMI, truyền hình hay app cũ. Bấm phím trước đó thì thôi. Không chạy khi đã chọn app mở lúc bật."
+ },
+ "inputs_connected_only": {
+  "ten": "Chỉ hiện cổng đang cắm thiết bị",
+  "moTa": "Bảng chọn nguồn (HDMI, AV) chỉ hiện cổng có thiết bị đang cắm, các cổng trống gom vào \"Thêm cổng vào\"."
  }
 }
