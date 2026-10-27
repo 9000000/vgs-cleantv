@@ -8522,7 +8522,7 @@ index 71356fff..e22ee1ab 100644
          if (chosenRows >= 0 && chosenRows <= 3) rowsBelow = chosenRows;
          animations = choices.getBoolean("animations", animations);
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/DockDecoration.java b/launcher/app/src/main/java/com/gathin/tvhome/DockDecoration.java
-index fe821b9d..b523fc78 100644
+index fe821b9d..84895de2 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/DockDecoration.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/DockDecoration.java
 @@ -57,8 +57,8 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
@@ -8536,19 +8536,16 @@ index fe821b9d..b523fc78 100644
      }
  
      /** Concentric corners: the band's radius is the tiles' radius plus the band's padding around them. */
-@@ -87,7 +87,10 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
+@@ -87,6 +87,8 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
  
      @Override
      public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
--        if (!bandVisible) return;
-+        // CleanTV: Vẽ dải dock nếu bật dải nền (bandVisible) HOẶC bật hiệu ứng kính mờ (lightGlass).
-+        // Nhờ đó, người dùng có thể tắt dải nền đen (dock_band = false) để không che hình nền,
-+        // nhưng vẫn bật được hiệu ứng kính mờ (dock_glass = true) với viền nổi 3D và gradient mờ sang trọng.
-+        if (!bandVisible && !lightGlass) return;
++        // CleanTV: Khi TẮT "Dải nền thanh dock" (bandVisible = false) thì tắt luôn cả dải kính mờ của dock,
++        // để các app nổi tự do trên hình nền; các hiệu ứng kính mờ và ánh sáng ở các app vẫn giữ nguyên.
+         if (!bandVisible) return;
          boolean any = false;
          int cardWidth = 0;
-         for (int i = 0; i < parent.getChildCount(); i++) {
-@@ -139,14 +142,20 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
+@@ -139,12 +141,16 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
              rect.right = Math.min(rect.right, parent.getWidth() - density);
          }
          rect.bottom += namesRoom;
@@ -8566,17 +8563,11 @@ index fe821b9d..b523fc78 100644
 +                shaderTop = rect.top;
 +                shaderBottom = rect.bottom;
 +            }
-+            c.drawRoundRect(rect, radius, radius, band);
-+            c.drawRoundRect(rect, radius, radius, edge);
-+        } else if (bandVisible) {
++        } else {
 +            band.setShader(null);
-+            c.drawRoundRect(rect, radius, radius, band);
-+            c.drawRoundRect(rect, radius, radius, edge);
          }
--        c.drawRoundRect(rect, radius, radius, band);
--        c.drawRoundRect(rect, radius, radius, edge);
-     }
- }
+         c.drawRoundRect(rect, radius, radius, band);
+         c.drawRoundRect(rect, radius, radius, edge);
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/EventsTracker.java b/launcher/app/src/main/java/com/gathin/tvhome/EventsTracker.java
 new file mode 100644
 index 00000000..7cbaba9f
