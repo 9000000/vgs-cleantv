@@ -822,11 +822,12 @@ private fun XemTruocHome(vm: PhienLamViec) {
     Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(RoundedCornerShape(16.dp)).background(Brush.linearGradient(th.mau.map { Color(it) })).border(1.dp, Vien, RoundedCornerShape(16.dp))) {
         if (anh != null) Image(anh, null, Modifier.fillMaxSize(), contentScale = androidx.compose.ui.layout.ContentScale.Crop)
         if (vm.lamToiNen > 0) Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = vm.lamToiNen / 100f)))
+        val mauDau = vm.mauChu?.let { Color(android.graphics.Color.parseColor(it)) } ?: Color.White
         Column(Modifier.align(Alignment.TopStart).padding(12.dp)) {
-            if (vm.tenChao.isNotBlank()) Text(t("XIN CHÀO, ", "HELLO, ") + vm.tenChao.uppercase(), fontSize = 9.sp, color = Color.White.copy(alpha = 0.8f), maxLines = 1)
-            Text(java.text.SimpleDateFormat("HH:mm", java.util.Locale.US).format(java.util.Date()), fontSize = 26.sp, fontWeight = FontWeight.Light, color = Color.White)
+            if (vm.tenChao.isNotBlank()) Text(t("XIN CHÀO, ", "HELLO, ") + vm.tenChao.uppercase(), fontSize = 9.sp, color = mauDau.copy(alpha = 0.8f), maxLines = 1)
+            Text(java.text.SimpleDateFormat("HH:mm", java.util.Locale.US).format(java.util.Date()), fontSize = 26.sp, fontWeight = FontWeight.Light, color = mauDau)
             val dong = listOfNotNull(if (vm.amLich) t("âm lịch", "lunar date") else null, vm.thanhPho?.ten).joinToString(" · ")
-            if (dong.isNotEmpty()) Text(dong, fontSize = 10.sp, color = Color.White.copy(alpha = 0.85f), maxLines = 1)
+            if (dong.isNotEmpty()) Text(dong, fontSize = 10.sp, color = mauDau.copy(alpha = 0.85f), maxLines = 1)
         }
         Row(Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(horizontal = 14.dp, vertical = 14.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             repeat(5) { i -> Box(Modifier.weight(1f).height(24.dp).clip(RoundedCornerShape(5.dp)).background(if (i == 0) Color.White else Color.White.copy(alpha = if (i < vm.dock.size) 0.6f else 0.25f))) }
@@ -1004,6 +1005,12 @@ private fun TheHomeNoiDung(vm: PhienLamViec) {
             singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
         Hang(t("Nút hẹn giờ tắt tivi", "Sleep timer button"), t("Một nút trên cùng: bấm lần lượt 15, 30, 60, 90 phút, bấm nữa là huỷ", "A top button: each press sets 15, 30, 60, 90 minutes, then off"), vm.nutHenTat) { vm.nutHenTat = it }
         Hang(t("Chữ giờ, ngày trắng sáng", "Bright white clock and date"), t("Dòng ngày tháng trắng hẳn thay vì xám nhạt, dễ đọc từ xa", "The date line in full white instead of soft grey, easier to read from afar"), vm.chuTrang) { vm.chuTrang = it }
+        // Màu chữ đồng hồ, ngày, thời tiết (header_color; góp ý nggh, tranhoangnt555, Nam Tran 26–27/10/2026).
+        Text(t("Màu chữ đồng hồ & thời tiết", "Clock & weather text colour"), fontSize = 14.sp)
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ChonChip(t("Mặc định", "Default"), vm.mauChu == null) { vm.mauChu = null }
+            MAU_CHU.forEach { (vi, en, ma) -> ChonChip(t(vi, en), vm.mauChu == ma) { vm.mauChu = ma } }
+        }
         Hang(t("Ẩn lời chào", "Hide the greeting"), t("Bỏ dòng \"Chào buổi tối\" phía trên đồng hồ", "Drops the \"Good evening\" line above the clock"), vm.anLoiChao) { vm.anLoiChao = it }
         Hang(t("Âm lịch dưới ngày dương", "Lunar date under the date"), t("Ví dụ: 2/9 âm lịch · Bính Ngọ", "e.g. Lunar 2/9 · Year of the Horse"), vm.amLich) { vm.amLich = it }
         Text(t("Đồng hồ khi để yên", "Clock when idle"), fontSize = 14.sp)
@@ -1786,3 +1793,7 @@ private fun ManKhoaTre(vm: PhienLamViec) = Cuon {
 
 /** Ô liên hệ chỉ nhận email (góp ý trả lời qua thư). */
 private fun laEmail(s: String) = Regex("""^[^\s@]+@[^\s@]+\.[^\s@]{2,}$""").matches(s.trim())
+
+/** Màu chữ đồng hồ cho sẵn: dễ đọc trên ảnh nền sáng / tối. */
+private val MAU_CHU = listOf(Triple("Trắng", "White", "#FFFFFF"), Triple("Vàng", "Yellow", "#FFD54F"), Triple("Xanh ngọc", "Cyan", "#4DD0E1"),
+    Triple("Xanh lá", "Green", "#81C784"), Triple("Hồng", "Pink", "#F48FB1"), Triple("Cam", "Orange", "#FFB74D"), Triple("Đen", "Black", "#111111"))

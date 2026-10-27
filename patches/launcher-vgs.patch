@@ -158,7 +158,7 @@ index 701b5feb..5e70a9f6 100644
      </application>
  </manifest>
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
-index 41825a1a..a29b6569 100644
+index 41825a1a..5b01ca52 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 @@ -64,7 +64,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -179,7 +179,17 @@ index 41825a1a..a29b6569 100644
  
          Entry(String label, ComponentName component, Drawable banner, Drawable icon) {
              this(APP, label, component, banner, icon, null, 0);
-@@ -309,6 +311,15 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -108,7 +110,8 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+         if (innerWidthPx <= 0 || columns <= 0) return design;
+         int cell = innerWidthPx / columns;
+         int fit = (int) ((cell - 12 * density) / FOCUS_SCALE);
+-        return Math.max(Math.round(80 * density), Math.min(design, fit));
++        // CleanTV/VGS: past 8 columns (single_row, the macOS Dock) tiles may go down to 48dp so the gaps stay.
++        return Math.max(Math.round((columns > 8 ? 48 : 80) * density), Math.min(design, fit));
+     }
+ 
+     static int tileHeightPx(int tileWidthPx) {
+@@ -309,6 +312,15 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                  fresh.add(new Entry(label, component, banner, icon));
              }
          }
@@ -195,7 +205,7 @@ index 41825a1a..a29b6569 100644
          Collections.sort(fresh, (a, b) -> {
              // The owner's own order first; tiles it does not know (new installs) follow by the rule below.
              int saved = Order.compare(savedRanks, a.component.flattenToShortString(), b.component.flattenToShortString());
-@@ -503,6 +514,13 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -503,6 +515,13 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
              h.icon.setVisibility(View.VISIBLE);
              h.label.setText(e.label);
              h.label.setVisibility(uniformTiles ? View.GONE : View.VISIBLE);
@@ -209,7 +219,7 @@ index 41825a1a..a29b6569 100644
          }
          h.card.setOnClickListener(v -> launch(e));
          h.card.setOnLongClickListener(v -> {
-@@ -511,7 +529,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -511,7 +530,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                  if (pos != RecyclerView.NO_POSITION) listener.onTileLongPress(pos, v);
                  return true;
              }
@@ -218,7 +228,7 @@ index 41825a1a..a29b6569 100644
              i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
              try {
                  ctx.startActivity(i);
-@@ -523,6 +541,10 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -523,6 +542,10 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
  
      /** Opens the tile's activity by explicit component, with no extras: a card can name nothing else. */
      private void launch(Entry e) {
@@ -229,7 +239,7 @@ index 41825a1a..a29b6569 100644
          if (e.kind == Entry.HOME_SETTINGS) {
              ctx.startActivity(new Intent(ctx, HomeSettingsActivity.class)
                      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-@@ -552,6 +574,27 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -552,6 +575,27 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
          }
      }
  
@@ -257,7 +267,7 @@ index 41825a1a..a29b6569 100644
      @Override
      public int getItemCount() {
          return items.size() + (showLibrary ? 1 : 0);
-@@ -823,6 +866,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -823,6 +867,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
          return Math.max(0, Math.min(255, Math.round(v)));
      }
  
@@ -281,6 +291,20 @@ index 41825a1a..a29b6569 100644
      private static int vividColor(Drawable live) {
          if (live == null) return 0xFF444444;
          // Draw a private copy: changing the bounds of the drawable an ImageView shows would blank the tile.
+diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Config.java b/launcher/app/src/main/java/com/gathin/tvhome/Config.java
+index 5d4b78fb..acb03b72 100644
+--- a/launcher/app/src/main/java/com/gathin/tvhome/Config.java
++++ b/launcher/app/src/main/java/com/gathin/tvhome/Config.java
+@@ -524,7 +524,8 @@ final class Config {
+             inputAction = string(json, "input_action", inputAction);
+             inputSources = stringList(json, "input_sources", inputSources);
+             inputUriScheme = string(json, "input_uri_scheme", inputUriScheme).trim();
+-            columns = integer(json, "columns", columns, 1, 8);
++            // CleanTV/VGS: up to 12 with single_row, for a small macOS-style Dock (Alex 27/10/2026); tiles stop at 80dp.
++            columns = integer(json, "columns", columns, 1, json.optBoolean("single_row", false) ? 12 : 8);
+             rowsBelow = integer(json, "rows_below_dock", rowsBelow, 0, 3);
+             animations = bool(json, "animations", animations);
+             advancedEffects = bool(json, "advanced_effects", advancedEffects);
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java b/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
 index 233f9820..4b26fa1f 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
@@ -573,7 +597,7 @@ index 00000000..9b2fd8e3
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 17961443..94a34705 100644
+index 17961443..ef2708dd 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -184,6 +184,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
@@ -609,7 +633,25 @@ index 17961443..94a34705 100644
              sky.update();
              wallpaperPlayer.update();
              handler.postDelayed(this, MINUTE_MS);
-@@ -504,6 +516,15 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -472,6 +484,17 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+             ((TextView) findViewById(R.id.date)).setTextColor(Color.WHITE);
+             findViewById(R.id.clockDivider).setBackgroundColor(Color.WHITE);
+         }
++        // CleanTV/VGS: header_color (#RRGGBB) — the clock, date, lunar, weather, greeting and stats in one colour of the
++        // owner's choice, for a wallpaper where white is hard to read (feedback 26–27/10/2026).
++        int mauChu = Weather.mau(this, "header_color");
++        if (mauChu != 0) {
++            for (int id : new int[] {R.id.clock, R.id.ampm, R.id.date, R.id.lunarDate, R.id.shamsiDate, R.id.weather, R.id.greeting, R.id.stats}) {
++                View v = findViewById(id);
++                if (v instanceof TextView) ((TextView) v).setTextColor(mauChu);
++            }
++            findViewById(R.id.clockDivider).setBackgroundColor(mauChu);
++            greetingColor = mauChu;
++        }
+         if (getResources().getBoolean(R.bool.rtl_menu_bar)) {
+             // Center Hebrew greetings over the numeric time, independent of a visible AM/PM label. The clock's row
+             // is watched too: date_below_clock can move the whole row right under a wider date.
+@@ -504,6 +527,15 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          lunarOffset = Lunar.offsetFor(cfg.lunarUtcOffset, Locale.getDefault());
          if (lunar) lunarDate.setVisibility(View.VISIBLE);
          greetingName = cfg.greetingName;
@@ -625,7 +667,7 @@ index 17961443..94a34705 100644
          if (cfg.dateBelowClock) moveDateBelowClock();
          if (shamsi) {
              shamsiDate.setVisibility(View.VISIBLE);
-@@ -512,6 +533,22 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -512,6 +544,45 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              lunarDate.setTextSize(11f);
              date.setPadding(0, (int) (4 * density), 0, 0);
          }
@@ -645,10 +687,52 @@ index 17961443..94a34705 100644
 +                if (v instanceof TextView) ((TextView) v).setShadowLayer(r, 0, density, 0xB3000000);
 +            }
 +        }
++        // CleanTV/VGS: top_bar_band — a translucent band edge to edge behind the clock and the top buttons, with a
++        // hairline under it, like the macOS menu bar (Alex 27/10/2026, macOS theme). Follows the header's height.
++        if (Weather.flag(this, "top_bar_band", false)) {
++            View header = (View) findViewById(R.id.leftBlock).getParent();
++            View band = new View(this);
++            android.graphics.drawable.GradientDrawable nen = new android.graphics.drawable.GradientDrawable(
++                    android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM, new int[] {0x8C1A1830, 0x66141226});
++            android.graphics.drawable.ColorDrawable vien = new android.graphics.drawable.ColorDrawable(0x33FFFFFF);
++            android.graphics.drawable.LayerDrawable lop = new android.graphics.drawable.LayerDrawable(
++                    new android.graphics.drawable.Drawable[] {nen, vien});
++            lop.setLayerGravity(1, Gravity.BOTTOM);
++            lop.setLayerHeight(1, Math.max(1, Math.round(density)));
++            band.setBackground(lop);
++            ViewGroup root = findViewById(R.id.root);
++            root.addView(band, root.indexOfChild(findViewById(R.id.hero)) + 1, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0));
++            header.addOnLayoutChangeListener((v, l, t, rr, b, ol, ot, orr, ob) -> {
++                int[] o = new int[2];
++                v.getLocationInWindow(o);
++                int cao = o[1] + v.getHeight() + Math.round(14 * density);
++                ViewGroup.LayoutParams lp = band.getLayoutParams();
++                if (lp.height != cao) { lp.height = cao; band.setLayoutParams(lp); }
++            });
++        }
          vpnApp = cfg.vpnApp;
          vpnPill = cfg.vpnPill && !cfg.topMenu;
          btnVpn = findViewById(R.id.btnVpn);
-@@ -609,6 +646,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -593,6 +664,18 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+         });
+         if (dockRow) grid.addItemDecoration(new DockDecoration(COLUMNS, density, cinematic, cfg.alwaysShowNames, cfg.dockOpacity, cfg.dockGlass, cfg.dockEvenPadding, cfg.dockBand,
+                 singleRow, cfg.dockBandAll));
++        // CleanTV/VGS: dock_center — a single row with fewer apps than columns sits in the middle, like the macOS
++        // Dock (Alex 27/10/2026): the first tile is pushed right by half the empty columns.
++        if (singleRow && Weather.flag(this, "dock_center", false)) grid.addItemDecoration(new RecyclerView.ItemDecoration() {
++            @Override
++            public void getItemOffsets(@NonNull Rect out, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
++                int n = state.getItemCount();
++                if (n >= COLUMNS || parent.getChildAdapterPosition(view) != 0) return;
++                int inner = parent.getWidth() - parent.getPaddingLeft() - parent.getPaddingRight();
++                int dich = inner / COLUMNS * (COLUMNS - n) / 2;
++                if (rtlAppGrid) out.right += dich; else out.left += dich;
++            }
++        });
+         if (cfg.fadeRows) TopFade.attach(grid, 48 * density);
+         // Reduced motion: the tiles are simply there, with no entrance (reloadApps skips it there too).
+         if (animations && !reducedMotion) {
+@@ -609,6 +692,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // tvOS layout: push the dock row towards the bottom of the screen, leaving room for
          // rows_below_dock grid rows under it; the rest of the grid stays below until you press Down.
          int rowsBelowDock = cfg.rowsBelowDock;
@@ -660,7 +744,7 @@ index 17961443..94a34705 100644
          grid.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
              int h = b - t;
              // Item height follows the tile size, which follows the columns and the rows that must fit (AppAdapter.tileWidthPx).
-@@ -629,6 +671,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -629,6 +717,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // A single row never shows the names under its tiles (the title above the row names the app), so the
              // 7dp gap and 22dp label item_app.xml keeps for them would only lift the row: sit it that much lower.
              if (singleRow && !cfg.alwaysShowNames) want += (int) (29 * density);
@@ -672,7 +756,7 @@ index 17961443..94a34705 100644
              if (grid.getPaddingTop() != want) {
                  grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
                  // A vertical grid parks the dock on the new padding line by scrolling (onTileFocused); a sideways
-@@ -796,8 +843,42 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -796,8 +889,42 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -715,7 +799,7 @@ index 17961443..94a34705 100644
          btnSettings.setOnKeyListener(pillKeys);
          btnReorder.setOnKeyListener(pillKeys);
          btnLibraryTop.setOnKeyListener(pillKeys);
-@@ -943,6 +1024,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -943,6 +1070,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onResume() {
          super.onResume();
@@ -723,7 +807,7 @@ index 17961443..94a34705 100644
          // A festival that started or ended while Home was in the background: rebuild with or without it.
          if (festive != festival.active(LocalDate.now())) {
              recreate();
-@@ -986,6 +1068,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -986,6 +1114,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -731,7 +815,7 @@ index 17961443..94a34705 100644
          sky.update();
          wallpaperPlayer.start();
          handler.postDelayed(minuteTick, MINUTE_MS);
-@@ -1154,6 +1237,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1154,6 +1283,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onPause() {
          super.onPause();
@@ -739,7 +823,7 @@ index 17961443..94a34705 100644
          root.removeCallbacks(showIdleClock);
          endReorder();   // Home or another app while reordering keeps the order so far
          wallpaperPlayer.stop();
-@@ -2053,6 +2137,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2053,6 +2183,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -770,7 +854,7 @@ index 17961443..94a34705 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2117,13 +2225,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2117,13 +2271,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -798,7 +882,7 @@ index 17961443..94a34705 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2318,6 +2437,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2318,6 +2483,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -809,7 +893,7 @@ index 17961443..94a34705 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2679,7 +2802,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2679,7 +2848,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -822,7 +906,7 @@ index 17961443..94a34705 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2934,7 +3061,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2934,7 +3107,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       *  source number; "HW8=-" leaves that input out of the Inputs menu (a port the board reports but the set
       *  does not have). Returns the number, -1 for a left-out input, or null when the input is not listed. */
      private Integer mappedSource(String inputId) {
@@ -856,7 +940,7 @@ index 17961443..94a34705 100644
      }
  
      /** Switches to a passthrough input (HDMI, AV). An input mapped in `input_sources` is opened by sending
-@@ -3371,10 +3523,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3371,10 +3569,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
@@ -1214,10 +1298,10 @@ index 18fded94..f6798ffb 100644
                  && (collectionImage(segments.get(1)) || WallpaperCaptions.FILE_NAME.equals(segments.get(1)))) {
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Weather.java b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
 new file mode 100644
-index 00000000..30a276fe
+index 00000000..3efde247
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
-@@ -0,0 +1,157 @@
+@@ -0,0 +1,171 @@
 +package com.gathin.tvhome;
 +
 +import android.content.Context;
@@ -1275,6 +1359,20 @@ index 00000000..30a276fe
 +            return Math.max(min, Math.min(max, j.optInt(key, def)));
 +        } catch (Exception e) {
 +            return def;
++        }
++    }
++
++    /** CleanTV/VGS: an opaque colour "#RRGGBB" from config.json, 0 when missing or malformed. */
++    static int mau(Context ctx, String key) {
++        File dir = Config.dir(ctx);
++        File f = dir != null ? new File(dir, Config.FILE_NAME) : null;
++        if (f == null || !f.isFile() || f.length() > 64 * 1024) return 0;
++        try (InputStream in = new FileInputStream(f)) {
++            String s = new JSONObject(new String(readAll(in), "UTF-8")).optString(key, "").trim();
++            if (!s.matches("#[0-9A-Fa-f]{6}")) return 0;
++            return 0xFF000000 | Integer.parseInt(s.substring(1), 16);
++        } catch (Exception e) {
++            return 0;
 +        }
 +    }
 +

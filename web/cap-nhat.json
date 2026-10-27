@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 89,
-  "versionName": "3.3.0",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.3.0.apk",
-  "co": 12079225,
-  "ghiChu": "332 mẫu tivi; Home sạch theo bản gốc mới (ô icon cho app có ảnh banner xấu, lọc cổng vào trống).",
-  "ghiChuEn": "332 TV models; Home sạch on the latest CleanYourTV (icon tiles for bad banners, hide empty inputs).",
+  "versionCode": 90,
+  "versionName": "3.4.0",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.4.0.apk",
+  "co": 12195965,
+  "ghiChu": "Giao diện mới Kiểu macOS (thanh menu mờ, Dock kính nhỏ ở giữa, nền logo VGS) và chọn màu chữ cho đồng hồ, thời tiết.",
+  "ghiChuEn": "New macOS style (translucent menu bar, small centred glass Dock, VGS logo wallpaper) and a colour choice for the clock and weather text.",
   "ngay": "2026-10-27"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "cf3df720ed6c1c61",
+   "phienBan": "2c3b25d3f4ab7170",
    "url": "/ota/du-lieu.json",
    "co": 1917629,
-   "tuBan": 89
+   "tuBan": 90
   },
   "tvhome.apk": {
-   "phienBan": "141cd062f85177bc",
+   "phienBan": "dcce03dda96ec2c1",
    "url": "/ota/tvhome.apk",
-   "co": 653501,
-   "tuBan": 89
+   "co": 654305,
+   "tuBan": 90
   }
  }
 }

@@ -184,6 +184,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var moKhiThuc by mutableStateOf(false)
     /** Chữ giờ / ngày trắng sáng hẳn (header_white của launcher). Góp ý tranhoangnt555 26/10/2026. */
     var chuTrang by mutableStateOf(false)
+    /** Màu chữ đồng hồ / ngày / thời tiết "#RRGGBB" (header_color), null là mặc định. */
+    var mauChu by mutableStateOf<String?>(null)
     /** Bật tivi luôn về Home sạch (power_on_home_always của launcher, cần HomeKeyService). 3.0.0, góp ý caibangddd, huyenson91. */
     var luonVeHome by mutableStateOf(false)
     /** Nút hẹn giờ tắt tivi trên Home sạch (sleep_timer_button, cần HomeKeyService). 3.2.0, góp ý duongghoangg1103. */
@@ -876,8 +878,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         hienThongSo = j.optBoolean("show_stats", false)
         doiHang = if (j.optBoolean("rows_middle", false)) HANG_GIUA else if (cuaTheme("rows_offset_dp")) 0 else j.optInt("rows_offset_dp", 0)
         nutDangPhat = j.optBoolean("now_playing", true)
-        coChuDau = j.optInt("header_scale", 100)
-        motHang = j.optBoolean("single_row", false)
+        coChuDau = if (cuaTheme("header_scale")) 100 else j.optInt("header_scale", 100)
+        motHang = !cuaTheme("single_row") && j.optBoolean("single_row", false)
         anLoiChao = !cuaTheme("show_greeting") && !j.optBoolean("show_greeting", true)
         giuAmLuong = !cuaTheme("key_filter") && !j.optBoolean("key_filter", true) && !laTclGoogleTv
         // 3.0.0 (góp ý contact.khanhtoan): công tắc hiện đúng trạng thái thật, kể cả khi theme bật, và tắt được đè lên theme.
@@ -888,6 +890,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         nutHenTat = j.optBoolean("sleep_timer_button", false)
         phimGan.clear(); j.optJSONArray("vgs_phim_gan")?.let { a -> (0 until a.length()).map { a.optString(it) }.filter { it.isNotBlank() }.forEach { phimGan.add(it) } }
         chuTrang = !cuaTheme("header_white") && j.optBoolean("header_white", false)
+        mauChu = j.optString("header_color").takeIf { Regex("#[0-9A-Fa-f]{6}").matches(it) }
         // Chỉ nạp số cột do người dùng chọn ở đây (vgs_so_cot), không lấy columns của theme.
         soCot = if (j.optBoolean("vgs_so_cot", false)) j.optInt("columns", 0) else 0
         if (j.has("handle_view_inputs")) nutInput = j.optBoolean("handle_view_inputs", nutInput)
@@ -1041,6 +1044,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (luonVeHome) put("power_on_home_always", true)
         if (nutHenTat) put("sleep_timer_button", true)
         if (chuTrang) put("header_white", true)
+        mauChu?.let { put("header_color", it) }
         if (soCot > 0) { put("columns", soCot); put("vgs_so_cot", true) }
         // Phím APPS (KEYCODE_ALL_APPS) chỉ là nút Home với que / tivi Xiaomi hoặc khi bật "Remote gửi phím Home lạ";
         // tivi khác (Sony VH2: nút Apps mở Home sạch như Back, abc999roses 24/10/2026) để phím cho tivi.

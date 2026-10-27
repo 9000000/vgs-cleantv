@@ -1,5 +1,17 @@
 [
  {
+  "ban": "3.4.0",
+  "ngay": "2026-10-27",
+  "vi": [
+   "• Giao diện Kiểu macOS: thanh menu mờ trên cùng, Dock kính mờ ô nhỏ nằm giữa đáy màn hình, ô đang chọn nổi lên sáng theo màu app, ảnh nền lượn tím hồng có logo VGS ở giữa.",
+   "• Chọn màu chữ đồng hồ, ngày, thời tiết (Trắng, Vàng, Xanh ngọc, Xanh lá, Hồng, Cam, Đen) cho ảnh nền sáng khó đọc. Góp ý của nggh, tranhoangnt555, Nam Tran."
+  ],
+  "en": [
+   "• macOS style: translucent menu bar on top, a small glass Dock centred at the bottom, the focused tile lifts and glows in the app's colour, a violet–pink wave wallpaper with the VGS logo in the middle.",
+   "• Pick the clock, date and weather text colour (White, Yellow, Cyan, Green, Pink, Orange, Black) for bright wallpapers."
+  ]
+ },
+ {
   "ban": "3.3.0",
   "ngay": "2026-10-27",
   "vi": [
