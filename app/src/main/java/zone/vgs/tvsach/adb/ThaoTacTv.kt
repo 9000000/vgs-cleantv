@@ -641,9 +641,11 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         // BootHome của bản vá (3.4.2, TCL 43P618 về Home gốc sau khi rút điện): lúc khởi động, Home sạch tự bật lại dịch vụ
         // bắt phím mà hãng gỡ mất (cần WRITE_SECURE_SETTINGS) và tự mở lên (cần quyền hiện trên app khác).
         val luonVe = cuoi?.optBoolean("power_on_home_always") == true
-        val canQuyen = khoiPhucPhim || luonVe || !cuoi?.optString("stock_home_redirect").isNullOrBlank()
+        // Kiểu mở đè Home cũ (stock_home_redirect): 3.5.1 BootHome cũng mở Home sạch sau khi rút điện.
+        val moDe = !cuoi?.optString("stock_home_redirect").isNullOrBlank()
+        val canQuyen = khoiPhucPhim || luonVe || moDe
         sh("pm ${if (canQuyen) "grant" else "revoke"} $pkgHome android.permission.WRITE_SECURE_SETTINGS 2>/dev/null; true")
-        sh("appops set $pkgHome SYSTEM_ALERT_WINDOW ${if (luonVe) "allow" else "default"} 2>/dev/null; true")
+        sh("appops set $pkgHome SYSTEM_ALERT_WINDOW ${if (luonVe || moDe) "allow" else "default"} 2>/dev/null; true")
         // Nút hẹn giờ tắt (sleep_timer_button) cần báo thức đúng giờ: cấp sẵn, máy cũ không có lệnh thì thôi.
         sh("appops set $pkgHome SCHEDULE_EXACT_ALARM allow 2>/dev/null; true")
         ghiFileTheme("config.json", ghi.toByteArray())
@@ -904,6 +906,8 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             ghiFileTheme("config.json", j.toString().toByteArray())
             ghiFileTheme("theme_revision", java.util.UUID.randomUUID().toString().replace("-", "").toByteArray())
         }
+        // BootHome (3.5.1): rút điện bật lại thì Home sạch tự bật lại dịch vụ và tự mở đè lên Home cũ.
+        sh("pm grant $pkgHome android.permission.WRITE_SECURE_SETTINGS 2>/dev/null; appops set $pkgHome SYSTEM_ALERT_WINDOW allow 2>/dev/null; true")
         batDichVu("HomeKeyService")
         return true
     }

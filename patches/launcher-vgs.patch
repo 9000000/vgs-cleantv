@@ -310,10 +310,10 @@ index 41825a1a..5b01ca52 100644
          // Draw a private copy: changing the bounds of the drawable an ImageView shows would blank the tile.
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/BootHome.java b/launcher/app/src/main/java/com/gathin/tvhome/BootHome.java
 new file mode 100644
-index 00000000..66c90b59
+index 00000000..0ceaad00
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/BootHome.java
-@@ -0,0 +1,63 @@
+@@ -0,0 +1,65 @@
 +package com.gathin.tvhome;
 +
 +import android.Manifest;
@@ -327,7 +327,7 @@ index 00000000..66c90b59
 +import android.provider.Settings;
 +
 +/**
-+ * CleanTV/VGS: power_on_home_always without the helper. On TCL (43P618, Smart TV Pro, 27/10/2026) the TV came back on the
++ * CleanTV/VGS: power_on_home_always (and stock_home_redirect) without the helper. On TCL (43P618, Smart TV Pro, 27/10/2026) the TV came back on the
 + * stock home after a real power-off: the firmware drops HomeKeyService from the accessibility list at boot (or binds it
 + * after the stock home is already up), so nothing redirected. At BOOT_COMPLETED this puts HomeKeyService back on the list
 + * when CleanTV granted WRITE_SECURE_SETTINGS, then opens this Home once the firmware has brought up its own. Starting an
@@ -344,7 +344,9 @@ index 00000000..66c90b59
 +        Config config = Config.load(context);
 +        boolean redirect = !config.stockHomeRedirect.isEmpty();
 +        if (redirect || config.powerOnHomeAlways) enableHelper(context);
-+        if (!config.powerOnHomeAlways || config.bootToLiveTv) return;
++        // stock_home_redirect too (3.5.1): the stock home stays the default there, so after a power cut it is what
++        // comes up (TCL Smart TV Pro G10, Android 12, 27/10/2026), even without power_on_home_always.
++        if (!(config.powerOnHomeAlways || redirect) || config.bootToLiveTv) return;
 +        PendingResult pending = goAsync();
 +        new Handler(Looper.getMainLooper()).postDelayed(() -> {
 +            try {
@@ -513,10 +515,10 @@ index 5d4b78fb..acb03b72 100644
              animations = bool(json, "animations", animations);
              advancedEffects = bool(json, "advanced_effects", advancedEffects);
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java b/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
-index 233f9820..cc92efaf 100644
+index 233f9820..851fdd8d 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
-@@ -80,6 +80,57 @@ public class HomeKeyService extends AccessibilityService {
+@@ -80,6 +80,72 @@ public class HomeKeyService extends AccessibilityService {
      private Map<Integer, String> frontAppKeys = Collections.emptyMap();
      private Map<Integer, String> frontAppScancodes = Collections.emptyMap();
      private String frontPackage = "";
@@ -525,6 +527,21 @@ index 233f9820..cc92efaf 100644
 +    /** CleanTV/VGS: sleep_timer_button — whether standby is possible now (the helper is bound, Android 9 or later). */
 +    static boolean canSleep() {
 +        return running != null && Build.VERSION.SDK_INT >= 28;
++    }
++
++    /** How long the window tracking stays on after the phone remote last typed. */
++    private static final long TYPING_WINDOWS_MS = 15_000L;
++    private final Runnable stopWatchingWindows = () -> watchWindows(false);
++
++    /** flagRetrieveInteractiveWindows on or off, keeping every other setting of the running service. */
++    private void watchWindows(boolean on) {
++        android.accessibilityservice.AccessibilityServiceInfo info = getServiceInfo();
++        if (info == null) return;
++        int flag = android.accessibilityservice.AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS;
++        int flags = on ? info.flags | flag : info.flags & ~flag;
++        if (flags == info.flags) return;
++        info.flags = flags;
++        setServiceInfo(info);
 +    }
 +
 +    /** CleanTV/VGS: TYPE_TEXT — append (or replace) the text of the field that has input focus; false when none is editable. */
@@ -574,7 +591,7 @@ index 233f9820..cc92efaf 100644
      /** power_on_home_always: Home at every power-on, not only over Live TV. */
      private boolean powerOnAlways;
      /** power_on_home: re-arms after the screen turns on; null unless the key is on. */
-@@ -97,6 +148,26 @@ public class HomeKeyService extends AccessibilityService {
+@@ -97,6 +163,36 @@ public class HomeKeyService extends AccessibilityService {
      protected void onServiceConnected() {
          super.onServiceConnected();
          running = this;
@@ -593,7 +610,17 @@ index 233f9820..cc92efaf 100644
 +            public void onReceive(Context context, Intent intent) {
 +                String b64 = intent.getStringExtra("b64");
 +                String text = b64 == null ? "" : new String(android.util.Base64.decode(b64, android.util.Base64.DEFAULT), java.nio.charset.StandardCharsets.UTF_8);
-+                setResultCode(typeText(text, intent.getBooleanExtra("replace", false)) ? 1 : 0);
++                boolean replace = intent.getBooleanExtra("replace", false);
++                // Every window is reachable only with flagRetrieveInteractiveWindows: on for this typing, off again
++                // TYPING_WINDOWS_MS after the last one, and a moment for Android to list the windows before the lookup.
++                PendingResult result = goAsync();
++                watchWindows(true);
++                handler.removeCallbacks(stopWatchingWindows);
++                handler.postDelayed(() -> {
++                    result.setResultCode(typeText(text, replace) ? 1 : 0);
++                    result.finish();
++                    handler.postDelayed(stopWatchingWindows, TYPING_WINDOWS_MS);
++                }, 300);
 +            }
 +        };
 +        if (Build.VERSION.SDK_INT >= 33) registerReceiver(typeReceiver, new IntentFilter(ACTION_TYPE_TEXT), android.Manifest.permission.DUMP, null, Context.RECEIVER_EXPORTED);
@@ -601,7 +628,7 @@ index 233f9820..cc92efaf 100644
          settingsScancodes = getResources().getIntArray(R.array.settings_key_scancodes);
          // The service is directBootAware: Android 11 skips a service that is not while the user is still
          // locked at boot, writes accessibility_enabled=0 and, on TCL G03 firmware, never binds it after the
-@@ -181,7 +252,11 @@ public class HomeKeyService extends AccessibilityService {
+@@ -181,7 +277,11 @@ public class HomeKeyService extends AccessibilityService {
          GuardKeep.stepOut(this);
      }
  
@@ -613,7 +640,7 @@ index 233f9820..cc92efaf 100644
          // Keycodes and the panel choice can also come from a theme; theme.sh restarts this service.
          Config config = Config.load(this);
          // restore_key_services: note that this helper runs, so Home can put it back after a force stop. Here, not
-@@ -213,6 +288,12 @@ public class HomeKeyService extends AccessibilityService {
+@@ -213,6 +313,12 @@ public class HomeKeyService extends AccessibilityService {
          powerOnLiveTv = config.powerOnHome && !config.bootToLiveTv && !config.liveTvPackage.equals(openOnStart)
                  ? config.liveTvPackage : "";
          powerOnAlways = config.powerOnHomeAlways && !config.bootToLiveTv && openOnStart.isEmpty();
@@ -626,7 +653,7 @@ index 233f9820..cc92efaf 100644
          if (!powerOnLiveTv.isEmpty() || powerOnAlways) {
              armPowerOnHome();
          } else if (screenOnReceiver != null) {
-@@ -253,6 +334,21 @@ public class HomeKeyService extends AccessibilityService {
+@@ -253,6 +359,21 @@ public class HomeKeyService extends AccessibilityService {
  
      @Override
      protected boolean onKeyEvent(KeyEvent event) {
@@ -648,7 +675,7 @@ index 233f9820..cc92efaf 100644
          // power_on_home: the first key after power-on hands the TV to the user (power and wake keys don't count).
          if (powerOnUntil != 0 && event.getAction() == KeyEvent.ACTION_DOWN
                  && event.getKeyCode() != KeyEvent.KEYCODE_POWER && event.getKeyCode() != KeyEvent.KEYCODE_WAKEUP) {
-@@ -286,7 +382,9 @@ public class HomeKeyService extends AccessibilityService {
+@@ -286,7 +407,9 @@ public class HomeKeyService extends AccessibilityService {
              redirectHomeKey(event);
              return false;
          }
@@ -659,7 +686,7 @@ index 233f9820..cc92efaf 100644
          if (event.getAction() == KeyEvent.ACTION_UP && !event.isCanceled()) openHome();
          return true;
      }
-@@ -294,6 +392,8 @@ public class HomeKeyService extends AccessibilityService {
+@@ -294,6 +417,8 @@ public class HomeKeyService extends AccessibilityService {
      /** Unbound by Android: the user turned the helper off, so Home doesn't put it back (ServiceRepair). */
      @Override
      public boolean onUnbind(Intent intent) {
@@ -668,7 +695,7 @@ index 233f9820..cc92efaf 100644
          if (repairRecord && !steppingOut) ServiceRepair.disconnected(this, getClass());
          return super.onUnbind(intent);
      }
-@@ -347,7 +447,18 @@ public class HomeKeyService extends AccessibilityService {
+@@ -347,7 +472,18 @@ public class HomeKeyService extends AccessibilityService {
  
      /** power_on_home_always: Home, unless a key was pressed since the screen came on (the user has the TV). */
      private void homeAtPowerOn() {
@@ -6469,21 +6496,21 @@ index ca006552..8be60909 100644
 +    <string name="sleep_timer_no_helper">Timer set for %1$d min, but the TV can only turn itself off with CleanTV\'s key helper on (Android 9 or later)</string>
  </resources>
 diff --git a/launcher/app/src/main/res/xml/home_key_service.xml b/launcher/app/src/main/res/xml/home_key_service.xml
-index 49565e22..5cc8f023 100644
+index 49565e22..a67dadc9 100644
 --- a/launcher/app/src/main/res/xml/home_key_service.xml
 +++ b/launcher/app/src/main/res/xml/home_key_service.xml
-@@ -2,9 +2,12 @@
+@@ -2,9 +2,13 @@
  <!-- Keys only: no accessibilityEventTypes (0), so the system never calls into the launcher for
       accessibility events, which both services ignore. Key filtering depends only on
       flagRequestFilterKeyEvents and canRequestFilterKeyEvents, not on the event types.
 -     stock_home_redirect is the exception: with it set, HomeKeyService adds typeWindowStateChanged at runtime. -->
 +     stock_home_redirect is the exception: with it set, HomeKeyService adds typeWindowStateChanged at runtime.
 +     CleanTV/VGS: canRetrieveWindowContent for the phone remote's typing (TYPE_TEXT): it sets the text of the focused
-+     field, still with no events. -->
++     field, still with no events. flagRetrieveInteractiveWindows is turned on only while typing (HomeKeyService):
++     kept on, the window tracking slowed the remote on a weak ATV11 box (27/10/2026). -->
  <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
      android:accessibilityFeedbackType="feedbackGeneric"
--    android:accessibilityFlags="flagRequestFilterKeyEvents"
-+    android:accessibilityFlags="flagRequestFilterKeyEvents|flagRetrieveInteractiveWindows"
+     android:accessibilityFlags="flagRequestFilterKeyEvents"
      android:canRequestFilterKeyEvents="true"
 +    android:canRetrieveWindowContent="true"
      android:description="@string/home_key_description" />

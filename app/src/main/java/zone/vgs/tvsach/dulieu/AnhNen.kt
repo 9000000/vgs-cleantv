@@ -54,7 +54,9 @@ object AnhNen {
      * ảnh đó phóng to, làm mờ (thu nhỏ 1/24 rồi phóng lại) và tối đi, như khung ảnh dọc trên điện thoại.
      */
     private fun veKhung(goc: Bitmap, vuaKhung: Boolean): ByteArray {
-        val ra = if (!vuaKhung) phuKin(goc) else {
+        // Ảnh dọc (cao hơn rộng) luôn vừa khung: cắt cho kín 16:9 thì chỉ còn một dải giữa ảnh (3.5.1, góp ý build.dng
+        // 27/10/2026: ảnh dọc trên ảnh nền và màn chờ động bị cắt mất).
+        val ra = if (!vuaKhung && goc.height <= goc.width) phuKin(goc) else {
             val nen = phuKin(goc)
             val mo = Bitmap.createScaledBitmap(Bitmap.createScaledBitmap(nen, RONG / 24, CAO / 24, true), RONG, CAO, true)
             val kq = mo.copy(Bitmap.Config.ARGB_8888, true)

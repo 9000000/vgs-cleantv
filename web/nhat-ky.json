@@ -1,5 +1,21 @@
 [
  {
+  "ban": "3.5.1",
+  "ngay": "2026-10-27",
+  "vi": [
+   "Remote của tivi không còn chậm trên hộp yếu (gõ chữ từ điện thoại chỉ bật theo dõi màn hình lúc đang gõ)",
+   "Tivi giữ Home Google (TCL Google TV…): rút điện bật lại tự về Home sạch, không cần bật thêm công tắc",
+   "Ảnh dọc làm hình nền và màn chờ động hiện trọn ảnh, hai bên là ảnh làm mờ, không bị cắt",
+   "Danh sách theo CleanYourTV mới: 335 mẫu tivi, 94 hãng"
+  ],
+  "en": [
+   "The TV remote is no longer slow on weak boxes (phone typing watches the screen only while typing)",
+   "TVs that keep the Google home (TCL Google TV…): after a power cut the clean Home comes back by itself",
+   "Portrait photos as wallpaper and in the moving screensaver show whole, with blurred sides",
+   "Lists follow the latest CleanYourTV: 335 TV models, 94 brands"
+  ]
+ },
+ {
   "ban": "3.5.0",
   "ngay": "2026-10-27",
   "vi": [

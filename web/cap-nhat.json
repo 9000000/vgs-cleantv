@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 93,
-  "versionName": "3.5.0",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.0.apk",
-  "co": 12232769,
-  "ghiChu": "Remote trên điện thoại (phím, gõ và nói tiếng Việt có dấu, hẹn giờ tắt, mở/gỡ/cài app), màn chờ động",
-  "ghiChuEn": "Phone remote (keys, typing and voice, sleep timer, open/uninstall/install apps), moving screensaver",
+  "versionCode": 94,
+  "versionName": "3.5.1",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.1.apk",
+  "co": 12255225,
+  "ghiChu": "Remote trên tivi không còn chậm, TCL Google TV rút điện tự về Home sạch, ảnh dọc không bị cắt, 335 mẫu tivi",
+  "ghiChuEn": "No more slow remote on weak boxes, TCL Google TV back to the clean Home after a power cut, portrait photos no longer cropped, 335 TV models",
   "ngay": "2026-10-27"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "4ef502a669640665",
+   "phienBan": "47f04103775364ce",
    "url": "/ota/du-lieu.json",
-   "co": 1917629,
-   "tuBan": 93
+   "co": 1954504,
+   "tuBan": 94
   },
   "tvhome.apk": {
-   "phienBan": "ed4648b8840d2b23",
+   "phienBan": "9d79338ba2244db0",
    "url": "/ota/tvhome.apk",
-   "co": 656321,
-   "tuBan": 93
+   "co": 662945,
+   "tuBan": 94
   }
  }
 }
