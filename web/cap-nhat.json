@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 98,
-  "versionName": "3.5.5",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.5.apk",
-  "co": 12256721,
-  "ghiChu": "Home sạch ghi lại lúc khởi động để sửa lỗi về Home gốc sau khi rút điện",
-  "ghiChuEn": "The clean Home keeps a boot record, to fix TVs that go back to the stock Home after a power cut",
+  "versionCode": 99,
+  "versionName": "3.5.6",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.6.apk",
+  "co": 12256853,
+  "ghiChu": "TCL: Home sạch tự mở sau khi rút điện qua đường khác khi hãng chặn tín hiệu khởi động",
+  "ghiChuEn": "TCL: the clean Home opens after a power cut another way when the maker blocks the boot signal",
   "ngay": "2026-10-27"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "a6b8497a9247fc28",
+   "phienBan": "dedcefa9661eb01c",
    "url": "/ota/du-lieu.json",
    "co": 1954504,
-   "tuBan": 98
+   "tuBan": 99
   },
   "tvhome.apk": {
-   "phienBan": "30743d69ac855353",
+   "phienBan": "8aab027706fac392",
    "url": "/ota/tvhome.apk",
-   "co": 663709,
-   "tuBan": 98
+   "co": 663773,
+   "tuBan": 99
   }
  }
 }

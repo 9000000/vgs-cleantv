@@ -333,10 +333,10 @@ index 41825a1a..f5b1f644 100644
          // Draw a private copy: changing the bounds of the drawable an ImageView shows would blank the tile.
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/BootHome.java b/launcher/app/src/main/java/com/gathin/tvhome/BootHome.java
 new file mode 100644
-index 00000000..b1b043f7
+index 00000000..658a4fa8
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/BootHome.java
-@@ -0,0 +1,109 @@
+@@ -0,0 +1,127 @@
 +package com.gathin.tvhome;
 +
 +import android.Manifest;
@@ -368,20 +368,38 @@ index 00000000..b1b043f7
 +    public void onReceive(Context context, Intent intent) {
 +        String action = intent.getAction();
 +        if (!Intent.ACTION_BOOT_COMPLETED.equals(action) && (action == null || !action.endsWith("QUICKBOOT_POWERON"))) return;
-+        // Once per boot: firmware that sends both would open Home twice.
++        wake(context, action.endsWith("QUICKBOOT_POWERON") ? "q" : "b", goAsync());
++    }
++
++    /** CleanTV/VGS 3.5.6: a wake from a bind Android makes at boot (NowPlayingListener), counted only this early. */
++    static final long BIND_WAKE_MS = 10 * 60 * 1000L;
++
++    /**
++     * The boot path, once per boot whichever signal comes first. TCL 43P618 (Võ Thái, 27/10/2026, boot record
++     * "h307 h309 h320 s324"): no BOOT_COMPLETED reached this app and the helper stayed off until CleanTV connected, so
++     * 3.5.6 also starts it from the notification listener, which Android binds at boot by itself.
++     */
++    static void wake(Context context, String event, BroadcastReceiver.PendingResult pending) {
++        // Noted before the once-per-boot check, so the record shows every way in that worked ("b7 n8").
++        note(context, event);
++        // Once per boot: firmware that sends several signals would open Home twice.
 +        int boot = Settings.Global.getInt(context.getContentResolver(), Settings.Global.BOOT_COUNT, -1);
 +        android.content.SharedPreferences prefs = context.getSharedPreferences("boot", Context.MODE_PRIVATE);
-+        if (boot >= 0 && prefs.getInt("boot_home", -1) == boot) return;
++        if (boot >= 0 && prefs.getInt("boot_home", -1) == boot) {
++            if (pending != null) pending.finish();
++            return;
++        }
 +        prefs.edit().putInt("boot_home", boot).apply();
-+        note(context, action.endsWith("QUICKBOOT_POWERON") ? "q" : "b");
 +        Config config = Config.load(context);
 +        boolean redirect = !config.stockHomeRedirect.isEmpty();
-+        Log.i(TAG, "boot redirect=" + redirect + " always=" + config.powerOnHomeAlways + " liveTv=" + config.bootToLiveTv);
++        Log.i(TAG, "boot " + event + " redirect=" + redirect + " always=" + config.powerOnHomeAlways + " liveTv=" + config.bootToLiveTv);
 +        if (redirect || config.powerOnHomeAlways) enableHelper(context);
 +        // stock_home_redirect too (3.5.1): the stock home stays the default there, so after a power cut it is what
 +        // comes up (TCL Smart TV Pro G10, Android 12, 27/10/2026), even without power_on_home_always.
-+        if (!(config.powerOnHomeAlways || redirect) || config.bootToLiveTv) return;
-+        PendingResult pending = goAsync();
++        if (!(config.powerOnHomeAlways || redirect) || config.bootToLiveTv) {
++            if (pending != null) pending.finish();
++            return;
++        }
 +        new Handler(Looper.getMainLooper()).postDelayed(() -> {
 +            try {
 +                context.startActivity(new Intent(context, MainActivity.class)
@@ -394,7 +412,7 @@ index 00000000..b1b043f7
 +                Log.w(TAG, "boot open refused: " + refused);
 +                note(context, "r");
 +            }
-+            pending.finish();
++            if (pending != null) pending.finish();
 +        }, OPEN_DELAY_MS);
 +    }
 +
@@ -405,7 +423,7 @@ index 00000000..b1b043f7
 +     * CleanTV/VGS 3.5.5: logcat on a TCL 43P618 had rotated the boot lines away nine minutes after boot (Võ Thái,
 +     * 27/10/2026), so what ran at boot is also kept in Settings.Global, which CleanTV can read at any time:
 +     * "boot 7: b12 h14 o16 s20" = boot count, then event + seconds since boot (b BOOT_COMPLETED, q QUICKBOOT,
-+     * h helper connected, o Home opened, r open refused, s stock home seen, x helper turned back on).
++     * n notification listener bound, h helper connected, o Home opened, r open refused, s stock home seen, x helper turned back on).
 +     * Needs WRITE_SECURE_SETTINGS, which CleanTV grants; without it nothing is noted.
 +     */
 +    static void note(Context context, String event) {
@@ -1685,10 +1703,10 @@ index 00000000..f9fc8577
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/NowPlayingListener.java b/launcher/app/src/main/java/com/gathin/tvhome/NowPlayingListener.java
 new file mode 100644
-index 00000000..37668a0f
+index 00000000..6481c45d
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/NowPlayingListener.java
-@@ -0,0 +1,11 @@
+@@ -0,0 +1,18 @@
 +package com.gathin.tvhome;
 +
 +import android.service.notification.NotificationListenerService;
@@ -1699,6 +1717,13 @@ index 00000000..37668a0f
 + * "cmd notification allow_listener"; without it the button simply never shows.
 + */
 +public class NowPlayingListener extends NotificationListenerService {
++    /** CleanTV/VGS 3.5.6: Android binds this at boot by itself, a way in where the firmware blocks BOOT_COMPLETED (TCL). */
++    @Override
++    public void onListenerConnected() {
++        super.onListenerConnected();
++        if (android.os.SystemClock.elapsedRealtime() < BootHome.BIND_WAKE_MS) BootHome.wake(this, "n", null);
++    }
++
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/SleepTimer.java b/launcher/app/src/main/java/com/gathin/tvhome/SleepTimer.java
 new file mode 100644

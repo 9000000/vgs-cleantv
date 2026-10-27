@@ -1,5 +1,17 @@
 [
  {
+  "ban": "3.5.6",
+  "ngay": "2026-10-27",
+  "vi": [
+   "Tivi chặn tín hiệu khởi động với app ngoài (TCL 43P618): Home sạch tự mở lên qua dịch vụ Android tự nối lúc khởi động, cần bấm Áp dụng lên tivi một lần",
+   "Dấu khởi động ghi đủ mọi đường Home sạch được gọi dậy, để chẩn đoán chính xác hơn"
+  ],
+  "en": [
+   "TVs that block the boot signal for outside apps (TCL 43P618): the clean Home opens through a service Android connects by itself at boot; Apply to the TV once",
+   "The boot record lists every way the clean Home was woken, for a sharper diagnosis"
+  ]
+ },
+ {
   "ban": "3.5.5",
   "ngay": "2026-10-27",
   "vi": [

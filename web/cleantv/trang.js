@@ -10,6 +10,8 @@
   var CHU_KY_SO_NGUOI = 30000;
   /** Góp ý vào cùng hộp của vgs.zone (phần "cleantv"). */
   var API_GOP_Y = "https://vgs.zone/api/gop-y";
+  // Dữ liệu OTA nằm ở Cloudflare Pages; trang hiện ở vgs.zone/cleantv nên đọc địa chỉ đầy đủ (Pages trả CORS cho vgs.zone).
+  var NGUON_OTA = "https://cleantv.alexvgs.tech";
   /**
    * /api/gop-y chưa trả header CORS cho cleantv.alexvgs.tech (soát 27/10/2026), nên trình duyệt không cho đọc câu trả
    * lời: gửi kiểu no-cors (multipart là "simple request", máy chủ vẫn nhận và lưu), không đọc được lỗi máy chủ.
@@ -58,7 +60,7 @@
     var mb = typeof b.co === "number" ? " · " + (b.co / 1048576).toFixed(1).replace(".", ",") + " MB" : "";
     return "Bản " + b.versionName + ngay + mb;
   }
-  layJson("/cap-nhat.json").then(function (j) {
+  layJson(NGUON_OTA + "/cap-nhat.json").then(function (j) {
     var b = j && j.app;
     if (!b || !b.versionName) return;
     $$("[data-ban]").forEach(function (el) {
@@ -134,7 +136,7 @@
     ve();
   }
 
-  choDuLieu.push(layJson("/tivi.json").then(function (j) {
+  choDuLieu.push(layJson(NGUON_OTA + "/tivi.json").then(function (j) {
     var ds = j && Array.isArray(j.ds) ? j.ds.filter(function (m) { return m && m.hang && m.ten; }) : [];
     if (!ds.length) throw new Error("tivi.json rỗng");
     var soMau = ds.length;
@@ -165,7 +167,7 @@
     return li;
   }
 
-  choDuLieu.push(layJson("/nhat-ky.json").then(function (ds) {
+  choDuLieu.push(layJson(NGUON_OTA + "/nhat-ky.json").then(function (ds) {
     ds = Array.isArray(ds) ? ds.filter(function (d) { return d && d.ban && Array.isArray(d.vi); }) : [];
     if (!ds.length) throw new Error("nhat-ky.json rỗng");
     // App mở /?b=<bản đang dùng>#cap-nhat: đánh dấu bản đó.

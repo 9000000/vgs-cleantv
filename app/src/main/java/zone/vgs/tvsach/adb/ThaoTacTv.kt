@@ -653,6 +653,9 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         val canQuyen = khoiPhucPhim || luonVe || moDe
         sh("pm ${if (canQuyen) "grant" else "revoke"} $pkgHome android.permission.WRITE_SECURE_SETTINGS 2>/dev/null; true")
         sh("appops set $pkgHome SYSTEM_ALERT_WINDOW ${if (luonVe || moDe) "allow" else "default"} 2>/dev/null; true")
+        // 3.5.6 (TCL 43P618 chặn BOOT_COMPLETED với app ngoài): Android tự nối dịch vụ nghe thông báo lúc khởi động, Home sạch
+        // dùng lúc đó để tự mở. Chỉ cấp, không thu lại: nút "đang phát" cũng dùng dịch vụ này.
+        if (luonVe || moDe) choPhepDangPhat()
         // Nút hẹn giờ tắt (sleep_timer_button) cần báo thức đúng giờ: cấp sẵn, máy cũ không có lệnh thì thôi.
         sh("appops set $pkgHome SCHEDULE_EXACT_ALARM allow 2>/dev/null; true")
         ghiFileTheme("config.json", ghi.toByteArray())
