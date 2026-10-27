@@ -1155,6 +1155,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // giải mã màu 32-bit thay vì RGB_565. Nâng cao ghi sau nên vẫn đổi lại được.
         // Ảnh riêng sáng làm chìm chữ trắng (26/10/2026, Sony VH22): bóng mờ sau chữ đồng hồ, ngày, thời tiết.
         if (anhNenRieng != null) { put("sky_intensity", 0); put("wallpaper_true_color", true); put("header_shadow", true) }
+        // Sony BRAVIA XR (Google TV): nút Khởi động lại trong hộp nguồn mở từ menu nút Cài đặt không chạy (góp ý moluna,
+        // XR-65X90L 27/10/2026), nên ẩn dòng đó (power_menu_row của bản vá). Sony đời khác không hiện dòng này.
+        if (thongTin?.brand?.equals("Sony", ignoreCase = true) == true && thongTin?.model?.startsWith("XR-", ignoreCase = true) == true) put("power_menu_row", false)
         // Tivi Xiaomi bản Trung Quốc không có tiếng Việt: Home sạch hiện chữ Trung (25/10/2026). Tivi đang để tiếng Trung mà
         // app dùng tiếng Việt thì ép Home sạch sang tiếng Việt (locale của bản vá launcher).
         if (zone.vgs.tvsach.NgonNgu.tiengViet && Regex("""\[(persist\.sys\.locale|ro\.product\.locale)\]: \[zh""").containsMatchIn(getprop)) put("locale", "vi")

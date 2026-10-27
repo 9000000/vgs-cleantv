@@ -1,5 +1,17 @@
 [
  {
+  "ban": "3.5.2",
+  "ngay": "2026-10-27",
+  "vi": [
+   "Rút điện bật lại: Home sạch không còn mất hình nền, thời tiết, ô kênh, màu chữ (tivi Android 11 trở lên đọc thư mục cấu hình chậm lúc khởi động)",
+   "Sony BRAVIA XR: ẩn dòng Khởi động lại không chạy trong menu nút Cài đặt"
+  ],
+  "en": [
+   "After a power cut the clean Home keeps its wallpaper, weather, channel tiles and text colour (Android 11+ TVs read the settings folder late at boot)",
+   "Sony BRAVIA XR: the Restart row that did nothing is hidden from the Settings button menu"
+  ]
+ },
+ {
   "ban": "3.5.1",
   "ngay": "2026-10-27",
   "vi": [

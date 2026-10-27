@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 94,
-  "versionName": "3.5.1",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.1.apk",
-  "co": 12255225,
-  "ghiChu": "Remote trên tivi không còn chậm, TCL Google TV rút điện tự về Home sạch, ảnh dọc không bị cắt, 335 mẫu tivi",
-  "ghiChuEn": "No more slow remote on weak boxes, TCL Google TV back to the clean Home after a power cut, portrait photos no longer cropped, 335 TV models",
+  "versionCode": 95,
+  "versionName": "3.5.2",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.2.apk",
+  "co": 12255141,
+  "ghiChu": "Rút điện bật lại không còn mất hình nền, thời tiết, ô kênh",
+  "ghiChuEn": "No more lost wallpaper, weather and channel tiles after a power cut",
   "ngay": "2026-10-27"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "47f04103775364ce",
+   "phienBan": "04078ac2c84fa1c6",
    "url": "/ota/du-lieu.json",
    "co": 1954504,
-   "tuBan": 94
+   "tuBan": 95
   },
   "tvhome.apk": {
-   "phienBan": "9d79338ba2244db0",
+   "phienBan": "8905d11388560a09",
    "url": "/ota/tvhome.apk",
    "co": 662945,
-   "tuBan": 94
+   "tuBan": 95
   }
  }
 }
