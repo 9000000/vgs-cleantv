@@ -66,11 +66,14 @@ object KenhVtvGo {
         c.connectTimeout = 8000; c.readTimeout = 10000
         val goc = c.inputStream.use { BitmapFactory.decodeStream(it) } ?: return null
         val ra = Bitmap.createBitmap(320, 180, Bitmap.Config.ARGB_8888)
-        val cv = Canvas(ra); cv.drawColor(Color.WHITE)
-        // Vừa khung, giữ tỉ lệ, giữa ô.
-        val tl = minOf(320f / goc.width, 180f / goc.height)
-        val w = (goc.width * tl).toInt(); val h = (goc.height * tl).toInt()
-        cv.drawBitmap(goc, null, Rect((320 - w) / 2, (180 - h) / 2, (320 + w) / 2, (180 + h) / 2), Paint(Paint.FILTER_BITMAP_FLAG))
+        // Nền theo màu góc ảnh (ảnh trong suốt thì trắng như cũ); ảnh gần 16:9 thì phủ kín ô. Logo FPT 410×230 thu vừa
+        // khung thừa một dòng nền trắng, thành vệt sáng ở mép ô HTV7 (góp ý cefas, 27/10/2026).
+        val goc0 = goc.getPixel(0, 0)
+        val cv = Canvas(ra); cv.drawColor(if (Color.alpha(goc0) == 255) goc0 else Color.WHITE)
+        val tiLe = goc.width.toFloat() / goc.height / (320f / 180f)
+        val tl = if (tiLe in 0.94f..1.06f) maxOf(320f / goc.width, 180f / goc.height) else minOf(320f / goc.width, 180f / goc.height)
+        val w = Math.round(goc.width * tl); val h = Math.round(goc.height * tl)
+        cv.drawBitmap(goc, null, Rect((320 - w) / 2, (180 - h) / 2, (320 - w) / 2 + w, (180 - h) / 2 + h), Paint(Paint.FILTER_BITMAP_FLAG))
         ByteArrayOutputStream().also { ra.compress(Bitmap.CompressFormat.JPEG, 90, it) }.toByteArray()
     }.getOrNull()
 }

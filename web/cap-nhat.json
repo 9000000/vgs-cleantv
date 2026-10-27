@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 99,
-  "versionName": "3.5.6",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.6.apk",
-  "co": 12256853,
-  "ghiChu": "TCL: Home sạch tự mở sau khi rút điện qua đường khác khi hãng chặn tín hiệu khởi động",
-  "ghiChuEn": "TCL: the clean Home opens after a power cut another way when the maker blocks the boot signal",
-  "ngay": "2026-10-27"
+  "versionCode": 100,
+  "versionName": "3.5.7",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.7.apk",
+  "co": 12257573,
+  "ghiChu": "Sửa tivi TCL rút điện bật lại vẫn hiện Home cũ; tìm giọng nói Google TV hiện kết quả; ô kênh FPT hết vệt trắng",
+  "ghiChuEn": "Fixes TCL TVs showing the old Home after a power cut; Google TV voice search shows its results; FPT channel tiles lose the white line",
+  "ngay": "2026-10-28"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "dedcefa9661eb01c",
+   "phienBan": "5060865e2658bb00",
    "url": "/ota/du-lieu.json",
    "co": 1954504,
-   "tuBan": 99
+   "tuBan": 100
   },
   "tvhome.apk": {
-   "phienBan": "8aab027706fac392",
+   "phienBan": "5fba3c6e841be91d",
    "url": "/ota/tvhome.apk",
-   "co": 663773,
-   "tuBan": 99
+   "co": 664153,
+   "tuBan": 100
   }
  }
 }

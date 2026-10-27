@@ -1,5 +1,19 @@
 [
  {
+  "ban": "3.5.7",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Tivi chặn tín hiệu khởi động (TCL 43P618): lúc vừa bật Home sạch đọc cấu hình chưa được thì đọc lại mỗi 15 giây trong 2 phút đầu, không còn nằm ở Home cũ vài phút",
+   "- Kiểu mở đè Home cũ: bấm tìm giọng nói trên Google TV thì kết quả hiện ra bình thường, không bị Home sạch che (Xiaomi MZTU0)",
+   "- Ô kênh FPT Play (HTV7…): hết vệt trắng ở mép ô, nền theo màu logo. Bấm Áp dụng lại để làm mới ảnh ô"
+  ],
+  "en": [
+   "- TVs that block the boot signal (TCL 43P618): if the clean Home cannot read its settings right after power-on it reads them again every 15 s for 2 minutes instead of leaving the old Home up",
+   "- Open-over-old-Home mode: Google TV voice search results now show instead of being covered (Xiaomi MZTU0)",
+   "- FPT Play channel tiles (HTV7…): no white line at the edge, background follows the logo. Apply again to refresh the tiles"
+  ]
+ },
+ {
   "ban": "3.5.6",
   "ngay": "2026-10-27",
   "vi": [
