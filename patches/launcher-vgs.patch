@@ -27108,6 +27108,32 @@ index 71356fff..e22ee1ab 100644
          int chosenRows = choices.getInt(ROWS_BELOW_DOCK_KEY, rowsBelow);
          if (chosenRows >= 0 && chosenRows <= 3) rowsBelow = chosenRows;
          animations = choices.getBoolean("animations", animations);
+diff --git a/launcher/app/src/main/java/com/gathin/tvhome/DockDecoration.java b/launcher/app/src/main/java/com/gathin/tvhome/DockDecoration.java
+index fe821b9d..604fc74c 100644
+--- a/launcher/app/src/main/java/com/gathin/tvhome/DockDecoration.java
++++ b/launcher/app/src/main/java/com/gathin/tvhome/DockDecoration.java
+@@ -57,8 +57,8 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
+         this.bandVisible = bandVisible;
+         band.setColor(translucent ? 0x8C121014 : (Math.round(opacity * 2.55f) << 24) | 0x141416);
+         edge.setStyle(Paint.Style.STROKE);
+-        edge.setStrokeWidth(density);
+-        edge.setColor(lightGlass ? 0x38FFFFFF : translucent ? 0x26FFFFFF : 0x1FFFFFFF);
++        edge.setStrokeWidth(lightGlass ? 2.0f * density : density);
++        edge.setColor(lightGlass ? 0x99FFFFFF : translucent ? 0x4DFFFFFF : 0x2EFFFFFF);
+     }
+ 
+     /** Concentric corners: the band's radius is the tiles' radius plus the band's padding around them. */
+@@ -140,8 +140,8 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
+         }
+         rect.bottom += namesRoom;
+         if (lightGlass && (rect.top != shaderTop || rect.bottom != shaderBottom)) {
+-            // The pills' glass (pill_bg: white, 18% fading to 8%), a little fainter over this much larger area.
+-            band.setShader(new LinearGradient(0, rect.top, 0, rect.bottom, 0x24FFFFFF, 0x0DFFFFFF,
++            // The pills' glass: viền và gradient kính mờ sáng rõ và lấp lánh hơn
++            band.setShader(new LinearGradient(0, rect.top, 0, rect.bottom, 0x3DFFFFFF, 0x16FFFFFF,
+                     Shader.TileMode.CLAMP));
+             shaderTop = rect.top;
+             shaderBottom = rect.bottom;
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/EventsTracker.java b/launcher/app/src/main/java/com/gathin/tvhome/EventsTracker.java
 new file mode 100644
 index 00000000..7cbaba9f
@@ -27433,6 +27459,69 @@ index 00000000..7cbaba9f
 +        return stems[stemIdx] + " " + branches[branchIdx];
 +    }
 +}
+diff --git a/launcher/app/src/main/java/com/gathin/tvhome/GlassView.java b/launcher/app/src/main/java/com/gathin/tvhome/GlassView.java
+index 0fd2b6cd..7d83f99e 100644
+--- a/launcher/app/src/main/java/com/gathin/tvhome/GlassView.java
++++ b/launcher/app/src/main/java/com/gathin/tvhome/GlassView.java
+@@ -35,8 +35,8 @@ public class GlassView extends View {
+         density = getResources().getDisplayMetrics().density;
+         radius = 20f * density;
+         rim.setStyle(Paint.Style.STROKE);
+-        rim.setStrokeWidth(1.5f * density);
+-        rim.setColor(0xCCFFFFFF);
++        rim.setStrokeWidth(2.5f * density);
++        rim.setColor(0xF0FFFFFF);
+         glow.setStyle(Paint.Style.STROKE);
+         // Cache the slab as a texture. The spring only changes translation, so the GPU can
+         // move it without replaying clipPath and the glow on every frame. That path is
+@@ -48,15 +48,15 @@ public class GlassView extends View {
+     void setAccent(int argb) {
+         if (argb == 0) {
+             glowRgb = 0xFFFFFF;
+-            glowAlpha = 0x30;
+-            rim.setColor(0xCCFFFFFF);
++            glowAlpha = 0x55;
++            rim.setColor(0xF0FFFFFF);
+         } else {
+             glowRgb = argb & 0xFFFFFF;
+-            glowAlpha = 0x70;
++            glowAlpha = 0x99;
+             // The rim is the accent lifted towards white, so the edge still reads as glass, not paint.
+-            int r = (((glowRgb >> 16) & 0xFF) + 255 * 2) / 3, g = (((glowRgb >> 8) & 0xFF) + 255 * 2) / 3,
+-                    b = ((glowRgb & 0xFF) + 255 * 2) / 3;
+-            rim.setColor(0xE6000000 | (r << 16) | (g << 8) | b);
++            int r = (((glowRgb >> 16) & 0xFF) + 255 * 3) / 4, g = (((glowRgb >> 8) & 0xFF) + 255 * 3) / 4,
++                    b = ((glowRgb & 0xFF) + 255 * 3) / 4;
++            rim.setColor(0xF5000000 | (r << 16) | (g << 8) | b);
+         }
+         invalidate();
+     }
+@@ -65,7 +65,7 @@ public class GlassView extends View {
+     void setStyle(String style) {
+         flat = Config.GLASS_RIM.equals(style) || Config.GLASS_HALO.equals(style);
+         halo = Config.GLASS_HALO.equals(style);
+-        rim.setStrokeWidth((flat ? 2f : 1.5f) * density);
++        rim.setStrokeWidth((flat ? 3f : 2.5f) * density);
+         invalidate();
+     }
+ 
+@@ -83,14 +83,14 @@ public class GlassView extends View {
+ 
+     @Override
+     protected void onDraw(Canvas canvas) {
+-        float inset = 6f * density;   // room for the glow
++        float inset = 8f * density;   // room for the glow (tăng từ 6dp lên 8dp tạo hào quang rộng hơn)
+         rect.set(inset, inset, getWidth() - inset, getHeight() - inset);
+ 
+         // Outer glow: thin rings across the inset, each a little fainter, so it fades out smoothly. Three wide
+         // strokes left visible bands once the glow took an app's colour at a stronger alpha. The hardware layer
+         // caches the result, so the rings cost one draw, not one per frame of the spring.
+         if (!flat || halo) {
+-            int rings = 12;
++            int rings = 14;
+             float step = inset / rings;
+             int alpha = flat ? glowAlpha / 2 : glowAlpha;
+             glow.setStrokeWidth(step + 0.5f);
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/HistoryProvider.java b/launcher/app/src/main/java/com/gathin/tvhome/HistoryProvider.java
 new file mode 100644
 index 00000000..2267989e
@@ -28141,7 +28230,7 @@ index d6bf13a3..330da398 100644
          long b11 = a11;
          int lunarYear;
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index a5acd794..0ab4e303 100644
+index a5acd794..43950622 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -55,6 +55,7 @@ import android.text.style.ForegroundColorSpan;
@@ -28172,7 +28261,7 @@ index a5acd794..0ab4e303 100644
      private TextView shamsiDate;
      /** lunar_date: the lunisolar date under the date line, and the time zone it is computed for. */
      private TextView lunarDate;
-@@ -195,6 +202,42 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -195,6 +202,43 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private TextView raceKicker, raceHeadline, raceSessions;
      /** config.xml show_stats, overridable by a theme. Off: the line is gone and nothing is read. */
      private boolean showStats;
@@ -28186,10 +28275,11 @@ index a5acd794..0ab4e303 100644
 +    private Thread weatherThread;
 +    private long weatherAt;
 +    private static final long WEATHER_MS = 30 * 60 * 1000L;
-+    /** CleanTV/VGS: Today Carousel (Đếm ngược ngày lễ/Tết, Danh ngôn, Ngày này năm xưa - đổi 2h một lần). */
-+    private static final long CAROUSEL_INTERVAL_MS = 2 * 60 * 60 * 1000L;
++    /** CleanTV/VGS: Today Carousel (Ngày này năm xưa xoay vòng 3 phút một lần, Danh ngôn đổi 2h một lần). */
++    private static final long CAROUSEL_INTERVAL_MS = 3 * 60 * 1000L;
 +    private TextView todayCarouselView;
 +    private int carouselStep = 0;
++    private int historyEventIndex = 0;
 +    private boolean carouselEnabled = true;
 +    private final Runnable carouselTick = new Runnable() {
 +        @Override
@@ -28215,7 +28305,7 @@ index a5acd794..0ab4e303 100644
      private boolean shamsi;
      /** greeting_name: said after the greeting, which is shown in capitals. */
      private String greetingName = "";
-@@ -375,14 +418,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -375,14 +419,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // The pill follows the network callbacks and each return to Home; only the diya's flame follows the
              // signal level, so only it needs this minute's binder calls (about 7 ms on the UI thread).
              if (festive) updateWifiLabel();
@@ -28231,7 +28321,7 @@ index a5acd794..0ab4e303 100644
      @Override
      protected void onCreate(Bundle savedInstanceState) {
          super.onCreate(savedInstanceState);
-@@ -390,7 +432,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -390,7 +433,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          density = getResources().getDisplayMetrics().density;
          // config.xml, overlaid by config.json from a pushed theme (see Config and tools/theme.sh).
          Config cfg = Config.load(this);
@@ -28239,7 +28329,7 @@ index a5acd794..0ab4e303 100644
          appLibrarySelection = cfg.appLibrarySelection;
          libraryOkOpens = cfg.libraryOkOpens;
          // restore_key_services: after a force stop, put back the remote's accessibility helpers that Android took
-@@ -501,7 +542,50 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -501,7 +543,54 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          lunarOffset = Lunar.offsetFor(cfg.lunarUtcOffset, Locale.getDefault());
          if (lunar) lunarDate.setVisibility(View.VISIBLE);
          greetingName = cfg.greetingName;
@@ -28283,14 +28373,18 @@ index a5acd794..0ab4e303 100644
 +                HistoryProvider.loadToday(null);
 +                advanceTodayCarousel();
 +                if (todayCard != null) {
-+                    todayCard.setOnClickListener(v -> advanceTodayCarousel());
++                    todayCard.setOnClickListener(v -> {
++                        handler.removeCallbacks(carouselTick);
++                        advanceTodayCarousel();
++                        handler.postDelayed(carouselTick, CAROUSEL_INTERVAL_MS);
++                    });
 +                }
 +            }
 +        }
          if (shamsi) {
              shamsiDate.setVisibility(View.VISIBLE);
              TextView date = findViewById(R.id.date);
-@@ -509,6 +593,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -509,6 +598,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              lunarDate.setTextSize(11f);
              date.setPadding(0, (int) (4 * density), 0, 0);
          }
@@ -28304,7 +28398,7 @@ index a5acd794..0ab4e303 100644
          vpnApp = cfg.vpnApp;
          vpnPill = cfg.vpnPill && !cfg.topMenu;
          btnVpn = findViewById(R.id.btnVpn);
-@@ -588,6 +679,21 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -588,6 +684,21 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              public void onChildViewDetachedFromWindow(@NonNull View v) {
              }
          });
@@ -28326,7 +28420,7 @@ index a5acd794..0ab4e303 100644
          if (dockRow) grid.addItemDecoration(new DockDecoration(COLUMNS, density, cinematic, cfg.alwaysShowNames, cfg.dockOpacity, cfg.dockGlass, cfg.dockEvenPadding, cfg.dockBand,
                  singleRow, cfg.dockBandAll));
          if (cfg.fadeRows) TopFade.attach(grid, 48 * density);
-@@ -606,6 +712,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -606,6 +717,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // tvOS layout: push the dock row towards the bottom of the screen, leaving room for
          // rows_below_dock grid rows under it; the rest of the grid stays below until you press Down.
          int rowsBelowDock = cfg.rowsBelowDock;
@@ -28338,7 +28432,7 @@ index a5acd794..0ab4e303 100644
          grid.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
              int h = b - t;
              // Item height follows the tile size, which follows the columns and the rows that must fit (AppAdapter.tileWidthPx).
-@@ -626,6 +737,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -626,6 +742,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // A single row never shows the names under its tiles (the title above the row names the app), so the
              // 7dp gap and 22dp label item_app.xml keeps for them would only lift the row: sit it that much lower.
              if (singleRow && !cfg.alwaysShowNames) want += (int) (29 * density);
@@ -28350,7 +28444,7 @@ index a5acd794..0ab4e303 100644
              if (grid.getPaddingTop() != want) {
                  grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
                  // A vertical grid parks the dock on the new padding line by scrolling (onTileFocused); a sideways
-@@ -793,8 +909,35 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -793,8 +914,35 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -28387,7 +28481,7 @@ index a5acd794..0ab4e303 100644
          btnSettings.setOnKeyListener(pillKeys);
          btnReorder.setOnKeyListener(pillKeys);
          btnLibraryTop.setOnKeyListener(pillKeys);
-@@ -940,6 +1083,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -940,6 +1088,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onResume() {
          super.onResume();
@@ -28395,7 +28489,7 @@ index a5acd794..0ab4e303 100644
          // A festival that started or ended while Home was in the background: rebuild with or without it.
          if (festive != festival.active(LocalDate.now())) {
              recreate();
-@@ -983,9 +1127,20 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -983,9 +1132,20 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -28417,7 +28511,7 @@ index a5acd794..0ab4e303 100644
          if (festive && diya != null) {
              diya.start();
              LocalDate today = LocalDate.now();
-@@ -1151,6 +1306,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1151,6 +1311,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onPause() {
          super.onPause();
@@ -28425,7 +28519,7 @@ index a5acd794..0ab4e303 100644
          root.removeCallbacks(showIdleClock);
          endReorder();   // Home or another app while reordering keeps the order so far
          wallpaperPlayer.stop();
-@@ -1159,6 +1315,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1159,6 +1320,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          ambient.animate().cancel();
          heroArt.animate().cancel();
          handler.removeCallbacks(minuteTick);
@@ -28433,7 +28527,7 @@ index a5acd794..0ab4e303 100644
          stopStats();
          if (diya != null) diya.stop();
          cancelPendingFocusScroll();
-@@ -1256,8 +1413,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1256,8 +1418,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       */
      @Override
      public boolean dispatchKeyEvent(KeyEvent event) {
@@ -28442,7 +28536,7 @@ index a5acd794..0ab4e303 100644
          if (handleSettingsKey(event)) return true;
          if (tileMenuEnabled && !reordering && openPopup == null && cardPrompt == null
                  && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
-@@ -1693,14 +1848,33 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1693,14 +1853,33 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  if (!animations || reducedMotion) grid.scrollBy(0, dy);
                  else grid.smoothScrollBy(0, dy);
              }
@@ -28480,7 +28574,7 @@ index a5acd794..0ab4e303 100644
          }
      }
  
-@@ -1725,17 +1899,80 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1725,17 +1904,80 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private void showHero(int position, float dockTopInRoot) {
          String label = adapter.labelAt(position);
          int color = adapter.ambientColorAt(position);
@@ -28563,7 +28657,7 @@ index a5acd794..0ab4e303 100644
              hero.setTranslationX(0f);
              hero.setAlpha(1f);
              if (ambientGlow) {
-@@ -1751,7 +1988,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1751,7 +1993,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              hero.animate().cancel();
              ambient.animate().cancel();
              fillHero(position, label);
@@ -28572,7 +28666,7 @@ index a5acd794..0ab4e303 100644
              hero.setTranslationX(0f);
              hero.animate().alpha(1f).setDuration(260).start();
              if (ambientGlow) {
-@@ -1763,7 +2000,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1763,7 +2005,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              if (advancedEffects) hero.animate().cancel();
              hero.animate().alpha(0f).translationX(-12 * density).setDuration(120).withEndAction(() -> {
                  fillHero(position, label);
@@ -28581,7 +28675,7 @@ index a5acd794..0ab4e303 100644
                  hero.setTranslationX(12 * density);
                  hero.animate().alpha(1f).translationX(0f).setDuration(200).start();
              }).start();
-@@ -1776,7 +2013,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1776,7 +2018,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  }).start();
              }
          } else {
@@ -28590,7 +28684,7 @@ index a5acd794..0ab4e303 100644
          }
      }
  
-@@ -2001,6 +2238,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2001,6 +2243,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          heroArt.animate().cancel();
          heroArt.setAlpha(0f);
          heroShown = false;
@@ -28600,7 +28694,7 @@ index a5acd794..0ab4e303 100644
          if (!ambientGlow) return;
          if (!animations || reducedMotion) {
              setAmbient(color);
-@@ -2044,6 +2284,246 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2044,6 +2289,244 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -28795,11 +28889,9 @@ index a5acd794..0ab4e303 100644
 +    private void advanceTodayCarousel() {
 +        if (!showToday || todayCard == null) return;
 +
-+        // Xoay vòng giữa:
-+        // - CÂU NÓI HAY (Quotes)
-+        // - NGÀY NÀY NĂM XƯA (Wikipedia tiếng Việt)
-+        // Tuyệt đối không lấy tin tức giật gân, đảm bảo thanh tịnh phòng khách
-+        boolean isQuote = (carouselStep % 2 == 0);
++        // CleanTV/VGS: Ngày này năm xưa xoay vòng 3 phút một lần, Danh ngôn đổi 2h một lần.
++        // Tỷ lệ: 1 lần Danh ngôn (3 phút) -> 2 lần Sự kiện Lịch sử mới (3 phút/lần)
++        boolean isQuote = (carouselStep % 3 == 0);
 +        carouselStep++;
 +
 +        final String label;
@@ -28807,12 +28899,12 @@ index a5acd794..0ab4e303 100644
 +        final String meta;
 +
 +        if (isQuote) {
-+            QuotesProvider.QuoteItem q = QuotesProvider.getTwoHourQuote(carouselStep);
++            QuotesProvider.QuoteItem q = QuotesProvider.getTwoHourQuote(0);
 +            label = "CÂU NÓI HAY";
 +            text = (q.text.startsWith("“") ? q.text : "“" + q.text + "”");
 +            meta = (q.author != null && !q.author.isEmpty() ? "— " + q.author : "");
 +        } else {
-+            HistoryProvider.HistoryItem hi = HistoryProvider.getItemAt(carouselStep / 2);
++            HistoryProvider.HistoryItem hi = HistoryProvider.getItemAt(historyEventIndex++);
 +            if (hi != null && hi.year > 0) {
 +                label = "NGÀY NÀY NĂM XƯA · " + hi.year;
 +                text = hi.text;
@@ -28824,7 +28916,7 @@ index a5acd794..0ab4e303 100644
 +                text = hi.text;
 +                meta = "";
 +            } else {
-+                QuotesProvider.QuoteItem q = QuotesProvider.getTwoHourQuote(carouselStep);
++                QuotesProvider.QuoteItem q = QuotesProvider.getTwoHourQuote(0);
 +                label = "CÂU NÓI HAY";
 +                text = (q.text.startsWith("“") ? q.text : "“" + q.text + "”");
 +                meta = (q.author != null && !q.author.isEmpty() ? "— " + q.author : "");
@@ -28847,7 +28939,7 @@ index a5acd794..0ab4e303 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2108,13 +2588,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2108,13 +2591,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -28875,7 +28967,7 @@ index a5acd794..0ab4e303 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2309,6 +2800,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2309,6 +2803,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -28886,7 +28978,7 @@ index a5acd794..0ab4e303 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2670,7 +3165,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2670,7 +3168,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -28899,7 +28991,7 @@ index a5acd794..0ab4e303 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2925,7 +3424,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2925,7 +3427,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       *  source number; "HW8=-" leaves that input out of the Inputs menu (a port the board reports but the set
       *  does not have). Returns the number, -1 for a left-out input, or null when the input is not listed. */
      private Integer mappedSource(String inputId) {
@@ -28933,7 +29025,7 @@ index a5acd794..0ab4e303 100644
      }
  
      /** Switches to a passthrough input (HDMI, AV). An input mapped in `input_sources` is opened by sending
-@@ -3267,8 +3791,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3267,8 +3794,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          if (moduleCards) addSettingsMenuRow(rows, popup, R.string.module_cards, this::showModuleCards);
          if (dockRow) addSettingsMenuRow(rows, popup, R.string.dock_edit, this::startDockEdit);
          addSettingsMenuRow(rows, popup, R.string.reorder, this::toggleReorder);
@@ -28942,7 +29034,7 @@ index a5acd794..0ab4e303 100644
          panel.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
          popup.setWidth(Math.max((int) (200 * density), panel.getMeasuredWidth()));
          // Hebrew puts Settings at the left of the header: grow the menu inward from it.
-@@ -3329,10 +3851,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3329,10 +3854,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
@@ -29086,7 +29178,7 @@ index a5acd794..0ab4e303 100644
          View row = getLayoutInflater().inflate(R.layout.item_input, rows, false);
          row.findViewById(R.id.icon).setVisibility(View.GONE);
          row.findViewById(R.id.dot).setVisibility(View.GONE);
-@@ -3381,8 +4036,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3381,8 +4039,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          if (card == null) return;
  
          View panel = getLayoutInflater().inflate(R.layout.dialog_card_prompt, root, false);
@@ -29095,7 +29187,7 @@ index a5acd794..0ab4e303 100644
          ((TextView) panel.findViewById(R.id.title)).setText(getString(R.string.card_prompt_title, card.appLabel));
          ((TextView) panel.findViewById(R.id.body)).setText(card.state == Cards.State.RESIGNED
                  ? getString(R.string.card_prompt_resigned, card.appLabel)
-@@ -3396,16 +4049,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3396,16 +4052,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  getString(R.string.card_prompt_identity, card.pkg, Cards.shortDigest(card.digest)));
          TextView keep = panel.findViewById(R.id.btnKeep);
          TextView show = panel.findViewById(R.id.btnShow);
@@ -29112,7 +29204,7 @@ index a5acd794..0ab4e303 100644
  
          final Dialog dialog = new Dialog(this);
          dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-@@ -3437,10 +4080,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3437,10 +4083,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          View.OnKeyListener keys = (v, keyCode, event) -> {
              if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
              if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN) return true;
@@ -29125,7 +29217,7 @@ index a5acd794..0ab4e303 100644
          };
          keep.setOnKeyListener(keys);
          show.setOnKeyListener(keys);
-@@ -3474,8 +4115,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3474,8 +4118,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private void showModuleCardsNow() {
          View anchor = findViewById(R.id.btnSettings);
          View panel = getLayoutInflater().inflate(R.layout.popup_cards, root, false);
@@ -29134,7 +29226,7 @@ index a5acd794..0ab4e303 100644
          LinearLayout rows = panel.findViewById(R.id.rows);
          final PopupWindow popup = glassPopup(panel, (int) (400 * density));
          List<Cards.Card> listed = new ArrayList<>(cards);
-@@ -3484,12 +4123,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3484,12 +4126,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              View row = getLayoutInflater().inflate(R.layout.item_card_row, rows, false);
              row.setTag(card.pkg);
              ((TextView) row.findViewById(R.id.title)).setText(card.label);
@@ -30071,26 +30163,26 @@ index 00000000..a25ea3bf
 +</shape>
 diff --git a/launcher/app/src/main/res/drawable/bg_today_card.xml b/launcher/app/src/main/res/drawable/bg_today_card.xml
 new file mode 100644
-index 00000000..0d892435
+index 00000000..28b29bba
 --- /dev/null
 +++ b/launcher/app/src/main/res/drawable/bg_today_card.xml
 @@ -0,0 +1,6 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-+    <gradient android:angle="270" android:startColor="#2D181E2A" android:endColor="#1E11141E" />
-+    <stroke android:width="0.75dp" android:color="#1AFFFFFF" />
++    <gradient android:angle="270" android:startColor="#33181E2A" android:endColor="#2411141E" />
++    <stroke android:width="1.2dp" android:color="#4DFFFFFF" />
 +    <corners android:radius="20dp" />
 +</shape>
 diff --git a/launcher/app/src/main/res/drawable/bg_weather_card.xml b/launcher/app/src/main/res/drawable/bg_weather_card.xml
 new file mode 100644
-index 00000000..3fc9d5a3
+index 00000000..bf7b91fd
 --- /dev/null
 +++ b/launcher/app/src/main/res/drawable/bg_weather_card.xml
 @@ -0,0 +1,6 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-+    <gradient android:angle="270" android:startColor="#2D181E2A" android:endColor="#1E11141E" />
-+    <stroke android:width="0.75dp" android:color="#1AFFFFFF" />
++    <gradient android:angle="270" android:startColor="#33181E2A" android:endColor="#2411141E" />
++    <stroke android:width="1.2dp" android:color="#4DFFFFFF" />
 +    <corners android:radius="22dp" />
 +</shape>
 diff --git a/launcher/app/src/main/res/drawable/cum_bg.xml b/launcher/app/src/main/res/drawable/cum_bg.xml

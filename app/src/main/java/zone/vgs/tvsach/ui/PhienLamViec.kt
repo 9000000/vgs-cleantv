@@ -1029,7 +1029,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         thuVienApp = j.optBoolean("app_library", false)
         dongHoKhiYen = j.optInt("home_idle_clock_minutes", 0)
         tiviYeu = j.optBoolean("reduced_motion", false)
-        hieuUngKinh = !cuaTheme("dock_glass") && j.optBoolean("dock_glass", false)
+        hieuUngKinh = j.optBoolean("dock_glass", false)
         lamToiNen = j.optInt("wallpaper_dim", 0)
         hienThongSo = j.optBoolean("show_stats", false)
         doiHang = if (j.optBoolean("rows_middle", false)) HANG_GIUA else if (cuaTheme("rows_offset_dp")) 0 else j.optInt("rows_offset_dp", 0)
