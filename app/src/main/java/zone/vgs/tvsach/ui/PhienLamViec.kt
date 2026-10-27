@@ -1065,6 +1065,14 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             luuConfigHienTaiChoTheme()
         }
         dongBoCongTacTuTheme(themeChon)
+        if (j.has("dock_glass")) {
+            hieuUngKinh = j.optBoolean("dock_glass")
+            nangCao["dock_glass"] = hieuUngKinh.toString()
+        }
+        if (j.has("dock_band")) {
+            daiNenDock = j.optBoolean("dock_band")
+            nangCao["dock_band"] = daiNenDock.toString()
+        }
 
         nutManCho = j.optBoolean("dream_button", nutManCho)
         gonNut = j.optBoolean("top_compact", gonNut)

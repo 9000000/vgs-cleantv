@@ -8522,7 +8522,7 @@ index 71356fff..e22ee1ab 100644
          if (chosenRows >= 0 && chosenRows <= 3) rowsBelow = chosenRows;
          animations = choices.getBoolean("animations", animations);
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/DockDecoration.java b/launcher/app/src/main/java/com/gathin/tvhome/DockDecoration.java
-index fe821b9d..604fc74c 100644
+index fe821b9d..b523fc78 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/DockDecoration.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/DockDecoration.java
 @@ -57,8 +57,8 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
@@ -8536,17 +8536,47 @@ index fe821b9d..604fc74c 100644
      }
  
      /** Concentric corners: the band's radius is the tiles' radius plus the band's padding around them. */
-@@ -140,8 +140,8 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
+@@ -87,7 +87,10 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
+ 
+     @Override
+     public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+-        if (!bandVisible) return;
++        // CleanTV: Vẽ dải dock nếu bật dải nền (bandVisible) HOẶC bật hiệu ứng kính mờ (lightGlass).
++        // Nhờ đó, người dùng có thể tắt dải nền đen (dock_band = false) để không che hình nền,
++        // nhưng vẫn bật được hiệu ứng kính mờ (dock_glass = true) với viền nổi 3D và gradient mờ sang trọng.
++        if (!bandVisible && !lightGlass) return;
+         boolean any = false;
+         int cardWidth = 0;
+         for (int i = 0; i < parent.getChildCount(); i++) {
+@@ -139,14 +142,20 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
+             rect.right = Math.min(rect.right, parent.getWidth() - density);
          }
          rect.bottom += namesRoom;
-         if (lightGlass && (rect.top != shaderTop || rect.bottom != shaderBottom)) {
+-        if (lightGlass && (rect.top != shaderTop || rect.bottom != shaderBottom)) {
 -            // The pills' glass (pill_bg: white, 18% fading to 8%), a little fainter over this much larger area.
 -            band.setShader(new LinearGradient(0, rect.top, 0, rect.bottom, 0x24FFFFFF, 0x0DFFFFFF,
-+            // The pills' glass: viền và gradient kính mờ sáng rõ và lấp lánh hơn
-+            band.setShader(new LinearGradient(0, rect.top, 0, rect.bottom, 0x3DFFFFFF, 0x16FFFFFF,
-                     Shader.TileMode.CLAMP));
-             shaderTop = rect.top;
-             shaderBottom = rect.bottom;
+-                    Shader.TileMode.CLAMP));
+-            shaderTop = rect.top;
+-            shaderBottom = rect.bottom;
++        if (lightGlass) {
++            if (rect.top != shaderTop || rect.bottom != shaderBottom) {
++                // The pills' glass: viền và gradient kính mờ sáng rõ và lấp lánh hơn
++                band.setShader(new LinearGradient(0, rect.top, 0, rect.bottom, 0x3DFFFFFF, 0x16FFFFFF,
++                        Shader.TileMode.CLAMP));
++                shaderTop = rect.top;
++                shaderBottom = rect.bottom;
++            }
++            c.drawRoundRect(rect, radius, radius, band);
++            c.drawRoundRect(rect, radius, radius, edge);
++        } else if (bandVisible) {
++            band.setShader(null);
++            c.drawRoundRect(rect, radius, radius, band);
++            c.drawRoundRect(rect, radius, radius, edge);
+         }
+-        c.drawRoundRect(rect, radius, radius, band);
+-        c.drawRoundRect(rect, radius, radius, edge);
+     }
+ }
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/EventsTracker.java b/launcher/app/src/main/java/com/gathin/tvhome/EventsTracker.java
 new file mode 100644
 index 00000000..7cbaba9f
