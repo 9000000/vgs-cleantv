@@ -1,5 +1,17 @@
 [
  {
+  "ban": "3.5.15",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Ô kênh có logo viền hơi trong suốt (HTV7 của FPT Play) không còn vệt sáng ở mép trên. Ô đã thêm trước đó: bỏ chọn rồi chọn lại kênh để app làm lại ảnh",
+   "- Gói com.tcl.assistant vào nhóm \"Tìm kiếm giọng nói\", không tự tích: trên TCL BeyondTV tắt gói này là nút mic trên remote không thu được tiếng"
+  ],
+  "en": [
+   "- Channel tiles whose logo has a semi-transparent edge (FPT Play HTV7) no longer get a light strip at the top. For a tile added earlier, untick and re-pick the channel so the app rebuilds its picture",
+   "- com.tcl.assistant joins the \"Voice search\" group and is never pre-ticked: on TCL BeyondTV the remote mic stops recording without it"
+  ]
+ },
+ {
   "ban": "3.5.14",
   "ngay": "2026-10-28",
   "vi": [

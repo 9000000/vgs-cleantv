@@ -68,8 +68,10 @@ object KenhVtvGo {
         val ra = Bitmap.createBitmap(320, 180, Bitmap.Config.ARGB_8888)
         // Nền theo màu góc ảnh (ảnh trong suốt thì trắng như cũ); ảnh gần 16:9 thì phủ kín ô. Logo FPT 410×230 thu vừa
         // khung thừa một dòng nền trắng, thành vệt sáng ở mép ô HTV7 (góp ý cefas, 27/10/2026).
+        // Viền nửa trong suốt (hàng trên cùng logo HTV7 của FPT có độ đặc 159, lót trắng vẫn ra vệt sáng; cefas 28/10/2026):
+        // điểm góc đặc từ một nửa trở lên thì lấy màu của nó làm nền, chỉ logo trong suốt hẳn mới lót trắng.
         val goc0 = goc.getPixel(0, 0)
-        val cv = Canvas(ra); cv.drawColor(if (Color.alpha(goc0) == 255) goc0 else Color.WHITE)
+        val cv = Canvas(ra); cv.drawColor(if (Color.alpha(goc0) >= 128) goc0 or 0xFF000000.toInt() else Color.WHITE)
         val tiLe = goc.width.toFloat() / goc.height / (320f / 180f)
         val tl = if (tiLe in 0.94f..1.06f) maxOf(320f / goc.width, 180f / goc.height) else minOf(320f / goc.width, 180f / goc.height)
         val w = Math.round(goc.width * tl); val h = Math.round(goc.height * tl)

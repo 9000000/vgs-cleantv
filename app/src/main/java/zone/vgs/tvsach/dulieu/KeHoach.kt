@@ -93,8 +93,11 @@ object KeHoach {
     private val GOOGLE_HOME = Regex("""^com\.google\.android\.apps\.mediashell$|chromecast|googlecast|seeds\.iot|shield\.ask|^com\.google\.android\.tungsten\.setupwraith$""")
     fun laGoiGoogleHome(pkg: String) = GOOGLE_HOME.containsMatchIn(pkg)
 
-    /** Nút mic / tìm bằng giọng nói (22/10/2026: Mi Box S mất giọng nói vì danh sách tắt katniss "personal choice"). */
-    private val GIONG_NOI = Regex("""^com\.google\.android\.katniss$|^com\.google\.android\.speech\.pumpkin$|^com\.google\.android\.(apps\.)?tv\.assistant$|^com\.google\.android\.googlequicksearchbox$""")
+    /**
+     * Nút mic / tìm bằng giọng nói (22/10/2026: Mi Box S mất giọng nói vì danh sách tắt katniss "personal choice").
+     * com.tcl.assistant: nút mic remote TCL BeyondTV chạy qua nó, tắt thì hiện màn tìm mà không thu tiếng (danh sách 225, 28/10/2026).
+     */
+    private val GIONG_NOI = Regex("""^com\.google\.android\.katniss$|^com\.google\.android\.speech\.pumpkin$|^com\.google\.android\.(apps\.)?tv\.assistant$|^com\.google\.android\.googlequicksearchbox$|^com\.tcl\.assistant$""")
 
     /**
      * Nhóm trong danh sách đúng mẫu mà người làm danh sách ghi là tắt THEO Ý RIÊNG ("off by choice", "personal choice",
