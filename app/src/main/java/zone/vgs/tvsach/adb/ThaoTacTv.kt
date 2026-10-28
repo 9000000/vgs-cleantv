@@ -946,6 +946,33 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         batDichVu("HomeKeyService")
     }
 
+    /**
+     * Khôi phục mà giữ Home sạch (góp ý dtafzum 28/10/2026, Chromecast: khôi phục xong bấm Home vẫn vào Home sạch): nhả
+     * nút Home hẳn. Bỏ dịch vụ trợ năng của Home sạch, xoá mở đè / luôn mở khi bật tivi trong cấu hình, thu quyền ghi cài
+     * đặt hệ thống và hiện đè (không thì BootHome bật lại bộ bắt phím ở lần khởi động sau). [truoc]: danh sách trợ năng
+     * trước khi dọn, có thì trả nguyên, không thì chỉ gỡ phần của Home sạch.
+     */
+    fun nhaNutHome(truoc: String?) {
+        val tc = sh("settings get secure enabled_accessibility_services").trim()
+        val ve = (truoc?.takeIf { it.isNotBlank() && it != "null" } ?: tc)
+            .split(':').filter { d -> d.isNotBlank() && d != "null" && HOME_SACH.none { d.startsWith("$it/") } }.joinToString(":")
+        if (ve != tc) {
+            if (ve.isBlank()) sh("settings delete secure enabled_accessibility_services") else sh("settings put secure enabled_accessibility_services '$ve'")
+        }
+        docCauHinhTv()?.let { j ->
+            val bo = listOf("stock_home_redirect", "power_on_home_always").map { j.remove(it) != null }.any { it }
+            if (bo) {
+                ghiFileTheme("config.json", j.toString().toByteArray())
+                // Home sạch giữ một bản sao cấu hình để đọc lúc khởi động; mở nó một lần cho bản sao theo file mới, không
+                // thì lần rút điện sau nó vẫn đọc mở đè cũ và tự mở lên (thử máy ảo 28/10/2026).
+                sh("am start -n $pkgHome/$NS_HOME.MainActivity >/dev/null 2>&1; sleep 3; true")
+            }
+        }
+        HOME_SACH.forEach { p ->
+            sh("pm revoke $p android.permission.WRITE_SECURE_SETTINGS 2>/dev/null; appops set $p SYSTEM_ALERT_WINDOW default 2>/dev/null; true")
+        }
+    }
+
     private fun traHomeGoc(sl: BanSaoLuu) {
         val goc = sl.homeGocDaTat.ifBlank { sl.homeTruoc.substringBefore('/') }
         if (goc.isBlank()) return
@@ -1051,11 +1078,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             val out = runCatching { sh("pm enable --user 0 $p") }.getOrElse { "${it.message}" }
             if (!out.contains("enabled")) loi += "$p: ${out.trim()}"
         }
-        val tc = sh("settings get secure enabled_accessibility_services").trim()
-        if (HOME_SACH.any { tc.contains("$it/") }) {
-            val con = tc.split(':').filter { d -> d.isNotBlank() && HOME_SACH.none { d.startsWith("$it/") } }.joinToString(":")
-            if (con.isBlank()) sh("settings delete secure enabled_accessibility_services") else sh("settings put secure enabled_accessibility_services '$con'")
-        }
+        nhaNutHome(null)
         if (sh("settings get global private_dns_specifier").trim() == "dns.adguard-dns.com") {
             bao(t("Trả DNS về tự động…", "Setting DNS back to automatic…"))
             sh("settings put global private_dns_mode opportunistic; settings delete global private_dns_specifier")
@@ -1092,6 +1115,11 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             val goc = sl.homeTruoc
             if (goc.isNotBlank() && HOME_SACH.none { goc.startsWith("$it/") }) {
                 sh("cmd package set-home-activity --user 0 $goc")
+            }
+            if (!goLauncher) {
+                bao(t("Nhả nút Home cho Home gốc…", "Handing the Home button back…"))
+                nhaNutHome(sl.truyCapTruoc)
+                sh("input keyevent KEYCODE_HOME")
             }
             if (goLauncher) {
                 bao(t("Gỡ Home sạch…", "Removing the clean Home…"))

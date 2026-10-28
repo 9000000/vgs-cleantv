@@ -1,5 +1,17 @@
 [
  {
+  "ban": "3.5.11",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Sửa Khôi phục khi chọn giữ Home sạch: tắt bộ bắt phím của Home sạch, bỏ kiểu mở đè và \"luôn mở khi bật tivi\", thu lại quyền. Nút Home về hẳn Home gốc, rút điện bật lại không bị Home sạch giành lại (Chromecast)",
+   "- Có thể sửa luôn lỗi tìm giọng nói trong YouTube sau khi khôi phục"
+  ],
+  "en": [
+   "- Fixed Restore when keeping the clean Home: its Home-key helper is switched off, open-over and open-at-power-on are cleared and its permissions taken back. Home goes to the stock Home for good, even after a power cut (Chromecast)",
+   "- This may also fix YouTube voice search after a restore"
+  ]
+ },
+ {
   "ban": "3.5.10",
   "ngay": "2026-10-28",
   "vi": [
