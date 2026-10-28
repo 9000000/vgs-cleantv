@@ -71,9 +71,11 @@ object KeHoach {
     /**
      * Khối gói lõi của repo CleanYourTV (tools/disable.sh CORE_RE / CORE_OK, tests/test_core_packages.py, #884), chép
      * nguyên văn: tatGoi từ chối mọi gói khớp ngay trước lệnh tắt, dù gói đến từ danh sách mẫu, luật chung hay người
-     * dùng tự tích (23/10/2026, Gathin muốn CleanTV có đủ các chốt an toàn của repo).
+     * dùng tự tích (23/10/2026, Gathin muốn CleanTV có đủ các chốt an toàn của repo). 28/10/2026 theo fa1a2f00 (#1578):
+     * thêm android.ext.* và phần mềm lõi của tivi MediaTek (com.cltv.mal, com.mediatek.tis / tv.service / tv.agent), một
+     * Haier H50H5F khởi động lại liên tục sau khi tắt com.cltv.mal.
      */
-    private val CORE_RE = Regex("""^(android|com\.android\.systemui|com\.android\.shell|com\.android\.phone|com\.android\.settings|com\.android\.tv\.settings|com\.(google\.)?android\.(permissioncontroller|packageinstaller|ext\.services|ext\.shared|modulemetadata)|com\.google\.android\.overlay\.modules.*|com\.android\.providers\..*)$""")
+    private val CORE_RE = Regex("""^(android|android\.ext\.(services|shared)|com\.android\.systemui|com\.android\.shell|com\.android\.phone|com\.android\.settings|com\.android\.tv\.settings|com\.(google\.)?android\.(permissioncontroller|packageinstaller|ext\.services|ext\.shared|modulemetadata)|com\.google\.android\.overlay\.modules.*|com\.android\.providers\..*|com\.cltv\.mal|com\.mediatek\.(tis|tv\.service|tv\.agent))$""")
     private val CORE_OK = Regex("""^com\.android\.providers\.(calendar|contacts|userdictionary|blockednumber)$""")
     fun laGoiLoiAndroid(pkg: String) = CORE_RE.matches(pkg) && !CORE_OK.matches(pkg)
 

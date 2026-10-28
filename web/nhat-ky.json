@@ -1,5 +1,253 @@
 [
  {
+  "ban": "3.5.15",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Đồng bộ toàn diện CleanTV 3.5.14: Hỗ trợ 101 kênh TV360, 16 ô kênh, icon app to",
+   "- Sửa triệt để sự kiện Ngày này năm xưa: loại bỏ text hỏng Wikipedia, hỗ trợ mục sự kiện con, bộ lọc an toàn phòng khách",
+   "- Bảo toàn trọn vẹn Widget phong cách Samsung The Frame: Thời tiết góc, Đếm ngược ngày/Tết, Thẻ sự kiện & danh ngôn, Lịch âm",
+   "- Thanh Dock 9 ô biểu tượng, tuỳ chỉnh dải nền dock độc lập, bộ 27 theme hoàn chỉnh"
+  ],
+  "en": [
+   "- Full sync with CleanTV 3.5.14: 101 TV360 channels, 16 channel tiles, big app icons",
+   "- Fixed Today in History: cleaned corrupted Wikipedia markup, added sub-bullet support, family-safe filter",
+   "- Preserved Samsung The Frame widgets: Corner weather, Event/Tet countdown, Today quote & history card, Lunar calendar",
+   "- 9-column Dock, independent dock background band toggle, 27 complete themes"
+  ]
+ },
+ {
+  "ban": "3.5.14",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Thêm nguồn kênh TV360 (Viettel): 101 kênh trong nước, bấm ô là mở thẳng kênh trong app TV360 (cần bản 6.4 trở lên trên tivi). Kênh có ổ khoá cần đăng nhập TV360"
+  ],
+  "en": [
+   "- New channel source TV360 (Viettel): 101 Vietnamese channels, a tile opens the channel straight in TV360 (needs 6.4 or later on the TV). Locked channels need a TV360 login"
+  ]
+ },
+ {
+  "ban": "3.5.13",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Ô kênh trên Home sạch tăng từ 12 lên 16, đủ chỗ cho người gộp kênh VTVgo và FPT Play",
+   "- Công tắc mới \"Icon to trong ô app\": app không có ảnh tivi có icon gần kín ô",
+   "- Công tắc lọc quảng cáo DNS có thêm lưu ý: tivi nào bị YouTube hay app kênh chập chờn thì tắt đi",
+   "- Nâng cao: mô tả tuỳ chọn âm lượng nhảy hai nấc chỉ rõ công tắc nào dùng khi giữ nút chỉ nhảy một nấc"
+  ],
+  "en": [
+   "- Channel tiles on Home go from 12 to 16",
+   "- New switch \"Big icons in app tiles\": apps without a TV banner get an icon that fills most of the tile",
+   "- The ad-blocking DNS switch now notes it can make YouTube or channel apps stall on some TVs",
+   "- Advanced: the volume double-step option now points to the right switch for a held key that moves only one step"
+  ]
+ },
+ {
+  "ban": "3.5.12",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Công tắc mới \"Thư viện trong menu Cài đặt\": bỏ nút Thư viện trên thanh đầu, mở bằng cách giữ OK trên nút Cài đặt của Home sạch",
+   "- Sửa nhỏ Home sạch: đặt lại giao diện không còn hiện lại giao diện cũ lúc vừa bật tivi"
+  ],
+  "en": [
+   "- New switch \"Library in the Settings menu\": no Library button in the top bar, open it by holding OK on Home's Settings button",
+   "- Small Home fix: a theme reset no longer shows the old theme right after power-on"
+  ]
+ },
+ {
+  "ban": "3.5.11",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Sửa Khôi phục khi chọn giữ Home sạch: tắt bộ bắt phím của Home sạch, bỏ kiểu mở đè và \"luôn mở khi bật tivi\", thu lại quyền. Nút Home về hẳn Home gốc, rút điện bật lại không bị Home sạch giành lại (Chromecast)",
+   "- Có thể sửa luôn lỗi tìm giọng nói trong YouTube sau khi khôi phục"
+  ],
+  "en": [
+   "- Fixed Restore when keeping the clean Home: its Home-key helper is switched off, open-over and open-at-power-on are cleared and its permissions taken back. Home goes to the stock Home for good, even after a power cut (Chromecast)",
+   "- This may also fix YouTube voice search after a restore"
+  ]
+ },
+ {
+  "ban": "3.5.10",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Lưu ra file, mở file, chọn ảnh hay chuyển sang app khác rồi quay lại: app tự kiểm và nối lại tivi nếu điện thoại đã cắt kết nối, không phải kết nối lại bằng tay"
+  ],
+  "en": [
+   "- Saving or opening a file, picking a picture or switching apps and coming back: the app checks the TV connection and reconnects by itself if the phone dropped it"
+  ]
+ },
+ {
+  "ban": "3.5.9",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- An toàn hơn theo CleanYourTV: không bao giờ tắt phần mềm lõi của tivi MediaTek (com.cltv.mal, com.mediatek.tis, tv.service, tv.agent). Một tivi Haier đã khởi động lại liên tục sau khi tắt gói này",
+   "- Tivi đã lỡ tắt các gói đó (vài máy Skyworth, Hisense, Xiaomi): bấm Áp dụng hoặc dọn lại là app tự bật lại",
+   "- Danh sách theo CleanYourTV mới: 341 mẫu tivi, 95 hãng"
+  ],
+  "en": [
+   "- Safer, following CleanYourTV: never disables MediaTek TV middleware (com.cltv.mal, com.mediatek.tis, tv.service, tv.agent). A Haier TV restarted in a loop with it off",
+   "- TVs where these were already disabled (some Skyworth, Hisense, Xiaomi): Apply or clean again and the app turns them back on",
+   "- Lists from the latest CleanYourTV: 341 TV models, 95 brands"
+  ]
+ },
+ {
+  "ban": "3.5.8",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Tuỳ chỉnh thêm: \"Nút Wi-Fi, Cài đặt sát mép trên\", hàng nút không tụt theo đồng hồ to và dòng ngày, thời tiết",
+   "- Tivi khởi động chậm (TCL 43P618): Home sạch chờ đến lúc đọc được cấu hình, bật bộ bắt phím Home ngay khi đọc được, và ghi mốc đó vào chẩn đoán"
+  ],
+  "en": [
+   "- More options: \"Wi-Fi, Settings buttons at the very top\", so they no longer drop with a large clock and the date and weather lines",
+   "- Slow-booting TVs (TCL 43P618): the clean Home waits until its settings are readable, turns the Home key helper on right then, and records the time in the diagnosis"
+  ]
+ },
+ {
+  "ban": "3.5.7",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Tivi chặn tín hiệu khởi động (TCL 43P618): lúc vừa bật Home sạch đọc cấu hình chưa được thì đọc lại mỗi 15 giây trong 2 phút đầu, không còn nằm ở Home cũ vài phút",
+   "- Kiểu mở đè Home cũ: bấm tìm giọng nói trên Google TV thì kết quả hiện ra bình thường, không bị Home sạch che (Xiaomi MZTU0)",
+   "- Ô kênh FPT Play (HTV7…): hết vệt trắng ở mép ô, nền theo màu logo. Bấm Áp dụng lại để làm mới ảnh ô"
+  ],
+  "en": [
+   "- TVs that block the boot signal (TCL 43P618): if the clean Home cannot read its settings right after power-on it reads them again every 15 s for 2 minutes instead of leaving the old Home up",
+   "- Open-over-old-Home mode: Google TV voice search results now show instead of being covered (Xiaomi MZTU0)",
+   "- FPT Play channel tiles (HTV7…): no white line at the edge, background follows the logo. Apply again to refresh the tiles"
+  ]
+ },
+ {
+  "ban": "3.5.6",
+  "ngay": "2026-10-27",
+  "vi": [
+   "Tivi chặn tín hiệu khởi động với app ngoài (TCL 43P618): Home sạch tự mở lên qua dịch vụ Android tự nối lúc khởi động, cần bấm Áp dụng lên tivi một lần",
+   "Dấu khởi động ghi đủ mọi đường Home sạch được gọi dậy, để chẩn đoán chính xác hơn"
+  ],
+  "en": [
+   "TVs that block the boot signal for outside apps (TCL 43P618): the clean Home opens through a service Android connects by itself at boot; Apply to the TV once",
+   "The boot record lists every way the clean Home was woken, for a sharper diagnosis"
+  ]
+ },
+ {
+  "ban": "3.5.5",
+  "ngay": "2026-10-27",
+  "vi": [
+   "Home sạch ghi lại những gì chạy lúc tivi khởi động vào cài đặt của tivi (không mất như nhật ký), gửi kèm khi bấm Gửi danh sách gói",
+   "Tivi khởi động nhanh (không báo khởi động đủ) cũng được tự mở Home sạch"
+  ],
+  "en": [
+   "The clean Home keeps a record of what ran at boot in the TV settings (it does not rotate away like the log) and sends it with the package list",
+   "TVs with fast boot (no full boot signal) also get the clean Home opened"
+  ]
+ },
+ {
+  "ban": "3.5.4",
+  "ngay": "2026-10-27",
+  "vi": [
+   "Ô app tô màu (YouTube, TV360…): logo to theo cỡ ô, không còn bé tí ở giữa khi ô lớn",
+   "Dòng \"Mở lần cuối\" trên Home cập nhật ngay khi quay về từ app, không còn hiện \"Hôm kia\" lúc vừa mở"
+  ],
+  "en": [
+   "Colour app tiles (YouTube, TV360…): the logo grows with the tile instead of sitting tiny in the middle of big tiles",
+   "The \"Last opened\" line on Home updates as soon as you come back from the app, no more \"2 days ago\" right after opening it"
+  ]
+ },
+ {
+  "ban": "3.5.3",
+  "ngay": "2026-10-27",
+  "vi": [
+   "Ô tìm thời tiết: báo \"Đang tìm…\", báo không thấy hoặc điện thoại không vào được dịch vụ tìm địa danh, tự thử lại một lần khi mạng chậm",
+   "Gửi danh sách gói kèm chẩn đoán lúc khởi động (Home sạch có được gọi dậy không), để sửa lỗi tivi về Home gốc sau khi rút điện trên TCL và Google TV"
+  ],
+  "en": [
+   "Weather search: shows \"Searching…\", says when nothing is found or the phone cannot reach the place search, and retries once on a slow network",
+   "Sending the package list now includes a boot diagnosis (did the clean Home wake up), to fix TVs that go back to the stock Home after a power cut on TCL and Google TV"
+  ]
+ },
+ {
+  "ban": "3.5.2",
+  "ngay": "2026-10-27",
+  "vi": [
+   "Rút điện bật lại: Home sạch không còn mất hình nền, thời tiết, ô kênh, màu chữ (tivi Android 11 trở lên đọc thư mục cấu hình chậm lúc khởi động)",
+   "Sony BRAVIA XR: ẩn dòng Khởi động lại không chạy trong menu nút Cài đặt"
+  ],
+  "en": [
+   "After a power cut the clean Home keeps its wallpaper, weather, channel tiles and text colour (Android 11+ TVs read the settings folder late at boot)",
+   "Sony BRAVIA XR: the Restart row that did nothing is hidden from the Settings button menu"
+  ]
+ },
+ {
+  "ban": "3.5.1",
+  "ngay": "2026-10-27",
+  "vi": [
+   "Remote của tivi không còn chậm trên hộp yếu (gõ chữ từ điện thoại chỉ bật theo dõi màn hình lúc đang gõ)",
+   "Tivi giữ Home Google (TCL Google TV…): rút điện bật lại tự về Home sạch, không cần bật thêm công tắc",
+   "Ảnh dọc làm hình nền và màn chờ động hiện trọn ảnh, hai bên là ảnh làm mờ, không bị cắt",
+   "Danh sách theo CleanYourTV mới: 335 mẫu tivi, 94 hãng"
+  ],
+  "en": [
+   "The TV remote is no longer slow on weak boxes (phone typing watches the screen only while typing)",
+   "TVs that keep the Google home (TCL Google TV…): after a power cut the clean Home comes back by itself",
+   "Portrait photos as wallpaper and in the moving screensaver show whole, with blurred sides",
+   "Lists follow the latest CleanYourTV: 335 TV models, 94 brands"
+  ]
+ },
+ {
+  "ban": "3.5.0",
+  "ngay": "2026-10-27",
+  "vi": [
+   "Remote trên điện thoại: kết nối tivi → Remote trên điện thoại. Phím điều hướng, OK, Home, quay lại, âm lượng, nguồn",
+   "Gõ hoặc nói để điền chữ vào ô đang chọn trên tivi (tìm YouTube, mật khẩu Wi-Fi), tiếng Việt có dấu",
+   "Hẹn giờ tắt tivi 15–120 phút, tivi tự đếm nên đóng app vẫn tắt đúng hẹn",
+   "Mở, gỡ app trên tivi; cài file APK từ điện thoại sang tivi",
+   "Màn chờ động (Tuỳ chỉnh): đồng hồ trên ảnh nền trôi chậm, nhiều ảnh thì 20 giây đổi một ảnh, hiện khi để yên ở Home sạch và làm màn chờ của tivi"
+  ],
+  "en": [
+   "Phone remote: connect a TV → Phone remote. D-pad, OK, Home, Back, volume, power",
+   "Type or speak into the field selected on the TV (YouTube search, Wi-Fi password), accents included",
+   "Sleep timer 15–120 minutes; the TV counts down itself, so closing the app is fine",
+   "Open and uninstall TV apps; install an APK from the phone onto the TV",
+   "Moving screensaver (Options): a clock over your wallpaper drifting slowly, a new picture every 20 s, shown when Home is idle and as the TV screensaver"
+  ]
+ },
+ {
+  "ban": "3.4.2",
+  "ngay": "2026-10-27",
+  "vi": [
+   "Thêm 61 kênh FPT Play chọn sẵn (toàn quốc, HTV, địa phương), không cần dán link",
+   "Tivi TCL rút điện bật lại: Home sạch tự lên, tự bật lại nút Home",
+   "Hộp RockChip: sửa lỗi không cài được Home sạch (màn cài đặt lần đầu tranh Home)",
+   "Màn nhỏ: nút trên cùng tự thu thành icon để không che đồng hồ, lời chào, thời tiết"
+  ],
+  "en": [
+   "61 ready FPT Play channels (national, HTV, local), no link pasting needed",
+   "TCL TVs after a power cut: the clean Home comes up and the Home key works again",
+   "RockChip boxes: fixed the clean Home failing to install (first-run setup screen claimed Home)",
+   "Small screens: top buttons shrink to icons so the clock, greeting and weather fit"
+  ]
+ },
+ {
+  "ban": "3.4.1",
+  "ngay": "2026-10-27",
+  "vi": [
+   "• Ảnh nền riêng tự đổi: sau khi chọn ảnh của bạn, bấm \"Thêm ảnh để hình nền tự đổi\" (tối đa 20 ảnh) và chọn bao lâu đổi một lần (5, 15, 30, 60 phút). Góp ý của build.dng."
+  ],
+  "en": [
+   "• Rotating wallpapers of your own: after picking your picture, press \"Add pictures to rotate the wallpaper\" (up to 20) and choose how often it changes (5, 15, 30, 60 minutes)."
+  ]
+ },
+ {
+  "ban": "3.4.0",
+  "ngay": "2026-10-27",
+  "vi": [
+   "• Giao diện Kiểu macOS: thanh menu mờ trên cùng, Dock kính mờ ô nhỏ nằm giữa đáy màn hình, ô đang chọn nổi lên sáng theo màu app, ảnh nền lượn tím hồng có logo VGS ở giữa.",
+   "• Chọn màu chữ đồng hồ, ngày, thời tiết (Trắng, Vàng, Xanh ngọc, Xanh lá, Hồng, Cam, Đen) cho ảnh nền sáng khó đọc. Góp ý của nggh, tranhoangnt555, Nam Tran."
+  ],
+  "en": [
+   "• macOS style: translucent menu bar on top, a small glass Dock centred at the bottom, the focused tile lifts and glows in the app's colour, a violet–pink wave wallpaper with the VGS logo in the middle.",
+   "• Pick the clock, date and weather text colour (White, Yellow, Cyan, Green, Pink, Orange, Black) for bright wallpapers."
+  ]
+ },
+ {
   "ban": "3.3.0",
   "ngay": "2026-10-27",
   "vi": [

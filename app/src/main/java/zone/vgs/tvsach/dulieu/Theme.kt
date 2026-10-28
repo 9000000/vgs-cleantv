@@ -65,6 +65,24 @@ val THEMES = listOf(
         listOf(0xFF7A0A14, 0xFF0B3A6E, 0xFF050505)
     ),
 
+    // 3. Kiểu macOS (CleanTV 3.5.14)
+    Theme(
+        "macos", "Kiểu macOS", "macOS style",
+        "Thanh menu mờ, Dock kính sát đáy, nền logo VGS",
+        "Translucent menu bar, glass Dock at the bottom, VGS logo wallpaper",
+        mapOf(
+            "background_color" to "#0B0820", "top_bar_band" to true, "dock_row" to true,
+            "single_row" to true, "dock_band_all" to true, "dock_glass" to true,
+            "uniform_tiles" to true, "show_greeting" to false, "header_white" to true,
+            "icon_only_buttons" to true, "icon_only_inputs" to true, "rows_offset_dp" to 300,
+            "columns" to 12, "dock_center" to true, "app_glow" to true, "advanced_effects" to true,
+            "header_scale" to 80, "wallpaper_true_color" to true
+        ),
+        "theme/macos.jpg",
+        listOf(0xFF2A1A7A, 0xFF7C3AED, 0xFFDB2777)
+    ),
+
+
     // 3. Mặc định (Default)
     Theme(
         "default", "Mặc định", "Default",
@@ -331,20 +349,21 @@ object XaPhuong {
 
     /**
      * Thành phố ngoài Việt Nam (25/10/2026, người dùng ở Indonesia, Nhật xin thời tiết nơi mình ở): hỏi dịch vụ tìm địa
-     * danh của Open-Meteo, cùng nơi cấp số thời tiết. Bỏ kết quả ở Việt Nam (đã có danh sách xã). Lỗi mạng thì rỗng.
+     * danh của Open-Meteo, cùng nơi cấp số thời tiết. Bỏ kết quả ở Việt Nam (đã có danh sách xã). Lỗi mạng thì null
+     * (3.5.3: tungtom591 ở Nagoya gõ mãi không ra gì mà không biết vì sao, nên màn hình phải phân biệt lỗi với không thấy).
      */
-    fun timTheGioi(q: String, tiengViet: Boolean, toiDa: Int = 6): List<Xa> = runCatching {
+    fun timTheGioi(q: String, tiengViet: Boolean, toiDa: Int = 6, choMs: Int = 5000): List<Xa>? = runCatching {
         val url = java.net.URL("https://geocoding-api.open-meteo.com/v1/search?count=$toiDa&format=json&language=${if (tiengViet) "vi" else "en"}&name=" +
             java.net.URLEncoder.encode(q.trim(), "UTF-8"))
         val c = url.openConnection() as java.net.HttpURLConnection
-        c.connectTimeout = 5000; c.readTimeout = 5000
+        c.connectTimeout = choMs; c.readTimeout = choMs
         val j = c.inputStream.bufferedReader().use { org.json.JSONObject(it.readText()) }
         val ds = j.optJSONArray("results") ?: return@runCatching emptyList()
         (0 until ds.length()).map { ds.getJSONObject(it) }.filter { it.optString("country_code") != "VN" }.map { r ->
             Xa(r.optString("name"), listOf(r.optString("admin1"), r.optString("country")).filter { it.isNotBlank() }.joinToString(", "),
                 r.optDouble("latitude"), r.optDouble("longitude"))
         }
-    }.getOrDefault(emptyList())
+    }.getOrNull()
 
     fun timXa(ds: List<Xa>, q: String, toiDa: Int = 8): List<Xa> {
         val tu = boDau(q).split(' ').filter { it.isNotBlank() }

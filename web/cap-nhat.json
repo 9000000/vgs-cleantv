@@ -1,26 +1,26 @@
 {
   "app": {
-    "versionCode": 108,
-    "versionName": "3.3.2",
-    "apk": "https://github.com/9000000/vgs-cleantv/releases/latest/download/CleanTV-v3.3.2.apk",
+    "versionCode": 109,
+    "versionName": "3.5.15",
+    "apk": "https://github.com/9000000/vgs-cleantv/releases/latest/download/CleanTV-v3.5.15.apk",
     "releaseUrl": "https://github.com/9000000/vgs-cleantv/releases/latest",
-    "co": 17211805,
-    "ghiChu": "CleanTV v3.3.2",
-    "ghiChuEn": "CleanTV v3.3.2 release",
-    "ngay": "2026-10-27"
+    "co": 18000000,
+    "ghiChu": "Đồng bộ CleanTV 3.5.14: 16 ô kênh, TV360, sửa Ngày này năm xưa, widget Samsung Frame, dock 9 ô",
+    "ghiChuEn": "Sync CleanTV 3.5.14: 16 channel tiles, TV360, fixed Today history, Samsung Frame widgets, 9-column dock",
+    "ngay": "2026-10-28"
   },
   "duLieu": {
     "du-lieu.json": {
-      "phienBan": "cf3df720ed6c1c61",
+      "phienBan": "737ecd8e55b27b1c",
       "url": "/ota/du-lieu.json",
-      "co": 1917629,
-      "tuBan": 80
+      "co": 2003864,
+      "tuBan": 107
     },
     "tvhome.apk": {
-      "phienBan": "083c3823ee916405",
+      "phienBan": "f3394bca836846e3",
       "url": "/ota/tvhome.apk",
-      "co": 681141,
-      "tuBan": 80
+      "co": 684609,
+      "tuBan": 109
     }
   }
 }
