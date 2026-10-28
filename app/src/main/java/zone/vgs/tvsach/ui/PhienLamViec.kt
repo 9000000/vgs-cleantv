@@ -333,6 +333,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     /** Ô app điện thoại (không có ảnh tivi) tô màu theo icon (launcher icon_tile_color, 23/10/2026). */
     var toMauOApp by mutableStateOf(true)
     var thuVienApp by mutableStateOf(false)
+    /** Thư viện app mở từ menu Cài đặt của Home sạch thay vì nút trên thanh đầu (góp ý thangmath 28/10/2026). */
+    var thuVienTrongMenu by mutableStateOf(false)
     var dongHoKhiYen by mutableStateOf(0)
     var tiviYeu by mutableStateOf(false)
     var hieuUngKinh by mutableStateOf(false)
@@ -980,6 +982,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         tenToTrenDock = j.optBoolean("dock_title", true)
         toMauOApp = j.optBoolean("icon_tile_color", true)
         thuVienApp = j.optBoolean("app_library", false)
+        thuVienTrongMenu = thuVienApp && !j.optBoolean("library_button", true)
         dongHoKhiYen = j.optInt("home_idle_clock_minutes", 0)
         tiviYeu = j.optBoolean("reduced_motion", false)
         hieuUngKinh = !cuaTheme("dock_glass") && j.optBoolean("dock_glass", false)
@@ -1140,7 +1143,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (tenDuoiApp) put("always_show_names", true)
         if (!tenToTrenDock) put("dock_title", false)
         if (!toMauOApp) put("icon_tile_color", false)
-        if (thuVienApp) { put("app_library", true); put("library_button", true) }
+        if (thuVienApp) { put("app_library", true); put("library_button", !thuVienTrongMenu) }
+        // Giữ OK trên nút Cài đặt có dòng Thư viện ứng dụng khi nút trên thanh đầu tắt; viên cuối hàng cũng bỏ cho gọn.
+        if (thuVienApp && thuVienTrongMenu) put("show_library_pill", false)
         if (dongHoKhiYen > 0) put("home_idle_clock_minutes", dongHoKhiYen)
         if (tiviYeu) put("reduced_motion", true)
         if (hieuUngKinh) { put("dock_glass", true); put("app_glow", true) }

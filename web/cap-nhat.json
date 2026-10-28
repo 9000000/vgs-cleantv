@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 104,
-  "versionName": "3.5.11",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.11.apk",
-  "co": 12271021,
-  "ghiChu": "Khôi phục mà giữ Home sạch: nút Home trả hẳn về Home gốc, rút điện cũng không tự bật lại Home sạch",
-  "ghiChuEn": "Restore while keeping the clean Home: the Home button goes back to the stock Home for good, even after a power cut",
+  "versionCode": 105,
+  "versionName": "3.5.12",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.12.apk",
+  "co": 12271077,
+  "ghiChu": "Thư viện app mở từ menu Cài đặt của Home sạch",
+  "ghiChuEn": "App library from Home's Settings menu",
   "ngay": "2026-10-28"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "867d738698864d52",
+   "phienBan": "a6c12434a83a24a1",
    "url": "/ota/du-lieu.json",
    "co": 2003864,
-   "tuBan": 104
+   "tuBan": 105
   },
   "tvhome.apk": {
-   "phienBan": "39833f37e6e569c2",
+   "phienBan": "6cec970e5262dfb7",
    "url": "/ota/tvhome.apk",
-   "co": 664429,
-   "tuBan": 104
+   "co": 664501,
+   "tuBan": 105
   }
  }
 }

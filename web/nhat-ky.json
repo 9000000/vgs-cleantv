@@ -1,5 +1,17 @@
 [
  {
+  "ban": "3.5.12",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Công tắc mới \"Thư viện trong menu Cài đặt\": bỏ nút Thư viện trên thanh đầu, mở bằng cách giữ OK trên nút Cài đặt của Home sạch",
+   "- Sửa nhỏ Home sạch: đặt lại giao diện không còn hiện lại giao diện cũ lúc vừa bật tivi"
+  ],
+  "en": [
+   "- New switch \"Library in the Settings menu\": no Library button in the top bar, open it by holding OK on Home's Settings button",
+   "- Small Home fix: a theme reset no longer shows the old theme right after power-on"
+  ]
+ },
+ {
   "ban": "3.5.11",
   "ngay": "2026-10-28",
   "vi": [

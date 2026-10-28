@@ -178,7 +178,7 @@ index 701b5feb..4e22d871 100644
      </application>
  </manifest>
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
-index 41825a1a..f5b1f644 100644
+index 5e2ab51c..56c0aa70 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 @@ -64,7 +64,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -233,7 +233,7 @@ index 41825a1a..f5b1f644 100644
          View card = v.findViewById(R.id.card);
          ViewGroup.LayoutParams cardLp = card.getLayoutParams();
          cardLp.width = w;
-@@ -503,6 +516,16 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -504,6 +517,16 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
              h.icon.setVisibility(View.VISIBLE);
              h.label.setText(e.label);
              h.label.setVisibility(uniformTiles ? View.GONE : View.VISIBLE);
@@ -250,7 +250,7 @@ index 41825a1a..f5b1f644 100644
          }
          h.card.setOnClickListener(v -> launch(e));
          h.card.setOnLongClickListener(v -> {
-@@ -511,7 +534,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -512,7 +535,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                  if (pos != RecyclerView.NO_POSITION) listener.onTileLongPress(pos, v);
                  return true;
              }
@@ -259,7 +259,7 @@ index 41825a1a..f5b1f644 100644
              i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
              try {
                  ctx.startActivity(i);
-@@ -523,6 +546,10 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -524,6 +547,10 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
  
      /** Opens the tile's activity by explicit component, with no extras: a card can name nothing else. */
      private void launch(Entry e) {
@@ -270,7 +270,7 @@ index 41825a1a..f5b1f644 100644
          if (e.kind == Entry.HOME_SETTINGS) {
              ctx.startActivity(new Intent(ctx, HomeSettingsActivity.class)
                      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-@@ -552,6 +579,27 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -553,6 +580,27 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
          }
      }
  
@@ -298,7 +298,7 @@ index 41825a1a..f5b1f644 100644
      @Override
      public int getItemCount() {
          return items.size() + (showLibrary ? 1 : 0);
-@@ -681,6 +729,8 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -682,6 +730,8 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
  
      /** Share of the tile height the icon takes in uniform_tiles mode (onCreateViewHolder). */
      private static final float ICON_SHARE = 0.62f;
@@ -307,7 +307,7 @@ index 41825a1a..f5b1f644 100644
  
      /**
       * The colour covering most of an icon, for a card that should read as that app: a small saturated badge
-@@ -823,6 +873,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -824,6 +874,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
          return Math.max(0, Math.min(255, Math.round(v)));
      }
  
@@ -1097,7 +1097,7 @@ index 00000000..067f64b5
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 17961443..ad3f4e48 100644
+index 17961443..1e2cd5de 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -184,6 +184,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
@@ -1396,7 +1396,7 @@ index 17961443..ad3f4e48 100644
          updateRace();
 +        // CleanTV/VGS: back from an app opened on the shelf, focus is still on its tile, so the "Last opened" line
 +        // kept the time from before this launch ("2 days ago" right after opening it). Refresh it (ngoctrung, 27/10/2026).
-+        if (cinematic && heroMeta != null && lastFocused < adapter.appCount()) updateHeroMeta(lastFocused);
++        if (cinematic && heroMeta != null && lastFocused >= 0 && lastFocused < adapter.appCount()) updateHeroMeta(lastFocused);
          // The network and Inputs pills keep their state while Home is in the background, and callbacks update them
          // when the network or the inputs change, so this refresh only catches anything missed. Its binder calls
          // (about 7 ms on a TCL C755, most of it WifiManager.getConnectionInfo) would hold up the first frame back
@@ -1533,9 +1533,13 @@ index 17961443..ad3f4e48 100644
      }
  
      /** Switches to a passthrough input (HDMI, AV). An input mapped in `input_sources` is opened by sending
-@@ -3310,7 +3570,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3309,8 +3569,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+         if (moduleCards) addSettingsMenuRow(rows, popup, R.string.module_cards, this::showModuleCards);
          if (dockRow) addSettingsMenuRow(rows, popup, R.string.dock_edit, this::startDockEdit);
          addSettingsMenuRow(rows, popup, R.string.reorder, this::toggleReorder);
++        // CleanTV/VGS: the App library with its top-bar button off (thangmath, Mi Box 3, 28/10/2026: the button was in the way).
++        if (appLibraryEnabled && btnLibraryTop.getVisibility() != View.VISIBLE)
++            addSettingsMenuRow(rows, popup, R.string.app_library, this::onLibraryRequested);
          // A launcher may not restart the TV itself; the Home key helper can open the system power menu instead.
 -        if (HomeKeyService.canOpenPowerMenu()) addSettingsMenuRow(rows, popup, R.string.power_menu, HomeKeyService::openPowerMenu);
 +        // CleanTV/VGS: power_menu_row false hides it where the firmware ignores Restart in that menu (Sony XR-65X90L).
@@ -1544,7 +1548,7 @@ index 17961443..ad3f4e48 100644
          panel.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
          popup.setWidth(Math.max((int) (200 * density), panel.getMeasuredWidth()));
          // Hebrew puts Settings at the left of the header: grow the menu inward from it.
-@@ -3371,10 +3633,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3371,10 +3636,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
@@ -1881,10 +1885,10 @@ index 00000000..893ad6c3
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/SystemSettings.java b/launcher/app/src/main/java/com/gathin/tvhome/SystemSettings.java
-index 20eb8e01..0d63d82f 100644
+index 3b9e1d01..c69b99b3 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/SystemSettings.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/SystemSettings.java
-@@ -46,6 +46,7 @@ final class SystemSettings {
+@@ -60,6 +60,7 @@ final class SystemSettings {
  
      /** The TV's App info page for pkg, or null where the firmware has none (CVTE's settings app, #1202). */
      static Intent appInfo(Context context, String pkg) {
@@ -1907,6 +1911,22 @@ index 18fded94..f6798ffb 100644
          }
          if (segments.size() == 2 && WALLPAPERS.equals(segments.get(0))
                  && (collectionImage(segments.get(1)) || WallpaperCaptions.FILE_NAME.equals(segments.get(1)))) {
+diff --git a/launcher/app/src/main/java/com/gathin/tvhome/ThemeProvider.java b/launcher/app/src/main/java/com/gathin/tvhome/ThemeProvider.java
+index 183f9c18..b591df7f 100644
+--- a/launcher/app/src/main/java/com/gathin/tvhome/ThemeProvider.java
++++ b/launcher/app/src/main/java/com/gathin/tvhome/ThemeProvider.java
+@@ -50,6 +50,11 @@ public class ThemeProvider extends ContentProvider {
+             if (images != null) for (File f : images) if (f.delete()) n++;
+             return n;
+         }
++        // A theme reset deletes config.json here (often after a shell rm): drop the kept copy too, or Config's
++        // early-boot fallback would bring the removed theme back (upstream #2327 review).
++        if (Config.FILE_NAME.equals(ThemeFiles.path(uri.getPathSegments()))) {
++            new File(getContext().getFilesDir(), Config.FILE_NAME).delete();
++        }
+         try {
+             return file(uri).delete() ? 1 : 0;
+         } catch (FileNotFoundException e) {
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Weather.java b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
 new file mode 100644
 index 00000000..a62e5fe8
