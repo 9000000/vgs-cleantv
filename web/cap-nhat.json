@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 101,
-  "versionName": "3.5.8",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.8.apk",
-  "co": 12257737,
-  "ghiChu": "Tuỳ chọn đưa nút Wi-Fi, Cài đặt lên sát mép trên; tivi khởi động chậm (TCL) ghi rõ lúc đọc được cấu hình",
-  "ghiChuEn": "Option to put the Wi-Fi and Settings buttons at the very top; slow-booting TVs (TCL) record when the settings became readable",
+  "versionCode": 102,
+  "versionName": "3.5.9",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.9.apk",
+  "co": 12271017,
+  "ghiChu": "An toàn hơn: không bao giờ tắt phần mềm lõi của tivi MediaTek (Haier, Skyworth…) và tự bật lại nếu đã lỡ tắt; 341 mẫu tivi",
+  "ghiChuEn": "Safer: never disables MediaTek TV middleware (Haier, Skyworth…) and re-enables it if already off; 341 TV models",
   "ngay": "2026-10-28"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "45742aab656d14bf",
+   "phienBan": "867d738698864d52",
    "url": "/ota/du-lieu.json",
-   "co": 1954504,
-   "tuBan": 101
+   "co": 2003864,
+   "tuBan": 102
   },
   "tvhome.apk": {
-   "phienBan": "0db8702ec3d734e7",
+   "phienBan": "39833f37e6e569c2",
    "url": "/ota/tvhome.apk",
-   "co": 664221,
-   "tuBan": 101
+   "co": 664429,
+   "tuBan": 102
   }
  }
 }

@@ -17,6 +17,8 @@ class GoiLoiTest {
         "com.android.settings", "com.android.tv.settings",
         "com.android.providers.settings", "com.android.providers.tv", "com.android.providers.media",
         "com.android.providers.downloads", "android",
+        "android.ext.services", "android.ext.shared",
+        "com.cltv.mal", "com.mediatek.tis", "com.mediatek.tv.service", "com.mediatek.tv.agent",
     )
     private val NOT_CORE = listOf(
         "com.android.providers.calendar", "com.android.providers.contacts",
@@ -24,6 +26,7 @@ class GoiLoiTest {
         "com.android.settings.intelligence", "com.android.tv.settings.overlay", "com.android.phone.extra",
         "com.google.android.tungsten.setupwraith", "com.google.android.apps.tv.launcherx",
         "com.android.shell2", "com.example.android.ext.services",
+        "com.mediatek.wwtv.tvcenter", "com.cltv.mal.extra",
     )
 
     @Test fun goiLoi_bichan() = CORE.forEach { assertTrue(it, KeHoach.laGoiLoiAndroid(it)) }

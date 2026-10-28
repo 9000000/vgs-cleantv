@@ -1,5 +1,19 @@
 [
  {
+  "ban": "3.5.9",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- An toàn hơn theo CleanYourTV: không bao giờ tắt phần mềm lõi của tivi MediaTek (com.cltv.mal, com.mediatek.tis, tv.service, tv.agent). Một tivi Haier đã khởi động lại liên tục sau khi tắt gói này",
+   "- Tivi đã lỡ tắt các gói đó (vài máy Skyworth, Hisense, Xiaomi): bấm Áp dụng hoặc dọn lại là app tự bật lại",
+   "- Danh sách theo CleanYourTV mới: 341 mẫu tivi, 95 hãng"
+  ],
+  "en": [
+   "- Safer, following CleanYourTV: never disables MediaTek TV middleware (com.cltv.mal, com.mediatek.tis, tv.service, tv.agent). A Haier TV restarted in a loop with it off",
+   "- TVs where these were already disabled (some Skyworth, Hisense, Xiaomi): Apply or clean again and the app turns them back on",
+   "- Lists from the latest CleanYourTV: 341 TV models, 95 brands"
+  ]
+ },
+ {
   "ban": "3.5.8",
   "ngay": "2026-10-28",
   "vi": [

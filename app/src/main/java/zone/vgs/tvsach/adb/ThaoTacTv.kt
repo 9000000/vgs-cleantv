@@ -199,6 +199,21 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
      * Lọc qua các lớp bảo vệ rồi tắt từng gói một (mỗi lệnh pm một lần gọi, như PROMPT.md dặn).
      * [epSetupwraith]: tivi chạy dây mạng, cho tắt setupwraith dù nó giữ Wi-Fi.
      */
+    /**
+     * Gói lõi đã lỡ tắt từ trước (bản cũ chưa chặn phần mềm lõi MediaTek: 6 danh sách gửi về có com.cltv.mal,
+     * com.mediatek.tis hoặc tv.service tắt, 28/10/2026) thì bật lại, kẻo lần khởi động sau tivi treo như Haier #1578.
+     * Chạy khi dọn và khi Áp dụng. Trả các gói đã bật lại, null khi không có.
+     */
+    fun batLaiGoiLoi(bao: (String) -> Unit): List<String>? {
+        val ds = sh("pm list packages -d").lines().map { it.substringAfter("package:").trim() }
+            .filter { zone.vgs.tvsach.dulieu.KeHoach.laGoiLoiAndroid(it) }
+        ds.forEach { p ->
+            bao(t("Bật lại gói lõi $p…", "Re-enabling core package $p…"))
+            sh("pm enable --user 0 $p")
+        }
+        return ds.ifEmpty { null }
+    }
+
     fun tatGoi(
         goi: List<String>,
         sl: BanSaoLuu,
@@ -211,8 +226,9 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         // Chốt cuối như repo CleanYourTV: không bao giờ tắt gói lõi Android (#884) hay gói đang giữ nút Home (Home guard).
         val homeNay = runCatching { homeHienTai().substringBefore('/') }.getOrDefault("")
         ds.filter { zone.vgs.tvsach.dulieu.KeHoach.laGoiLoiAndroid(it) }.forEach {
-            boQua += it to t("Gói lõi của Android: tắt có thể làm tivi không khởi động lại được.", "Core Android package: disabling it can stop the TV from booting.")
+            boQua += it to t("Gói lõi của Android hoặc của tivi: tắt có thể làm tivi không khởi động lại được.", "Core Android or TV package: disabling it can stop the TV from booting.")
         }
+        batLaiGoiLoi(bao)?.let { p -> sl.daTatBoiApp.removeAll(p.toSet()) }
         if (homeNay.isNotBlank() && homeNay in ds) boQua += homeNay to t("Đang là màn Home của tivi: tắt là không còn Home.", "It is the TV's Home right now: disabling it leaves no Home.")
         ds = ds.filter { p -> boQua.none { it.first == p } }
 
@@ -633,6 +649,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
 
     fun dayCauHinh(json: String, anhNen: ByteArray? = null, boAnh: List<Pair<String, ByteArray>>? = null) {
         giaHanGac()
+        batLaiGoiLoi {}
         val dir = "/sdcard/Android/data/$pkgHome/files"
         val uri = "content://$pkgHome.theme"
         sh("mkdir -p $dir 2>/dev/null; true")
