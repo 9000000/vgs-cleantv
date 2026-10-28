@@ -271,6 +271,16 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         linkFpt = ""
     }
 
+    // ---- TV360 (3.5.14) ----
+    val coTv360 get() = trangThai?.caiDat?.contains(zone.vgs.tvsach.dulieu.Tv360.GOI) == true
+    fun batTatKenhTv360(k: zone.vgs.tvsach.dulieu.Tv360.K) = viewModelScope.launch {
+        val uri = zone.vgs.tvsach.dulieu.Tv360.uri(k.id)
+        if (coO(uri)) { kenhChon.removeAll { it.uri == uri }; return@launch }
+        val anh = io { zone.vgs.tvsach.dulieu.Tv360.anh(k) }
+        if (!batTatO(zone.vgs.tvsach.dulieu.OKenh(k.ten, zone.vgs.tvsach.dulieu.Tv360.GOI, uri, "#D32F2F", anh)))
+            loi = t("Không thêm được: đã đủ $KENH_TOI_DA ô hoặc trùng tên ô khác.", "Couldn't add: $KENH_TOI_DA tiles already, or the name clashes with another tile.")
+    }
+
     // ---- IPTV (3.1.0) ----
     var nguonIptv by mutableStateOf("")
     var dsIptv by mutableStateOf<List<zone.vgs.tvsach.dulieu.Iptv.Kenh>?>(null)

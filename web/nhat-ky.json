@@ -1,5 +1,15 @@
 [
  {
+  "ban": "3.5.14",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Thêm nguồn kênh TV360 (Viettel): 101 kênh trong nước, bấm ô là mở thẳng kênh trong app TV360 (cần bản 6.4 trở lên trên tivi). Kênh có ổ khoá cần đăng nhập TV360"
+  ],
+  "en": [
+   "- New channel source TV360 (Viettel): 101 Vietnamese channels, a tile opens the channel straight in TV360 (needs 6.4 or later on the TV). Locked channels need a TV360 login"
+  ]
+ },
+ {
   "ban": "3.5.13",
   "ngay": "2026-10-28",
   "vi": [

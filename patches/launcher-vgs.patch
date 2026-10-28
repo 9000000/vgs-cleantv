@@ -178,7 +178,7 @@ index 701b5feb..4e22d871 100644
      </application>
  </manifest>
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
-index 5e2ab51c..b6c9d98a 100644
+index 5e2ab51c..34254189 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 @@ -64,7 +64,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -309,7 +309,7 @@ index 5e2ab51c..b6c9d98a 100644
          if (e.kind == Entry.HOME_SETTINGS) {
              ctx.startActivity(new Intent(ctx, HomeSettingsActivity.class)
                      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-@@ -553,6 +585,27 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -553,6 +585,29 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
          }
      }
  
@@ -317,6 +317,8 @@ index 5e2ab51c..b6c9d98a 100644
 +    private void launchLink(Entry e) {
 +        Intent view = new Intent(Intent.ACTION_VIEW, Uri.parse(e.uri)).setPackage(e.target)
 +                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
++        // TV360 (6.4, 28/10/2026): a login screen left open on top swallowed the next channel tile; clear above its Home.
++        if (e.uri.startsWith("tv360:")) view.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 +        PackageManager pm = ctx.getPackageManager();
 +        Intent open = pm.resolveActivity(view, 0) != null ? view : null;
 +        // CleanTV/VGS: an IPTV stream (http/rtsp…) in a video player (VLC, MX Player…), whose filters ask for a video type.
@@ -337,7 +339,7 @@ index 5e2ab51c..b6c9d98a 100644
      @Override
      public int getItemCount() {
          return items.size() + (showLibrary ? 1 : 0);
-@@ -682,6 +735,9 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -682,6 +737,9 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
  
      /** Share of the tile height the icon takes in uniform_tiles mode (onCreateViewHolder). */
      private static final float ICON_SHARE = 0.62f;
@@ -347,7 +349,7 @@ index 5e2ab51c..b6c9d98a 100644
  
      /**
       * The colour covering most of an icon, for a card that should read as that app: a small saturated badge
-@@ -726,8 +782,8 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -726,8 +784,8 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
       * square), the card takes that colour, so the mark reads as filling the tile as on tvOS. Otherwise a
       * gradient of the icon's main colour, deepened so the mark stands out. The card clips the corners.
       */
@@ -358,7 +360,7 @@ index 5e2ab51c..b6c9d98a 100644
          if (plate != null) return plate;
          float[] hsv = new float[3];
          Color.colorToHSV(fallback, hsv);
-@@ -744,7 +800,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -744,7 +802,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
       * card's top and bottom edges so the mark reads as filling the tile; null when the icon has no
       * opaque plate (a bare mark on transparency).
       */
@@ -367,7 +369,7 @@ index 5e2ab51c..b6c9d98a 100644
          if (live == null) return null;
          Drawable d = live.getConstantState() != null ? live.getConstantState().newDrawable().mutate() : live;
          Rect saved = new Rect(d.getBounds());
-@@ -763,8 +819,8 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -763,8 +821,8 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
          if (a == 0 || b == 0) return null;
          // The sampled rows sit at these heights of the tile; extend the line through them to its edges. A row
          // taken further in sits on artwork-side plate, so its slope is less certain: cap how far it reaches.
@@ -378,7 +380,7 @@ index 5e2ab51c..b6c9d98a 100644
          float t0 = -yA / (yB - yA), t1 = (1f - yA) / (yB - yA);
          if (topRow != 7 || bottomRow != n - 8) {
              t0 = Math.max(-0.35f, t0);
-@@ -824,6 +880,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -824,6 +882,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
          return Math.max(0, Math.min(255, Math.round(v)));
      }
  

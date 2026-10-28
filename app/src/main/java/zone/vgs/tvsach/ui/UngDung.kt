@@ -1078,8 +1078,8 @@ private fun TheHomeNoiDung(vm: PhienLamViec) {
     if (vm.moChonKenh) HopChonKenh(vm)
     if (vm.dsIptv != null) HopChonIptv(vm)
     The(t("Kênh truyền hình trên màn chính", "TV channels on Home"), Icons.Rounded.LiveTv) {
-        Phu(t("Mỗi kênh thành một ô có logo ở đầu dock, bấm là xem luôn, ông bà khỏi phải tìm. Tối đa $KENH_TOI_DA ô, lấy từ VTVgo, FPT Play hay danh sách IPTV của bạn.",
-            "Each channel becomes a tile with its logo at the start of the dock that plays it at once. Up to $KENH_TOI_DA, from VTVgo, FPT Play or your own IPTV list."))
+        Phu(t("Mỗi kênh thành một ô có logo ở đầu dock, bấm là xem luôn, ông bà khỏi phải tìm. Tối đa $KENH_TOI_DA ô, lấy từ VTVgo, FPT Play, TV360 hay danh sách IPTV của bạn.",
+            "Each channel becomes a tile with its logo at the start of the dock that plays it at once. Up to $KENH_TOI_DA, from VTVgo, FPT Play, TV360 or your own IPTV list."))
         // Các ô đã chọn (mọi nguồn), bấm để bỏ.
         if (vm.kenhChon.isNotEmpty()) {
             Text(t("Đã chọn ${vm.kenhChon.size}/$KENH_TOI_DA (bấm để bỏ)", "${vm.kenhChon.size}/$KENH_TOI_DA picked (tap to remove)"), fontSize = 13.sp, color = ChuPhu)
@@ -1112,6 +1112,21 @@ private fun TheHomeNoiDung(vm: PhienLamViec) {
                 "Get a link: in the FPT Play app or website open the channel / match / film → Share → Copy link. Paid content needs an FPT Play login on the TV."))
         } else Phu(t("Cần app \"FPT Play for Android TV\" trên tivi (Google Play trên tivi tìm \"FPT Play\"), rồi kết nối lại CleanTV.",
             "Needs \"FPT Play for Android TV\" on the TV (search \"FPT Play\" in Google Play on the TV), then reconnect CleanTV."))
+        // TV360 (3.5.14): kênh có sẵn, mở thẳng bằng tv360://recommendation (bản 6.4 trở lên).
+        Text("TV360", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+        if (vm.coTv360) {
+            listOf("qg" to t("Toàn quốc, HTV, VTVcab", "National, HTV, VTVcab"), "dp" to t("Địa phương", "Local")).forEach { (nhom, tenNhom) ->
+                Text(tenNhom, fontSize = 13.sp, color = ChuPhu)
+                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    zone.vgs.tvsach.dulieu.Tv360.KENH.filter { it.nhom == nhom }.forEach { k ->
+                        ChonChip(k.ten + if (k.khoa) " 🔒" else "", vm.coO(zone.vgs.tvsach.dulieu.Tv360.uri(k.id))) { vm.batTatKenhTv360(k) }
+                    }
+                }
+            }
+            Phu(t("Cần TV360 bản 6.4 trở lên trên tivi (bản cũ chỉ mở trang chủ TV360). Kênh có ổ khoá cần đăng nhập TV360 trên tivi.",
+                "Needs TV360 6.4 or later on the TV (older versions only open TV360's home). Locked channels need a TV360 login on the TV."))
+        } else Phu(t("Cần app \"TV360 SmartTV\" bản 6.4 trở lên trên tivi (Google Play trên tivi tìm \"TV360\"), rồi kết nối lại CleanTV.",
+            "Needs \"TV360 SmartTV\" 6.4 or later on the TV (search \"TV360\" in Google Play on the TV), then reconnect CleanTV."))
         // IPTV cá nhân (3.1.0): danh sách m3u, mở bằng trình phát video trên tivi.
         Text(t("Danh sách IPTV của bạn", "Your IPTV list"), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
         if (vm.trinhPhatCo.isEmpty()) Phu(t("Cần một trình phát video trên tivi: VLC (Google Play trên tivi tìm \"VLC\"), MX Player, Just Player hoặc Kodi, rồi kết nối lại CleanTV.",

@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 106,
-  "versionName": "3.5.13",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.13.apk",
-  "co": 12271273,
-  "ghiChu": "16 ô kênh, icon to trong ô app",
-  "ghiChuEn": "16 channel tiles, big app icons",
+  "versionCode": 107,
+  "versionName": "3.5.14",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.14.apk",
+  "co": 12271369,
+  "ghiChu": "Kênh TV360 trên màn chính",
+  "ghiChuEn": "TV360 channels on Home",
   "ngay": "2026-10-28"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "039314c63593d838",
+   "phienBan": "737ecd8e55b27b1c",
    "url": "/ota/du-lieu.json",
    "co": 2003864,
-   "tuBan": 106
+   "tuBan": 107
   },
   "tvhome.apk": {
-   "phienBan": "164b07c5bc5a7e34",
+   "phienBan": "2815fdd681c68573",
    "url": "/ota/tvhome.apk",
-   "co": 664561,
-   "tuBan": 106
+   "co": 664569,
+   "tuBan": 107
   }
  }
 }

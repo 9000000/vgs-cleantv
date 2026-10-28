@@ -123,6 +123,130 @@ object FptPlay {
 }
 
 /**
+ * TV360 của Viettel trên tivi (gói com.viettel.tv360.tv, "TV360 SmartTV"): từ bản 6.4 nhận tv360://recommendation?type=LIVE&id=<mã
+ * kênh> (link Android TV dùng cho ô gợi ý ở màn chính), mở thẳng màn xem kênh. Bản 4.3 chưa có (đọc manifest + dịch ngược,
+ * 28/10/2026; góp ý quangptq và 2 phiếu trước). Mã kênh lấy từ trang tv360.vn/tv/<slug>?ch=<mã>; kênh khoa = isFree 0, TV360 bắt
+ * đăng nhập (VTV1 phát ngay, VTV3 hiện màn đăng nhập, thử trên tivi ảo).
+ */
+object Tv360 {
+    const val GOI = "com.viettel.tv360.tv"
+    data class K(val ten: String, val id: Int, val slug: String, val nhom: String, val khoa: Boolean = false)
+    /** 101 kênh trong nước (bỏ kênh quốc tế, kênh riêng của TV360, radio), rút từ dữ liệu trang tv360.vn ngày 28/10/2026. */
+    val KENH = listOf(
+        K("VTV1", 2, "vtv1", "qg"),
+        K("VTV2", 3, "vtv2", "qg", true),
+        K("VTV3", 4, "vtv3", "qg", true),
+        K("VTV4", 108, "vtv4", "qg", true),
+        K("VTV5", 110, "vtv5", "qg"),
+        K("VTV5 Tây Nam Bộ", 157, "vtv5-tay-nam-bo", "qg", true),
+        K("VTV5 Tây Nguyên", 207, "vtv5-tay-nguyen", "qg", true),
+        K("VTV6", 10043, "vtv6", "qg", true),
+        K("VTV7", 6, "vtv7", "qg", true),
+        K("VTV8", 115, "vtv8", "qg", true),
+        K("VTV9", 8, "vtv9", "qg", true),
+        K("VTV10", 98, "vtv10", "qg", true),
+        K("ANTV", 20, "antv", "qg"),
+        K("QPVN HD", 19, "qpvn-hd", "qg"),
+        K("Vietnam Today", 9951, "vietnam-today-hd", "qg"),
+        K("HTV1", 190, "htv1", "qg"),
+        K("HTV2", 191, "htv2", "qg"),
+        K("HTV3", 192, "htv3", "qg"),
+        K("HTV4", 9, "htv4", "qg"),
+        K("HTV7 HD", 193, "htv7-hd", "qg"),
+        K("HTV9 HD", 194, "htv9-hd", "qg"),
+        K("HTV Thể Thao", 195, "htv-the-thao", "qg", true),
+        K("HTVC Du Lịch", 133, "htvc-du-lich-cuoc-song", "qg"),
+        K("HTVC Phim Truyện", 15, "htvc-phim-truyen-hd", "qg"),
+        K("HTVC Phụ Nữ", 12, "htvc-phu-nu", "qg"),
+        K("HTVC Thuần Việt", 13, "htvc-thuan-viet", "qg"),
+        K("HTVC+ Channel B", 132, "htvc", "qg"),
+        K("VTVcab 1 Vie Giải Trí HD", 180, "vtvcab-1-vie-giai-tri-hd", "qg"),
+        K("VTVcab 2 Phim Việt HD", 175, "vtvcab-2-phim-viet-hd", "qg"),
+        K("VTVcab 3 On Sports", 173, "vtvcab-3-on-sports", "qg", true),
+        K("VTVcab 4 On Movies", 181, "vtvcab-4-on-movies", "qg"),
+        K("VTVcab 5 E Channel HD", 182, "vtvcab-5-e-channel-hd", "qg"),
+        K("VTVcab 6 On Sports +", 183, "vtvcab-6-on-sports", "qg", true),
+        K("VTVcab 8 BiBi", 178, "vtvcab-8-bi-bi-sd", "qg"),
+        K("VTVcab 9 InfoTV HD", 189, "vtvcab-9-infotv-hd", "qg"),
+        K("VTVcab 10 On Cine HD", 176, "vtvcab10-on-cine-hd", "qg"),
+        K("VTVcab 12 StyleTV HD", 184, "vtvcab-12-styletv-hd", "qg"),
+        K("VTVcab 15 On Music", 185, "vtvcab15-on-music", "qg"),
+        K("VTVcab 16 On Football HD", 174, "vtvcab-16-hd", "qg", true),
+        K("VTVcab 17 Trending TV", 186, "vtvcab17-trending-tv", "qg"),
+        K("VTVcab 18 On Sports News", 170, "vtvcab-18-on-sports-news", "qg", true),
+        K("VTVcab 19 Vie Dramas", 177, "vtvcab19-vie-dramas", "qg"),
+        K("VTVcab 20 V Family HD", 187, "vtvcab-20-v-family-hd", "qg"),
+        K("VTVcab 21 Cartoon Kids H", 179, "vtvcab-21-cartoon-kids-hd", "qg"),
+        K("VTVcab 22 Life TV HD", 188, "vtvcab-22-life-tv-hd", "qg"),
+        K("VTVcab 23 Golf Channel", 169, "vtvcab-23-golf-channel", "qg", true),
+        K("An Viên HD", 151, "an-vien-hd", "qg"),
+        K("BTV6", 9838, "btv6", "qg"),
+        K("HITV", 32, "hitv", "qg"),
+        K("O2TV", 136, "o2tv", "qg"),
+        K("SCTV2 Today TV", 201, "sctv2-today-tv", "qg"),
+        K("SCTV6", 232, "sctv6", "qg"),
+        K("YouTV", 31, "youtv", "qg"),
+        K("An Giang 1", 66, "an-giang-1", "dp"),
+        K("An Giang 2", 35, "an-giang-2", "dp"),
+        K("Bắc Ninh", 39, "bac-ninh", "dp"),
+        K("Cao Bằng", 48, "cao-bang", "dp"),
+        K("Cà Mau", 46, "ca-mau", "dp"),
+        K("Cần Thơ 1", 47, "can-tho-1", "dp"),
+        K("Cần Thơ 2", 61, "can-tho-2", "dp"),
+        K("Cần Thơ 3", 84, "can-tho-3", "dp"),
+        K("Gia Lai", 55, "gia-lai", "dp"),
+        K("Huế", 63, "hue", "dp"),
+        K("Hà Nội 1", 33, "ha-noi-1", "dp"),
+        K("Hà Nội 2", 34, "ha-noi-2", "dp"),
+        K("Hà Tĩnh", 58, "ha-tinh", "dp"),
+        K("Hưng Yên", 64, "hung-yen", "dp"),
+        K("Hải Phòng", 60, "hai-phong", "dp"),
+        K("Hải Phòng 3", 59, "hai-phong-3", "dp"),
+        K("Khánh Hòa", 65, "khanh-hoa", "dp"),
+        K("Khánh Hòa 1", 76, "khanh-hoa-1", "dp"),
+        K("Lai Châu", 68, "lai-chau", "dp"),
+        K("Lào Cai", 71, "lao-cai", "dp"),
+        K("Lâm Đồng 1", 69, "lam-dong-1", "dp"),
+        K("Lâm Đồng 2", 45, "lam-dong-2", "dp"),
+        K("Lạng Sơn", 70, "lang-son", "dp"),
+        K("Nghệ An", 74, "nghe-an", "dp"),
+        K("Ninh Bình", 75, "ninh-binh", "dp"),
+        K("Phú Thọ", 77, "phu-tho", "dp"),
+        K("Quảng Ngãi", 81, "quang-ngai", "dp"),
+        K("Quảng Ninh 1", 82, "quang-ninh-1", "dp"),
+        K("Quảng Ninh 3", 134, "quang-ninh-3", "dp"),
+        K("Quảng Trị", 83, "quang-tri", "dp"),
+        K("Sơn La", 85, "son-la", "dp"),
+        K("Thanh Hóa", 89, "thanh-hoa", "dp"),
+        K("Thái Nguyên", 88, "thai-nguyen", "dp"),
+        K("Tuyên Quang", 92, "tuyen-quang", "dp"),
+        K("Tây Ninh 1", 72, "tay-ninh-1", "dp"),
+        K("Vĩnh Long 1", 25, "vinh-long-1", "dp"),
+        K("Vĩnh Long 2", 26, "vinh-long-2", "dp"),
+        K("Vĩnh Long 3", 219, "vinh-long-3", "dp"),
+        K("Vĩnh Long 4", 220, "vinh-long-4", "dp"),
+        K("Vĩnh Long 5", 91, "vinh-long-5", "dp"),
+        K("Điện Biên", 52, "dien-bien", "dp"),
+        K("Đà Nẵng 1", 49, "da-nang-1", "dp"),
+        K("Đà Nẵng 2", 80, "da-nang-2", "dp"),
+        K("Đắk Lắk", 51, "dak-lak", "dp"),
+        K("Đồng Nai", 255, "dong-nai", "dp"),
+        K("Đồng Nai 1", 53, "dong-nai-1", "dp"),
+        K("Đồng Tháp 1", 54, "dong-thap-1", "dp"),
+        K("Đồng Tháp 2", 90, "dong-thap-2", "dp")
+    )
+    fun uri(id: Int) = "tv360://recommendation?type=LIVE&id=$id"
+
+    /** Ảnh thẻ logo kênh (og:image của trang kênh); null nếu không đọc được. */
+    fun anh(k: K): String? = runCatching {
+        val c = java.net.URL("https://tv360.vn/tv/${k.slug}?ch=${k.id}").openConnection() as java.net.HttpURLConnection
+        c.connectTimeout = 8000; c.readTimeout = 10000; c.setRequestProperty("User-Agent", "Mozilla/5.0")
+        val html = c.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
+        Regex("""property="og:image" content="([^"]+)"""").find(html)?.groupValues?.get(1)
+    }.getOrNull()
+}
+
+/**
  * Danh sách IPTV cá nhân (m3u / m3u8, góp ý 26/10/2026): mỗi kênh thành một ô, bấm là mở link luồng trong trình phát video
  * có trên tivi (VLC, MX Player, Just Player, Kodi). Launcher thử ACTION_VIEW, không ai nhận thì gửi kèm kiểu video.
  */
