@@ -1,5 +1,17 @@
 [
  {
+  "ban": "3.5.16",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Luôn mở / Mở đè Home sạch: xin thêm quyền tự khởi động (tivi Xiaomi chặn app ngoài tự chạy lúc bật) và kiểm lại quyền đã cấp; tivi từ chối thì app báo rõ",
+   "- Lỗi ảnh nền không sang được tivi: bấm \"Gửi danh sách cho VGS\" sẽ gửi kèm lỗi để VGS tìm nguyên nhân"
+  ],
+  "en": [
+   "- Always open / redirect Home: also grants auto-start (Xiaomi blocks third-party apps from starting at power-on) and checks the permissions really took; if the TV refuses, the app says so",
+   "- Wallpaper not reaching the TV: \"Send the list to VGS\" now includes the error so VGS can find the cause"
+  ]
+ },
+ {
   "ban": "3.5.15",
   "ngay": "2026-10-28",
   "vi": [

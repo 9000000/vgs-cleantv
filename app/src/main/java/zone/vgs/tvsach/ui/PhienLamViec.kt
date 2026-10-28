@@ -1397,6 +1397,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (ghimMayChieu.isNotEmpty()) zone.vgs.tvsach.Dem.gui(ctx, "may-chieu", tenTiviDem(), ghimMayChieu.size, ghimMayChieu.keys.joinToString(",").take(110))
         homeXong = true
         man = Man.XONG
+        // 3.5.16: tivi không cho cấp quyền mà Luôn mở / Mở đè cần (Xiaomi MZTU0, famquanh) thì nói ra, đừng để người dùng tưởng đã xong.
+        if (tv.thieuQuyen.isNotEmpty()) loi = t("Tivi không cho Home sạch quyền ${tv.thieuQuyen}, nên \"Luôn mở Home sạch khi bật tivi\" có thể không chạy. Bấm Áp dụng lên tivi lại; vẫn báo thì gửi góp ý kèm model tivi.",
+            "The TV refused the clean Home permission to ${tv.thieuQuyen}, so \"Always open the clean Home at power-on\" may not work. Apply again; if this shows again, send feedback with the TV model.")
     }
 
     fun khoiDongLaiTv() = chay(t("Đang khởi động lại tivi…", "Rebooting the TV…")) {

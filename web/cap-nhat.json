@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 108,
-  "versionName": "3.5.15",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.15.apk",
-  "co": 12271365,
-  "ghiChu": "Sửa vệt sáng trên ô kênh HTV, giữ trợ lý TCL",
-  "ghiChuEn": "No light strip on HTV tiles; keep TCL assistant",
+  "versionCode": 109,
+  "versionName": "3.5.16",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.16.apk",
+  "co": 12271369,
+  "ghiChu": "Xiaomi: Luôn mở Home sạch chắc hơn",
+  "ghiChuEn": "Xiaomi: more reliable Always open Home",
   "ngay": "2026-10-28"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "737ecd8e55b27b1c",
    "url": "/ota/du-lieu.json",
    "co": 2003864,
-   "tuBan": 108
+   "tuBan": 109
   },
   "tvhome.apk": {
    "phienBan": "2815fdd681c68573",
    "url": "/ota/tvhome.apk",
    "co": 664569,
-   "tuBan": 108
+   "tuBan": 109
   }
  }
 }

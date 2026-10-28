@@ -122,7 +122,8 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             "logcat -d -v brief -s CleanTVBoot:* 2>/dev/null | grep CleanTVBoot | tail -6 | cut -c1-120; " +
             "echo '# resolve'; $HOME_QUERY 2>&1 | tail -2; echo '# query'; cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME 2>&1 | grep '/' | head -8; " +
             "echo '# focus'; dumpsys window 2>/dev/null | grep -m2 -E 'mCurrentFocus|mFocusedApp'; echo '# a11y'; settings get secure enabled_accessibility_services")
-            .lines().map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n").take(2700)
+            .lines().map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n")
+            .let { if (loiGhiFile.isNotEmpty()) "# ghi-file\n$loiGhiFile\n$it" else it }.take(2700)
     }.getOrDefault("")
 
     fun homeHienTai(): String = sh(HOME_QUERY).lines().lastOrNull { it.isNotBlank() }?.trim() ?: ""
@@ -613,9 +614,20 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             sh("cp $tam $dir/$ten 2>/dev/null; chmod 666 $dir/$ten 2>/dev/null; true")
             if (coFileTheme(dir, ten) == du.size) { ok = true; break }
         }
+        // 3.5.16 (TCL 65T66, truongthanguit 28/10/2026: "tivi chặn ghi file" mà không biết bước nào): hỏng thì giữ lại lỗi
+        // của từng lệnh, đưa vào chẩn đoán khi người dùng bấm Gửi danh sách.
+        if (!ok) loiGhiFile = runCatching {
+            sh("echo \"$ten ${du.size}\"; ls -l $tam 2>&1; content write --uri content://$pkgHome.theme/$ten < $tam 2>&1; echo rc=\$?; " +
+                "cp $tam $dir/$ten 2>&1; echo cp=\$?; ls -ld $dir 2>&1").lines().map { it.trim() }.filter { it.isNotEmpty() && !it.startsWith("at ") }.joinToString("\n").take(500)
+        }.getOrDefault("")
         sh("rm -f $tam")
         return ok
     }
+
+    /** Lỗi lần ghi file hỏng gần nhất (ghiFileTheme), rỗng nếu chưa hỏng lần nào. */
+    var loiGhiFile = ""
+    /** Quyền Home sạch cần cho Luôn mở / Mở đè mà tivi không cho cấp (dayCauHinh), rỗng nếu đủ. */
+    var thieuQuyen = ""
 
     /**
      * Ảnh có sẵn trên tivi / USB cắm vào tivi (24/10/2026): tivi không có trình chọn ảnh ("không có ứng dụng phù hợp"),
@@ -673,13 +685,23 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         // 3.5.6 (TCL 43P618 chặn BOOT_COMPLETED với app ngoài): Android tự nối dịch vụ nghe thông báo lúc khởi động, Home sạch
         // dùng lúc đó để tự mở. Chỉ cấp, không thu lại: nút "đang phát" cũng dùng dịch vụ này.
         if (luonVe || moDe) choPhepDangPhat()
+        // 3.5.16 (Xiaomi MiTV-MZTU0, famquanh 28/10/2026: Luôn mở bật mà vẫn về Netflix; danh sách cho thấy quyền chưa cấp):
+        // Xiaomi chặn app ngoài tự chạy lúc khởi động nếu thiếu AUTO_START, và lệnh cấp quyền có thể bị từ chối im lặng.
+        thieuQuyen = ""
+        if (luonVe || moDe) {
+            sh("cmd appops set $pkgHome AUTO_START allow 2>/dev/null; true")
+            val q = sh("dumpsys package $pkgHome 2>/dev/null | grep -m1 -o 'WRITE_SECURE_SETTINGS: granted=[a-z]*'; appops get $pkgHome SYSTEM_ALERT_WINDOW 2>&1 | head -1")
+            thieuQuyen = listOfNotNull(
+                t("sửa cài đặt hệ thống", "change system settings").takeIf { !q.contains("granted=true") },
+                t("hiện trên app khác", "show over other apps").takeIf { !q.contains("allow") }).joinToString(", ")
+        }
         // Nút hẹn giờ tắt (sleep_timer_button) cần báo thức đúng giờ: cấp sẵn, máy cũ không có lệnh thì thôi.
         sh("appops set $pkgHome SCHEDULE_EXACT_ALARM allow 2>/dev/null; true")
         ghiFileTheme("config.json", ghi.toByteArray())
         if (anhNen != null) {
             if (!ghiFileTheme("wallpaper.jpg", anhNen)) throw java.io.IOException(
-                t("Ảnh nền chưa sang được tivi (tivi chặn ghi file của Home sạch). Bấm Áp dụng lên tivi lại; vẫn không được thì gửi góp ý kèm model tivi.",
-                    "The wallpaper did not reach the TV (it blocks writing the clean Home's files). Apply again; if it still fails, send feedback with the TV model."))
+                t("Ảnh nền chưa sang được tivi (tivi chặn ghi file của Home sạch). Bấm Áp dụng lên tivi lại; vẫn không được thì bấm \"Gửi danh sách cho VGS\" để gửi kèm lỗi cho VGS xem.",
+                    "The wallpaper did not reach the TV (it blocks writing the clean Home's files). Apply again; if it still fails, press \"Send the list to VGS\" so VGS gets the error."))
         } else sh("rm -f $dir/wallpaper.jpg 2>/dev/null; content delete --uri $uri/wallpaper.jpg 2>/dev/null; true")
         // Bộ ảnh xoay vòng (wallpapers/): xoá bộ cũ trước, theme không có bộ ảnh thì chỉ xoá.
         sh("rm -rf $dir/wallpapers 2>/dev/null; content delete --uri $uri/wallpapers 2>/dev/null; true")
