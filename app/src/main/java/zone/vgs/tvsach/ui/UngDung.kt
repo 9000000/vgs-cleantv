@@ -95,6 +95,15 @@ private val BangMau = darkColorScheme(
 fun UngDung(vm: PhienLamViec = viewModel()) {
     val ctx = LocalContext.current
     LaunchedEffect(Unit) { NgonNgu.nap(ctx) }
+    // Quay lại từ nền (trình chọn file, app khác): nối lại tivi nếu điện thoại đã cắt kết nối.
+    val vongDoi = androidx.compose.ui.platform.LocalLifecycleOwner.current
+    DisposableEffect(vongDoi) {
+        val nghe = androidx.lifecycle.LifecycleEventObserver { _, e ->
+            if (e == androidx.lifecycle.Lifecycle.Event.ON_START) vm.kiemKetNoiKhiVe()
+        }
+        vongDoi.lifecycle.addObserver(nghe)
+        onDispose { vongDoi.lifecycle.removeObserver(nghe) }
+    }
     MaterialTheme(colorScheme = BangMau) {
         // Chế độ tivi: đi bằng remote nên ô đang chọn phải thấy rõ — lớp sáng khi focus đậm hơn hẳn mặc định.
         val gon = if (zone.vgs.tvsach.ManHinh.laTv)

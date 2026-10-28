@@ -1,11 +1,11 @@
 {
  "app": {
-  "versionCode": 102,
-  "versionName": "3.5.9",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.9.apk",
-  "co": 12271017,
-  "ghiChu": "An toàn hơn: không bao giờ tắt phần mềm lõi của tivi MediaTek (Haier, Skyworth…) và tự bật lại nếu đã lỡ tắt; 341 mẫu tivi",
-  "ghiChuEn": "Safer: never disables MediaTek TV middleware (Haier, Skyworth…) and re-enables it if already off; 341 TV models",
+  "versionCode": 103,
+  "versionName": "3.5.10",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.10.apk",
+  "co": 12271025,
+  "ghiChu": "Quay lại app sau khi lưu / mở file: tự nối lại tivi nếu điện thoại đã cắt kết nối",
+  "ghiChuEn": "Back in the app after saving / opening a file: reconnects to the TV if the phone dropped the connection",
   "ngay": "2026-10-28"
  },
  "duLieu": {
@@ -13,13 +13,13 @@
    "phienBan": "867d738698864d52",
    "url": "/ota/du-lieu.json",
    "co": 2003864,
-   "tuBan": 102
+   "tuBan": 103
   },
   "tvhome.apk": {
    "phienBan": "39833f37e6e569c2",
    "url": "/ota/tvhome.apk",
    "co": 664429,
-   "tuBan": 102
+   "tuBan": 103
   }
  }
 }

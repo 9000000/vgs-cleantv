@@ -1232,6 +1232,12 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
     /** Gỡ hẳn một app người dùng tự cài. */
     fun goApp(pkg: String): Boolean = TEN_GOI.matches(pkg) && pkg !in HOME_SACH && sh("pm uninstall $pkg").contains("Success")
 
+    /**
+     * Kết nối còn sống không; rớt thì nối lại ngầm. Gọi khi app quay lại từ nền (góp ý uongcafe 28/10/2026: mỗi lần
+     * Lưu ra file là mất kết nối; trình chọn file đẩy app xuống nền và vài điện thoại cắt kết nối của app nền).
+     */
+    fun giuKetNoi(): Boolean = voiHan(8) { sh("echo ok") }.trim() == "ok" || adb.ketNoiLai()
+
     /** Cài một file APK từ điện thoại (đè bản cũ nếu có); trả dòng kết quả của pm. */
     fun caiApkTuDienThoai(apk: ByteArray): String {
         // Chọn file làm app nằm nền một lúc; kết nối có thể đã rớt (máy ảo 27/10/2026: lần đầu báo mất kết nối, tivi

@@ -1395,6 +1395,12 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var daTuTatAdb by mutableStateOf(false)
     private var daHenTatAdb = false
 
+    /** App quay lại từ nền khi đang nối tivi: kiểm kết nối, rớt thì nối lại ngầm (không đụng khi đang chạy việc). */
+    fun kiemKetNoiKhiVe() {
+        if (thongTin == null || dangBan || daHenTatAdb) return
+        viewModelScope.launch { runCatching { io { tv.giuKetNoi() } } }
+    }
+
     fun henTuTatAdb() {
         if (giuAdb || man != Man.XONG || dangBan) return
         daHenTatAdb = true

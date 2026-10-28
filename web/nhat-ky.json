@@ -1,5 +1,15 @@
 [
  {
+  "ban": "3.5.10",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Lưu ra file, mở file, chọn ảnh hay chuyển sang app khác rồi quay lại: app tự kiểm và nối lại tivi nếu điện thoại đã cắt kết nối, không phải kết nối lại bằng tay"
+  ],
+  "en": [
+   "- Saving or opening a file, picking a picture or switching apps and coming back: the app checks the TV connection and reconnects by itself if the phone dropped it"
+  ]
+ },
+ {
   "ban": "3.5.9",
   "ngay": "2026-10-28",
   "vi": [
