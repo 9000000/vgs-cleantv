@@ -36303,7 +36303,7 @@ index ea1242b1..330da398 100644
          long b11 = a11;
          int lunarYear;
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 17961443..3d2d1b4a 100644
+index 17961443..d7157195 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -55,6 +55,7 @@ import android.text.style.ForegroundColorSpan;
@@ -36825,37 +36825,15 @@ index 17961443..3d2d1b4a 100644
          if (!ambientGlow) return;
          if (!animations || reducedMotion) {
              setAmbient(color);
-@@ -2053,6 +2325,244 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2053,6 +2325,237 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
 +    // ---- CleanTV/VGS weather line -----------------------------------------------------------------
 +
-+    /** Re-reads the weather when the last reading is older than WEATHER_MS; called on resume and every minute. */
++    /** Re-reads the weather when the last reading is older than 30 min (or 3 min on error); called on resume and every minute. */
 +    private void updateWeather() {
-+        if (weatherCfg == null) {
-+            weatherCfg = Weather.load(this);
-+            if (weatherCfg == null && showWeatherCorner) weatherCfg = new Weather(21.03, 105.85, "Hà Nội");
-+        }
-+        boolean needWeather = (weatherView != null && weatherView.getVisibility() == View.VISIBLE);
-+        if (weatherCfg == null || !needWeather) return;
-+        long now = System.currentTimeMillis();
-+        if (weatherThread != null || now - weatherAt < WEATHER_MS) return;
-+        Weather w = weatherCfg;
-+        weatherThread = new Thread(() -> {
-+            String text = w.fetch();
-+            handler.post(() -> {
-+                weatherThread = null;
-+                if (text != null) {
-+                    weatherAt = System.currentTimeMillis();
-+                    if (weatherView != null && weatherView.getVisibility() == View.VISIBLE) weatherView.setText(text);
-+                } else {
-+                    weatherAt = System.currentTimeMillis() - WEATHER_MS + 5 * 60 * 1000L;  // retry in 5 minutes
-+                    if (weatherView != null && weatherView.getVisibility() == View.VISIBLE && weatherView.getText().length() == 0 && !w.place.isEmpty()) weatherView.setText(w.place);
-+                }
-+            });
-+        }, "weather");
-+        weatherThread.start();
++        updateWeatherCard();
 +    }
 +
 +    // ---- CleanTV/VGS Today Carousel (Đếm ngược ngày, Danh ngôn, Ngày này năm xưa) ----
@@ -36897,9 +36875,23 @@ index 17961443..3d2d1b4a 100644
 +    }
 +
 +    private void updateWeatherCard() {
-+        if ((!showWeather || weatherCard == null) && (!showWeatherCorner || weatherCornerCard == null)) return;
++        boolean needFull = (showWeather && weatherCard != null) || (showWeatherCorner && weatherCornerCard != null);
++        boolean needHeader = (weatherView != null && weatherView.getVisibility() == View.VISIBLE);
++        if (!needFull && !needHeader) return;
++
 +        Weather.fetchFull(this, fw -> runOnUiThread(() -> {
 +            if (fw == null) return;
++
++            // 1. Dòng thời tiết trên header cạnh đồng hồ
++            if (needHeader && weatherView != null) {
++                if (weatherCfg == null) weatherCfg = Weather.load(this);
++                String place = weatherCfg != null ? weatherCfg.place : fw.place;
++                String text = fw.getShortLine();
++                if (place != null && !place.isEmpty()) text += " · " + place;
++                weatherView.setText(text);
++            }
++
++            // 2. Khối thời tiết Samsung The Frame
 +            if (showWeather && weatherCard != null) {
 +                if (wxIcon != null) wxIcon.setImageResource(fw.iconRes);
 +                if (wxTemp != null) wxTemp.setText(fw.temp + "°");
@@ -36944,6 +36936,7 @@ index 17961443..3d2d1b4a 100644
 +                }
 +            }
 +
++            // 3. Widget thời tiết góc trên nút Cài đặt
 +            if (showWeatherCorner && weatherCornerCard != null) {
 +                if (wxCornerIcon != null) wxCornerIcon.setImageResource(fw.iconRes);
 +                if (wxCornerTemp != null) wxCornerTemp.setText(fw.temp + "°");
@@ -36971,7 +36964,7 @@ index 17961443..3d2d1b4a 100644
 +        if (weatherCornerCard != null) {
 +            weatherCornerCard.setVisibility(showWeatherCorner ? View.VISIBLE : View.GONE);
 +        }
-+        if (showWeatherCorner) {
++        if (showWeather || showWeatherCorner) {
 +            updateWeatherCard();
 +        }
 +        if (todayCard != null) {
@@ -37070,7 +37063,7 @@ index 17961443..3d2d1b4a 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2117,13 +2627,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2117,13 +2620,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -37098,7 +37091,7 @@ index 17961443..3d2d1b4a 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2318,6 +2839,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2318,6 +2832,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -37109,7 +37102,7 @@ index 17961443..3d2d1b4a 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2679,7 +3204,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2679,7 +3197,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -37122,7 +37115,7 @@ index 17961443..3d2d1b4a 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2934,7 +3463,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2934,7 +3456,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       *  source number; "HW8=-" leaves that input out of the Inputs menu (a port the board reports but the set
       *  does not have). Returns the number, -1 for a left-out input, or null when the input is not listed. */
      private Integer mappedSource(String inputId) {
@@ -37156,7 +37149,7 @@ index 17961443..3d2d1b4a 100644
      }
  
      /** Switches to a passthrough input (HDMI, AV). An input mapped in `input_sources` is opened by sending
-@@ -3016,9 +3570,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3016,9 +3563,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          final PopupWindow popup = glassPopup(panel, width);
  
          TvInputManager tim = (TvInputManager) getSystemService(TV_INPUT_SERVICE);
@@ -37166,7 +37159,7 @@ index 17961443..3d2d1b4a 100644
          boolean sawNonHdmi = false;
          String tunerId = null;
          boolean tunerIsHw = false;
-@@ -3090,10 +3641,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3090,10 +3634,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  if (hdmi && !label.toUpperCase(Locale.ROOT).contains("HDMI")) label = "HDMI " + label;
                  CharSequence custom = InputNames.tidy(info.loadCustomLabel(this));
                  boolean named = custom != null && custom.length() > 0 && !custom.toString().equals(label);
@@ -37178,7 +37171,7 @@ index 17961443..3d2d1b4a 100644
                  if (!hdmi) sawNonHdmi = true;
                  List<TvInputInfo> devices = cecDevices.get(info.getId());
                  if (devices != null) {
-@@ -3106,8 +3654,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3106,8 +3647,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                          String deviceLabel = name == null || name.length() == 0 ? label : name + " \u00B7 " + label;
                          final String deviceId = device.getId();
                          int state = hdmiStateBogus ? -1 : tim.getInputState(deviceId);
@@ -37188,7 +37181,7 @@ index 17961443..3d2d1b4a 100644
                      }
                      continue;
                  }
-@@ -3117,25 +3664,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3117,25 +3657,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  // Analog AV jacks have no hotplug detection, and some TVs report them as always connected
                  // (TCL Smart TV Pro G03 says "Connected" with nothing plugged in), so AV rows show no state.
                  int state = !hdmi || hdmiStateBogus ? -1 : tim.getInputState(id);
@@ -37216,7 +37209,7 @@ index 17961443..3d2d1b4a 100644
          }
          // Coocaa OS registers nothing with TvInputManager; com.skyworth.tv lists its sources instead.
          if (rows.getChildCount() == 0) {
-@@ -3187,15 +3718,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3187,15 +3711,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
  
          int alignment = getResources().getBoolean(R.bool.rtl_menu_bar) != underGear ? Gravity.END : Gravity.START;
          dropIn(popup, panel, anchor, alignment);
@@ -37233,7 +37226,7 @@ index 17961443..3d2d1b4a 100644
      }
  
      private PopupWindow glassPopup(View panel, int width) {
-@@ -3222,17 +3745,16 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3222,17 +3738,16 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
      }
  
@@ -37253,7 +37246,7 @@ index 17961443..3d2d1b4a 100644
          View row = getLayoutInflater().inflate(R.layout.item_input, rows, false);
          ((ImageView) row.findViewById(R.id.icon)).setImageResource(iconRes);
          ((TextView) row.findViewById(R.id.title)).setText(title);
-@@ -3255,7 +3777,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3255,7 +3770,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              action.run();
          });
          rows.addView(row);
@@ -37261,7 +37254,7 @@ index 17961443..3d2d1b4a 100644
      }
  
      // ---- launcher settings and module cards -------------------------------------------------------
-@@ -3309,8 +3830,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3309,8 +3823,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          if (moduleCards) addSettingsMenuRow(rows, popup, R.string.module_cards, this::showModuleCards);
          if (dockRow) addSettingsMenuRow(rows, popup, R.string.dock_edit, this::startDockEdit);
          addSettingsMenuRow(rows, popup, R.string.reorder, this::toggleReorder);
@@ -37270,7 +37263,7 @@ index 17961443..3d2d1b4a 100644
          panel.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
          popup.setWidth(Math.max((int) (200 * density), panel.getMeasuredWidth()));
          // Hebrew puts Settings at the left of the header: grow the menu inward from it.
-@@ -3371,10 +3890,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3371,10 +3883,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
@@ -37414,7 +37407,7 @@ index 17961443..3d2d1b4a 100644
          View row = getLayoutInflater().inflate(R.layout.item_input, rows, false);
          row.findViewById(R.id.icon).setVisibility(View.GONE);
          row.findViewById(R.id.dot).setVisibility(View.GONE);
-@@ -3423,8 +4075,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3423,8 +4068,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          if (card == null) return;
  
          View panel = getLayoutInflater().inflate(R.layout.dialog_card_prompt, root, false);
@@ -37423,7 +37416,7 @@ index 17961443..3d2d1b4a 100644
          ((TextView) panel.findViewById(R.id.title)).setText(getString(R.string.card_prompt_title, card.appLabel));
          ((TextView) panel.findViewById(R.id.body)).setText(card.state == Cards.State.RESIGNED
                  ? getString(R.string.card_prompt_resigned, card.appLabel)
-@@ -3438,16 +4088,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3438,16 +4081,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  getString(R.string.card_prompt_identity, card.pkg, Cards.shortDigest(card.digest)));
          TextView keep = panel.findViewById(R.id.btnKeep);
          TextView show = panel.findViewById(R.id.btnShow);
@@ -37440,7 +37433,7 @@ index 17961443..3d2d1b4a 100644
  
          final Dialog dialog = new Dialog(this);
          dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-@@ -3479,10 +4119,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3479,10 +4112,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          View.OnKeyListener keys = (v, keyCode, event) -> {
              if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
              if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN) return true;
@@ -37453,7 +37446,7 @@ index 17961443..3d2d1b4a 100644
          };
          keep.setOnKeyListener(keys);
          show.setOnKeyListener(keys);
-@@ -3516,8 +4154,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3516,8 +4147,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private void showModuleCardsNow() {
          View anchor = findViewById(R.id.btnSettings);
          View panel = getLayoutInflater().inflate(R.layout.popup_cards, root, false);
@@ -37462,7 +37455,7 @@ index 17961443..3d2d1b4a 100644
          LinearLayout rows = panel.findViewById(R.id.rows);
          final PopupWindow popup = glassPopup(panel, (int) (400 * density));
          List<Cards.Card> listed = new ArrayList<>(cards);
-@@ -3526,12 +4162,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3526,12 +4155,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              View row = getLayoutInflater().inflate(R.layout.item_card_row, rows, false);
              row.setTag(card.pkg);
              ((TextView) row.findViewById(R.id.title)).setText(card.label);
@@ -37475,7 +37468,7 @@ index 17961443..3d2d1b4a 100644
              TextView app = row.findViewById(R.id.app);
              if (Cards.fold(card.label).equals(Cards.fold(card.appLabel))) app.setVisibility(View.GONE);
              else app.setText(getString(R.string.card_app_name, card.appLabel));
-@@ -3592,4 +4222,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3592,4 +4215,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  return getString(R.string.card_state_new);
          }
      }
@@ -38064,10 +38057,10 @@ index c1044b36..3f8371f8 100644
  }
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/Weather.java b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
 new file mode 100644
-index 00000000..78c91a1e
+index 00000000..4eacbf40
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/Weather.java
-@@ -0,0 +1,444 @@
+@@ -0,0 +1,485 @@
 +package com.gathin.tvhome;
 +
 +import android.content.Context;
@@ -38241,6 +38234,7 @@ index 00000000..78c91a1e
 +    }
 +
 +    public static class FullWeather {
++        public boolean isValid = false;
 +        public int temp = 28;
 +        public boolean isDay = false;
 +        public int code = 0;
@@ -38310,27 +38304,67 @@ index 00000000..78c91a1e
 +        void onLoaded(FullWeather fw);
 +    }
 +
++    /** Chu kỳ cập nhật thời tiết định kỳ: 30 phút khi có dữ liệu tốt, 3 phút thử lại khi mất mạng. */
++    public static final long WEATHER_CACHE_TTL_MS = 30 * 60 * 1000L;
++    public static final long WEATHER_RETRY_MS = 3 * 60 * 1000L;
++
++    private static volatile FullWeather cachedFull = null;
++    private static volatile long lastFullFetchTime = 0;
++    private static volatile boolean lastFetchSuccessful = false;
++    private static volatile double lastCachedLat = Double.NaN;
++    private static volatile double lastCachedLon = Double.NaN;
++    private static volatile boolean isFetching = false;
++
++    public static void invalidateCache() {
++        lastFullFetchTime = 0;
++        lastFetchSuccessful = false;
++    }
++
 +    public static void fetchFull(Context ctx, WeatherCallback callback) {
++        fetchFull(ctx, false, callback);
++    }
++
++    public static void fetchFull(Context ctx, boolean force, WeatherCallback callback) {
++        // Phục vụ ngay từ bộ nhớ cache nếu có để UI hiển thị tức thì
 +        if (cachedFull != null && callback != null) {
 +            callback.onLoaded(cachedFull);
 +        }
-+        new Thread(() -> {
-+            FullWeather fw = getCachedOrFetch(ctx);
-+            if (callback != null) {
-+                callback.onLoaded(fw);
-+            }
-+        }, "weather-full").start();
-+    }
 +
-+    /** Mặc định cache để hiển thị tức thì. */
-+    private static volatile FullWeather cachedFull = null;
-+
-+    static FullWeather getCachedOrFetch(Context ctx) {
-+        if (cachedFull != null) return cachedFull;
++        long now = System.currentTimeMillis();
 +        Weather w = load(ctx);
 +        if (w == null) w = new Weather(21.03, 105.85, "Hà Nội");
-+        cachedFull = w.fetchFull();
-+        return cachedFull;
++
++        boolean locChanged = (Double.isNaN(lastCachedLat) || lastCachedLat != w.lat || lastCachedLon != w.lon);
++        long ttl = lastFetchSuccessful ? WEATHER_CACHE_TTL_MS : WEATHER_RETRY_MS;
++        boolean expired = (now - lastFullFetchTime >= ttl);
++
++        if ((force || cachedFull == null || expired || locChanged || !lastFetchSuccessful) && !isFetching) {
++            isFetching = true;
++            final Weather finalW = w;
++            new Thread(() -> {
++                try {
++                    FullWeather fw = finalW.fetchFull();
++                    if (fw != null && fw.isValid) {
++                        cachedFull = fw;
++                        lastFullFetchTime = System.currentTimeMillis();
++                        lastFetchSuccessful = true;
++                        lastCachedLat = finalW.lat;
++                        lastCachedLon = finalW.lon;
++                        if (callback != null) {
++                            callback.onLoaded(fw);
++                        }
++                    } else {
++                        lastFetchSuccessful = false;
++                        lastFullFetchTime = System.currentTimeMillis();
++                        if (cachedFull == null && fw != null && callback != null) {
++                            callback.onLoaded(fw);
++                        }
++                    }
++                } finally {
++                    isFetching = false;
++                }
++            }, "weather-full").start();
++        }
 +    }
 +
 +    static void setCachedFull(FullWeather fw) {
@@ -38360,6 +38394,7 @@ index 00000000..78c91a1e
 +                    fw.isDay = cur.optInt("is_day", 1) == 1;
 +                    fw.desc = label(fw.code);
 +                    fw.iconRes = getIconRes(fw.code, fw.isDay);
++                    fw.isValid = true;
 +                }
 +                JSONObject daily = root.optJSONObject("daily");
 +                if (daily != null) {
@@ -38429,7 +38464,6 @@ index 00000000..78c91a1e
 +            fw.days.add(new DayForecast(DOW_NAMES[(todayDow + 4) % 7], 61, "🌧️", 31, 24));
 +        }
 +
-+        cachedFull = fw;
 +        return fw;
 +    }
 +
@@ -45229,10 +45263,10 @@ index ca006552..9afe1a1a 100644
  </resources>
 diff --git a/launcher/app/src/test/java/com/gathin/tvhome/FamilyFeaturesTest.java b/launcher/app/src/test/java/com/gathin/tvhome/FamilyFeaturesTest.java
 new file mode 100644
-index 00000000..b4abb9bf
+index 00000000..dbed0a30
 --- /dev/null
 +++ b/launcher/app/src/test/java/com/gathin/tvhome/FamilyFeaturesTest.java
-@@ -0,0 +1,105 @@
+@@ -0,0 +1,133 @@
 +package com.gathin.tvhome;
 +
 +import org.junit.Test;
@@ -45336,6 +45370,34 @@ index 00000000..b4abb9bf
 +        assertEquals("Only peaceful/positive events should pass GRIM filter", 1, items.size());
 +        assertEquals(1966, items.get(0).year);
 +        assertTrue(items.get(0).text.contains("Học viện Kỹ thuật Quân sự"));
++    }
++
++    @Test
++    public void testWeatherContinuousUpdateLogic() {
++        // 1. Kiểm tra hằng số chu kỳ cập nhật
++        assertEquals("Chu kỳ cập nhật thời tiết chuẩn là 30 phút", 30 * 60 * 1000L, Weather.WEATHER_CACHE_TTL_MS);
++        assertEquals("Chu kỳ thử lại khi mất mạng là 3 phút", 3 * 60 * 1000L, Weather.WEATHER_RETRY_MS);
++
++        // 2. Kiểm tra FullWeather object
++        Weather.FullWeather fw = new Weather.FullWeather();
++        assertFalse("FullWeather ban đầu phải có isValid = false", fw.isValid);
++        fw.temp = 29;
++        fw.desc = "Có mây";
++        fw.code = 2;
++        fw.isDay = true;
++        fw.isValid = true;
++        assertTrue(fw.isValid);
++
++        // 3. Kiểm tra định dạng hiển thị
++        String shortLine = fw.getShortLine();
++        assertTrue("Dòng ngắn phải có nhiệt độ", shortLine.contains("29°"));
++        assertTrue("Dòng ngắn phải có mô tả", shortLine.contains("Có mây"));
++
++        // 4. Kiểm tra cache invalidate và cập nhật
++        Weather.setCachedFull(fw);
++        assertEquals("Latest weather phải lấy từ cache", 29, Weather.FullWeather.getLatest().temp);
++
++        Weather.invalidateCache();
 +    }
 +}
 diff --git a/launcher/app/src/test/java/com/gathin/tvhome/InputFoldTest.java b/launcher/app/src/test/java/com/gathin/tvhome/InputFoldTest.java
