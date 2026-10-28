@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 100,
-  "versionName": "3.5.7",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.7.apk",
-  "co": 12257573,
-  "ghiChu": "Sửa tivi TCL rút điện bật lại vẫn hiện Home cũ; tìm giọng nói Google TV hiện kết quả; ô kênh FPT hết vệt trắng",
-  "ghiChuEn": "Fixes TCL TVs showing the old Home after a power cut; Google TV voice search shows its results; FPT channel tiles lose the white line",
+  "versionCode": 101,
+  "versionName": "3.5.8",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.8.apk",
+  "co": 12257737,
+  "ghiChu": "Tuỳ chọn đưa nút Wi-Fi, Cài đặt lên sát mép trên; tivi khởi động chậm (TCL) ghi rõ lúc đọc được cấu hình",
+  "ghiChuEn": "Option to put the Wi-Fi and Settings buttons at the very top; slow-booting TVs (TCL) record when the settings became readable",
   "ngay": "2026-10-28"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "5060865e2658bb00",
+   "phienBan": "45742aab656d14bf",
    "url": "/ota/du-lieu.json",
    "co": 1954504,
-   "tuBan": 100
+   "tuBan": 101
   },
   "tvhome.apk": {
-   "phienBan": "5fba3c6e841be91d",
+   "phienBan": "0db8702ec3d734e7",
    "url": "/ota/tvhome.apk",
-   "co": 664153,
-   "tuBan": 100
+   "co": 664221,
+   "tuBan": 101
   }
  }
 }

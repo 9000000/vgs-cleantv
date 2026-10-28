@@ -333,10 +333,10 @@ index 41825a1a..f5b1f644 100644
          // Draw a private copy: changing the bounds of the drawable an ImageView shows would blank the tile.
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/BootHome.java b/launcher/app/src/main/java/com/gathin/tvhome/BootHome.java
 new file mode 100644
-index 00000000..0bb13b9b
+index 00000000..e17d01bc
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/BootHome.java
-@@ -0,0 +1,150 @@
+@@ -0,0 +1,165 @@
 +package com.gathin.tvhome;
 +
 +import android.Manifest;
@@ -396,6 +396,8 @@ index 00000000..0bb13b9b
 +    /** CleanTV/VGS 3.5.7: how often, and how long after boot, an early wake reads the config again. */
 +    static final long RETRY_MS = 15_000L;
 +    static final long RETRY_UNTIL_MS = 2 * 60 * 1000L;
++    /** Whether an earlier read this boot found a config (for the "u" note). */
++    private static boolean wasApplied;
 +
 +    /**
 +     * TCL 43P618 on 3.5.6 (Võ Thái, 28/10/2026): the bind wake came so early that boot_count had not moved yet and the
@@ -409,9 +411,16 @@ index 00000000..0bb13b9b
 +        Log.i(TAG, "boot " + event + " redirect=" + redirect + " always=" + config.powerOnHomeAlways + " liveTv=" + config.bootToLiveTv
 +                + (tries > 0 ? " try " + tries : ""));
 +        if (tries > 0 && (redirect || config.powerOnHomeAlways)) note(context, "c");
++        // 3.5.8: no config at all (neither config.json nor the kept copy) is a folder not ready yet, whatever the uptime.
++        // TCL 43P618 again (Võ Thái, 28/10/2026): the bind wake came 220 s after boot and still read nothing, the
++        // helper 9 s later read stock_home_redirect. Noted once as "u" with the uptime the config first read.
++        if (!config.overlayApplied && tries == 0) note(context, "l");
++        if (config.overlayApplied && tries > 0 && !wasApplied) note(context, "u");
++        if (config.overlayApplied) wasApplied = true;
 +        if (redirect || config.powerOnHomeAlways) enableHelper(context);
++        long up = android.os.SystemClock.elapsedRealtime();
 +        if (!(config.powerOnHomeAlways || redirect) && !config.bootToLiveTv
-+                && android.os.SystemClock.elapsedRealtime() + RETRY_MS < RETRY_UNTIL_MS) {
++                && up + RETRY_MS < (config.overlayApplied ? RETRY_UNTIL_MS : BIND_WAKE_MS)) {
 +            if (pending != null) pending.finish();
 +            Context app = context.getApplicationContext();
 +            new Handler(Looper.getMainLooper()).postDelayed(() -> decide(app, event, null, tries + 1), RETRY_MS);
@@ -420,6 +429,12 @@ index 00000000..0bb13b9b
 +        // stock_home_redirect too (3.5.1): the stock home stays the default there, so after a power cut it is what
 +        // comes up (TCL Smart TV Pro G10, Android 12, 27/10/2026), even without power_on_home_always.
 +        if (!(config.powerOnHomeAlways || redirect) || config.bootToLiveTv) {
++            if (pending != null) pending.finish();
++            return;
++        }
++        // A late read only turns the helper on: by then the person may be in an app, and the helper opens this Home
++        // when the stock one comes up.
++        if (tries > 0 && up > RETRY_UNTIL_MS) {
 +            if (pending != null) pending.finish();
 +            return;
 +        }
@@ -1082,7 +1097,7 @@ index 00000000..067f64b5
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 17961443..62e4bf56 100644
+index 17961443..ad3f4e48 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -184,6 +184,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
@@ -1251,7 +1266,23 @@ index 17961443..62e4bf56 100644
              if (grid.getPaddingTop() != want) {
                  grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
                  // A vertical grid parks the dock on the new padding line by scrolling (onTileFocused); a sideways
-@@ -773,6 +869,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -766,6 +862,15 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+             tlp.bottomMargin = 0;
+             topButtons.setLayoutParams(tlp);
+             topButtons.setGravity(Gravity.CENTER_VERTICAL);
++        } else if (Weather.flag(this, "top_buttons_top", false)) {
++            // CleanTV/VGS: top_buttons_top puts the pills on the clock's top line instead of its bottom one, so a large
++            // clock or the date and weather under it no longer push them down (góp ý nguyenthanhsn88, 28/10/2026).
++            LinearLayout topButtons = findViewById(R.id.topButtons);
++            RelativeLayout.LayoutParams tlp = (RelativeLayout.LayoutParams) topButtons.getLayoutParams();
++            tlp.removeRule(RelativeLayout.ALIGN_BOTTOM);
++            tlp.addRule(RelativeLayout.ALIGN_TOP, R.id.leftBlock);
++            tlp.bottomMargin = 0;
++            topButtons.setLayoutParams(tlp);
+         }
+         if (iconOnlyButtons) {
+             if (cfg.wifiLabelWidth > 0) btnWifi.setMaxWidth(Math.round(cfg.wifiLabelWidth * density));
+@@ -773,6 +878,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              makeIconOnly((TextView) btnSettings);
          }
          if (cfg.iconOnlyInputs) makeIconOnly((TextView) btnInputs);
@@ -1276,7 +1307,7 @@ index 17961443..62e4bf56 100644
          btnSettings.setOnLongClickListener(v -> {
              showSettingsMenu();
              return true;
-@@ -796,8 +910,42 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -796,8 +919,42 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -1319,7 +1350,7 @@ index 17961443..62e4bf56 100644
          btnSettings.setOnKeyListener(pillKeys);
          btnReorder.setOnKeyListener(pillKeys);
          btnLibraryTop.setOnKeyListener(pillKeys);
-@@ -940,9 +1088,39 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -940,9 +1097,39 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          tileRefresh.onStart();
      }
  
@@ -1359,7 +1390,7 @@ index 17961443..62e4bf56 100644
          // A festival that started or ended while Home was in the background: rebuild with or without it.
          if (festive != festival.active(LocalDate.now())) {
              recreate();
-@@ -974,6 +1152,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -974,6 +1161,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          if (openLiveTvAfterBoot()) return;
          updateGreeting();
          updateRace();
@@ -1369,7 +1400,7 @@ index 17961443..62e4bf56 100644
          // The network and Inputs pills keep their state while Home is in the background, and callbacks update them
          // when the network or the inputs change, so this refresh only catches anything missed. Its binder calls
          // (about 7 ms on a TCL C755, most of it WifiManager.getConnectionInfo) would hold up the first frame back
-@@ -986,6 +1167,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -986,6 +1176,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -1377,7 +1408,7 @@ index 17961443..62e4bf56 100644
          sky.update();
          wallpaperPlayer.start();
          handler.postDelayed(minuteTick, MINUTE_MS);
-@@ -1154,6 +1336,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1154,6 +1345,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onPause() {
          super.onPause();
@@ -1385,7 +1416,7 @@ index 17961443..62e4bf56 100644
          root.removeCallbacks(showIdleClock);
          endReorder();   // Home or another app while reordering keeps the order so far
          wallpaperPlayer.stop();
-@@ -2053,6 +2236,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2053,6 +2245,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -1416,7 +1447,7 @@ index 17961443..62e4bf56 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2117,13 +2324,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2117,13 +2333,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -1444,7 +1475,7 @@ index 17961443..62e4bf56 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2318,6 +2536,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2318,6 +2545,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -1455,7 +1486,7 @@ index 17961443..62e4bf56 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2679,7 +2901,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2679,7 +2910,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -1468,7 +1499,7 @@ index 17961443..62e4bf56 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2934,7 +3160,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2934,7 +3169,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       *  source number; "HW8=-" leaves that input out of the Inputs menu (a port the board reports but the set
       *  does not have). Returns the number, -1 for a left-out input, or null when the input is not listed. */
      private Integer mappedSource(String inputId) {
@@ -1502,7 +1533,7 @@ index 17961443..62e4bf56 100644
      }
  
      /** Switches to a passthrough input (HDMI, AV). An input mapped in `input_sources` is opened by sending
-@@ -3310,7 +3561,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3310,7 +3570,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          if (dockRow) addSettingsMenuRow(rows, popup, R.string.dock_edit, this::startDockEdit);
          addSettingsMenuRow(rows, popup, R.string.reorder, this::toggleReorder);
          // A launcher may not restart the TV itself; the Home key helper can open the system power menu instead.
@@ -1513,7 +1544,7 @@ index 17961443..62e4bf56 100644
          panel.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
          popup.setWidth(Math.max((int) (200 * density), panel.getMeasuredWidth()));
          // Hebrew puts Settings at the left of the header: grow the menu inward from it.
-@@ -3371,10 +3624,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3371,10 +3633,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }

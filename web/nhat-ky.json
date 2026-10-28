@@ -1,5 +1,17 @@
 [
  {
+  "ban": "3.5.8",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Tuỳ chỉnh thêm: \"Nút Wi-Fi, Cài đặt sát mép trên\", hàng nút không tụt theo đồng hồ to và dòng ngày, thời tiết",
+   "- Tivi khởi động chậm (TCL 43P618): Home sạch chờ đến lúc đọc được cấu hình, bật bộ bắt phím Home ngay khi đọc được, và ghi mốc đó vào chẩn đoán"
+  ],
+  "en": [
+   "- More options: \"Wi-Fi, Settings buttons at the very top\", so they no longer drop with a large clock and the date and weather lines",
+   "- Slow-booting TVs (TCL 43P618): the clean Home waits until its settings are readable, turns the Home key helper on right then, and records the time in the diagnosis"
+  ]
+ },
+ {
   "ban": "3.5.7",
   "ngay": "2026-10-28",
   "vi": [

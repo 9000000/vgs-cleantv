@@ -325,6 +325,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     val dungPhimRemote get() = nutAppRemote && phimRemote() != null
     // Tuỳ chỉnh thêm (1.7, các "switch" của launcher — upstream themes/README.md).
     var amLich by mutableStateOf(true)
+    /** Hàng nút Wi-Fi / Cài đặt sát mép trên thay vì canh theo đáy khối đồng hồ (top_buttons_top, 3.5.8, góp ý nguyenthanhsn88). */
+    var nutTrenCung by mutableStateOf(false)
     var tenDuoiApp by mutableStateOf(false)
     /** Tên app to phía trên dock (dock_title, launcher mặc định bật); góp ý 22/10/2026 muốn tắt cho đỡ rối. */
     var tenToTrenDock by mutableStateOf(true)
@@ -973,6 +975,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         theme?.let { themeChon = it }
         fun cuaTheme(k: String) = theme?.cauHinh?.containsKey(k) == true
         amLich = j.optBoolean("lunar_date", amLich)
+        nutTrenCung = j.optBoolean("top_buttons_top", false)
         tenDuoiApp = j.optBoolean("always_show_names", false)
         tenToTrenDock = j.optBoolean("dock_title", true)
         toMauOApp = j.optBoolean("icon_tile_color", true)
@@ -1128,6 +1131,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         thanhPho?.let { put("weather_lat", it.lat); put("weather_lon", it.lon); put("weather_place", it.ten) }
         if (ghimMayChieu.isNotEmpty()) put("projector_actions", JSONArray(ghimMayChieu.map { (comp, nhan) -> "$nhan=$comp" }))
         put("lunar_date", amLich)
+        if (nutTrenCung) put("top_buttons_top", true)
         // Âm lịch tính theo múi giờ: launcher tự chọn theo ngôn ngữ tivi, tivi để tiếng Anh ở VN thì lệch một ngày quanh
         // ngày sóc (Formovie L206, 22/10/2026: 12/9 thay vì 13/9). Ghi múi giờ của điện thoại khi là +7 / +8.
         if (amLich) (java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 3_600_000).takeIf { it == 7 || it == 8 }?.let { put("lunar_utc_offset", it) }

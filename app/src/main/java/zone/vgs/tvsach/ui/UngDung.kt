@@ -1148,6 +1148,7 @@ private fun TheHomeNoiDung(vm: PhienLamViec) {
             MAU_CHU.forEach { (vi, en, ma) -> ChonChip(t(vi, en), vm.mauChu == ma) { vm.mauChu = ma } }
         }
         Hang(t("Ẩn lời chào", "Hide the greeting"), t("Bỏ dòng \"Chào buổi tối\" phía trên đồng hồ", "Drops the \"Good evening\" line above the clock"), vm.anLoiChao) { vm.anLoiChao = it }
+        Hang(t("Nút Wi-Fi, Cài đặt sát mép trên", "Wi-Fi, Settings buttons at the very top"), t("Không tụt xuống theo đồng hồ to và dòng ngày, thời tiết", "They no longer drop with a large clock and the date and weather lines"), vm.nutTrenCung) { vm.nutTrenCung = it }
         Hang(t("Âm lịch dưới ngày dương", "Lunar date under the date"), t("Ví dụ: 2/9 âm lịch · Bính Ngọ", "e.g. Lunar 2/9 · Year of the Horse"), vm.amLich) { vm.amLich = it }
         Text(t("Đồng hồ khi để yên", "Clock when idle"), fontSize = 14.sp)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
