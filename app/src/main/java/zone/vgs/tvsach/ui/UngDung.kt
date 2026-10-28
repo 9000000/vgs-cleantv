@@ -1078,11 +1078,11 @@ private fun TheHomeNoiDung(vm: PhienLamViec) {
     if (vm.moChonKenh) HopChonKenh(vm)
     if (vm.dsIptv != null) HopChonIptv(vm)
     The(t("Kênh truyền hình trên màn chính", "TV channels on Home"), Icons.Rounded.LiveTv) {
-        Phu(t("Mỗi kênh thành một ô có logo ở đầu dock, bấm là xem luôn, ông bà khỏi phải tìm. Tối đa 12 ô, lấy từ VTVgo, FPT Play hay danh sách IPTV của bạn.",
-            "Each channel becomes a tile with its logo at the start of the dock that plays it at once. Up to 12, from VTVgo, FPT Play or your own IPTV list."))
+        Phu(t("Mỗi kênh thành một ô có logo ở đầu dock, bấm là xem luôn, ông bà khỏi phải tìm. Tối đa $KENH_TOI_DA ô, lấy từ VTVgo, FPT Play hay danh sách IPTV của bạn.",
+            "Each channel becomes a tile with its logo at the start of the dock that plays it at once. Up to $KENH_TOI_DA, from VTVgo, FPT Play or your own IPTV list."))
         // Các ô đã chọn (mọi nguồn), bấm để bỏ.
         if (vm.kenhChon.isNotEmpty()) {
-            Text(t("Đã chọn ${vm.kenhChon.size}/12 (bấm để bỏ)", "${vm.kenhChon.size}/12 picked (tap to remove)"), fontSize = 13.sp, color = ChuPhu)
+            Text(t("Đã chọn ${vm.kenhChon.size}/$KENH_TOI_DA (bấm để bỏ)", "${vm.kenhChon.size}/$KENH_TOI_DA picked (tap to remove)"), fontSize = 13.sp, color = ChuPhu)
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 vm.kenhChon.toList().forEach { o -> ChonChip(o.ten, true) { vm.batTatO(o) } }
             }
@@ -1173,6 +1173,7 @@ private fun TheTuyChinh(vm: PhienLamViec) {
         Hang(t("Tên app to phía trên dock", "Large app name above the dock"), t("Tắt để Home gọn hơn, chỉ còn viền sáng", "Turn off for a calmer Home, just the glow"), vm.tenToTrenDock) { vm.tenToTrenDock = it }
         Hang(t("Hiện tên dưới mọi app", "Names under every app"), t("Ông bà dễ nhận app hơn", "Easier to recognise apps"), vm.tenDuoiApp) { vm.tenDuoiApp = it }
         Hang(t("Tô màu ô app điện thoại", "Colour phone-app tiles"), t("App không có ảnh tivi (Chrome, Thư viện…) có ô màu theo icon thay vì nền xám", "Apps without a TV banner get a tile in their icon's colour"), vm.toMauOApp) { vm.toMauOApp = it }
+        Hang(t("Icon to trong ô app", "Big icons in app tiles"), t("App không có ảnh tivi: icon gần kín chiều cao ô, bỏ chữ trong ô", "Apps without a TV banner: the icon fills most of the tile's height, no name inside"), vm.iconTo) { vm.iconTo = it }
         Hang(t("Tất cả app một hàng", "Every app in one row"), t("Một hàng cuộn ngang, không còn lưới bên dưới", "One sideways-scrolling row, no grid below"), vm.motHang) { vm.motHang = it }
         Hang(t("Ô icon đều nhau", "Uniform icon tiles"), t("Mọi ô là icon trên nền màu của app. Tắt để dùng lại ảnh banner của app (cả với giao diện Apple TV)", "Every tile is the icon on its own colour. Turn off for the apps' banners (Apple TV look too)"), vm.oDeuNhau) { vm.oDeuNhau = it }
         Hang(t("Gom nút trên cùng thành icon", "Compact icon buttons"), t("Một cụm gọn, bỏ chữ", "One tidy cluster, no labels"), vm.gonNut) { vm.gonNut = it }
@@ -1273,7 +1274,7 @@ private fun TheTuyChinh(vm: PhienLamViec) {
     The(t("Tivi yếu & mạng", "Slow TVs & network"), Icons.Rounded.Speed) {
         Hang(t("Chế độ tivi yếu", "Slow TV mode"), t("Bớt hiệu ứng chuyển động cho tivi cũ, ít RAM", "Calmer motion for old, low-memory TVs"), vm.tiviYeu) { vm.tiviYeu = it }
         Hang(t("Hiệu ứng kính mờ", "Frosted glass effects"), t("Dock kính mờ, ánh sáng theo màu app", "Frosted dock, glow in the app's colour"), vm.hieuUngKinh) { vm.hieuUngKinh = it }
-        Hang(t("DNS chặn quảng cáo (AdGuard)", "Ad-blocking DNS (AdGuard)"), t("Là cài đặt DNS của tivi, không phải app (xem ở Cài đặt → Mạng → DNS riêng tư). Không chặn được quảng cáo YouTube. Nhà đã chặn ở router (Pi-hole, AdGuard Home, VPN router) thì đừng bật: tivi sẽ đi vòng qua router", "A TV DNS setting, not an app (Settings → Network → Private DNS). Does not block YouTube ads. If your router already filters (Pi-hole, AdGuard Home, router VPN), leave it off: the TV would bypass the router"), vm.dnsChanQc) { vm.dnsChanQc = it }
+        Hang(t("DNS chặn quảng cáo (AdGuard)", "Ad-blocking DNS (AdGuard)"), t("Là cài đặt DNS của tivi, không phải app (xem ở Cài đặt → Mạng → DNS riêng tư). Không chặn được quảng cáo YouTube. Nhà đã chặn ở router (Pi-hole, AdGuard Home, VPN router) thì đừng bật: tivi sẽ đi vòng qua router. Có tivi bị YouTube hay app kênh chạy chập chờn khi bật: gặp thì tắt đi", "A TV DNS setting, not an app (Settings → Network → Private DNS). Does not block YouTube ads. If your router already filters (Pi-hole, AdGuard Home, router VPN), leave it off: the TV would bypass the router. On some TVs YouTube or channel apps stall with it on: if so, turn it off"), vm.dnsChanQc) { vm.dnsChanQc = it }
     }
 }
 
@@ -1781,7 +1782,7 @@ private fun HopChonIptv(vm: PhienLamViec) {
         text = {
             Column {
                 OutlinedTextField(tim, { tim = it }, singleLine = true, modifier = Modifier.fillMaxWidth(), label = { Text(t("Tìm kênh", "Search")) })
-                Text(t("Đã chọn ${vm.kenhChon.size}/12", "${vm.kenhChon.size}/12 picked"), fontSize = 12.sp, color = ChuPhu, modifier = Modifier.padding(vertical = 6.dp))
+                Text(t("Đã chọn ${vm.kenhChon.size}/$KENH_TOI_DA", "${vm.kenhChon.size}/$KENH_TOI_DA picked"), fontSize = 12.sp, color = ChuPhu, modifier = Modifier.padding(vertical = 6.dp))
                 LazyColumn(Modifier.heightIn(max = 400.dp)) {
                     items(loc.take(500), key = { it.url }) { k ->
                         val chon = vm.coO(k.url)
@@ -1820,7 +1821,7 @@ private fun HopChonKenh(vm: PhienLamViec) {
                 if (vm.dsKenhGo.isEmpty()) Text(if (vm.dangTaiKenh) t("Đang tải danh sách kênh…", "Loading channels…")
                     else t("Không tải được danh sách kênh. Kiểm tra mạng của điện thoại rồi mở lại.", "Could not load the channel list. Check the phone's internet and try again."),
                     fontSize = 13.sp, modifier = Modifier.padding(vertical = 8.dp))
-                Text(t("Đã chọn ${vm.kenhChon.size}/12 ô · kênh có ổ khoá cần đăng nhập VTVgo trên tivi", "${vm.kenhChon.size}/12 picked · locked channels need a VTVgo login on the TV"),
+                Text(t("Đã chọn ${vm.kenhChon.size}/$KENH_TOI_DA ô · kênh có ổ khoá cần đăng nhập VTVgo trên tivi", "${vm.kenhChon.size}/$KENH_TOI_DA picked · locked channels need a VTVgo login on the TV"),
                     fontSize = 12.sp, color = ChuPhu, modifier = Modifier.padding(vertical = 6.dp))
                 LazyColumn(Modifier.heightIn(max = 400.dp)) {
                     var nhomTruoc = ""

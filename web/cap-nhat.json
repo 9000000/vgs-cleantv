@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 105,
-  "versionName": "3.5.12",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.12.apk",
-  "co": 12271077,
-  "ghiChu": "Thư viện app mở từ menu Cài đặt của Home sạch",
-  "ghiChuEn": "App library from Home's Settings menu",
+  "versionCode": 106,
+  "versionName": "3.5.13",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.13.apk",
+  "co": 12271273,
+  "ghiChu": "16 ô kênh, icon to trong ô app",
+  "ghiChuEn": "16 channel tiles, big app icons",
   "ngay": "2026-10-28"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "a6c12434a83a24a1",
+   "phienBan": "039314c63593d838",
    "url": "/ota/du-lieu.json",
    "co": 2003864,
-   "tuBan": 105
+   "tuBan": 106
   },
   "tvhome.apk": {
-   "phienBan": "6cec970e5262dfb7",
+   "phienBan": "164b07c5bc5a7e34",
    "url": "/ota/tvhome.apk",
-   "co": 664501,
-   "tuBan": 105
+   "co": 664561,
+   "tuBan": 106
   }
  }
 }

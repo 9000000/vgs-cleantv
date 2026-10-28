@@ -1,5 +1,21 @@
 [
  {
+  "ban": "3.5.13",
+  "ngay": "2026-10-28",
+  "vi": [
+   "- Ô kênh trên Home sạch tăng từ 12 lên 16, đủ chỗ cho người gộp kênh VTVgo và FPT Play",
+   "- Công tắc mới \"Icon to trong ô app\": app không có ảnh tivi có icon gần kín ô",
+   "- Công tắc lọc quảng cáo DNS có thêm lưu ý: tivi nào bị YouTube hay app kênh chập chờn thì tắt đi",
+   "- Nâng cao: mô tả tuỳ chọn âm lượng nhảy hai nấc chỉ rõ công tắc nào dùng khi giữ nút chỉ nhảy một nấc"
+  ],
+  "en": [
+   "- Channel tiles on Home go from 12 to 16",
+   "- New switch \"Big icons in app tiles\": apps without a TV banner get an icon that fills most of the tile",
+   "- The ad-blocking DNS switch now notes it can make YouTube or channel apps stall on some TVs",
+   "- Advanced: the volume double-step option now points to the right switch for a held key that moves only one step"
+  ]
+ },
+ {
   "ban": "3.5.12",
   "ngay": "2026-10-28",
   "vi": [

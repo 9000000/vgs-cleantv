@@ -297,7 +297,7 @@
  },
  "consume_volume_keys": {
   "ten": "Sửa nút âm lượng nhảy hai nấc",
-  "moTa": "Dịch vụ phím tự giữ và lặp nút tăng/giảm âm lượng. Dùng khi bấm một lần mà âm lượng nhảy hai nấc (TCL BeyondTV4). Cần bật lọc phím (key_filter). Mặc định tắt."
+  "moTa": "Dịch vụ phím tự giữ và lặp nút tăng/giảm âm lượng. Dùng khi bấm một lần mà âm lượng nhảy hai nấc (TCL BeyondTV4). Cần bật lọc phím (key_filter). Mặc định tắt. Giữ nút mà chỉ nhảy một nấc thì KHÔNG phải tuỳ chọn này: dùng công tắc \"Giữ nút âm lượng để tăng / giảm liên tục\" ở mục Remote."
  },
  "clock_wallpaper": {
   "ten": "Màn chờ đồng hồ trên hình nền",

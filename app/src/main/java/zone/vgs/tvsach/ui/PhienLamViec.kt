@@ -50,6 +50,8 @@ const val DOCK_TOI_DA = 8
  */
 /** doiHang đặc biệt: hàng dock nằm giữa màn hình (rows_middle của bản vá launcher), góp ý 24/10/2026. */
 const val HANG_GIUA = Int.MIN_VALUE
+/** Số ô kênh tối đa (link_tiles): 12 lên 16 cho người gộp kênh VTVgo + FPT Play (góp ý tnhoang97 28/10/2026). */
+const val KENH_TOI_DA = 16
 /** Số ảnh thêm tối đa sau ảnh riêng chính trong bộ ảnh tự đổi (cả bộ 20 ảnh, gửi qua ADB vẫn nhanh). */
 const val ANH_XOAY_TOI_DA = 19
 
@@ -226,7 +228,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     /** HomeKeyService cần bật: phím Home lạ, phím app remote, hoặc mở app khi bật từ chế độ chờ. */
     val canDichVuPhim get() = nutHome || dungPhimRemote || (moKhiBat && moKhiThuc) || luonVeHome || phimGan.isNotEmpty() || nutHenTat
     /**
-     * Ô kênh đặt ở đầu dock, theo thứ tự chọn: VTVgo (3.0.0, mọi kênh), FPT Play và IPTV (3.1.0). Tối đa 12 (link_tiles).
+     * Ô kênh đặt ở đầu dock, theo thứ tự chọn: VTVgo (3.0.0, mọi kênh), FPT Play và IPTV (3.1.0). Tối đa KENH_TOI_DA (link_tiles).
      */
     val kenhChon = mutableStateListOf<zone.vgs.tvsach.dulieu.OKenh>()
     /** Danh sách kênh VTVgo (tải khi mở hộp chọn kênh); rỗng = chưa tải. */
@@ -242,7 +244,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     fun batTatO(o: zone.vgs.tvsach.dulieu.OKenh): Boolean {
         val i = kenhChon.indexOfFirst { it.uri == o.uri }
         if (i >= 0) { kenhChon.removeAt(i); return true }
-        if (o.slug.isEmpty() || kenhChon.any { it.slug == o.slug } || kenhChon.size >= 12) return false
+        if (o.slug.isEmpty() || kenhChon.any { it.slug == o.slug } || kenhChon.size >= KENH_TOI_DA) return false
         kenhChon.add(o)
         o.anh?.let { a -> ctx.getSharedPreferences("anh_o", android.content.Context.MODE_PRIVATE).edit().putString(o.uri, a).apply() }
         return true
@@ -265,7 +267,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val (ten, anh) = io { zone.vgs.tvsach.dulieu.FptPlay.docTrang(url) }
             ?: error(t("FPT Play không có nội dung ở link này (đã kết thúc hoặc sai link).", "FPT Play has nothing at this link (ended or wrong)."))
         if (!batTatO(zone.vgs.tvsach.dulieu.OKenh(ten, zone.vgs.tvsach.dulieu.FptPlay.GOI, url, "#E65100", anh)))
-            error(t("Không thêm được: đã đủ 12 ô hoặc trùng tên ô khác.", "Couldn't add: 12 tiles already, or the name clashes with another tile."))
+            error(t("Không thêm được: đã đủ $KENH_TOI_DA ô hoặc trùng tên ô khác.", "Couldn't add: $KENH_TOI_DA tiles already, or the name clashes with another tile."))
         linkFpt = ""
     }
 
@@ -332,6 +334,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var tenToTrenDock by mutableStateOf(true)
     /** Ô app điện thoại (không có ảnh tivi) tô màu theo icon (launcher icon_tile_color, 23/10/2026). */
     var toMauOApp by mutableStateOf(true)
+    /** Icon to trên ô app không có ảnh tivi (launcher icon_fill, góp ý duongle 28/10/2026). */
+    var iconTo by mutableStateOf(false)
     var thuVienApp by mutableStateOf(false)
     /** Thư viện app mở từ menu Cài đặt của Home sạch thay vì nút trên thanh đầu (góp ý thangmath 28/10/2026). */
     var thuVienTrongMenu by mutableStateOf(false)
@@ -981,6 +985,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         tenDuoiApp = j.optBoolean("always_show_names", false)
         tenToTrenDock = j.optBoolean("dock_title", true)
         toMauOApp = j.optBoolean("icon_tile_color", true)
+        iconTo = j.optBoolean("icon_fill", false)
         thuVienApp = j.optBoolean("app_library", false)
         thuVienTrongMenu = thuVienApp && !j.optBoolean("library_button", true)
         dongHoKhiYen = j.optInt("home_idle_clock_minutes", 0)
@@ -1143,6 +1148,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (tenDuoiApp) put("always_show_names", true)
         if (!tenToTrenDock) put("dock_title", false)
         if (!toMauOApp) put("icon_tile_color", false)
+        if (iconTo) put("icon_fill", true)
         if (thuVienApp) { put("app_library", true); put("library_button", !thuVienTrongMenu) }
         // Giữ OK trên nút Cài đặt có dòng Thư viện ứng dụng khi nút trên thanh đầu tắt; viên cuối hàng cũng bỏ cho gọn.
         if (thuVienApp && thuVienTrongMenu) put("show_library_pill", false)

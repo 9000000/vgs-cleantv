@@ -178,7 +178,7 @@ index 701b5feb..4e22d871 100644
      </application>
  </manifest>
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
-index 5e2ab51c..56c0aa70 100644
+index 5e2ab51c..b6c9d98a 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/AppAdapter.java
 @@ -64,7 +64,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -209,7 +209,26 @@ index 5e2ab51c..56c0aa70 100644
      }
  
      static int tileHeightPx(int tileWidthPx) {
-@@ -309,6 +312,15 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -216,6 +219,9 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+     private final Map<String, String> appLabels, appBanners;
+     /** Every app tile is its icon on a card tinted from that icon, never its banner (config.xml, uniform_tiles). */
+     private final boolean uniformTiles;
++    /** CleanTV/VGS: icon_fill — a bigger icon on tiles with no banner (duongle, Xiaomi MiTV-ASTP0, 28/10/2026). */
++    private final float iconShare;
++    private final boolean iconFill;
+     /** Packages drawn from their icon and name even when they have a banner (config.xml icon_tiles). */
+     private final Set<String> iconTiles;
+     private final List<Entry> items = new ArrayList<>();
+@@ -246,6 +252,8 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+         this.appLabels = cfg.appLabels;
+         this.appBanners = cfg.appBanners;
+         this.uniformTiles = cfg.uniformTiles;
++        this.iconFill = Weather.flag(ctx, "icon_fill", false);
++        this.iconShare = iconFill ? ICON_SHARE_FILL : ICON_SHARE;
+         // Tiles keep their identity across reload(), so a focused tile stays on its app instead of
+         // its view being rebound to whatever app now sits in that slot.
+         setHasStableIds(true);
+@@ -309,6 +317,15 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                  fresh.add(new Entry(label, component, banner, icon));
              }
          }
@@ -225,7 +244,7 @@ index 5e2ab51c..56c0aa70 100644
          Collections.sort(fresh, (a, b) -> {
              // The owner's own order first; tiles it does not know (new installs) follow by the rule below.
              int saved = Order.compare(savedRanks, a.component.flattenToShortString(), b.component.flattenToShortString());
-@@ -414,6 +426,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -414,6 +431,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
          int width = parent.getWidth() > 0 ? parent.getWidth() : parent.getMeasuredWidth();
          int inner = width - parent.getPaddingLeft() - parent.getPaddingRight();
          int w = tileWidthPx(inner, parent.getHeight(), dockSize, rowsBelowDock, dockTitle, dockRow, density), h = tileHeightPx(w);
@@ -233,10 +252,30 @@ index 5e2ab51c..56c0aa70 100644
          View card = v.findViewById(R.id.card);
          ViewGroup.LayoutParams cardLp = card.getLayoutParams();
          cardLp.width = w;
-@@ -504,6 +517,16 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -436,7 +454,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+             // tvOS-style tile: a large centred mark, no caption inside the card.
+             View icon = v.findViewById(R.id.icon);
+             FrameLayout.LayoutParams iconLp = (FrameLayout.LayoutParams) icon.getLayoutParams();
+-            iconLp.width = iconLp.height = Math.round(h * ICON_SHARE);
++            iconLp.width = iconLp.height = Math.round(h * iconShare);
+             iconLp.bottomMargin = 0;
+             icon.setLayoutParams(iconLp);
+         } else if (h < Math.round(DESIGN_H_DP * density)) {
+@@ -489,7 +507,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+         // nothing on every frame; keep it under banners with transparent parts and under icon tiles.
+         h.card.setBackground(e.banner != null && e.banner.getOpacity() == PixelFormat.OPAQUE ? null : h.cardBackground);
+         if (uniformTiles && e.banner == null) {
+-            if (e.backdrop == null) e.backdrop = backdrop(e.icon, ambientColorAt(position));
++            if (e.backdrop == null) e.backdrop = backdrop(e.icon, ambientColorAt(position), iconShare);
+             h.card.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, e.backdrop));
+         }
+         if (e.banner != null) {
+@@ -503,7 +521,17 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+             h.icon.setImageDrawable(e.icon);
              h.icon.setVisibility(View.VISIBLE);
              h.label.setText(e.label);
-             h.label.setVisibility(uniformTiles ? View.GONE : View.VISIBLE);
+-            h.label.setVisibility(uniformTiles ? View.GONE : View.VISIBLE);
++            h.label.setVisibility(uniformTiles || iconFill ? View.GONE : View.VISIBLE);
 +            // CleanTV/VGS: icon_tile_color (default on) — a phone app with no TV banner gets a tile filled with its
 +            // icon's own colour and a bigger icon, instead of a small icon on the grey card. uniform_tiles sizes its own.
 +            float dp = ctx.getResources().getDisplayMetrics().density;
@@ -244,13 +283,13 @@ index 5e2ab51c..56c0aa70 100644
 +            int size = Math.round((iconTileColor() ? 60 : 48) * dp);
 +            // Big tiles (2–3 columns): 60 dp sat small in the middle of the colour (hp4440s, 27/10/2026), so the
 +            // icon takes half the tile's height there; normal tiles keep 60 dp.
-+            if (iconTileColor()) size = Math.max(size, Math.round(tilePx * 0.5f));
++            if (iconTileColor()) size = Math.max(size, Math.round(tilePx * (iconFill ? 0.7f : 0.5f)));
 +            if (!uniformTiles && lp.width != size) { lp.width = size; lp.height = size; h.icon.setLayoutParams(lp); }
 +            if (!uniformTiles && iconTileColor()) h.card.setBackground(new android.graphics.drawable.ColorDrawable(tileColor(ambientColorAt(position))));
          }
          h.card.setOnClickListener(v -> launch(e));
          h.card.setOnLongClickListener(v -> {
-@@ -512,7 +535,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -512,7 +540,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                  if (pos != RecyclerView.NO_POSITION) listener.onTileLongPress(pos, v);
                  return true;
              }
@@ -259,7 +298,7 @@ index 5e2ab51c..56c0aa70 100644
              i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
              try {
                  ctx.startActivity(i);
-@@ -524,6 +547,10 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -524,6 +552,10 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
  
      /** Opens the tile's activity by explicit component, with no extras: a card can name nothing else. */
      private void launch(Entry e) {
@@ -270,7 +309,7 @@ index 5e2ab51c..56c0aa70 100644
          if (e.kind == Entry.HOME_SETTINGS) {
              ctx.startActivity(new Intent(ctx, HomeSettingsActivity.class)
                      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-@@ -553,6 +580,27 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -553,6 +585,27 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
          }
      }
  
@@ -298,16 +337,48 @@ index 5e2ab51c..56c0aa70 100644
      @Override
      public int getItemCount() {
          return items.size() + (showLibrary ? 1 : 0);
-@@ -682,6 +730,8 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -682,6 +735,9 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
  
      /** Share of the tile height the icon takes in uniform_tiles mode (onCreateViewHolder). */
      private static final float ICON_SHARE = 0.62f;
++    private static final float ICON_SHARE_FILL = 0.9f;
 +    /** CleanTV/VGS: the last tile height laid out, so a colour-filled icon tile grows its icon with the tile. */
 +    private int tilePx;
  
      /**
       * The colour covering most of an icon, for a card that should read as that app: a small saturated badge
-@@ -824,6 +874,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+@@ -726,8 +782,8 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+      * square), the card takes that colour, so the mark reads as filling the tile as on tvOS. Otherwise a
+      * gradient of the icon's main colour, deepened so the mark stands out. The card clips the corners.
+      */
+-    private static int[] backdrop(Drawable live, int fallback) {
+-        int[] plate = iconPlate(live);
++    private static int[] backdrop(Drawable live, int fallback, float share) {
++        int[] plate = iconPlate(live, share);
+         if (plate != null) return plate;
+         float[] hsv = new float[3];
+         Color.colorToHSV(fallback, hsv);
+@@ -744,7 +800,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+      * card's top and bottom edges so the mark reads as filling the tile; null when the icon has no
+      * opaque plate (a bare mark on transparency).
+      */
+-    private static int[] iconPlate(Drawable live) {
++    private static int[] iconPlate(Drawable live, float share) {
+         if (live == null) return null;
+         Drawable d = live.getConstantState() != null ? live.getConstantState().newDrawable().mutate() : live;
+         Rect saved = new Rect(d.getBounds());
+@@ -763,8 +819,8 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+         if (a == 0 || b == 0) return null;
+         // The sampled rows sit at these heights of the tile; extend the line through them to its edges. A row
+         // taken further in sits on artwork-side plate, so its slope is less certain: cap how far it reaches.
+-        float margin = (1f - ICON_SHARE) / 2f;
+-        float yA = margin + ICON_SHARE * topRow / n, yB = margin + ICON_SHARE * bottomRow / n;
++        float margin = (1f - share) / 2f;
++        float yA = margin + share * topRow / n, yB = margin + share * bottomRow / n;
+         float t0 = -yA / (yB - yA), t1 = (1f - yA) / (yB - yA);
+         if (topRow != 7 || bottomRow != n - 8) {
+             t0 = Math.max(-0.35f, t0);
+@@ -824,6 +880,23 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
          return Math.max(0, Math.min(255, Math.round(v)));
      }
  
@@ -940,7 +1011,7 @@ index 233f9820..12f81212 100644
          startActivity(open.addCategory(Intent.CATEGORY_HOME)
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/LinkTiles.java b/launcher/app/src/main/java/com/gathin/tvhome/LinkTiles.java
 new file mode 100644
-index 00000000..067f64b5
+index 00000000..b9b2c0b3
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/LinkTiles.java
 @@ -0,0 +1,152 @@
@@ -974,7 +1045,7 @@ index 00000000..067f64b5
 + */
 +final class LinkTiles {
 +    static final String PREFIX = "vgs.kenh.";
-+    private static final int MAX = 12;
++    private static final int MAX = 16;
 +
 +    static final class Link {
 +        final String label, target, uri, pkg;

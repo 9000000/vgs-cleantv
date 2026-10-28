@@ -569,7 +569,7 @@
 "moTa": "true makes the key helpers swallow Volume Up/Down and repeat a held one themselves (after 500 ms, every 60 ms). Use it on firmware that applies a volume key both before the helper and when the helper hands it back, so one tap moves two steps (TCL G03 / BeyondTV4, Android 11, #1100). Needs key_filter on. Off by default",
 "canThan": false,
 "ten": "Sửa nút âm lượng nhảy hai nấc",
-"moTaVi": "Dịch vụ phím tự giữ và lặp nút tăng/giảm âm lượng. Dùng khi bấm một lần mà âm lượng nhảy hai nấc (TCL BeyondTV4). Cần bật lọc phím (key_filter). Mặc định tắt."
+"moTaVi": "Dịch vụ phím tự giữ và lặp nút tăng/giảm âm lượng. Dùng khi bấm một lần mà âm lượng nhảy hai nấc (TCL BeyondTV4). Cần bật lọc phím (key_filter). Mặc định tắt. Giữ nút mà chỉ nhảy một nấc thì KHÔNG phải tuỳ chọn này: dùng công tắc \"Giữ nút âm lượng để tăng / giảm liên tục\" ở mục Remote."
 },
 {
 "khoa": "stock_home_redirect",
