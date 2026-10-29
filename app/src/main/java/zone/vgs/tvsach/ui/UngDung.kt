@@ -1206,7 +1206,16 @@ private fun TheHomeNoiDung(vm: PhienLamViec) {
         Hang(t("Âm lịch dưới ngày dương", "Lunar date under the date"), t("Ví dụ: 2/9 âm lịch · Bính Ngọ", "e.g. Lunar 2/9 · Year of the Horse"), vm.amLich) { vm.amLich = it }
         Text(t("Đồng hồ khi để yên", "Clock when idle"), fontSize = 14.sp)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(0, 5, 15, 30).forEach { p -> ChonChip(if (p == 0) t("Tắt", "Off") else t("$p phút", "$p min"), vm.dongHoKhiYen == p) { vm.doiDongHoKhiYen(p) } }
+            listOf(0, 2, 5, 10, 15, 30).forEach { p ->
+                ChonChip(if (p == 0) t("Tắt", "Off") else t("$p phút", "$p min"), vm.dongHoKhiYen == p) { vm.doiDongHoKhiYen(p) }
+            }
+        }
+        if (vm.dongHoKhiYen > 0) {
+            Hang(
+                t("Làm cả màn hình chờ của tivi", "Also TV's screensaver"),
+                t("Tivi tự bật đồng hồ trôi trên ảnh nền cả khi đang ở các app khác", "Shows clock over wallpaper even while in other apps"),
+                vm.manChoDong
+            ) { vm.manChoDong = it }
         }
     }
     TheMayChieu(vm)
@@ -1251,12 +1260,6 @@ private fun TheTuyChinh(vm: PhienLamViec) {
         if (vm.moKhiBat) NutPhu(t("Mở màn chọn app trên tivi", "Open the app picker on the TV"), Icons.Rounded.Tv) { vm.moChonAppKhiBat() }
         if (vm.moKhiBat && vm.baoChonApp.isNotEmpty()) Phu(vm.baoChonApp, Xanh)
         Hang(t("Nút Đang phát", "Now playing button"), t("Hiện khi có app đang phát nhạc / video: tạm dừng từng app hay dừng tất cả", "Shows while apps play: pause each or stop them all"), vm.nutDangPhat) { vm.nutDangPhat = it }
-        Hang(t("Màn chờ động", "Moving screensaver"), t("Đồng hồ trên ảnh nền trôi chậm, nhiều ảnh thì 20 giây đổi một ảnh. Hiện khi để yên ở Home sạch, và làm màn chờ của tivi", "A clock over your wallpaper drifting slowly, changing every 20 s with several pictures. Shows when Home is left idle, and as the TV's screensaver"), vm.manChoDong) { vm.manChoDong = it }
-        if (vm.manChoDong) Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(5 to t("Để yên 5 phút", "Idle 5 min"), 10 to t("10 phút", "10 min"), 15 to t("15 phút", "15 min"), 30 to t("30 phút", "30 min"), 0 to t("Chỉ màn chờ của tivi", "TV's screensaver only")).forEach { (v, chu) ->
-                ChonChip(chu, vm.phutManCho == v) { vm.phutManCho = v }
-            }
-        }
         Hang(t("Nút màn hình chờ", "Screensaver button"), t("Bấm là bật ảnh / đồng hồ, tiện khi nghe nhạc", "Starts the photo / clock screensaver, handy with music"), vm.nutManCho) { vm.nutManCho = it }
         Hang(t("Thư viện app", "App library"), t("Nút xem mọi app trên tivi, thêm / bớt khỏi Home", "A button listing every app; add or remove from Home"), vm.thuVienApp) { vm.thuVienApp = it }
         if (vm.thuVienApp) Hang(t("Thư viện trong menu Cài đặt", "Library in the Settings menu"), t("Bỏ nút Thư viện trên thanh đầu. Mở bằng cách giữ OK trên nút Cài đặt của Home sạch", "No Library button in the top bar. Open it by holding OK on Home's Settings button"), vm.thuVienTrongMenu) { vm.thuVienTrongMenu = it }

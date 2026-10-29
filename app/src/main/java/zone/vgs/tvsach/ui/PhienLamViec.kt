@@ -158,10 +158,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var nutHome by mutableStateOf(false)
     var dnsChanQc by mutableStateOf(false)
     var nutManCho by mutableStateOf(true)
-    /** Màn chờ động (3.5.0): màn chờ đồng hồ của Home sạch trên ảnh nền trôi chậm, đổi ảnh 20 giây (dream_motion). */
+    /** Màn chờ động (3.5.0): đặt làm màn chờ của hệ thống tivi (screensaver_components sang ClockDream). */
     var manChoDong by mutableStateOf(false)
-    /** Đồng hồ động hiện sau bao nhiêu phút để yên ở Home sạch (home_idle_clock_minutes); 0 = chỉ màn chờ của tivi. */
-    var phutManCho by mutableStateOf(10)
     var gonNut by mutableStateOf(true)
     /** Dời khối dock + hàng app lên (âm) / xuống (dương), dp — rows_offset_dp của bản vá launcher (góp ý 24/10/2026). */
     var doiHang by mutableStateOf(0)
@@ -481,7 +479,13 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     fun doiDongHoKhiYen(v: Int) {
         dongHoKhiYen = v
-        if (v > 0) nangCao["home_idle_clock_minutes"] = v.toString() else nangCao.remove("home_idle_clock_minutes")
+        if (v > 0) {
+            nangCao["home_idle_clock_minutes"] = v.toString()
+            nangCao["clock_wallpaper"] = "true"
+            nangCao["dream_motion"] = "true"
+        } else {
+            nangCao.remove("home_idle_clock_minutes")
+        }
     }
 
     fun doiTenDuoiApp(v: Boolean) {
@@ -1209,7 +1213,6 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
         nutManCho = j.optBoolean("dream_button", nutManCho)
         manChoDong = j.optBoolean("dream_motion", false)
-        phutManCho = j.optInt("home_idle_clock_minutes", 10)
         gonNut = j.optBoolean("top_compact", gonNut)
         thoiTietGoc = j.optBoolean("weather_corner", thoiTietGoc)
         thoiTietDongHo = j.optBoolean("weather_clock", thoiTietDongHo)
@@ -1261,7 +1264,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (nutDangPhat) io { tv.choPhepDangPhat() }
         if (dnsChanQc) io { tv.batDnsChanQc(sl) }
         if (nutManCho) io { tv.chuanBiManCho(sl) }
-        io { tv.datManChoDong(manChoDong, sl) }
+        io { tv.datManChoDong(manChoDong && dongHoKhiYen > 0, sl) }
         thuPhimHome(sl)
         zone.vgs.tvsach.Dem.gui(ctx, "home", tenTiviDem(), dock.size, "theme:${themeChon.id}")
         if (ghimMayChieu.isNotEmpty()) zone.vgs.tvsach.Dem.gui(ctx, "may-chieu", tenTiviDem(), ghimMayChieu.size, ghimMayChieu.keys.joinToString(",").take(110))
@@ -1331,7 +1334,17 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // (bản vá CleanTV) đổi tên dòng HDMI1-3 / AV ra số cổng 23-25 / 2 khi input_action là EXTSRC_PLAY (23/10/2026).
         if (trangThai?.caiDat?.contains("com.xiaomi.mitv.tvplayer") == true) put("input_action", "com.xiaomi.mitv.tvplayer.EXTSRC_PLAY")
         put("dream_button", nutManCho)
-        if (manChoDong) { put("dream_motion", true); put("clock_wallpaper", true); if (phutManCho > 0) put("home_idle_clock_minutes", phutManCho) }
+        if (dongHoKhiYen > 0) {
+            put("home_idle_clock_minutes", dongHoKhiYen)
+            put("clock_wallpaper", true)
+            put("dream_motion", true)
+        } else {
+            remove("home_idle_clock_minutes")
+            if (!manChoDong) {
+                remove("clock_wallpaper")
+                remove("dream_motion")
+            }
+        }
         put("top_compact", gonNut)
         put("weather_corner", thoiTietGoc)
         put("weather_clock", thoiTietDongHo)
@@ -1357,7 +1370,6 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (thuVienApp) { put("app_library", true); put("library_button", !thuVienTrongMenu) }
         // Giữ OK trên nút Cài đặt có dòng Thư viện ứng dụng khi nút trên thanh đầu tắt; viên cuối hàng cũng bỏ cho gọn.
         if (thuVienApp && thuVienTrongMenu) put("show_library_pill", false)
-        if (dongHoKhiYen > 0) put("home_idle_clock_minutes", dongHoKhiYen) else remove("home_idle_clock_minutes")
         put("reduced_motion", tiviYeu)
         if (tiviYeu) put("animations", false)
         put("dock_glass", hieuUngKinh)
@@ -1609,7 +1621,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (!dnsChanQc && dangChan) io { tv.tatDnsChanQc(saoLuu) }
         if (nutDangPhat) io { tv.choPhepDangPhat() }
         if (nutManCho) io { tv.chuanBiManCho(saoLuu) }
-        io { tv.datManChoDong(manChoDong, saoLuu) }
+        io { tv.datManChoDong(manChoDong && dongHoKhiYen > 0, saoLuu) }
         thongBao = t("Đang thử nút Home trên tivi…", "Testing the TV's Home button…")
         val sl = saoLuu ?: thongTin?.let { tt -> runCatching { io { tv.damBaoSaoLuu(tt, getprop, ip) } }.getOrNull() }?.also { saoLuu = it }
         thuPhimHome(sl)
