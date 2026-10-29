@@ -22,8 +22,8 @@ android {
         applicationId = "zone.vgs.cleantv.manager"
         minSdk = 26
         targetSdk = 35
-        versionCode = 112
-        versionName = "3.5.18"
+        versionCode = 113
+        versionName = "3.5.19"
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a") }
     }
 
