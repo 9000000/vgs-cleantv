@@ -36303,7 +36303,7 @@ index ea1242b1..330da398 100644
          long b11 = a11;
          int lunarYear;
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 17961443..d6e43cf9 100644
+index 17961443..f2bb9ebf 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -55,6 +55,7 @@ import android.text.style.ForegroundColorSpan;
@@ -36334,7 +36334,7 @@ index 17961443..d6e43cf9 100644
      private TextView shamsiDate;
      /** lunar_date: the lunisolar date under the date line, and the time zone it is computed for. */
      private TextView lunarDate;
-@@ -195,8 +202,44 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -195,8 +202,45 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private TextView raceKicker, raceHeadline, raceSessions;
      /** config.xml show_stats, overridable by a theme. Off: the line is gone and nothing is read. */
      private boolean showStats;
@@ -36351,11 +36351,12 @@ index 17961443..d6e43cf9 100644
 +    private Thread weatherThread;
 +    private long weatherAt;
 +    private static final long WEATHER_MS = 30 * 60 * 1000L;
-+    /** CleanTV/VGS: Today Carousel (Ngày này năm xưa xoay vòng 3 phút một lần, Danh ngôn đổi 2h một lần). */
++    /** CleanTV/VGS: Today Carousel (Xoay vòng tỷ lệ 1:1 giữa Danh ngôn và Ngày này năm xưa, 3 phút một lần). */
 +    private static final long CAROUSEL_INTERVAL_MS = 3 * 60 * 1000L;
 +    private TextView todayCarouselView;
 +    private int carouselStep = 0;
 +    private int historyEventIndex = 0;
++    private int quoteIndex = (int) (System.currentTimeMillis() % QuotesProvider.getCount());
 +    private boolean carouselEnabled = true;
 +    private final Runnable carouselTick = new Runnable() {
 +        @Override
@@ -36381,7 +36382,7 @@ index 17961443..d6e43cf9 100644
      private boolean shamsi;
      /** greeting_name: said after the greeting, which is shown in capitals. */
      private String greetingName = "";
-@@ -377,14 +420,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -377,14 +421,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // The pill follows the network callbacks and each return to Home; only the diya's flame follows the
              // signal level, so only it needs this minute's binder calls (about 7 ms on the UI thread).
              if (festive) updateWifiLabel();
@@ -36397,7 +36398,7 @@ index 17961443..d6e43cf9 100644
      @Override
      protected void onCreate(Bundle savedInstanceState) {
          super.onCreate(savedInstanceState);
-@@ -392,7 +434,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -392,7 +435,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          density = getResources().getDisplayMetrics().density;
          // config.xml, overlaid by config.json from a pushed theme (see Config and tools/theme.sh).
          Config cfg = Config.load(this);
@@ -36405,7 +36406,7 @@ index 17961443..d6e43cf9 100644
          appLibrarySelection = cfg.appLibrarySelection;
          libraryOkOpens = cfg.libraryOkOpens;
          // restore_key_services: after a force stop, put back the remote's accessibility helpers that Android took
-@@ -472,6 +513,17 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -472,6 +514,17 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((TextView) findViewById(R.id.date)).setTextColor(Color.WHITE);
              findViewById(R.id.clockDivider).setBackgroundColor(Color.WHITE);
          }
@@ -36423,7 +36424,7 @@ index 17961443..d6e43cf9 100644
          if (getResources().getBoolean(R.bool.rtl_menu_bar)) {
              // Center Hebrew greetings over the numeric time, independent of a visible AM/PM label. The clock's row
              // is watched too: date_below_clock can move the whole row right under a wider date.
-@@ -497,14 +549,58 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -497,14 +550,58 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          raceHeadline = findViewById(R.id.raceHeadline);
          raceSessions = findViewById(R.id.raceSessions);
          showStats = cfg.showStats;
@@ -36466,7 +36467,7 @@ index 17961443..d6e43cf9 100644
 +            if (showWeather || showWeatherCorner) updateWeatherCard();
 +            if (showToday) {
 +                HistoryProvider.loadToday(items -> {
-+                    if (todayCard != null && carouselStep % 3 != 0) {
++                    if (todayCard != null && carouselStep % 2 != 0) {
 +                        advanceTodayCarousel();
 +                    }
 +                });
@@ -36483,7 +36484,7 @@ index 17961443..d6e43cf9 100644
          if (shamsi) {
              shamsiDate.setVisibility(View.VISIBLE);
              TextView date = findViewById(R.id.date);
-@@ -512,6 +608,22 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -512,6 +609,22 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              lunarDate.setTextSize(11f);
              date.setPadding(0, (int) (4 * density), 0, 0);
          }
@@ -36506,7 +36507,7 @@ index 17961443..d6e43cf9 100644
          vpnApp = cfg.vpnApp;
          vpnPill = cfg.vpnPill && !cfg.topMenu;
          btnVpn = findViewById(R.id.btnVpn);
-@@ -591,6 +703,21 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -591,6 +704,21 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              public void onChildViewDetachedFromWindow(@NonNull View v) {
              }
          });
@@ -36528,7 +36529,7 @@ index 17961443..d6e43cf9 100644
          if (dockRow) grid.addItemDecoration(new DockDecoration(COLUMNS, density, cinematic, cfg.alwaysShowNames, cfg.dockOpacity, cfg.dockGlass, cfg.dockEvenPadding, cfg.dockBand,
                  singleRow, cfg.dockBandAll));
          if (cfg.fadeRows) TopFade.attach(grid, 48 * density);
-@@ -609,6 +736,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -609,6 +737,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // tvOS layout: push the dock row towards the bottom of the screen, leaving room for
          // rows_below_dock grid rows under it; the rest of the grid stays below until you press Down.
          int rowsBelowDock = cfg.rowsBelowDock;
@@ -36540,7 +36541,7 @@ index 17961443..d6e43cf9 100644
          grid.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
              int h = b - t;
              // Item height follows the tile size, which follows the columns and the rows that must fit (AppAdapter.tileWidthPx).
-@@ -629,6 +761,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -629,6 +762,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // A single row never shows the names under its tiles (the title above the row names the app), so the
              // 7dp gap and 22dp label item_app.xml keeps for them would only lift the row: sit it that much lower.
              if (singleRow && !cfg.alwaysShowNames) want += (int) (29 * density);
@@ -36552,7 +36553,7 @@ index 17961443..d6e43cf9 100644
              if (grid.getPaddingTop() != want) {
                  grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
                  // A vertical grid parks the dock on the new padding line by scrolling (onTileFocused); a sideways
-@@ -796,8 +933,42 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -796,8 +934,42 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -36596,7 +36597,7 @@ index 17961443..d6e43cf9 100644
          btnSettings.setOnKeyListener(pillKeys);
          btnReorder.setOnKeyListener(pillKeys);
          btnLibraryTop.setOnKeyListener(pillKeys);
-@@ -943,6 +1114,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -943,6 +1115,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onResume() {
          super.onResume();
@@ -36604,7 +36605,7 @@ index 17961443..d6e43cf9 100644
          // A festival that started or ended while Home was in the background: rebuild with or without it.
          if (festive != festival.active(LocalDate.now())) {
              recreate();
-@@ -986,9 +1158,25 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -986,9 +1159,25 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -36619,7 +36620,7 @@ index 17961443..d6e43cf9 100644
 +            handler.removeCallbacks(carouselTick);
 +            if (showToday) {
 +                HistoryProvider.loadToday(items -> {
-+                    if (todayCard != null && carouselStep % 3 != 0) {
++                    if (todayCard != null && carouselStep % 2 != 0) {
 +                        advanceTodayCarousel();
 +                    }
 +                });
@@ -36631,7 +36632,7 @@ index 17961443..d6e43cf9 100644
          if (festive && diya != null) {
              diya.start();
              LocalDate today = LocalDate.now();
-@@ -1154,6 +1342,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1154,6 +1343,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onPause() {
          super.onPause();
@@ -36639,7 +36640,7 @@ index 17961443..d6e43cf9 100644
          root.removeCallbacks(showIdleClock);
          endReorder();   // Home or another app while reordering keeps the order so far
          wallpaperPlayer.stop();
-@@ -1162,6 +1351,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1162,6 +1352,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          ambient.animate().cancel();
          heroArt.animate().cancel();
          handler.removeCallbacks(minuteTick);
@@ -36647,7 +36648,7 @@ index 17961443..d6e43cf9 100644
          stopStats();
          if (diya != null) diya.stop();
          cancelPendingFocusScroll();
-@@ -1259,8 +1449,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1259,8 +1450,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       */
      @Override
      public boolean dispatchKeyEvent(KeyEvent event) {
@@ -36656,7 +36657,7 @@ index 17961443..d6e43cf9 100644
          if (handleSettingsKey(event)) return true;
          if (tileMenuEnabled && !reordering && openPopup == null && cardPrompt == null
                  && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
-@@ -1696,14 +1884,33 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1696,14 +1885,33 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  if (!animations || reducedMotion) grid.scrollBy(0, dy);
                  else grid.smoothScrollBy(0, dy);
              }
@@ -36694,7 +36695,7 @@ index 17961443..d6e43cf9 100644
          }
      }
  
-@@ -1728,17 +1935,80 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1728,17 +1936,80 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private void showHero(int position, float dockTopInRoot) {
          String label = adapter.labelAt(position);
          int color = adapter.ambientColorAt(position);
@@ -36777,7 +36778,7 @@ index 17961443..d6e43cf9 100644
              hero.setTranslationX(0f);
              hero.setAlpha(1f);
              if (ambientGlow) {
-@@ -1754,7 +2024,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1754,7 +2025,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              hero.animate().cancel();
              ambient.animate().cancel();
              fillHero(position, label);
@@ -36786,7 +36787,7 @@ index 17961443..d6e43cf9 100644
              hero.setTranslationX(0f);
              hero.animate().alpha(1f).setDuration(260).start();
              if (ambientGlow) {
-@@ -1766,7 +2036,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1766,7 +2037,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              if (advancedEffects) hero.animate().cancel();
              hero.animate().alpha(0f).translationX(-12 * density).setDuration(120).withEndAction(() -> {
                  fillHero(position, label);
@@ -36795,7 +36796,7 @@ index 17961443..d6e43cf9 100644
                  hero.setTranslationX(12 * density);
                  hero.animate().alpha(1f).translationX(0f).setDuration(200).start();
              }).start();
-@@ -1779,13 +2049,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1779,13 +2050,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  }).start();
              }
          } else {
@@ -36810,7 +36811,7 @@ index 17961443..d6e43cf9 100644
          }
      }
  
-@@ -2010,6 +2274,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2010,6 +2275,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          heroArt.animate().cancel();
          heroArt.setAlpha(0f);
          heroShown = false;
@@ -36820,7 +36821,7 @@ index 17961443..d6e43cf9 100644
          if (!ambientGlow) return;
          if (!animations || reducedMotion) {
              setAmbient(color);
-@@ -2053,6 +2320,256 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2053,6 +2321,255 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -37027,9 +37028,8 @@ index 17961443..d6e43cf9 100644
 +    private void advanceTodayCarousel() {
 +        if (!showToday || todayCard == null) return;
 +
-+        // CleanTV/VGS: Ngày này năm xưa xoay vòng 3 phút một lần, Danh ngôn đổi 2h một lần.
-+        // Tỷ lệ: 1 lần Danh ngôn (3 phút) -> 2 lần Sự kiện Lịch sử mới (3 phút/lần)
-+        boolean isQuote = (carouselStep % 3 == 0);
++        // CleanTV/VGS: Tỷ lệ 1 : 1 (1 lần Danh ngôn 3 phút -> 1 lần Ngày này năm xưa 3 phút).
++        boolean isQuote = (carouselStep % 2 == 0);
 +        carouselStep++;
 +
 +        final String label;
@@ -37037,7 +37037,7 @@ index 17961443..d6e43cf9 100644
 +        final String meta;
 +
 +        if (isQuote) {
-+            QuotesProvider.QuoteItem q = QuotesProvider.getTwoHourQuote(0);
++            QuotesProvider.QuoteItem q = QuotesProvider.getNextQuote(quoteIndex++);
 +            label = "CÂU NÓI HAY";
 +            text = (q.text.startsWith("“") ? q.text : "“" + q.text + "”");
 +            meta = (q.author != null && !q.author.isEmpty() ? "— " + q.author : "");
@@ -37054,7 +37054,7 @@ index 17961443..d6e43cf9 100644
 +                text = hi.text;
 +                meta = "";
 +            } else {
-+                QuotesProvider.QuoteItem q = QuotesProvider.getTwoHourQuote(0);
++                QuotesProvider.QuoteItem q = QuotesProvider.getNextQuote(quoteIndex++);
 +                label = "CÂU NÓI HAY";
 +                text = (q.text.startsWith("“") ? q.text : "“" + q.text + "”");
 +                meta = (q.author != null && !q.author.isEmpty() ? "— " + q.author : "");
