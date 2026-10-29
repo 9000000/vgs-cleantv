@@ -832,6 +832,14 @@
     "moTaVi": "Khối hiển thị câu nói hay và sự kiện Ngày này năm xưa từ Wikipedia tiếng Việt (mặc định bật)."
   },
   {
+    "khoa": "weather_clock",
+    "ten": "Thời tiết cạnh đồng hồ",
+    "moTa": "Show compact weather line under date and clock. True by default",
+    "kieu": "bool",
+    "tenVi": "Thời tiết cạnh đồng hồ",
+    "moTaVi": "Hiện dòng thời tiết nhỏ dưới ngày và đồng hồ (mặc định bật). Tắt đi nếu đã bật khối thời tiết lớn hoặc thời tiết góc để tránh trùng lặp."
+  },
+  {
     "khoa": "show_weather",
     "kieu": "bool",
     "moTa": "Show the middle weather card with 4-day forecast and air quality. True by default",

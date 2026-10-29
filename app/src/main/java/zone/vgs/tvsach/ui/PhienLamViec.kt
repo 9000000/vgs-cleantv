@@ -355,6 +355,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var lamToiNen by mutableStateOf(0)
     var hienThongSo by mutableStateOf(false)
     var thoiTietGoc by mutableStateOf(false)
+    var thoiTietDongHo by mutableStateOf(true)
     var hienSuKien by mutableStateOf(true)
     var hienHomNay by mutableStateOf(true)
     var hienThoiTiet by mutableStateOf(true)
@@ -410,6 +411,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         toMauOApp = (nangCao["icon_tile_color"] ?: th.cauHinh["icon_tile_color"]?.toString())?.toBooleanStrictOrNull() ?: true
         daiNenDock = (nangCao["dock_band"] ?: th.cauHinh["dock_band"]?.toString())?.toBooleanStrictOrNull() ?: false
         thoiTietGoc = (nangCao["weather_corner"] ?: th.cauHinh["weather_corner"]?.toString())?.toBooleanStrictOrNull() ?: false
+        thoiTietDongHo = (nangCao["weather_clock"] ?: th.cauHinh["weather_clock"]?.toString())?.toBooleanStrictOrNull() ?: true
         hienSuKien = (nangCao["show_events"] ?: th.cauHinh["show_events"]?.toString())?.toBooleanStrictOrNull() ?: true
         hienHomNay = (nangCao["show_today"] ?: th.cauHinh["show_today"]?.toString())?.toBooleanStrictOrNull() ?: true
         hienThoiTiet = (nangCao["show_weather"] ?: th.cauHinh["show_weather"]?.toString())?.toBooleanStrictOrNull() ?: true
@@ -1210,6 +1212,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         phutManCho = j.optInt("home_idle_clock_minutes", 10)
         gonNut = j.optBoolean("top_compact", gonNut)
         thoiTietGoc = j.optBoolean("weather_corner", thoiTietGoc)
+        thoiTietDongHo = j.optBoolean("weather_clock", thoiTietDongHo)
         hienSuKien = j.optBoolean("show_events", hienSuKien)
         hienHomNay = j.optBoolean("show_today", hienHomNay)
         hienThoiTiet = j.optBoolean("show_weather", hienThoiTiet)
@@ -1331,6 +1334,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (manChoDong) { put("dream_motion", true); put("clock_wallpaper", true); if (phutManCho > 0) put("home_idle_clock_minutes", phutManCho) }
         put("top_compact", gonNut)
         put("weather_corner", thoiTietGoc)
+        put("weather_clock", thoiTietDongHo)
         put("show_events", hienSuKien)
         if (!hienSuKien) put("countdown_events", false)
         put("show_today", hienHomNay)

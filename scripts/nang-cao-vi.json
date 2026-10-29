@@ -478,5 +478,9 @@
  "settings_fallback_components": {
   "ten": "Màn hình Cài đặt dự phòng của hãng",
   "moTa": "Danh sách component của hãng thử theo thứ tự khi không tìm thấy màn Cài đặt chuẩn của Android TV (dùng cho tivi chuyên dụng)."
+ },
+ "weather_clock": {
+  "ten": "Thời tiết cạnh đồng hồ",
+  "moTa": "Hiện dòng thời tiết nhỏ dưới ngày và đồng hồ (mặc định bật). Tắt đi nếu đã bật khối thời tiết lớn hoặc thời tiết góc để tránh trùng lặp."
  }
 }
