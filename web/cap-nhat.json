@@ -1,25 +1,25 @@
 {
  "app": {
-  "versionCode": 109,
-  "versionName": "3.5.16",
-  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-3.5.16.apk",
-  "co": 12271369,
-  "ghiChu": "Xiaomi: Luôn mở Home sạch chắc hơn",
-  "ghiChuEn": "Xiaomi: more reliable Always open Home",
-  "ngay": "2026-10-28"
+  "versionCode": 110,
+  "versionName": "4.0",
+  "apk": "https://cleantv-dem.vgszone.workers.dev/apk/CleanTV-4.0.apk",
+  "co": 12440477,
+  "ghiChu": "Home sạch theo bản mới nhất: giữ nút để mở app, đồng hồ 12/24 giờ, chờ mạng khi bật tivi",
+  "ghiChuEn": "Latest Home: hold a button to open an app, 12/24-hour clock, wait for network at power-on",
+  "ngay": "2026-10-31"
  },
  "duLieu": {
   "du-lieu.json": {
-   "phienBan": "737ecd8e55b27b1c",
+   "phienBan": "e34b29c0bf18eff6",
    "url": "/ota/du-lieu.json",
-   "co": 2003864,
-   "tuBan": 109
+   "co": 2280052,
+   "tuBan": 110
   },
   "tvhome.apk": {
-   "phienBan": "2815fdd681c68573",
+   "phienBan": "e65ad1fc7faa8840",
    "url": "/ota/tvhome.apk",
-   "co": 664569,
-   "tuBan": 109
+   "co": 705573,
+   "tuBan": 110
   }
  }
 }

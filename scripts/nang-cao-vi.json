@@ -366,5 +366,33 @@
  "inputs_connected_only": {
   "ten": "Chỉ hiện cổng đang cắm thiết bị",
   "moTa": "Bảng chọn nguồn (HDMI, AV) chỉ hiện cổng có thiết bị đang cắm, các cổng trống gom vào \"Thêm cổng vào\"."
+ },
+ "library_excluded_apps": {
+  "ten": "Không gợi ý trong Thư viện app",
+  "moTa": "Các app này không bao giờ hiện trong Thư viện app, kể cả khi bật Thư viện app. Khác với Ẩn app khỏi Home (chỉ bỏ khỏi Home, vẫn còn trong thư viện). Ghi tên gói, cách nhau bằng dấu phẩy."
+ },
+ "open_on_start_network_wait": {
+  "ten": "Chờ mạng trước khi mở app khi bật tivi",
+  "moTa": "Số giây (0–600) chờ có mạng rồi mới mở app tự mở khi bật tivi hoặc Live TV. Mất điện xong Wi-Fi có khi vài phút mới lên, mở app sớm sẽ báo lỗi. Trong lúc chờ vẫn ở Home, rời Home thì huỷ. 0 (mặc định) là mở ngay."
+ },
+ "icon_only_vpn": {
+  "ten": "Nút VPN chỉ có biểu tượng",
+  "moTa": "Khi bật nút VPN: hiện thành nút tròn chỉ có ổ khoá như các nút biểu tượng khác (khoá mở khi chưa có VPN, khoá đóng viền xanh khi đang bật). Mặc định tắt."
+ },
+ "game_day": {
+  "ten": "Lịch thi đấu thể thao (add-on)",
+  "moTa": "Tên gói add-on cung cấp lịch trận đấu (như Game Day) để hiện trận sắp tới dưới đồng hồ, xen với lịch F1. Launcher chỉ đọc, không dùng mạng. Để trống là tắt."
+ },
+ "seasonal_skin": {
+  "ten": "Giao diện theo mùa",
+  "moTa": "Tên giao diện lễ hội (ví dụ halloween), chỉ dùng khi chưa đặt Lễ hội. Hạn lễ hội, lời chào và màu nhấn áp dụng như với Lễ hội."
+ },
+ "clock_format": {
+  "ten": "Kiểu đồng hồ",
+  "moTa": "12 hoặc 24 giờ cho đồng hồ trên Home và màn hình chờ đồng hồ, bất kể cài đặt tivi. system (mặc định) theo tivi."
+ },
+ "back_opens_clock": {
+  "ten": "Nút Back ở Home mở đồng hồ",
+  "moTa": "Bấm Back khi đang ở Home thì mở màn hình chờ đồng hồ thay vì không làm gì. Back trong app và Cài đặt vẫn như cũ; bấm phím bất kỳ để về Home. Mặc định tắt."
  }
 }

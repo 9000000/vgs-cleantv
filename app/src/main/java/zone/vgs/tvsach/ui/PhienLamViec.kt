@@ -68,7 +68,9 @@ val KENH_VTV = listOf(
 )
 private const val GOI_KENH = "vgs.kenh."
 
-private const val PHIM_TCL_CHUNG = """{"app_keys":["4062:com.netflix.ninja","4065:com.google.android.youtube.tv","4099:com.amazon.amazonvideo.livingroom"],"settings_key_keycodes":[83,4077]}"""
+/** Keycode lên/xuống/trái/phải, OK, Enter, Enter số, Back: không cho gán app (khớp RemoteKeys.navigationKey). */
+private val PHIM_DIEU_HUONG = setOf(19, 20, 21, 22, 23, 66, 160, 4)
+private const val PHIM_TCL_CHUNG ="""{"app_keys":["4062:com.netflix.ninja","4065:com.google.android.youtube.tv","4099:com.amazon.amazonvideo.livingroom"],"settings_key_keycodes":[83,4077]}"""
 
 /**
  * Mẫu mà phím remote mặc định TẮT: TCL G09 Android 12 — bật dịch vụ lọc phím là giữ nút âm lượng chỉ nhảy một nấc
@@ -194,6 +196,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var chuTrang by mutableStateOf(false)
     /** Màu chữ đồng hồ / ngày / thời tiết "#RRGGBB" (header_color), null là mặc định. */
     var mauChu by mutableStateOf<String?>(null)
+    /** Khung mờ sau đồng hồ, ngày, thời tiết (header_panel của bản vá), góp ý nhathoang5795 30/10/2026. */
+    var khungDau by mutableStateOf(false)
     /** Bật tivi luôn về Home sạch (power_on_home_always của launcher, cần HomeKeyService). 3.0.0, góp ý caibangddd, huyenson91. */
     var luonVeHome by mutableStateOf(false)
     /** Nút hẹn giờ tắt tivi trên Home sạch (sleep_timer_button, cần HomeKeyService). 3.2.0, góp ý duongghoangg1103. */
@@ -212,6 +216,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             io { tv.batBatPhimHome() }
             val p = io { tv.docPhimRemote(20) } ?: error(t("Không bắt được nút nào. Bấm lại nút trên remote ngay sau khi bấm Dò (remote phải đang điều khiển tivi này).",
                 "No button was caught. Press the remote button right after tapping Detect (the remote must control this TV)."))
+            // OK, mũi tên, Back không gán được: gán OK cho CH Play là kẹt luôn tivi (ngocdaikimoanh 31/10). Launcher cũng bỏ qua.
+            if (p.first in PHIM_DIEU_HUONG) error(t("Nút OK, mũi tên và Back dùng để điều khiển tivi nên không gán cho app được. Bấm Dò rồi chọn nút khác.",
+                "OK, the arrows and Back drive the TV, so they can't open an app. Tap Detect and pick another button."))
             phimVuaDo = p
         } finally { dangDoPhim = false }
     }
@@ -509,7 +516,24 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (dangCapNhat) return
         dangCapNhat = true
         viewModelScope.launch {
-            try { io { zone.vgs.tvsach.CapNhat.taiVaCai(ctx, b) } }
+            try {
+                // Tivi hay giấu mục "cài app không rõ nguồn" (29/10/2026): đang có ADB vào chính tivi thì tự cho phép,
+                // không thì mở mục đó; tivi không có mục ấy thì nói rõ chỗ bật thay vì hộp cài im lặng không chạy.
+                if (android.os.Build.VERSION.SDK_INT >= 26 && !ctx.packageManager.canRequestPackageInstalls()) {
+                    if (zone.vgs.tvsach.ManHinh.laTv && thongTin != null) runCatching { io { tv.choPhepCaiApp(ctx.packageName) } }
+                    if (!ctx.packageManager.canRequestPackageInstalls()) {
+                        val moDuoc = runCatching {
+                            ctx.startActivity(android.content.Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, android.net.Uri.parse("package:" + ctx.packageName))
+                                .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+                        }.isSuccess
+                        loi = if (moDuoc) t("Cho phép CleanTV cài ứng dụng, rồi quay lại bấm Cập nhật.", "Allow CleanTV to install apps, then come back and press Update.")
+                        else t("Tivi chưa cho CleanTV cài bản mới. Vào Cài đặt → Ứng dụng → CleanTV (hoặc Bảo mật → Nguồn không xác định), bật cho phép cài, rồi bấm Cập nhật lại.",
+                            "The TV doesn't let CleanTV install the update yet. Go to Settings → Apps → CleanTV (or Security → Unknown sources), allow installs, then press Update again.")
+                        return@launch
+                    }
+                }
+                io { zone.vgs.tvsach.CapNhat.taiVaCai(ctx, b) }
+            }
             catch (e: Throwable) { loi = t("Tải bản mới không được: ${e.message}", "Could not download the update: ${e.message}") }
             finally { dangCapNhat = false }
         }
@@ -850,7 +874,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             .put("danhGia", dsDanhGia).put("ghiChu", dsGhiChu.trim()).put("lienHe", dsLienHe.trim())
             .put("goi", org.json.JSONArray(tt.daTat.sorted()))
             .put("giu", org.json.JSONArray((ketQua?.boQua ?: emptyList()).map { it.first }))
-        du.put("chanDoan", (io { tv.chanDoanHome(goiHome) } + "\n# phim-home " + phimHomeGhi).take(3000))
+        // Gửi từ app chạy trên tivi (29/10/2026): đánh dấu để biết không có điện thoại nào trong cuộc.
+        val tuTv = if (zone.vgs.tvsach.ManHinh.laTv) "# app-tren-tivi\n" else ""
+        du.put("chanDoan", (tuTv + io { tv.chanDoanHome(goiHome) } + "\n# phim-home " + phimHomeGhi).take(3000))
         val ok = io { zone.vgs.tvsach.Dem.guiDanhSach(ctx, du) }
         if (!ok) error(t("Chưa gửi được (mạng?). Thử lại sau nhé.", "Couldn't send (network?). Try again later."))
         dsDaGui = true
@@ -873,7 +899,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var henTatLuc by mutableStateOf<Long?>(null)
     var appTuCai by mutableStateOf<Set<String>>(emptySet())
     var hoiGo by mutableStateOf<String?>(null)
-    val appTrenTv: List<String> get() = trangThai?.let { tt -> tt.coBieuTuong.filter { it in tt.caiDat && it !in tt.daTat && it !in zone.vgs.tvsach.adb.ThaoTacTv.HOME_SACH } }
+    val appTrenTv: List<String> get() = trangThai?.let { tt -> tt.coBieuTuong.filter { it in tt.caiDat && it !in tt.daTat && it !in zone.vgs.tvsach.adb.ThaoTacTv.HOME_SACH &&
+        !(zone.vgs.tvsach.ManHinh.laTv && it == ctx.packageName) } }
         ?.sortedWith(compareBy({ it !in appTuCai }, { zone.vgs.tvsach.dulieu.tenDep(it).lowercase() })) ?: emptyList()
 
     fun moRemote() = chay(t("Đang mở remote…", "Opening the remote…")) {
@@ -933,6 +960,10 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     fun caiApkLenTv(uri: android.net.Uri) = chay(t("Đang gửi APK sang tivi…", "Sending the APK to the TV…")) {
         val du = io { ctx.contentResolver.openInputStream(uri)?.use { it.readBytes() } } ?: error(t("Không đọc được file.", "Couldn't read the file."))
+        caiApkByte(du)
+    }
+
+    private suspend fun caiApkByte(du: ByteArray) {
         if (du.size < 4 || du[0] != 'P'.code.toByte() || du[1] != 'K'.code.toByte()) error(t("File này không phải APK.", "This isn't an APK file."))
         val ra = io { tv.caiApkTuDienThoai(du) }
         if (!ra.contains("Success")) error(t("Tivi không cài được: $ra", "The TV couldn't install it: $ra"))
@@ -1019,6 +1050,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         chuTrang = !cuaTheme("header_white") && j.optBoolean("header_white", false)
         if (j.optInt("vgs_bo_rieng", 0) > 1) phutDoiAnh = j.optInt("wallpaper_rotation_minutes", 15)
         mauChu = j.optString("header_color").takeIf { Regex("#[0-9A-Fa-f]{6}").matches(it) }
+        khungDau = j.optBoolean("header_panel", false)
         // Chỉ nạp số cột do người dùng chọn ở đây (vgs_so_cot), không lấy columns của theme.
         soCot = if (j.optBoolean("vgs_so_cot", false)) j.optInt("columns", 0) else 0
         if (j.has("handle_view_inputs")) nutInput = j.optBoolean("handle_view_inputs", nutInput)
@@ -1057,6 +1089,15 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     fun doiDock(p: String) {
         if (p in dock) dock.remove(p) else if (dock.size < DOCK_TOI_DA) dock.add(p)
+    }
+
+    // Ẩn khỏi Home ngay ở danh sách app (góp ý khangnck.005 29/10/2026): ghi thẳng vào hidden_apps của Nâng cao.
+    private fun dsAn() = nangCao["hidden_apps"].orEmpty().split(',', '\n').map { it.trim() }.filter { it.isNotEmpty() }
+    fun daAn(p: String) = p in dsAn()
+    fun doiAn(p: String) {
+        val ds = dsAn().toMutableList()
+        if (!ds.remove(p)) { ds.add(p); dock.remove(p) }
+        if (ds.isEmpty()) nangCao.remove("hidden_apps") else nangCao["hidden_apps"] = ds.joinToString(", ")
     }
 
     fun caiHomeSach() = chay(t("Đang cài Home sạch…", "Installing the clean Home…")) {
@@ -1154,7 +1195,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // ngày sóc (Formovie L206, 22/10/2026: 12/9 thay vì 13/9). Ghi múi giờ của điện thoại khi là +7 / +8.
         if (amLich) (java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 3_600_000).takeIf { it == 7 || it == 8 }?.let { put("lunar_utc_offset", it) }
         // Launcher 2.6: nút Input trên remote (VIEW_INPUTS) mở bảng chọn nguồn của Home sạch — đi cùng công tắc nút Input.
-        if (nutInput) put("handle_view_inputs", true)
+        // Ghi cả khi tắt: thiếu khoá thì lần kết nối sau công tắc lấy lại mặc định "bật" của Google TV (ngocnd156 29/10/2026).
+        put("handle_view_inputs", nutInput)
         if (tenDuoiApp) put("always_show_names", true)
         if (!tenToTrenDock) put("dock_title", false)
         if (!toMauOApp) put("icon_tile_color", false)
@@ -1185,6 +1227,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (nutHenTat) put("sleep_timer_button", true)
         if (chuTrang) put("header_white", true)
         mauChu?.let { put("header_color", it) }
+        if (khungDau) put("header_panel", true)
         if (soCot > 0) { put("columns", soCot); put("vgs_so_cot", true) }
         // Phím APPS (KEYCODE_ALL_APPS) chỉ là nút Home với que / tivi Xiaomi hoặc khi bật "Remote gửi phím Home lạ";
         // tivi khác (Sony VH2: nút Apps mở Home sạch như Back, abc999roses 24/10/2026) để phím cho tivi.
@@ -1234,12 +1277,19 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     /** Ghi mọi lựa chọn Home sạch (config.json + theme, nút Home, DNS, ảnh nền riêng) ra một file JSON người dùng chọn chỗ lưu. */
     fun xuatCauHinh(uri: android.net.Uri) = chay(t("Đang lưu file cấu hình…", "Saving the settings file…")) {
+        val du = taoFileCauHinh()
+        io { ctx.contentResolver.openOutputStream(uri, "wt")?.use { it.write(du) } ?: error("không mở được file") }
+        cauHinhBao = t("Đã lưu file cấu hình.", "Settings file saved.")
+    }
+
+    val tenFileCauHinh get() = "cleantv-" + (thongTin?.model ?: "tivi").replace(Regex("[^A-Za-z0-9]+"), "-") + ".json"
+
+    private fun taoFileCauHinh(): ByteArray {
         val j = JSONObject(cauHinhHome())
         j.put("vgs_file", 1).put("vgs_theme", themeChon.id).put("vgs_nut_home", nutHome).put("vgs_dns", dnsChanQc)
         thongTin?.let { j.put("vgs_tivi", it.tenHienThi) }
         anhNenRieng?.let { j.put("vgs_anh_nen", android.util.Base64.encodeToString(it, android.util.Base64.NO_WRAP)) }
-        io { ctx.contentResolver.openOutputStream(uri, "wt")?.use { it.write(j.toString(1).toByteArray()) } ?: error("không mở được file") }
-        cauHinhBao = t("Đã lưu file cấu hình.", "Settings file saved.")
+        return j.toString(1).toByteArray()
     }
 
     /**
@@ -1281,15 +1331,53 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     /** Lưu kịch bản khôi phục cho máy tính (dulieu/KichBanKhoiPhuc) từ bản sao lưu của tivi đang mở. */
     fun xuatKichBan(uri: android.net.Uri) = chay(t("Đang lưu kịch bản khôi phục…", "Saving the restore script…")) {
-        val sl = saoLuu ?: error(t("Chưa có bản sao lưu của tivi này.", "No backup for this TV yet."))
-        val chu = zone.vgs.tvsach.dulieu.KichBanKhoiPhuc.tao(sl, zone.vgs.tvsach.NgonNgu.tiengViet)
+        val chu = kichBan()
         io { ctx.contentResolver.openOutputStream(uri, "wt")?.use { it.write(chu.toByteArray()) } ?: error("không mở được file") }
         cauHinhBao = t("Đã lưu kịch bản khôi phục.", "Restore script saved.")
+    }
+
+    private fun kichBan(): String = zone.vgs.tvsach.dulieu.KichBanKhoiPhuc.tao(
+        saoLuu ?: error(t("Chưa có bản sao lưu của tivi này.", "No backup for this TV yet.")), zone.vgs.tvsach.NgonNgu.tiengViet)
+
+    val tenFileKichBan get() = "cleantv-khoi-phuc-" + (saoLuu?.ten ?: "tivi").lowercase().replace(Regex("[^a-z0-9]+"), "-").trim('-').take(30) + ".bat"
+
+    // ---------- File ngay trên tivi (CleanTV chạy trên tivi, 29/10/2026) ----------
+    // Android TV thường không có trình chọn file (hộp Lưu / Mở báo "không hỗ trợ" hay không có gì): lưu thẳng vào
+    // Download của tivi, mở file từ Download / USB qua ADB như ảnh nền.
+
+    /** Hộp chọn file trên tivi: loại ("json" hoặc "apk") + đường dẫn; null = đóng. */
+    var fileTrenTv by mutableStateOf<Pair<String, List<String>>?>(null)
+
+    fun moFileTrenTv(loai: String) = chay(t("Đang tìm file trên tivi…", "Looking for files on the TV…")) {
+        fileTrenTv = loai to io { tv.timFileTrenTv(listOf(loai)) }
+    }
+
+    fun chonFileTrenTv(duongDan: String) = chay(t("Đang đọc file từ tivi…", "Reading the file from the TV…")) {
+        val loai = fileTrenTv?.first
+        fileTrenTv = null
+        val du = io { tv.docFileTv(duongDan) } ?: error(t("Không đọc được file này (quá 25 MB hoặc hỏng).", "Couldn't read this file (over 25 MB or broken)."))
+        if (loai == "apk") caiApkByte(du) else napFileCauHinh(du.toString(Charsets.UTF_8))
+    }
+
+    fun xuatCauHinhTv() = chay(t("Đang lưu file cấu hình…", "Saving the settings file…")) {
+        val du = taoFileCauHinh()
+        val p = io { tv.ghiVaoDownload(tenFileCauHinh, du) }
+        cauHinhBao = t("Đã lưu vào $p (thư mục Download của tivi).", "Saved to $p (the TV's Download folder).")
+    }
+
+    fun xuatKichBanTv() = chay(t("Đang lưu kịch bản khôi phục…", "Saving the restore script…")) {
+        val chu = kichBan()
+        val p = io { tv.ghiVaoDownload(tenFileKichBan, chu.toByteArray()) }
+        cauHinhBao = t("Đã lưu vào $p. Chép file này sang USB để chạy trên máy tính.", "Saved to $p. Copy it to a USB stick to run it on a computer.")
     }
 
     /** Mở file cấu hình đã lưu: điền lại mọi lựa chọn, bấm Áp dụng mới đưa lên tivi. */
     fun nhapCauHinh(uri: android.net.Uri) = chay(t("Đang mở file cấu hình…", "Opening the settings file…")) {
         val chu = io { ctx.contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) } } ?: error(t("Không đọc được file.", "Couldn't read the file."))
+        napFileCauHinh(chu)
+    }
+
+    private fun napFileCauHinh(chu: String) {
         val j = runCatching { JSONObject(chu) }.getOrNull()?.takeIf { it.has("vgs_file") || it.has("dock_apps") }
             ?: error(t("File này không phải file cấu hình CleanTV.", "This isn't a CleanTV settings file."))
         napTuJson(j)
@@ -1352,11 +1440,14 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         anhTrenTv = null
         val du = io { tv.docFileTv(duongDan) } ?: error(t("Không đọc được ảnh này (quá lớn hoặc hỏng), thử ảnh khác.", "Couldn't read this picture (too big or broken), try another one."))
         nguonAnh = du
+        // Ảnh dọc thì bật sẵn vừa khung; muốn phủ kín thì tắt công tắc (30/10/2026).
+        if (zone.vgs.tvsach.dulieu.AnhNen.laAnhDocByte(du)) anhVuaKhung = true
         anhNenRieng = io { zone.vgs.tvsach.dulieu.AnhNen.chuanBiByte(du, anhVuaKhung) } ?: error(t("Không mở được ảnh này (HEIC thì đổi sang JPG), thử ảnh khác.", "Couldn't open this picture (convert HEIC to JPG), try another one."))
     }
 
     fun chonAnhNen(uri: android.net.Uri) = chay(t("Đang chuẩn bị ảnh…", "Preparing the picture…")) {
         nguonAnh = uri
+        if (io { zone.vgs.tvsach.dulieu.AnhNen.laAnhDoc(ctx, uri) }) anhVuaKhung = true
         anhNenRieng = io { zone.vgs.tvsach.dulieu.AnhNen.chuanBi(ctx, uri, anhVuaKhung) } ?: error(t("Không đọc được ảnh này, thử ảnh khác.", "Couldn't read this picture, try another one."))
     }
 
@@ -1382,6 +1473,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val bo = boAnhTheme()
         if (bo != null) thongBao = t("Đang gửi ${bo.size} ảnh nền…", "Sending ${bo.size} wallpaper pictures…")
         io { tv.dayCauHinh(json, anh, bo) }
+        io { tv.datNutInput(nutInput) }
         if (dungPhimRemote || (moKhiBat && moKhiThuc) || luonVeHome || phimGan.isNotEmpty() || nutHenTat) io { tv.batBatPhimHome() }
         // Đổi giao diện cũng bật / tắt DNS AdGuard theo công tắc (trước 2.7.3 chỉ lúc cài Home sạch mới đặt).
         val dangChan = io { tv.dnsDangChan() }

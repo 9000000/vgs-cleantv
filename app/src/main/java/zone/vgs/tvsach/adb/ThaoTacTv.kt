@@ -638,6 +638,23 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             "\\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' -o -iname '*.heic' \\) 2>/dev/null; done | head -n 200"
     ).lines().map { it.trim() }.filter { it.startsWith("/") && !it.contains('\'') }
 
+    /** File có đuôi [duoi] trong Download và USB của tivi (CleanTV chạy trên tivi, 29/10/2026: không có trình chọn file). */
+    fun timFileTrenTv(duoi: List<String>): List<String> = sh(
+        "for d in /sdcard/Download /storage/*-*; do [ -d \"\$d\" ] && find \"\$d\" -maxdepth 4 -type f \\( " +
+            duoi.joinToString(" -o ") { "-iname '*.$it'" } + " \\) 2>/dev/null; done | head -n 200"
+    ).lines().map { it.trim() }.filter { it.startsWith("/") && !it.contains('\'') }
+
+    /** Ghi file vào Download của tivi, trả đường dẫn (thay hộp "Lưu" khi CleanTV chạy trên tivi). */
+    fun ghiVaoDownload(ten: String, du: ByteArray): String {
+        val p = "/sdcard/Download/" + ten.replace(Regex("[^A-Za-z0-9._-]+"), "-")
+        sh("mkdir -p /sdcard/Download")
+        adb.ghiFile(p, du)
+        return p
+    }
+
+    /** Cho CleanTV quyền cài bản cập nhật của chính nó (appops qua ADB; tivi thường giấu mục "nguồn không rõ"). */
+    fun choPhepCaiApp(goi: String) { sh("appops set $goi REQUEST_INSTALL_PACKAGES allow") }
+
     /** Đọc một file trên tivi (qua base64); quá 25 MB hoặc lỗi thì null. */
     fun docFileTv(duongDan: String): ByteArray? = runCatching {
         if (duongDan.contains('\'')) return null
@@ -946,6 +963,17 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
 
     /** Bật HomeKeyService cho phím remote của mẫu (nút app, Cài đặt). Bo CVTE: không (upstream #741). */
     fun batBatPhimHome() { if (!laBoMachCvte()) batDichVu("HomeKeyService") }
+
+    /**
+     * Công tắc nút Input khi Áp dụng (góp ý ngocnd156, Sony KD-43X75K 29/10/2026): InputKeyService luôn bắt phím TV,
+     * nên tắt công tắc mà không tắt dịch vụ thì phím TV vẫn mở bảng chọn nguồn. Nút app remote vẫn có HomeKeyService.
+     */
+    fun datNutInput(bat: Boolean) {
+        if (bat) { if (!laBoMachCvte()) batDichVu("InputKeyService"); return }
+        sh("s=\$(settings get secure enabled_accessibility_services); case \"\$s\" in *$pkgHome/*InputKeyService*) " +
+            "n=\$(echo \"\$s\" | sed -E 's#(^|:)$pkgHome/[^:]*InputKeyService(:|\$)#\\1\\2#; s#::#:#; s#^:##; s#:\$##'); " +
+            "settings put secure enabled_accessibility_services \"\$n\" ;; esac")
+    }
 
     fun ganChuyenHomeCu(pkg: String): Boolean {
         if (!TEN_GOI.matches(pkg)) return false

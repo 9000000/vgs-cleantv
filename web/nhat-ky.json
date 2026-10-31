@@ -1,5 +1,27 @@
 [
  {
+  "ban": "4.0",
+  "ngay": "2026-10-31",
+  "vi": [
+   "- Home sạch lên bản mới nhất của Clean Your TV: giữ lâu nút riêng của hãng trên remote để mở một app khác, đồng hồ 12 hoặc 24 giờ, bấm Back ở Home mở màn hình đồng hồ, giao diện Halloween",
+   "- Bật tivi xong tự mở app: có thể chờ có mạng rồi mới mở (sau mất điện Wi-Fi lên chậm, app khỏi báo lỗi). Mục Nâng cao có thêm 7 tuỳ chọn",
+   "- Sau màn hình chờ (chế độ Môi trường xung quanh), tivi không còn quay về giao diện Google TV cũ khi đã bật Luôn mở Home sạch",
+   "- Nút OK, mũi tên, Back không gán mở app được nữa (gán nhầm OK là kẹt tivi)",
+   "- Ảnh nền dọc: công tắc vừa khung tắt được để ảnh phủ kín màn; thêm khung mờ sau đồng hồ cho ảnh nền sáng",
+   "- Ẩn app khỏi Home ngay trong danh sách app; công tắc nút Input tắt rồi thì giữ tắt",
+   "- CleanTV chạy trên tivi: lưu/mở file cấu hình, kịch bản khôi phục và APK ngay trong Download hoặc USB của tivi; tự xin quyền cài bản cập nhật"
+  ],
+  "en": [
+   "- Home updated to the latest Clean Your TV: hold a vendor remote button to open another app, 12/24-hour clock, Back on Home opens the clock screen, Halloween skin",
+   "- Open-on-start app can wait for the network first (after a power cut Wi-Fi comes back slowly). Advanced has 7 new options",
+   "- After the screensaver (Ambient mode) the TV no longer falls back to the old Google TV home when Always open Home is on",
+   "- OK, arrows and Back can no longer be mapped to open an app (mapping OK locked the TV)",
+   "- Portrait wallpapers: fit-to-screen can be turned off to fill the screen; optional soft panel behind the clock for bright wallpapers",
+   "- Hide an app from Home right from the app list; the Input button switch stays off once turned off",
+   "- CleanTV on the TV itself: save/open settings files, the restore script and APKs in the TV's Download folder or USB; asks for permission to install its own updates"
+  ]
+ },
+ {
   "ban": "3.5.16",
   "ngay": "2026-10-28",
   "vi": [
