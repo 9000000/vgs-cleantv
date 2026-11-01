@@ -1,0 +1,604 @@
+package com.nuvio.tv.ui.screens.home
+
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.Outline
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.LayerDrawable
+import android.os.Build
+import android.text.TextUtils
+import android.util.TypedValue
+import android.view.Gravity
+import android.view.KeyEvent
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewOutlineProvider
+import android.view.animation.DecelerateInterpolator
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.graphics.ColorUtils
+import androidx.leanback.widget.BaseGridView
+import androidx.leanback.widget.HorizontalGridView
+import androidx.recyclerview.widget.RecyclerView
+import coil3.SingletonImageLoader
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.request.crossfade
+import coil3.BitmapImage
+import coil3.Image
+import coil3.asDrawable
+import coil3.target.Target
+
+/**
+ * Trích xuất màu chủ đạo rực rỡ nhất từ Bitmap (64-sample nhanh < 0.05ms)
+ */
+fun extractDominantColor(bitmap: Bitmap): Int {
+    var maxSat = 0f
+    var dominantColor = Color.parseColor("#38BDF8") // Fallback: Electric Cyan
+    val stepX = (bitmap.width / 8).coerceAtLeast(1)
+    val stepY = (bitmap.height / 8).coerceAtLeast(1)
+    val hsv = FloatArray(3)
+
+    for (x in 0 until bitmap.width step stepX) {
+        for (y in 0 until bitmap.height step stepY) {
+            val pixel = bitmap.getPixel(x, y)
+            val alpha = (pixel ushr 24) and 0xFF
+            if (alpha < 128) continue
+            Color.colorToHSV(pixel, hsv)
+            val sat = hsv[1]
+            val brightness = hsv[2]
+            if (sat > 0.35f && brightness in 0.25f..0.95f) {
+                if (sat > maxSat) {
+                    maxSat = sat
+                    dominantColor = pixel
+                }
+            }
+        }
+    }
+    Color.colorToHSV(dominantColor, hsv)
+    hsv[1] = (hsv[1] * 1.1f).coerceIn(0.6f, 1.0f)
+    hsv[2] = 1.0f
+    return Color.HSVToColor(hsv)
+}
+
+/**
+ * Tạo viền phát sáng đa tầng (Ambient Bloom Glow) đổi màu theo poster
+ */
+fun createGlowBorder(
+    dominantColor: Int,
+    cornerRadiusPx: Float,
+    borderWidthPx: Int,
+    animEnabled: Boolean
+): Drawable {
+    if (!animEnabled) {
+        // Chế độ TẮT HIỆU ỨNG: Viền trắng tĩnh đơn giản, không hào quang tỏa sáng
+        return GradientDrawable().apply {
+            setColor(Color.TRANSPARENT)
+            setStroke(borderWidthPx, Color.WHITE)
+            cornerRadius = cornerRadiusPx
+        }
+    }
+
+    // Chế độ BẬT HIỆU ỨNG: Hào quang Neon đa tầng tỏa sáng ra xung quanh
+    val outerGlow = GradientDrawable().apply {
+        setColor(Color.TRANSPARENT)
+        val alphaColor = ColorUtils.setAlphaComponent(dominantColor, 55)
+        setStroke((borderWidthPx * 2.8f).toInt(), alphaColor)
+        cornerRadius = cornerRadiusPx + 4f
+    }
+
+    val midGlow = GradientDrawable().apply {
+        setColor(Color.TRANSPARENT)
+        val alphaColor = ColorUtils.setAlphaComponent(dominantColor, 130)
+        setStroke((borderWidthPx * 1.8f).toInt(), alphaColor)
+        cornerRadius = cornerRadiusPx + 2f
+    }
+
+    val coreStroke = GradientDrawable().apply {
+        setColor(Color.TRANSPARENT)
+        setStroke(borderWidthPx, dominantColor)
+        cornerRadius = cornerRadiusPx
+    }
+
+    return LayerDrawable(arrayOf(outerGlow, midGlow, coreStroke))
+}
+
+class InteropHorizontalGridView(context: Context) : HorizontalGridView(context) {
+    var onNavigateDown: (() -> Boolean)? = null
+    var onNavigateUp: (() -> Boolean)? = null
+    var onNavigateBack: (() -> Boolean)? = null
+
+    init {
+        descendantFocusability = ViewGroup.FOCUS_AFTER_DESCENDANTS
+        itemAnimator = null
+    }
+
+    override fun requestChildFocus(child: View?, focused: View?) {
+        if (isInLayout) {
+            post { super.requestChildFocus(child, focused) }
+            return
+        }
+        super.requestChildFocus(child, focused)
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
+        if (event != null && event.action == KeyEvent.ACTION_DOWN) {
+            when (event.keyCode) {
+                KeyEvent.KEYCODE_DPAD_DOWN -> {
+                    if (onNavigateDown?.invoke() == true) return true
+                }
+                KeyEvent.KEYCODE_DPAD_UP -> {
+                    if (onNavigateUp?.invoke() == true) return true
+                }
+                KeyEvent.KEYCODE_BACK -> {
+                    if (onNavigateBack?.invoke() == true) return true
+                }
+            }
+        }
+        return super.dispatchKeyEvent(event)
+    }
+}
+
+class LeanbackCardViewHolder(
+    val root: LinearLayout,
+    val cardContainer: FrameLayout,
+    val posterImage: ImageView,
+    val titleText: TextView?,
+    val progressBar: ProgressBar?,
+    val cornerRadiusPx: Float,
+    val borderWidthPx: Int,
+    val adapter: LeanbackRowAdapter
+) : RecyclerView.ViewHolder(root) {
+
+    private var currentItem: ModernCarouselItem? = null
+    private val interpolator = DecelerateInterpolator(1.5f)
+    var currentDominantColor: Int = Color.WHITE
+
+    init {
+        root.isFocusable = true
+        root.isFocusableInTouchMode = true
+        root.descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
+
+        root.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+            updateFocusVisual(hasFocus)
+            if (hasFocus) {
+                val pos = bindingAdapterPosition
+                val item = currentItem
+                if (pos != RecyclerView.NO_POSITION && item != null) {
+                    adapter.onItemFocused(pos, item)
+                }
+            }
+        }
+
+        root.setOnKeyListener { _, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN) {
+                when (keyCode) {
+                    KeyEvent.KEYCODE_DPAD_DOWN -> {
+                        if (adapter.onNavigateDown()) return@setOnKeyListener true
+                    }
+                    KeyEvent.KEYCODE_DPAD_UP -> {
+                        if (adapter.onNavigateUp()) return@setOnKeyListener true
+                    }
+                    KeyEvent.KEYCODE_DPAD_LEFT -> {
+                        if (bindingAdapterPosition == 0) {
+                            if (adapter.onNavigateLeftOnFirstItem()) return@setOnKeyListener true
+                        }
+                    }
+                    KeyEvent.KEYCODE_BACK -> {
+                        if (adapter.onNavigateBack()) return@setOnKeyListener true
+                    }
+                }
+            }
+            false
+        }
+
+        root.setOnClickListener {
+            currentItem?.let { adapter.onItemClick(it) }
+        }
+
+        root.setOnLongClickListener {
+            currentItem?.let { adapter.onItemLongClick(it) }
+            true
+        }
+    }
+
+    fun updateFocusVisual(hasFocus: Boolean) {
+        val anim = adapter.animationsEnabled()
+        val targetScale = if (anim && hasFocus) 1.08f else 1.0f
+
+        root.animate()
+            .scaleX(targetScale)
+            .scaleY(targetScale)
+            .setDuration(if (anim) 110 else 0)
+            .setInterpolator(interpolator)
+            .start()
+
+        if (anim && hasFocus) {
+            cardContainer.elevation = 20f
+            cardContainer.translationZ = 20f
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                cardContainer.outlineAmbientShadowColor = ColorUtils.setAlphaComponent(currentDominantColor, 200)
+                cardContainer.outlineSpotShadowColor = currentDominantColor
+            }
+            cardContainer.foreground = createGlowBorder(currentDominantColor, cornerRadiusPx, borderWidthPx, true)
+        } else if (hasFocus) {
+            cardContainer.elevation = 0f
+            cardContainer.translationZ = 0f
+            cardContainer.foreground = createGlowBorder(Color.WHITE, cornerRadiusPx, borderWidthPx, false)
+        } else {
+            cardContainer.elevation = 0f
+            cardContainer.translationZ = 0f
+            cardContainer.foreground = null
+        }
+    }
+
+    fun bind(
+        item: ModernCarouselItem,
+        cardWidthPx: Int,
+        cardHeightPx: Int,
+        showLabels: Boolean,
+        isNearEnd: Boolean
+    ) {
+        currentItem = item
+        currentDominantColor = Color.WHITE
+
+        // Set dimensions
+        val cardLp = cardContainer.layoutParams
+        if (cardLp.width != cardWidthPx || cardLp.height != cardHeightPx) {
+            cardLp.width = cardWidthPx
+            cardLp.height = cardHeightPx
+            cardContainer.layoutParams = cardLp
+        }
+
+        // Title
+        if (showLabels && titleText != null) {
+            titleText.visibility = View.VISIBLE
+            titleText.text = item.title
+        } else {
+            titleText?.visibility = View.GONE
+        }
+
+        // Progress bar for Continue Watching
+        val cwPayload = item.payload as? ModernPayload.ContinueWatching
+        val progressItem = cwPayload?.item as? ContinueWatchingItem.InProgress
+        if (progressItem != null && progressBar != null) {
+            progressBar.visibility = View.VISIBLE
+            val pct = progressItem.progress.progressPercent?.toInt()
+                ?: if (progressItem.progress.duration > 0) {
+                    ((progressItem.progress.position.toFloat() / progressItem.progress.duration) * 100).toInt()
+                } else 0
+            progressBar.progress = pct.coerceIn(0, 100)
+        } else {
+            progressBar?.visibility = View.GONE
+        }
+
+        // Image loading via Coil với Dynamic Color extraction
+        val imageUrl = item.imageUrl ?: item.heroPreview.poster ?: item.heroPreview.backdrop
+        if (!imageUrl.isNullOrBlank()) {
+            val ctx = posterImage.context
+            val request = ImageRequest.Builder(ctx)
+                .data(imageUrl)
+                .size(cardWidthPx, cardHeightPx)
+                .allowHardware(false)
+                .crossfade(adapter.animationsEnabled())
+                .target(
+                    object : Target {
+                        override fun onStart(placeholder: Image?) {
+                            if (placeholder != null) {
+                                posterImage.setImageDrawable(placeholder.asDrawable(ctx.resources))
+                            } else {
+                                posterImage.setImageDrawable(null)
+                            }
+                        }
+                        override fun onSuccess(result: Image) {
+                            posterImage.setImageDrawable(result.asDrawable(ctx.resources))
+                            val bmp = (result as? BitmapImage)?.bitmap
+                            if (bmp != null) {
+                                currentDominantColor = extractDominantColor(bmp)
+                                if (root.hasFocus()) {
+                                    updateFocusVisual(true)
+                                }
+                            }
+                        }
+                        override fun onError(error: Image?) {
+                            if (error != null) {
+                                posterImage.setImageDrawable(error.asDrawable(ctx.resources))
+                            } else {
+                                posterImage.setImageDrawable(null)
+                            }
+                        }
+                    }
+                )
+                .build()
+            SingletonImageLoader.get(ctx).enqueue(request)
+        } else {
+            posterImage.setImageDrawable(null)
+        }
+
+        if (isNearEnd) {
+            adapter.onLoadMore()
+        }
+    }
+
+    fun unbind() {
+        posterImage.setImageDrawable(null)
+    }
+}
+
+class LeanbackRowAdapter(
+    val cardWidthPx: Int,
+    val cardHeightPx: Int,
+    val cornerRadiusPx: Float,
+    val showLabels: Boolean,
+    var animationsEnabled: () -> Boolean,
+    var onItemFocused: (Int, ModernCarouselItem) -> Unit,
+    var onItemClick: (ModernCarouselItem) -> Unit,
+    var onItemLongClick: (ModernCarouselItem) -> Unit,
+    var onLoadMore: () -> Unit,
+    var onNavigateDown: () -> Boolean,
+    var onNavigateUp: () -> Boolean,
+    var onNavigateLeftOnFirstItem: () -> Boolean,
+    var onNavigateBack: () -> Boolean
+) : RecyclerView.Adapter<LeanbackCardViewHolder>() {
+
+    private var items: List<ModernCarouselItem> = emptyList()
+
+    fun submitItems(newItems: List<ModernCarouselItem>) {
+        items = newItems
+        notifyDataSetChanged()
+    }
+
+    override fun getItemCount(): Int = items.size
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LeanbackCardViewHolder {
+        val context = parent.context
+
+        // Root container
+        val root = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            clipChildren = false
+            clipToPadding = false
+            layoutParams = ViewGroup.LayoutParams(cardWidthPx, ViewGroup.LayoutParams.WRAP_CONTENT)
+        }
+
+        // Card container
+        val cardContainer = FrameLayout(context).apply {
+            layoutParams = LinearLayout.LayoutParams(cardWidthPx, cardHeightPx)
+            setBackgroundColor(Color.parseColor("#1A1A1A"))
+            outlineProvider = object : ViewOutlineProvider() {
+                override fun getOutline(view: View, outline: Outline) {
+                    outline.setRoundRect(0, 0, view.width, view.height, cornerRadiusPx)
+                }
+            }
+            clipToOutline = false
+            clipChildren = false
+        }
+
+        // Poster image
+        val posterImage = ImageView(context).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+            scaleType = ImageView.ScaleType.CENTER_CROP
+            outlineProvider = object : ViewOutlineProvider() {
+                override fun getOutline(view: View, outline: Outline) {
+                    outline.setRoundRect(0, 0, view.width, view.height, cornerRadiusPx)
+                }
+            }
+            clipToOutline = true
+        }
+        cardContainer.addView(posterImage)
+
+        // Progress bar for continue watching
+        val progressBar = ProgressBar(context, null, android.R.attr.progressBarStyleHorizontal).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, context.resources.displayMetrics).toInt()
+            ).apply {
+                gravity = Gravity.BOTTOM
+            }
+            max = 100
+            progress = 0
+            visibility = View.GONE
+        }
+        cardContainer.addView(progressBar)
+
+        root.addView(cardContainer)
+
+        // Title text
+        val titleText: TextView? = if (showLabels) {
+            TextView(context).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    topMargin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6f, context.resources.displayMetrics).toInt()
+                }
+                setTextColor(Color.WHITE)
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+                maxLines = 1
+                ellipsize = TextUtils.TruncateAt.END
+            }.also { root.addView(it) }
+        } else null
+
+        val borderWidthPx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2.5f, context.resources.displayMetrics).toInt()
+
+        return LeanbackCardViewHolder(
+            root = root,
+            cardContainer = cardContainer,
+            posterImage = posterImage,
+            titleText = titleText,
+            progressBar = progressBar,
+            cornerRadiusPx = cornerRadiusPx,
+            borderWidthPx = borderWidthPx,
+            adapter = this
+        )
+    }
+
+    override fun onBindViewHolder(holder: LeanbackCardViewHolder, position: Int) {
+        val item = items[position]
+        val isNearEnd = position >= items.size - 4
+        holder.bind(item, cardWidthPx, cardHeightPx, showLabels, isNearEnd)
+    }
+
+    override fun onViewRecycled(holder: LeanbackCardViewHolder) {
+        if (holder.root.hasFocus()) {
+            holder.root.clearFocus()
+        }
+        holder.unbind()
+    }
+}
+
+@Composable
+fun LeanbackModernRow(
+    rowKey: String,
+    items: List<ModernCarouselItem>,
+    cardWidth: Dp,
+    cardHeight: Dp,
+    cornerRadius: Dp,
+    showLabels: Boolean,
+    animationsEnabled: Boolean,
+    startPadding: Dp,
+    spacing: Dp,
+    onItemFocused: (Int, ModernCarouselItem) -> Unit,
+    onItemClick: (ModernCarouselItem) -> Unit,
+    onItemLongClick: (ModernCarouselItem) -> Unit,
+    onLoadMore: () -> Unit,
+    onNavigateDown: () -> Boolean = { false },
+    onNavigateUp: () -> Boolean = { false },
+    onNavigateLeftOnFirstItem: () -> Boolean = { false },
+    onNavigateBack: () -> Boolean = { false },
+    rowGrids: MutableMap<String, HorizontalGridView>? = null,
+    isPendingFocus: Boolean = false,
+    pendingFocusIndex: Int = 0,
+    pendingFocusNonce: Int = 0,
+    onClearPendingFocus: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    val density = LocalDensity.current
+    val cardWidthPx = with(density) { cardWidth.roundToPx() }
+    val cardHeightPx = with(density) { cardHeight.roundToPx() }
+    val cornerRadiusPx = with(density) { cornerRadius.toPx() }
+    val startPaddingPx = with(density) { startPadding.roundToPx() }
+    val spacingPx = with(density) { spacing.roundToPx() }
+    val verticalPaddingPx = with(density) { 14.dp.roundToPx() }
+    val labelHeightPx = if (showLabels) with(density) { 26.dp.roundToPx() } else 0
+    val totalRowHeightPx = cardHeightPx + labelHeightPx + (verticalPaddingPx * 2)
+
+    val labelHeightDp = if (showLabels) 26.dp else 0.dp
+    val totalRowHeightDp = cardHeight + labelHeightDp + 28.dp
+
+    val adapter = remember(cardWidthPx, cardHeightPx, cornerRadiusPx, showLabels, animationsEnabled) {
+        LeanbackRowAdapter(
+            cardWidthPx = cardWidthPx,
+            cardHeightPx = cardHeightPx,
+            cornerRadiusPx = cornerRadiusPx,
+            showLabels = showLabels,
+            animationsEnabled = { animationsEnabled },
+            onItemFocused = onItemFocused,
+            onItemClick = onItemClick,
+            onItemLongClick = onItemLongClick,
+            onLoadMore = onLoadMore,
+            onNavigateDown = onNavigateDown,
+            onNavigateUp = onNavigateUp,
+            onNavigateLeftOnFirstItem = onNavigateLeftOnFirstItem,
+            onNavigateBack = onNavigateBack
+        )
+    }
+
+    DisposableEffect(rowKey) {
+        onDispose {
+            rowGrids?.remove(rowKey)
+        }
+    }
+
+    LaunchedEffect(isPendingFocus, pendingFocusNonce) {
+        if (isPendingFocus && items.isNotEmpty()) {
+            val targetIdx = pendingFocusIndex.coerceIn(0, (items.size - 1).coerceAtLeast(0))
+            val gridView = rowGrids?.get(rowKey)
+            if (gridView != null) {
+                if (animationsEnabled) {
+                    gridView.setSelectedPositionSmooth(targetIdx)
+                } else {
+                    gridView.setSelectedPosition(targetIdx)
+                }
+                gridView.post {
+                    val vh = gridView.findViewHolderForAdapterPosition(targetIdx)
+                    if (vh != null) {
+                        vh.itemView.requestFocus()
+                    } else {
+                        gridView.requestFocus()
+                    }
+                }
+            }
+            onClearPendingFocus()
+        }
+    }
+
+    AndroidView(
+        modifier = modifier
+            .height(totalRowHeightDp)
+            .fillMaxWidth(),
+        factory = { context ->
+            InteropHorizontalGridView(context).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    totalRowHeightPx
+                )
+                setRowHeight(totalRowHeightPx)
+                setNumRows(1)
+                windowAlignment = BaseGridView.WINDOW_ALIGN_LOW_EDGE
+                windowAlignmentOffset = startPaddingPx
+                windowAlignmentOffsetPercent = BaseGridView.WINDOW_ALIGN_OFFSET_PERCENT_DISABLED
+                itemAlignmentOffset = 0
+                itemAlignmentOffsetPercent = 0f
+                setItemSpacing(spacingPx)
+                clipToPadding = false
+                clipChildren = false
+                setPadding(startPaddingPx, verticalPaddingPx, startPaddingPx, verticalPaddingPx)
+                this.adapter = adapter
+                this.onNavigateDown = onNavigateDown
+                this.onNavigateUp = onNavigateUp
+                this.onNavigateBack = onNavigateBack
+                rowGrids?.put(rowKey, this)
+            }
+        },
+        update = { gridView ->
+            if (gridView is InteropHorizontalGridView) {
+                gridView.onNavigateDown = onNavigateDown
+                gridView.onNavigateUp = onNavigateUp
+                gridView.onNavigateBack = onNavigateBack
+            }
+            gridView.setAnimateChildLayout(animationsEnabled)
+            adapter.animationsEnabled = { animationsEnabled }
+            adapter.onItemFocused = onItemFocused
+            adapter.onItemClick = onItemClick
+            adapter.onItemLongClick = onItemLongClick
+            adapter.onLoadMore = onLoadMore
+            adapter.onNavigateDown = onNavigateDown
+            adapter.onNavigateUp = onNavigateUp
+            adapter.onNavigateLeftOnFirstItem = onNavigateLeftOnFirstItem
+            adapter.onNavigateBack = onNavigateBack
+            rowGrids?.put(rowKey, gridView)
+            adapter.submitItems(items)
+        }
+    )
+}

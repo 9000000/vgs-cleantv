@@ -35432,15 +35432,18 @@ index 0fd2b6cd..7d83f99e 100644
              glow.setStrokeWidth(step + 0.5f);
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/HistoryProvider.java b/launcher/app/src/main/java/com/gathin/tvhome/HistoryProvider.java
 new file mode 100644
-index 00000000..9b79a27d
+index 00000000..9209d1af
 --- /dev/null
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/HistoryProvider.java
-@@ -0,0 +1,275 @@
+@@ -0,0 +1,367 @@
 +package com.gathin.tvhome;
 +
++import android.content.Context;
++import android.content.SharedPreferences;
 +import android.os.Handler;
 +import android.os.Looper;
 +
++import org.json.JSONArray;
 +import org.json.JSONObject;
 +
 +import java.io.BufferedReader;
@@ -35458,12 +35461,15 @@ index 00000000..9b79a27d
 +/**
 + * CleanTV/VGS: Khối "Ngày này năm xưa" (Wikipedia tiếng Việt / On this day).
 + * Đọc sự kiện lịch sử tích cực trong ngày, lọc bỏ nội dung bạo lực/tai nạn (GRIM filter)
-+ * để đảm bảo an toàn cho phòng khách gia đình. Có sẵn dữ liệu dự phòng offline.
++ * để đảm bảo an toàn cho phòng khách gia đình. Có sẵn bộ nhớ đệm đĩa và dữ liệu dự phòng phong phú.
 + */
 +public final class HistoryProvider {
 +
 +    private HistoryProvider() {
 +    }
++
++    private static final String PREFS_NAME = "vgs_history_cache";
++    private static final String KEY_PREFIX = "history_";
 +
 +    public static class HistoryItem {
 +        public final int year;
@@ -35503,9 +35509,17 @@ index 00000000..9b79a27d
 +    private static volatile boolean isLoading = false;
 +
 +    /**
-+     * Tải sự kiện của ngày hôm nay (chạy ngầm, gọi callback trên main thread).
++     * Tương thích ngược: tải không cần truyền Context.
 +     */
 +    public static void loadToday(Callback callback) {
++        loadToday(null, callback);
++    }
++
++    /**
++     * Tải sự kiện của ngày hôm nay (chạy ngầm, gọi callback trên main thread).
++     * Có hỗ trợ bộ nhớ đệm đĩa SharedPreferences để offline-first ngay khi mở TV.
++     */
++    public static void loadToday(Context context, Callback callback) {
 +        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
 +        int day = cal.get(Calendar.DAY_OF_MONTH);
 +        int month = cal.get(Calendar.MONTH) + 1;
@@ -35513,6 +35527,20 @@ index 00000000..9b79a27d
 +        if (day == cachedDay && month == cachedMonth && !CACHED_ITEMS.isEmpty()) {
 +            if (callback != null) callback.onLoaded(new ArrayList<>(CACHED_ITEMS));
 +            return;
++        }
++
++        // 1. Thử nạp nhanh từ bộ nhớ đệm đĩa SharedPreferences (đặc biệt hữu ích khi vừa boot TV chưa kịp có WiFi)
++        if (context != null && CACHED_ITEMS.isEmpty()) {
++            List<HistoryItem> diskItems = loadFromDiskCache(context, day, month);
++            if (!diskItems.isEmpty()) {
++                CACHED_ITEMS.clear();
++                CACHED_ITEMS.addAll(diskItems);
++                cachedDay = day;
++                cachedMonth = month;
++                if (callback != null) {
++                    callback.onLoaded(new ArrayList<>(CACHED_ITEMS));
++                }
++            }
 +        }
 +
 +        if (isLoading) {
@@ -35526,26 +35554,63 @@ index 00000000..9b79a27d
 +        new Thread(() -> {
 +            List<HistoryItem> items = fetchFromWikipedia(day, month);
 +            boolean success = !items.isEmpty();
-+            if (items.isEmpty()) {
-+                items = getFallbackEvents(day, month);
-+            }
-+
-+            CACHED_ITEMS.clear();
-+            CACHED_ITEMS.addAll(items);
 +            if (success) {
++                CACHED_ITEMS.clear();
++                CACHED_ITEMS.addAll(items);
 +                cachedDay = day;
 +                cachedMonth = month;
-+            } else {
-+                cachedDay = -1;
-+                cachedMonth = -1;
++                if (context != null) {
++                    saveToDiskCache(context, day, month, items);
++                }
++            } else if (CACHED_ITEMS.isEmpty()) {
++                // Nếu chưa có cache và fetch mạng thất bại: nạp tập sự kiện dự phòng phong phú
++                items = getFallbackEvents(day, month);
++                CACHED_ITEMS.clear();
++                CACHED_ITEMS.addAll(items);
++                cachedDay = day;
++                cachedMonth = month;
 +            }
 +            isLoading = false;
 +
-+            final List<HistoryItem> result = new ArrayList<>(items);
++            final List<HistoryItem> result = new ArrayList<>(CACHED_ITEMS);
 +            new Handler(Looper.getMainLooper()).post(() -> {
 +                if (callback != null) callback.onLoaded(result);
 +            });
 +        }).start();
++    }
++
++    private static void saveToDiskCache(Context context, int day, int month, List<HistoryItem> items) {
++        try {
++            SharedPreferences sp = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
++            JSONArray arr = new JSONArray();
++            for (HistoryItem item : items) {
++                JSONObject obj = new JSONObject();
++                obj.put("year", item.year);
++                obj.put("text", item.text);
++                arr.put(obj);
++            }
++            sp.edit().putString(KEY_PREFIX + day + "_" + month, arr.toString()).apply();
++        } catch (Exception ignored) {}
++    }
++
++    private static List<HistoryItem> loadFromDiskCache(Context context, int day, int month) {
++        List<HistoryItem> list = new ArrayList<>();
++        try {
++            SharedPreferences sp = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
++            String raw = sp.getString(KEY_PREFIX + day + "_" + month, null);
++            if (raw != null && !raw.isEmpty()) {
++                JSONArray arr = new JSONArray(raw);
++                for (int i = 0; i < arr.length(); i++) {
++                    JSONObject obj = arr.getJSONObject(i);
++                    int year = obj.optInt("year", 0);
++                    String text = obj.optString("text", "");
++                    if (!text.isEmpty()) {
++                        list.add(new HistoryItem(year, text));
++                    }
++                }
++            }
++        } catch (Exception ignored) {}
++        return list;
 +    }
 +
 +    private static List<HistoryItem> fetchFromWikipedia(int day, int month) {
@@ -35555,6 +35620,7 @@ index 00000000..9b79a27d
 +            conn = (HttpURLConnection) url.openConnection();
 +            conn.setRequestMethod("GET");
 +            conn.setRequestProperty("User-Agent", "CleanTV-AndroidTV/2.10 (https://vgs.zone/cleantv)");
++            conn.setRequestProperty("Accept", "application/json");
 +            conn.setConnectTimeout(8000);
 +            conn.setReadTimeout(8000);
 +
@@ -35699,8 +35765,30 @@ index 00000000..9b79a27d
 +        } else if (month == 12 && day == 22) {
 +            list.add(new HistoryItem(1944, "Đội Việt Nam Tuyên truyền Giải phóng quân (tiền thân của Quân đội Nhân dân Việt Nam) được thành lập tại Cao Bằng."));
 +        } else {
-+            list.add(new HistoryItem(1945, "Những ngày tháng lịch sử không thể nào quên trong công cuộc giành và giữ độc lập tự do cho Tổ quốc."));
-+            list.add(new HistoryItem(1975, "Trang sử vàng chói lọi của dân tộc Việt Nam trên con đường hòa bình, độc lập và thống nhất non sông."));
++            // Danh sách các sự kiện lịch sử, văn hóa, khoa học tiêu biểu chọn lọc cho gia đình
++            list.add(new HistoryItem(1010, "Vua Lý Thái Tổ ban Chiếu dời đô từ Hoa Lư về Thăng Long (Hà Nội ngày nay)."));
++            list.add(new HistoryItem(1077, "Lý Thường Kiệt lãnh đạo quân dân Đại Việt trên phòng tuyến sông Như Nguyệt, vang vọng bài thơ thần Nam quốc sơn hà."));
++            list.add(new HistoryItem(1288, "Đại thắng Bạch Đằng: Quân dân nhà Trần dưới sự chỉ huy của Quốc công Tiết chế Trần Hưng Đạo đánh tan quân xâm lược."));
++            list.add(new HistoryItem(1428, "Khởi nghĩa Lam Sơn toàn thắng, Lê Lợi lên ngôi hoàng đế, Nguyễn Trãi viết Bình Ngô đại cáo."));
++            list.add(new HistoryItem(1789, "Đại phá quân Mãn Thanh: Hoàng đế Quang Trung - Nguyễn Huệ thần tốc tiến quân giải phóng Thăng Long vào mùng 5 Tết."));
++            list.add(new HistoryItem(1911, "Người thanh niên yêu nước Nguyễn Tất Thành rời bến cảng Nhà Rồng ra đi tìm con đường cứu nước."));
++            list.add(new HistoryItem(1930, "Đảng Cộng sản Việt Nam được thành lập, mở ra bước ngoặt quyết định cho cách mạng Việt Nam."));
++            list.add(new HistoryItem(1945, "Chủ tịch Hồ Chí Minh đọc bản Tuyên ngôn Độc lập tại Ba Đình, khai sinh nước Việt Nam Dân chủ Cộng hòa."));
++            list.add(new HistoryItem(1954, "Chiến thắng Điện Biên Phủ lừng lẫy năm châu, chấn động địa cầu, khẳng định ý chí quật cường của dân tộc."));
++            list.add(new HistoryItem(1954, "Đoàn quân chiến thắng tiến về tiếp quản Thủ đô Hà Nội trong niềm hân hoan của nhân dân."));
++            list.add(new HistoryItem(1969, "Con tàu Apollo 11 hạ cánh thành công xuống Mặt Trăng, mở ra kỷ nguyên mới trong khám phá vũ trụ của nhân loại."));
++            list.add(new HistoryItem(1975, "Chiến dịch Hồ Chí Minh toàn thắng, giải phóng hoàn toàn miền Nam, non sông Việt Nam thống nhất một nhà."));
++            list.add(new HistoryItem(1977, "Việt Nam chính thức gia nhập Liên Hợp Quốc, mở rộng quan hệ hữu nghị và hội nhập quốc tế."));
++            list.add(new HistoryItem(1980, "Anh hùng Phạm Tuân trở thành phi hành gia đầu tiên của Việt Nam và châu Á bay vào không gian vũ trụ."));
++            list.add(new HistoryItem(1986, "Đại hội Đảng toàn quốc lần thứ VI khởi xướng công cuộc Đổi mới toàn diện đất nước."));
++            list.add(new HistoryItem(1994, "Vịnh Hạ Long được UNESCO công nhận là Di sản thiên nhiên thế giới vì giá trị cảnh quan thẩm mỹ kiệt xuất."));
++            list.add(new HistoryItem(1995, "Việt Nam và Hoa Kỳ chính thức bình thường hóa quan hệ ngoại giao, mở ra kỷ nguyên hợp tác song phương."));
++            list.add(new HistoryItem(1995, "Việt Nam chính thức gia nhập Hiệp hội các Quốc gia Đông Nam Á (ASEAN)."));
++            list.add(new HistoryItem(1999, "Phố cổ Hội An và Thánh địa Mỹ Sơn được UNESCO vinh danh là Di sản văn hóa thế giới."));
++            list.add(new HistoryItem(2003, "Vườn Quốc gia Phong Nha - Kẻ Bàng được UNESCO công nhận là Di sản thiên nhiên thế giới."));
++            list.add(new HistoryItem(2007, "Việt Nam chính thức trở thành thành viên thứ 150 của Tổ chức Thương mại Thế giới (WTO)."));
++            list.add(new HistoryItem(2010, "Hoàng thành Thăng Long được UNESCO vinh danh Di sản thế giới đúng dịp Đại lễ 1000 năm Thăng Long - Hà Nội."));
++            list.add(new HistoryItem(2014, "Quần thể danh thắng Tràng An (Ninh Bình) trở thành Di sản thế giới hỗn hợp đầu tiên của Đông Nam Á."));
 +        }
 +        return list;
 +    }
@@ -35709,6 +35797,10 @@ index 00000000..9b79a27d
 +        if (CACHED_ITEMS.isEmpty()) return null;
 +        int idx = Math.floorMod(index, CACHED_ITEMS.size());
 +        return CACHED_ITEMS.get(idx);
++    }
++
++    public static int getCount() {
++        return CACHED_ITEMS.size();
 +    }
 +}
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java b/launcher/app/src/main/java/com/gathin/tvhome/HomeKeyService.java
@@ -36303,7 +36395,7 @@ index ea1242b1..330da398 100644
          long b11 = a11;
          int lunarYear;
 diff --git a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
-index 17961443..f2bb9ebf 100644
+index 17961443..5c87c8a2 100644
 --- a/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 +++ b/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java
 @@ -55,6 +55,7 @@ import android.text.style.ForegroundColorSpan;
@@ -36351,11 +36443,11 @@ index 17961443..f2bb9ebf 100644
 +    private Thread weatherThread;
 +    private long weatherAt;
 +    private static final long WEATHER_MS = 30 * 60 * 1000L;
-+    /** CleanTV/VGS: Today Carousel (Xoay vòng tỷ lệ 1:1 giữa Danh ngôn và Ngày này năm xưa, 3 phút một lần). */
-+    private static final long CAROUSEL_INTERVAL_MS = 3 * 60 * 1000L;
++    /** CleanTV/VGS: Today Carousel (Xoay vòng tỷ lệ 1:1 giữa Danh ngôn và Ngày này năm xưa, 15 giây một lần). */
++    static final long CAROUSEL_INTERVAL_MS = 15 * 1000L;
 +    private TextView todayCarouselView;
 +    private int carouselStep = 0;
-+    private int historyEventIndex = 0;
++    private int historyEventIndex = (int) (System.currentTimeMillis() % 1000);
 +    private int quoteIndex = (int) (System.currentTimeMillis() % QuotesProvider.getCount());
 +    private boolean carouselEnabled = true;
 +    private final Runnable carouselTick = new Runnable() {
@@ -36382,7 +36474,29 @@ index 17961443..f2bb9ebf 100644
      private boolean shamsi;
      /** greeting_name: said after the greeting, which is shown in capitals. */
      private String greetingName = "";
-@@ -377,14 +421,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -322,6 +366,21 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+             if (validated == lastValidated) return;
+             lastValidated = validated;
+             if (wifiNoInternetTint != null) handler.post(MainActivity.this::updateWifiLabel);
++            if (validated) {
++                // CleanTV/VGS: Khi mạng kết nối Internet thành công, lập tức tải lại Lịch sử ngày hôm nay và Thời tiết
++                handler.post(() -> {
++                    if (carouselEnabled && showToday) {
++                        HistoryProvider.loadToday(MainActivity.this, items -> {
++                            if (todayCard != null && carouselStep % 2 != 0) {
++                                advanceTodayCarousel();
++                            }
++                        });
++                    }
++                    if (showWeather || showWeatherCorner) {
++                        updateWeatherCard();
++                    }
++                });
++            }
+         }
+     };
+     /** Shows the Inputs pill once the TV registers an input: at boot HDMI inputs can appear after Home is shown. */
+@@ -377,14 +436,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // The pill follows the network callbacks and each return to Home; only the diya's flame follows the
              // signal level, so only it needs this minute's binder calls (about 7 ms on the UI thread).
              if (festive) updateWifiLabel();
@@ -36398,7 +36512,7 @@ index 17961443..f2bb9ebf 100644
      @Override
      protected void onCreate(Bundle savedInstanceState) {
          super.onCreate(savedInstanceState);
-@@ -392,7 +435,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -392,7 +450,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          density = getResources().getDisplayMetrics().density;
          // config.xml, overlaid by config.json from a pushed theme (see Config and tools/theme.sh).
          Config cfg = Config.load(this);
@@ -36406,7 +36520,7 @@ index 17961443..f2bb9ebf 100644
          appLibrarySelection = cfg.appLibrarySelection;
          libraryOkOpens = cfg.libraryOkOpens;
          // restore_key_services: after a force stop, put back the remote's accessibility helpers that Android took
-@@ -472,6 +514,17 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -472,6 +529,17 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((TextView) findViewById(R.id.date)).setTextColor(Color.WHITE);
              findViewById(R.id.clockDivider).setBackgroundColor(Color.WHITE);
          }
@@ -36424,7 +36538,7 @@ index 17961443..f2bb9ebf 100644
          if (getResources().getBoolean(R.bool.rtl_menu_bar)) {
              // Center Hebrew greetings over the numeric time, independent of a visible AM/PM label. The clock's row
              // is watched too: date_below_clock can move the whole row right under a wider date.
-@@ -497,14 +550,58 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -497,14 +565,60 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          raceHeadline = findViewById(R.id.raceHeadline);
          raceSessions = findViewById(R.id.raceSessions);
          showStats = cfg.showStats;
@@ -36466,12 +36580,14 @@ index 17961443..f2bb9ebf 100644
 +            if (showEvents) renderEventChips();
 +            if (showWeather || showWeatherCorner) updateWeatherCard();
 +            if (showToday) {
-+                HistoryProvider.loadToday(items -> {
++                HistoryProvider.loadToday(this, items -> {
 +                    if (todayCard != null && carouselStep % 2 != 0) {
 +                        advanceTodayCarousel();
 +                    }
 +                });
 +                advanceTodayCarousel();
++                handler.removeCallbacks(carouselTick);
++                handler.postDelayed(carouselTick, CAROUSEL_INTERVAL_MS);
 +                if (todayCard != null) {
 +                    todayCard.setOnClickListener(v -> {
 +                        handler.removeCallbacks(carouselTick);
@@ -36484,7 +36600,7 @@ index 17961443..f2bb9ebf 100644
          if (shamsi) {
              shamsiDate.setVisibility(View.VISIBLE);
              TextView date = findViewById(R.id.date);
-@@ -512,6 +609,22 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -512,6 +626,22 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              lunarDate.setTextSize(11f);
              date.setPadding(0, (int) (4 * density), 0, 0);
          }
@@ -36507,7 +36623,7 @@ index 17961443..f2bb9ebf 100644
          vpnApp = cfg.vpnApp;
          vpnPill = cfg.vpnPill && !cfg.topMenu;
          btnVpn = findViewById(R.id.btnVpn);
-@@ -591,6 +704,21 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -591,6 +721,21 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              public void onChildViewDetachedFromWindow(@NonNull View v) {
              }
          });
@@ -36529,7 +36645,7 @@ index 17961443..f2bb9ebf 100644
          if (dockRow) grid.addItemDecoration(new DockDecoration(COLUMNS, density, cinematic, cfg.alwaysShowNames, cfg.dockOpacity, cfg.dockGlass, cfg.dockEvenPadding, cfg.dockBand,
                  singleRow, cfg.dockBandAll));
          if (cfg.fadeRows) TopFade.attach(grid, 48 * density);
-@@ -609,6 +737,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -609,6 +754,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // tvOS layout: push the dock row towards the bottom of the screen, leaving room for
          // rows_below_dock grid rows under it; the rest of the grid stays below until you press Down.
          int rowsBelowDock = cfg.rowsBelowDock;
@@ -36541,7 +36657,7 @@ index 17961443..f2bb9ebf 100644
          grid.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
              int h = b - t;
              // Item height follows the tile size, which follows the columns and the rows that must fit (AppAdapter.tileWidthPx).
-@@ -629,6 +762,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -629,6 +779,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              // A single row never shows the names under its tiles (the title above the row names the app), so the
              // 7dp gap and 22dp label item_app.xml keeps for them would only lift the row: sit it that much lower.
              if (singleRow && !cfg.alwaysShowNames) want += (int) (29 * density);
@@ -36553,7 +36669,7 @@ index 17961443..f2bb9ebf 100644
              if (grid.getPaddingTop() != want) {
                  grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
                  // A vertical grid parks the dock on the new padding line by scrolling (onTileFocused); a sideways
-@@ -796,8 +934,42 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -796,8 +951,42 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
          };
          btnInputs.setOnKeyListener(pillKeys);
@@ -36597,7 +36713,7 @@ index 17961443..f2bb9ebf 100644
          btnSettings.setOnKeyListener(pillKeys);
          btnReorder.setOnKeyListener(pillKeys);
          btnLibraryTop.setOnKeyListener(pillKeys);
-@@ -943,6 +1115,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -943,6 +1132,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onResume() {
          super.onResume();
@@ -36605,7 +36721,7 @@ index 17961443..f2bb9ebf 100644
          // A festival that started or ended while Home was in the background: rebuild with or without it.
          if (festive != festival.active(LocalDate.now())) {
              recreate();
-@@ -986,9 +1159,25 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -986,9 +1176,25 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              pillsShown = true;
          }
          if (showStats) startStats();
@@ -36619,7 +36735,7 @@ index 17961443..f2bb9ebf 100644
 +            if (showWeather || showWeatherCorner) updateWeatherCard();
 +            handler.removeCallbacks(carouselTick);
 +            if (showToday) {
-+                HistoryProvider.loadToday(items -> {
++                HistoryProvider.loadToday(this, items -> {
 +                    if (todayCard != null && carouselStep % 2 != 0) {
 +                        advanceTodayCarousel();
 +                    }
@@ -36632,7 +36748,7 @@ index 17961443..f2bb9ebf 100644
          if (festive && diya != null) {
              diya.start();
              LocalDate today = LocalDate.now();
-@@ -1154,6 +1343,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1154,6 +1360,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      @Override
      protected void onPause() {
          super.onPause();
@@ -36640,7 +36756,7 @@ index 17961443..f2bb9ebf 100644
          root.removeCallbacks(showIdleClock);
          endReorder();   // Home or another app while reordering keeps the order so far
          wallpaperPlayer.stop();
-@@ -1162,6 +1352,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1162,6 +1369,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          ambient.animate().cancel();
          heroArt.animate().cancel();
          handler.removeCallbacks(minuteTick);
@@ -36648,7 +36764,7 @@ index 17961443..f2bb9ebf 100644
          stopStats();
          if (diya != null) diya.stop();
          cancelPendingFocusScroll();
-@@ -1259,8 +1450,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1259,8 +1467,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       */
      @Override
      public boolean dispatchKeyEvent(KeyEvent event) {
@@ -36657,7 +36773,7 @@ index 17961443..f2bb9ebf 100644
          if (handleSettingsKey(event)) return true;
          if (tileMenuEnabled && !reordering && openPopup == null && cardPrompt == null
                  && event.getKeyCode() == KeyEvent.KEYCODE_MENU) {
-@@ -1696,14 +1885,33 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1696,14 +1902,33 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  if (!animations || reducedMotion) grid.scrollBy(0, dy);
                  else grid.smoothScrollBy(0, dy);
              }
@@ -36695,7 +36811,7 @@ index 17961443..f2bb9ebf 100644
          }
      }
  
-@@ -1728,17 +1936,80 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1728,17 +1953,80 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private void showHero(int position, float dockTopInRoot) {
          String label = adapter.labelAt(position);
          int color = adapter.ambientColorAt(position);
@@ -36778,7 +36894,7 @@ index 17961443..f2bb9ebf 100644
              hero.setTranslationX(0f);
              hero.setAlpha(1f);
              if (ambientGlow) {
-@@ -1754,7 +2025,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1754,7 +2042,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              hero.animate().cancel();
              ambient.animate().cancel();
              fillHero(position, label);
@@ -36787,7 +36903,7 @@ index 17961443..f2bb9ebf 100644
              hero.setTranslationX(0f);
              hero.animate().alpha(1f).setDuration(260).start();
              if (ambientGlow) {
-@@ -1766,7 +2037,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1766,7 +2054,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              if (advancedEffects) hero.animate().cancel();
              hero.animate().alpha(0f).translationX(-12 * density).setDuration(120).withEndAction(() -> {
                  fillHero(position, label);
@@ -36796,7 +36912,7 @@ index 17961443..f2bb9ebf 100644
                  hero.setTranslationX(12 * density);
                  hero.animate().alpha(1f).translationX(0f).setDuration(200).start();
              }).start();
-@@ -1779,13 +2050,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -1779,13 +2067,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  }).start();
              }
          } else {
@@ -36811,7 +36927,7 @@ index 17961443..f2bb9ebf 100644
          }
      }
  
-@@ -2010,6 +2275,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2010,6 +2292,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          heroArt.animate().cancel();
          heroArt.setAlpha(0f);
          heroShown = false;
@@ -36821,7 +36937,7 @@ index 17961443..f2bb9ebf 100644
          if (!ambientGlow) return;
          if (!animations || reducedMotion) {
              setAmbient(color);
-@@ -2053,6 +2321,255 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2053,6 +2338,255 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          else glass.setAlpha(0f);
      }
  
@@ -37077,7 +37193,7 @@ index 17961443..f2bb9ebf 100644
      // ---- optional system stats (config.xml show_stats) --------------------------------------------
  
      /** Background reader. Started only while Home is resumed and show_stats is on. */
-@@ -2117,13 +2634,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2117,13 +2651,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          // showing a dash that never fills in.
          StringBuilder line = new StringBuilder();
          if (cpu >= 0) line.append(getString(R.string.stats_cpu, cpu));
@@ -37105,7 +37221,7 @@ index 17961443..f2bb9ebf 100644
      // -1: need another sample. -2: this source cannot be read (Android 9 hides /proc/stat from apps).
      private static final int CPU_UNREADABLE = -2;
      private long cpuTotalPrev = -1, cpuIdlePrev = -1;
-@@ -2318,6 +2846,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2318,6 +2863,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              ((LinearLayout.LayoutParams) clockRow.getLayoutParams()).gravity = Gravity.RIGHT;
          }
          clockColumn.addView(column, clockColumn.indexOfChild(clockRow) + 1, lp);
@@ -37116,7 +37232,7 @@ index 17961443..f2bb9ebf 100644
      }
  
      /** The first top-bar button after Inputs that is shown, in bar order (top_bar_apps, the network pill, ...); Settings is always there. */
-@@ -2679,7 +3211,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2679,7 +3228,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              text = stub || icon == R.drawable.ic_ethernet ? "" : name;
              SpannableString label = new SpannableString(text + " " + badge);
              label.setSpan(span, text.length() + 1, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -37129,7 +37245,7 @@ index 17961443..f2bb9ebf 100644
          } else if (!TextUtils.equals(btnWifi.getText(), text)) {
              btnWifi.setText(text);
          }
-@@ -2934,7 +3470,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -2934,7 +3487,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
       *  source number; "HW8=-" leaves that input out of the Inputs menu (a port the board reports but the set
       *  does not have). Returns the number, -1 for a left-out input, or null when the input is not listed. */
      private Integer mappedSource(String inputId) {
@@ -37163,7 +37279,7 @@ index 17961443..f2bb9ebf 100644
      }
  
      /** Switches to a passthrough input (HDMI, AV). An input mapped in `input_sources` is opened by sending
-@@ -3016,9 +3577,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3016,9 +3594,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          final PopupWindow popup = glassPopup(panel, width);
  
          TvInputManager tim = (TvInputManager) getSystemService(TV_INPUT_SERVICE);
@@ -37173,7 +37289,7 @@ index 17961443..f2bb9ebf 100644
          boolean sawNonHdmi = false;
          String tunerId = null;
          boolean tunerIsHw = false;
-@@ -3090,10 +3648,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3090,10 +3665,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  if (hdmi && !label.toUpperCase(Locale.ROOT).contains("HDMI")) label = "HDMI " + label;
                  CharSequence custom = InputNames.tidy(info.loadCustomLabel(this));
                  boolean named = custom != null && custom.length() > 0 && !custom.toString().equals(label);
@@ -37185,7 +37301,7 @@ index 17961443..f2bb9ebf 100644
                  if (!hdmi) sawNonHdmi = true;
                  List<TvInputInfo> devices = cecDevices.get(info.getId());
                  if (devices != null) {
-@@ -3106,8 +3661,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3106,8 +3678,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                          String deviceLabel = name == null || name.length() == 0 ? label : name + " \u00B7 " + label;
                          final String deviceId = device.getId();
                          int state = hdmiStateBogus ? -1 : tim.getInputState(deviceId);
@@ -37195,7 +37311,7 @@ index 17961443..f2bb9ebf 100644
                      }
                      continue;
                  }
-@@ -3117,25 +3671,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3117,25 +3688,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  // Analog AV jacks have no hotplug detection, and some TVs report them as always connected
                  // (TCL Smart TV Pro G03 says "Connected" with nothing plugged in), so AV rows show no state.
                  int state = !hdmi || hdmiStateBogus ? -1 : tim.getInputState(id);
@@ -37223,7 +37339,7 @@ index 17961443..f2bb9ebf 100644
          }
          // Coocaa OS registers nothing with TvInputManager; com.skyworth.tv lists its sources instead.
          if (rows.getChildCount() == 0) {
-@@ -3187,15 +3725,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3187,15 +3742,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
  
          int alignment = getResources().getBoolean(R.bool.rtl_menu_bar) != underGear ? Gravity.END : Gravity.START;
          dropIn(popup, panel, anchor, alignment);
@@ -37240,7 +37356,7 @@ index 17961443..f2bb9ebf 100644
      }
  
      private PopupWindow glassPopup(View panel, int width) {
-@@ -3222,17 +3752,16 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3222,17 +3769,16 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
      }
  
@@ -37260,7 +37376,7 @@ index 17961443..f2bb9ebf 100644
          View row = getLayoutInflater().inflate(R.layout.item_input, rows, false);
          ((ImageView) row.findViewById(R.id.icon)).setImageResource(iconRes);
          ((TextView) row.findViewById(R.id.title)).setText(title);
-@@ -3255,7 +3784,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3255,7 +3801,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              action.run();
          });
          rows.addView(row);
@@ -37268,7 +37384,7 @@ index 17961443..f2bb9ebf 100644
      }
  
      // ---- launcher settings and module cards -------------------------------------------------------
-@@ -3309,8 +3837,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3309,8 +3854,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          if (moduleCards) addSettingsMenuRow(rows, popup, R.string.module_cards, this::showModuleCards);
          if (dockRow) addSettingsMenuRow(rows, popup, R.string.dock_edit, this::startDockEdit);
          addSettingsMenuRow(rows, popup, R.string.reorder, this::toggleReorder);
@@ -37277,7 +37393,7 @@ index 17961443..f2bb9ebf 100644
          panel.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
          popup.setWidth(Math.max((int) (200 * density), panel.getMeasuredWidth()));
          // Hebrew puts Settings at the left of the header: grow the menu inward from it.
-@@ -3371,10 +3897,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3371,10 +3914,143 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              panel.animate().alpha(1f).scaleY(1f).translationY(0f).setDuration(220)
                      .setInterpolator(new android.view.animation.DecelerateInterpolator(1.6f)).start();
          }
@@ -37421,7 +37537,7 @@ index 17961443..f2bb9ebf 100644
          View row = getLayoutInflater().inflate(R.layout.item_input, rows, false);
          row.findViewById(R.id.icon).setVisibility(View.GONE);
          row.findViewById(R.id.dot).setVisibility(View.GONE);
-@@ -3423,8 +4082,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3423,8 +4099,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          if (card == null) return;
  
          View panel = getLayoutInflater().inflate(R.layout.dialog_card_prompt, root, false);
@@ -37430,7 +37546,7 @@ index 17961443..f2bb9ebf 100644
          ((TextView) panel.findViewById(R.id.title)).setText(getString(R.string.card_prompt_title, card.appLabel));
          ((TextView) panel.findViewById(R.id.body)).setText(card.state == Cards.State.RESIGNED
                  ? getString(R.string.card_prompt_resigned, card.appLabel)
-@@ -3438,16 +4095,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3438,16 +4112,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  getString(R.string.card_prompt_identity, card.pkg, Cards.shortDigest(card.digest)));
          TextView keep = panel.findViewById(R.id.btnKeep);
          TextView show = panel.findViewById(R.id.btnShow);
@@ -37447,7 +37563,7 @@ index 17961443..f2bb9ebf 100644
  
          final Dialog dialog = new Dialog(this);
          dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-@@ -3479,10 +4126,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3479,10 +4143,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
          View.OnKeyListener keys = (v, keyCode, event) -> {
              if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
              if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN) return true;
@@ -37460,7 +37576,7 @@ index 17961443..f2bb9ebf 100644
          };
          keep.setOnKeyListener(keys);
          show.setOnKeyListener(keys);
-@@ -3516,8 +4161,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3516,8 +4178,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      private void showModuleCardsNow() {
          View anchor = findViewById(R.id.btnSettings);
          View panel = getLayoutInflater().inflate(R.layout.popup_cards, root, false);
@@ -37469,7 +37585,7 @@ index 17961443..f2bb9ebf 100644
          LinearLayout rows = panel.findViewById(R.id.rows);
          final PopupWindow popup = glassPopup(panel, (int) (400 * density));
          List<Cards.Card> listed = new ArrayList<>(cards);
-@@ -3526,12 +4169,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3526,12 +4186,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
              View row = getLayoutInflater().inflate(R.layout.item_card_row, rows, false);
              row.setTag(card.pkg);
              ((TextView) row.findViewById(R.id.title)).setText(card.label);
@@ -37482,7 +37598,7 @@ index 17961443..f2bb9ebf 100644
              TextView app = row.findViewById(R.id.app);
              if (Cards.fold(card.label).equals(Cards.fold(card.appLabel))) app.setVisibility(View.GONE);
              else app.setText(getString(R.string.card_app_name, card.appLabel));
-@@ -3592,4 +4229,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
+@@ -3592,4 +4246,32 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                  return getString(R.string.card_state_new);
          }
      }
@@ -38596,16 +38712,28 @@ index 00000000..a25ea3bf
 +</shape>
 diff --git a/launcher/app/src/main/res/drawable/bg_today_card.xml b/launcher/app/src/main/res/drawable/bg_today_card.xml
 new file mode 100644
-index 00000000..28b29bba
+index 00000000..9b391519
 --- /dev/null
 +++ b/launcher/app/src/main/res/drawable/bg_today_card.xml
-@@ -0,0 +1,6 @@
+@@ -0,0 +1,18 @@
 +<?xml version="1.0" encoding="utf-8"?>
-+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-+    <gradient android:angle="270" android:startColor="#33181E2A" android:endColor="#2411141E" />
-+    <stroke android:width="1.2dp" android:color="#4DFFFFFF" />
-+    <corners android:radius="20dp" />
-+</shape>
++<!-- CleanTV/VGS: Thẻ Hôm nay (Danh ngôn & Ngày này năm xưa) - có hiệu ứng focus sáng vàng khi điều khiển bằng remote TV -->
++<selector xmlns:android="http://schemas.android.com/apk/res/android">
++    <item android:state_focused="true">
++        <shape android:shape="rectangle">
++            <gradient android:angle="270" android:startColor="#4D3B4861" android:endColor="#3D293345" />
++            <stroke android:width="2dp" android:color="#FFD479" />
++            <corners android:radius="20dp" />
++        </shape>
++    </item>
++    <item>
++        <shape android:shape="rectangle">
++            <gradient android:angle="270" android:startColor="#33181E2A" android:endColor="#2411141E" />
++            <stroke android:width="1.2dp" android:color="#4DFFFFFF" />
++            <corners android:radius="20dp" />
++        </shape>
++    </item>
++</selector>
 diff --git a/launcher/app/src/main/res/drawable/bg_weather_card.xml b/launcher/app/src/main/res/drawable/bg_weather_card.xml
 new file mode 100644
 index 00000000..bf7b91fd
@@ -43708,10 +43836,10 @@ index b3de8647..da7be36e 100644
              android:id="@+id/animationsChoice"
              style="@style/SettingsRow"
 diff --git a/launcher/app/src/main/res/layout/activity_main.xml b/launcher/app/src/main/res/layout/activity_main.xml
-index c037d247..0f7c42e5 100644
+index c037d247..f5d43442 100644
 --- a/launcher/app/src/main/res/layout/activity_main.xml
 +++ b/launcher/app/src/main/res/layout/activity_main.xml
-@@ -146,6 +146,164 @@
+@@ -146,6 +146,166 @@
              android:visibility="gone" />
      </LinearLayout>
  
@@ -43733,6 +43861,8 @@ index c037d247..0f7c42e5 100644
 +            android:layout_height="wrap_content"
 +            android:layout_alignParentStart="true"
 +            android:background="@drawable/bg_today_card"
++            android:focusable="true"
++            android:clickable="true"
 +            android:orientation="vertical"
 +            android:paddingStart="24dp"
 +            android:paddingEnd="24dp"
@@ -43876,7 +44006,7 @@ index c037d247..0f7c42e5 100644
      <LinearLayout
          android:layout_width="match_parent"
          android:layout_height="match_parent"
-@@ -160,6 +318,7 @@
+@@ -160,6 +320,7 @@
          <RelativeLayout
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
@@ -43884,7 +44014,7 @@ index c037d247..0f7c42e5 100644
              android:clipChildren="false"
              android:clipToPadding="false">
  
-@@ -167,6 +326,7 @@
+@@ -167,6 +328,7 @@
                  android:id="@+id/leftBlock"
                  android:layout_width="match_parent"
                  android:layout_height="wrap_content"
@@ -43892,7 +44022,7 @@ index c037d247..0f7c42e5 100644
                  android:layout_alignParentStart="true"
                  android:layout_toStartOf="@+id/topButtons"
                  android:layout_marginEnd="16dp"
-@@ -272,7 +432,7 @@
+@@ -272,7 +434,7 @@
                              android:letterSpacing="0.14"
                              android:textAllCaps="true" />
  
@@ -43901,7 +44031,7 @@ index c037d247..0f7c42e5 100644
                          <TextView
                              android:id="@+id/lunarDate"
                              android:gravity="left"
-@@ -283,13 +443,54 @@
+@@ -283,13 +445,54 @@
                              android:ellipsize="end"
                              android:textColor="#80FFFFFF"
                              android:textSize="14sp"
@@ -43957,7 +44087,7 @@ index c037d247..0f7c42e5 100644
              </LinearLayout>
  
              <!-- Shown only when show_stats is on. Outside leftBlock, so the top buttons stay level with the clock
-@@ -311,6 +512,65 @@
+@@ -311,6 +514,65 @@
                  android:focusable="false"
                  android:visibility="gone" />
  
@@ -44023,7 +44153,7 @@ index c037d247..0f7c42e5 100644
              <LinearLayout
                  android:id="@+id/topButtons"
                  android:layout_width="wrap_content"
-@@ -329,6 +589,15 @@
+@@ -329,6 +591,15 @@
                      android:drawableStart="@drawable/ic_input"
                      android:nextFocusDown="@+id/grid" />
  
@@ -44039,7 +44169,7 @@ index c037d247..0f7c42e5 100644
                  <TextView
                      android:id="@+id/btnWifi"
                      style="@style/TopButton"
-@@ -354,6 +623,32 @@
+@@ -354,6 +625,32 @@
                      android:drawableStart="@drawable/ic_swap_vert"
                      android:nextFocusDown="@+id/grid" />
  
@@ -45277,10 +45407,10 @@ index ca006552..9afe1a1a 100644
  </resources>
 diff --git a/launcher/app/src/test/java/com/gathin/tvhome/FamilyFeaturesTest.java b/launcher/app/src/test/java/com/gathin/tvhome/FamilyFeaturesTest.java
 new file mode 100644
-index 00000000..dbed0a30
+index 00000000..f5625805
 --- /dev/null
 +++ b/launcher/app/src/test/java/com/gathin/tvhome/FamilyFeaturesTest.java
-@@ -0,0 +1,133 @@
+@@ -0,0 +1,139 @@
 +package com.gathin.tvhome;
 +
 +import org.junit.Test;
@@ -45337,12 +45467,18 @@ index 00000000..dbed0a30
 +        List<HistoryProvider.HistoryItem> fallback = HistoryProvider.getFallbackEvents(28, 10);
 +        assertNotNull("Fallback events should not be null", fallback);
 +        assertFalse("Fallback events should not be empty", fallback.isEmpty());
++        assertTrue("Fallback must have at least 15 events for rich offline experience", fallback.size() >= 15);
 +        for (HistoryProvider.HistoryItem item : fallback) {
 +            assertTrue("Fallback event must have valid year > 0", item.year > 0);
 +            assertNotNull("Fallback event text must not be null", item.text);
 +            assertFalse("Fallback event text must not be empty", item.text.isEmpty());
 +            assertTrue("Formatted text should contain year", item.getFormatted().contains("Năm " + item.year));
 +        }
++    }
++
++    @Test
++    public void testTodayCarouselInterval() {
++        assertEquals("Chu kỳ xoay vòng khối Hôm nay chuẩn là 15 giây", 15 * 1000L, MainActivity.CAROUSEL_INTERVAL_MS);
 +    }
 +
 +    @Test
