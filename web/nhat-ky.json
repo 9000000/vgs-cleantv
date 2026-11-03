@@ -1,5 +1,19 @@
 [
   {
+    "ban": "4.0.4",
+    "ngay": "2026-11-03",
+    "vi": [
+      "Bấm Home / tắt tivi là app cũ thôi phát tiếng (tắt được ở Tuỳ chỉnh → Dừng tiếng app cũ khi về Home).",
+      "Tự động nạp lại cấu hình và kích hoạt đồng hồ khi để yên ngay sau khi lưu từ điện thoại.",
+      "Bảo toàn 100% các widget và giao diện nhánh tet."
+    ],
+    "en": [
+      "Pressing Home / turning the TV off silences the app left playing (Options → Silence the app behind Home).",
+      "Automatically reloads configuration and activates the idle clock immediately upon applying from phone.",
+      "Preserved 100% widgets and customizations from tet branch."
+    ]
+  },
+  {
     "ban": "4.0.3",
     "ngay": "2026-11-03",
     "vi": [
