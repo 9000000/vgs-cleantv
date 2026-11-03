@@ -420,7 +420,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         lamToiNen = (nangCao["wallpaper_dim"] ?: th.cauHinh["wallpaper_dim"]?.toString())?.toIntOrNull() ?: 0
         hienThongSo = (nangCao["show_stats"] ?: th.cauHinh["show_stats"]?.toString())?.toBooleanStrictOrNull() ?: false
         tiviYeu = (nangCao["reduced_motion"] ?: th.cauHinh["reduced_motion"]?.toString())?.toBooleanStrictOrNull() ?: false
-        dongHoKhiYen = (nangCao["home_idle_clock_minutes"] ?: th.cauHinh["home_idle_clock_minutes"]?.toString())?.toIntOrNull() ?: 0
+        val phutTheme = (nangCao["home_idle_clock_minutes"] ?: th.cauHinh["home_idle_clock_minutes"]?.toString())?.toIntOrNull()
+        if (phutTheme != null) dongHoKhiYen = phutTheme
         tenDuoiApp = (nangCao["always_show_names"] ?: th.cauHinh["always_show_names"]?.toString())?.toBooleanStrictOrNull() ?: false
         tenToTrenDock = (nangCao["dock_title"] ?: th.cauHinh["dock_title"]?.toString())?.toBooleanStrictOrNull() ?: true
         toMauOApp = (nangCao["icon_tile_color"] ?: th.cauHinh["icon_tile_color"]?.toString())?.toBooleanStrictOrNull() ?: true
@@ -1254,6 +1255,12 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (j.has("dock_band")) {
             daiNenDock = j.optBoolean("dock_band")
             nangCao["dock_band"] = daiNenDock.toString()
+        }
+        if (j.has("home_idle_clock_minutes")) {
+            val phut = j.optInt("home_idle_clock_minutes", 0)
+            dongHoKhiYen = phut
+            if (phut > 0) nangCao["home_idle_clock_minutes"] = phut.toString()
+            else nangCao.remove("home_idle_clock_minutes")
         }
 
         nutManCho = j.optBoolean("dream_button", nutManCho)

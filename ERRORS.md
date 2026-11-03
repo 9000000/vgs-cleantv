@@ -25,3 +25,27 @@
 
 ---
 
+
+## [2026-11-03 21:30] - Đồng hồ khi để yên (home_idle_clock_minutes) không hoạt động sau khi áp dụng cài đặt
+
+- **Type**: Logic
+- **Severity**: High
+- **File**: `app/src/main/java/zone/vgs/tvsach/ui/PhienLamViec.kt:423`, `upstream/launcher/app/src/main/java/com/gathin/tvhome/MainActivity.java`
+- **Agent**: mon
+- **Root Cause**:
+  1. `PhienLamViec.kt`: Trong `dongBoCongTacTuTheme()`, `dongHoKhiYen` bị gán `?: 0` khi theme hoặc `nangCao` không có khoá, đồng thời `napTuTivi()` không lưu lại `home_idle_clock_minutes` sau khi gọi `dongBoCongTacTuTheme()`. Do đó mỗi khi kết nối tới TV hoặc đổi theme, giá trị người dùng chọn bị reset về 0 (tắt) và ở lần áp dụng tiếp theo, `home_idle_clock_minutes` bị loại khỏi cấu hình.
+  2. `MainActivity.java` (Launcher): Launcher chỉ tính `idleClockMs` 1 lần duy nhất trong `onCreate()`. Khi CleanTV gửi cấu hình mới và gọi `am start -W -f 0x10008000 -n $cmpHome`, do Launcher là `singleTask`, Activity không được tạo lại mà chỉ đi qua `onNewIntent()` và `onResume()`. Launcher không lắng nghe broadcast `zone.vgs.cleantv.RELOAD_CONFIG` và không kiểm tra thay đổi file `config.json` trên đĩa, khiến giá trị `idleClockMs` trong bộ nhớ vẫn bằng 0 cho đến khi TV khởi động lại.
+- **Error Message**: Người dùng phản ánh: "mục đồng hồ khi để yên tôi thấy không hoạt động", "sửa ngay lỗi Đồng hồ khi để yên".
+- **Fix Applied**:
+  1. `PhienLamViec.kt`: Bảo toàn `dongHoKhiYen` khi đổi theme (chỉ cập nhật nếu theme/nâng cao chỉ định rõ). Sau khi nạp từ TV, đồng bộ lại `dongHoKhiYen` từ JSON vào `nangCao["home_idle_clock_minutes"]` nếu có.
+  2. `ThaoTacTv.kt`: Bổ sung cờ `--ez reload true` trong lệnh `am start` khi đẩy cấu hình xuống TV.
+  3. `Config.java`: Bổ sung `themeChanged(Context)` kiểm tra xem file `config.json` hoặc `theme_revision` trên đĩa có thay đổi signature so với bản đã lưu hay không.
+  4. `MainActivity.java`:
+     - Lắng nghe broadcast `zone.vgs.cleantv.RELOAD_CONFIG` (`RECEIVER_EXPORTED`) để gọi `recreate()`.
+     - Trong `onNewIntent()`, kiểm tra extra `reload == true` để gọi `recreate()`.
+     - Trong `onResume()`, kiểm tra `Config.themeChanged(this)` để tự động `recreate()` nạp lại cấu hình mới ngay lập tức.
+  5. Biên dịch lại toàn bộ `tvhome.apk` và `tvhome-xiaomi.apk` trong `app/src/main/assets/`, đồng bộ patch `launcher-vgs.patch`.
+- **Prevention**: Khi thêm tuỳ chọn launcher điều khiển runtime bằng file cấu hình, luôn đảm bảo luồng đồng bộ 2 chiều (load từ TV <-> UI CleanTV) không bị ghi đè ngầm bởi theme defaults, và Activity Launcher phải có cơ chế hot-reload hoặc restartActivity khi nhận tín hiệu cấu hình mới.
+- **Status**: Fixed
+
+---

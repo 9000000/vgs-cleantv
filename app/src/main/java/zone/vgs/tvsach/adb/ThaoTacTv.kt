@@ -38,7 +38,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
      * system_server trên TCL G06 Android 11, 2/5 lần, có hay không TalkBack (issue #5, brooklyn96, 01/11/2026).
      */
     private val KHOI_DONG_LAI_HOME get() =
-            "am start -W -f 0x10008000 -n $cmpHome >/dev/null; am broadcast -a $RELOAD_CONFIG -p $pkgHome >/dev/null"
+            "am start -W -f 0x10008000 -n $cmpHome --ez reload true >/dev/null; am broadcast -a $RELOAD_CONFIG -p $pkgHome >/dev/null"
 
 
     private fun sh(lenh: String): String = adb.shell(lenh).replace("\r", "")

@@ -103,4 +103,16 @@ class ThemeTest {
         assertTrue("phải có dream_button", cacKhoa.contains("dream_button"))
         assertTrue("phải có top_compact", cacKhoa.contains("top_compact"))
     }
+
+
+    @Test
+    fun kiemTraHomeIdleClockMinutes() {
+        val assetFile = File("src/main/assets/nang-cao.json")
+        val array = org.json.JSONArray(assetFile.readText())
+        val opt = (0 until array.length()).map { array.getJSONObject(it) }.firstOrNull { it.getString("khoa") == "home_idle_clock_minutes" }
+        assertTrue("nang-cao.json phải có home_idle_clock_minutes", opt != null)
+        assertEquals("so", opt!!.getString("kieu"))
+        assertEquals(0, opt.getInt("min"))
+        assertEquals(1440, opt.getInt("max"))
+    }
 }
