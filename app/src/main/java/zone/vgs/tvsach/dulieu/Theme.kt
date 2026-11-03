@@ -108,7 +108,8 @@ val THEMES = listOf(
         "A dark aurora wallpaper (teal and violet on navy, darker at the bottom) with a matching background colour",
         mapOf("background_color" to "#070A14", "wallpaper" to true),
         "theme/aurora.jpg",
-        listOf(0xFF070A14, 0xFF0E4F5C, 0xFF3B1E6E)
+        listOf(0xFF070A14, 0xFF0E4F5C, 0xFF3B1E6E),
+        anhXem = "theme/aurora-preview.jpg"
     ),
 
     // 5. Kính trong suốt (Glass)
@@ -136,7 +137,8 @@ val THEMES = listOf(
             "advanced_effects" to true
         ),
         "theme/glass.jpg",
-        listOf(0xFF090C14, 0xFF141A29, 0xFF2A1C4D)
+        listOf(0xFF090C14, 0xFF141A29, 0xFF2A1C4D),
+        anhXem = "theme/glass-preview.jpg"
     ),
 
     // 6. Thu Phần Lan (Ruska)
@@ -153,7 +155,8 @@ val THEMES = listOf(
             "focus_overshoot" to false
         ),
         "theme/ruska.jpg",
-        listOf(0xFF07080D, 0xFF2A1A12, 0xFF8B4513)
+        listOf(0xFF07080D, 0xFF2A1A12, 0xFF8B4513),
+        anhXem = "theme/ruska-preview.jpg"
     ),
 
     // 7. Phong cảnh (Scenes)
@@ -274,7 +277,8 @@ val THEMES = listOf(
             "wallpaper" to true
         ),
         "theme/dussehra.jpg",
-        listOf(0xFF120809, 0xFF3D1508, 0xFFFFB23C)
+        listOf(0xFF120809, 0xFF3D1508, 0xFFFFB23C),
+        anhXem = "theme/dussehra-preview.jpg"
     ),
 
     // 12. Thiên nhiên tĩnh lặng (Nature calm - CleanYourTV Addons)
@@ -318,6 +322,309 @@ val THEMES = listOf(
         listOf(0xFF05070C, 0xFF14241B, 0xFF283B2D),
         boAnh = "theme/nature-calm",
         anhXem = "theme/nature-calm/001.jpg"
+    ),
+
+    Theme(
+        "aerial", "Không gian Trái Đất", "Aerial Earth",
+        "10 ảnh Trái Đất chụp từ trạm vũ trụ ISS đổi mỗi 15 phút, tự bật màn chờ đồng hồ sau 3 phút",
+        "Ten views of Earth from the ISS rotating every 15 minutes, idle clock after 3 minutes",
+        mapOf(
+            "background_color" to "#000000",
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 15,
+            "wallpaper_order" to "shuffle",
+            "wallpaper_captions" to true,
+            "rows_below_dock" to 0,
+            "dock_title" to true,
+            "dock_glass" to true,
+            "dock_opacity" to 50,
+            "dock_even_padding" to true,
+            "ambient_glow" to false,
+            "icon_only_buttons" to true,
+            "icon_only_inputs" to true,
+            "home_idle_clock_minutes" to 3,
+            "back_opens_clock" to true,
+            "clock_wallpaper" to true,
+            "clock_wallpaper_dim" to 25
+        ),
+        null,
+        listOf(0xFF000000, 0xFF0B2545, 0xFF134074),
+        boAnh = "theme/aerial",
+        anhXem = "theme/aerial/screenshot.jpg"
+    ),
+
+    Theme(
+        "blocky", "Thế giới Khối Voxel", "Blocky Voxel",
+        "11 tranh phong cảnh khối voxel pixel đổi theo sáng / chiều / tối, quầng sáng tĩnh",
+        "Eleven pixelated voxel landscapes matching time of day, calm focus highlight",
+        mapOf(
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 60,
+            "wallpaper_moods" to mapOf(
+                "morning" to listOf("01-meadow-day.png", "04-plains.png", "05-desert.png", "06-snowy-forest.png", "07-jungle.png", "08-ocean.png", "09-blossom-grove.png"),
+                "evening" to listOf("01-meadow-day.png", "02-meadow-dusk.png", "04-plains.png", "05-desert.png", "06-snowy-forest.png", "07-jungle.png", "08-ocean.png", "09-blossom-grove.png"),
+                "night" to listOf("03-meadow-night.png", "10-cave.png", "11-lava-cavern.png")
+            ),
+            "wallpaper_captions" to true,
+            "wallpaper_dim" to 15,
+            "dock_opacity" to 70,
+            "dock_title" to false,
+            "ambient_glow" to false,
+            "focus_overshoot" to false,
+            "clock_wallpaper" to true,
+            "clock_wallpaper_dim" to 25
+        ),
+        null,
+        listOf(0xFF2E6F40, 0xFF4A8505, 0xFF1B3B22),
+        boAnh = "theme/blocky",
+        anhXem = "theme/blocky/screenshot.jpg"
+    ),
+
+    Theme(
+        "christmas", "Giáng sinh", "Christmas",
+        "Không khí Giáng sinh tuyết rơi lung linh trên nền xanh đêm, dock kính mờ 40%",
+        "Festive snowy winter night wallpaper, 40% frosted dock, fading rows",
+        mapOf(
+            "background_color" to "#050A1C",
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 0,
+            "wallpaper_dim" to 12,
+            "dock_glass" to true,
+            "dock_opacity" to 40,
+            "dock_even_padding" to true,
+            "ambient_glow" to false,
+            "icon_only_buttons" to true,
+            "fade_rows" to true,
+            "focus_overshoot" to false,
+            "advanced_effects" to true,
+            "glow_snap" to true,
+            "seasonal_skin" to "christmas"
+        ),
+        "theme/christmas.jpg",
+        listOf(0xFF050A1C, 0xFF142B47, 0xFFC42B2B),
+        anhXem = "theme/christmas-preview.jpg"
+    ),
+
+    Theme(
+        "cinematic", "Điện ảnh Phim truyện", "Cinematic",
+        "Tối ưu trải nghiệm rạp phim tại gia: poster nổi bật, hàng dock mờ dần khi cuộn, quầng sáng điện ảnh",
+        "Home cinema experience: highlighted posters, fading rows on scroll, cinematic horizon glow",
+        mapOf(
+            "background_color" to "#07090E",
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 0,
+            "wallpaper_dim" to 15,
+            "cinematic_home" to true,
+            "dock_glass" to true,
+            "dock_opacity" to 40,
+            "dock_even_padding" to true,
+            "icon_only_buttons" to true,
+            "app_glow" to true,
+            "glow_style" to "horizon",
+            "fade_rows" to true,
+            "focus_overshoot" to false,
+            "advanced_effects" to true
+        ),
+        "theme/cinematic.jpg",
+        listOf(0xFF07090E, 0xFF141923, 0xFF2E384D),
+        anhXem = "theme/cinematic-preview.jpg"
+    ),
+
+    Theme(
+        "dock-glass", "Thanh Dock Kính Mờ", "Dock Glass",
+        "Thanh dock bo góc kính mờ sang trọng như tvOS, nút bấm bo tròn tinh tế",
+        "Rounded translucent frosted-glass dock band inspired by modern smart TVs, icon-only pills",
+        mapOf(
+            "dock_glass" to true,
+            "dock_opacity" to 45,
+            "dock_band" to true,
+            "dock_even_padding" to true,
+            "glass_style" to "glass",
+            "icon_only_buttons" to true,
+            "icon_only_inputs" to true,
+            "advanced_effects" to true,
+            "focus_overshoot" to false
+        ),
+        null,
+        listOf(0xFF0A0F1D, 0xFF1E293B, 0xFF334155),
+        anhXem = "theme/dock-glass-preview.jpg"
+    ),
+
+    Theme(
+        "halloween", "Lễ hội Ma Quái", "Halloween",
+        "10 tranh Halloween kỳ bí đổi mỗi 30 phút, đồng hồ bí ngô ma mị, sắc cam tím huyền ảo",
+        "Ten spooky Halloween atmospheres rotating every 30 minutes, eerie orange glow and shadows",
+        mapOf(
+            "background_color" to "#0A050D",
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 30,
+            "wallpaper_order" to "shuffle",
+            "wallpaper_captions" to true,
+            "wallpaper_dim" to 15,
+            "dock_glass" to true,
+            "dock_opacity" to 40,
+            "dock_even_padding" to true,
+            "ambient_glow" to false,
+            "icon_only_buttons" to true,
+            "fade_rows" to true,
+            "focus_overshoot" to false,
+            "advanced_effects" to true,
+            "clock_wallpaper" to true,
+            "clock_wallpaper_dim" to 20,
+            "seasonal_skin" to "halloween"
+        ),
+        null,
+        listOf(0xFF0A050D, 0xFF2D1138, 0xFFE65100),
+        boAnh = "theme/halloween",
+        anhXem = "theme/halloween/screenshot.jpg"
+    ),
+
+    Theme(
+        "minimal", "Tối giản Tuyệt đối", "Minimalist",
+        "Đen tuyền OLED, dock không viền không nền, focus viền mỏng không loá mắt, siêu tiết kiệm điện",
+        "Deep OLED black, frameless dock, rim-only focus highlight, ultra clean and battery friendly",
+        mapOf(
+            "background_color" to "#000000",
+            "dock_glass" to false,
+            "dock_band" to false,
+            "glass_style" to "rim",
+            "dock_title" to false,
+            "dock_opacity" to 100,
+            "fill_dock" to false,
+            "columns" to 5,
+            "rows_below_dock" to 0,
+            "ambient_glow" to false,
+            "app_glow" to false,
+            "icon_only_buttons" to true,
+            "icon_only_inputs" to true,
+            "reduced_motion" to true,
+            "sky_intensity" to 0,
+            "wallpaper" to false
+        ),
+        null,
+        listOf(0xFF000000, 0xFF111111, 0xFF222222),
+        anhXem = "theme/minimal-preview.jpg"
+    ),
+
+    Theme(
+        "red-rain", "Cơn Mưa Đỏ Neon", "Red Rain",
+        "Phong cách Cyberpunk huyền bí với ánh đèn neon đỏ xuyên qua làn mưa đêm rực rỡ",
+        "Atmospheric crimson rain-streaked night aesthetic with high contrast glowing accents",
+        mapOf(
+            "background_color" to "#080305",
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 0,
+            "wallpaper_dim" to 10,
+            "dock_glass" to true,
+            "dock_opacity" to 40,
+            "dock_even_padding" to true,
+            "dock_title" to false,
+            "icon_only_buttons" to true,
+            "ambient_glow" to false,
+            "app_glow" to true,
+            "glow_style" to "horizon",
+            "fade_rows" to true,
+            "focus_overshoot" to false,
+            "advanced_effects" to true
+        ),
+        "theme/red-rain.jpg",
+        listOf(0xFF080305, 0xFF2A0D14, 0xFF8A1828),
+        anhXem = "theme/red-rain-preview.jpg"
+    ),
+
+    Theme(
+        "stockholm", "Bắc Âu Stockholm", "Stockholm",
+        "10 phong cảnh thủ đô Stockholm đổi mỗi 15 phút kèm chú thích, phong cách Scandi tinh tế",
+        "Ten serene perspectives of Stockholm rotating every 15 minutes with captions, Scandi calm",
+        mapOf(
+            "columns" to 5,
+            "rows_below_dock" to 1,
+            "background_color" to "#05070C",
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 15,
+            "wallpaper_order" to "shuffle",
+            "wallpaper_captions" to true,
+            "cinematic_home" to false,
+            "dock_title" to false,
+            "dock_glass" to true,
+            "dock_opacity" to 50,
+            "dock_even_padding" to true,
+            "icon_only_buttons" to true,
+            "icon_only_inputs" to true,
+            "ambient_glow" to false,
+            "app_glow" to false,
+            "fade_rows" to true,
+            "focus_overshoot" to false,
+            "advanced_effects" to true
+        ),
+        null,
+        listOf(0xFF05070C, 0xFF132235, 0xFF253E5C),
+        boAnh = "theme/stockholm",
+        anhXem = "theme/stockholm/screenshot.jpg"
+    ),
+
+    Theme(
+        "storm", "Bão tố Sấm sét", "Storm",
+        "4 tranh sấm sét kịch tính đổi mỗi giờ kèm địa danh, dock kính mờ 50%, 5 cột hiển thị",
+        "Four dramatic lightning storm photos rotating hourly with captions, 5-column frosted dock",
+        mapOf(
+            "columns" to 5,
+            "background_color" to "#02050A",
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 60,
+            "wallpaper_order" to "sequential",
+            "wallpaper_captions" to true,
+            "icon_only_buttons" to true,
+            "dock_glass" to true,
+            "dock_opacity" to 50,
+            "dock_even_padding" to true,
+            "dock_title" to false,
+            "ambient_glow" to false,
+            "app_glow" to false,
+            "fade_rows" to true,
+            "focus_overshoot" to false,
+            "advanced_effects" to true
+        ),
+        null,
+        listOf(0xFF02050A, 0xFF0E1A2B, 0xFF1E3A5F),
+        boAnh = "theme/storm",
+        anhXem = "theme/storm/screenshot.jpg"
+    ),
+
+    Theme(
+        "weeb", "Anime / Kiếm sĩ", "Anime Weeb",
+        "5 tranh nhân vật anime rực rỡ đổi mỗi 30 phút, dock kính mờ 30%, chữ tiêu đề trắng nổi bật",
+        "Five vibrant anime character artworks rotating every 30 minutes, 30% translucent dock",
+        mapOf(
+            "columns" to 4,
+            "rows_below_dock" to 0,
+            "background_color" to "#000000",
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 30,
+            "wallpaper_order" to "sequential",
+            "wallpaper_captions" to false,
+            "wallpaper_true_color" to true,
+            "wallpaper_dim" to 0,
+            "cinematic_home" to false,
+            "dock_title" to false,
+            "dock_glass" to true,
+            "dock_opacity" to 30,
+            "dock_even_padding" to true,
+            "icon_only_buttons" to true,
+            "icon_only_inputs" to true,
+            "ambient_glow" to false,
+            "app_glow" to false,
+            "fade_rows" to true,
+            "focus_overshoot" to true,
+            "advanced_effects" to true,
+            "show_greeting" to true,
+            "header_white" to true,
+            "tile_menu" to true
+        ),
+        null,
+        listOf(0xFF000000, 0xFF3D1A1A, 0xFFB33939),
+        boAnh = "theme/weeb",
+        anhXem = "theme/weeb/screenshot.jpg"
     ),
 )
 

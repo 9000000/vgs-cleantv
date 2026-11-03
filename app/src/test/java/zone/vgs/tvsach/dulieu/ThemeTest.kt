@@ -8,7 +8,7 @@ import java.io.File
 class ThemeTest {
     @Test
     fun danhSachThemeHopLe() {
-        assertEquals("Có 13 giao diện (VGS, Apple TV, macOS, Retro, Nature calm + 8 giao diện CleanYourTV)", 13, THEMES.size)
+        assertEquals("Có 24 giao diện (bao gồm các chủ đề cổ điển và toàn bộ 11 chủ đề mới từ CleanYourTV)", 24, THEMES.size)
         val ids = THEMES.map { it.id }
         assertEquals("Không trùng id theme", ids.size, ids.toSet().size)
 
