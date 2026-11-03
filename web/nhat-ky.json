@@ -1,1339 +1,1429 @@
 [
- {
-  "ban": "3.5.15",
-  "ngay": "2026-10-28",
-  "vi": [
-   "- Đồng bộ toàn diện CleanTV 3.5.14: Hỗ trợ 101 kênh TV360, 16 ô kênh, icon app to",
-   "- Sửa triệt để sự kiện Ngày này năm xưa: loại bỏ text hỏng Wikipedia, hỗ trợ mục sự kiện con, bộ lọc an toàn phòng khách",
-   "- Bảo toàn trọn vẹn Widget phong cách Samsung The Frame: Thời tiết góc, Đếm ngược ngày/Tết, Thẻ sự kiện & danh ngôn, Lịch âm",
-   "- Thanh Dock 9 ô biểu tượng, tuỳ chỉnh dải nền dock độc lập, bộ 27 theme hoàn chỉnh"
-  ],
-  "en": [
-   "- Full sync with CleanTV 3.5.14: 101 TV360 channels, 16 channel tiles, big app icons",
-   "- Fixed Today in History: cleaned corrupted Wikipedia markup, added sub-bullet support, family-safe filter",
-   "- Preserved Samsung The Frame widgets: Corner weather, Event/Tet countdown, Today quote & history card, Lunar calendar",
-   "- 9-column Dock, independent dock background band toggle, 27 complete themes"
-  ]
- },
- {
-  "ban": "3.5.14",
-  "ngay": "2026-10-28",
-  "vi": [
-   "- Thêm nguồn kênh TV360 (Viettel): 101 kênh trong nước, bấm ô là mở thẳng kênh trong app TV360 (cần bản 6.4 trở lên trên tivi). Kênh có ổ khoá cần đăng nhập TV360"
-  ],
-  "en": [
-   "- New channel source TV360 (Viettel): 101 Vietnamese channels, a tile opens the channel straight in TV360 (needs 6.4 or later on the TV). Locked channels need a TV360 login"
-  ]
- },
- {
-  "ban": "3.5.13",
-  "ngay": "2026-10-28",
-  "vi": [
-   "- Ô kênh trên Home sạch tăng từ 12 lên 16, đủ chỗ cho người gộp kênh VTVgo và FPT Play",
-   "- Công tắc mới \"Icon to trong ô app\": app không có ảnh tivi có icon gần kín ô",
-   "- Công tắc lọc quảng cáo DNS có thêm lưu ý: tivi nào bị YouTube hay app kênh chập chờn thì tắt đi",
-   "- Nâng cao: mô tả tuỳ chọn âm lượng nhảy hai nấc chỉ rõ công tắc nào dùng khi giữ nút chỉ nhảy một nấc"
-  ],
-  "en": [
-   "- Channel tiles on Home go from 12 to 16",
-   "- New switch \"Big icons in app tiles\": apps without a TV banner get an icon that fills most of the tile",
-   "- The ad-blocking DNS switch now notes it can make YouTube or channel apps stall on some TVs",
-   "- Advanced: the volume double-step option now points to the right switch for a held key that moves only one step"
-  ]
- },
- {
-  "ban": "3.5.12",
-  "ngay": "2026-10-28",
-  "vi": [
-   "- Công tắc mới \"Thư viện trong menu Cài đặt\": bỏ nút Thư viện trên thanh đầu, mở bằng cách giữ OK trên nút Cài đặt của Home sạch",
-   "- Sửa nhỏ Home sạch: đặt lại giao diện không còn hiện lại giao diện cũ lúc vừa bật tivi"
-  ],
-  "en": [
-   "- New switch \"Library in the Settings menu\": no Library button in the top bar, open it by holding OK on Home's Settings button",
-   "- Small Home fix: a theme reset no longer shows the old theme right after power-on"
-  ]
- },
- {
-  "ban": "3.5.11",
-  "ngay": "2026-10-28",
-  "vi": [
-   "- Sửa Khôi phục khi chọn giữ Home sạch: tắt bộ bắt phím của Home sạch, bỏ kiểu mở đè và \"luôn mở khi bật tivi\", thu lại quyền. Nút Home về hẳn Home gốc, rút điện bật lại không bị Home sạch giành lại (Chromecast)",
-   "- Có thể sửa luôn lỗi tìm giọng nói trong YouTube sau khi khôi phục"
-  ],
-  "en": [
-   "- Fixed Restore when keeping the clean Home: its Home-key helper is switched off, open-over and open-at-power-on are cleared and its permissions taken back. Home goes to the stock Home for good, even after a power cut (Chromecast)",
-   "- This may also fix YouTube voice search after a restore"
-  ]
- },
- {
-  "ban": "3.5.10",
-  "ngay": "2026-10-28",
-  "vi": [
-   "- Lưu ra file, mở file, chọn ảnh hay chuyển sang app khác rồi quay lại: app tự kiểm và nối lại tivi nếu điện thoại đã cắt kết nối, không phải kết nối lại bằng tay"
-  ],
-  "en": [
-   "- Saving or opening a file, picking a picture or switching apps and coming back: the app checks the TV connection and reconnects by itself if the phone dropped it"
-  ]
- },
- {
-  "ban": "3.5.9",
-  "ngay": "2026-10-28",
-  "vi": [
-   "- An toàn hơn theo CleanYourTV: không bao giờ tắt phần mềm lõi của tivi MediaTek (com.cltv.mal, com.mediatek.tis, tv.service, tv.agent). Một tivi Haier đã khởi động lại liên tục sau khi tắt gói này",
-   "- Tivi đã lỡ tắt các gói đó (vài máy Skyworth, Hisense, Xiaomi): bấm Áp dụng hoặc dọn lại là app tự bật lại",
-   "- Danh sách theo CleanYourTV mới: 341 mẫu tivi, 95 hãng"
-  ],
-  "en": [
-   "- Safer, following CleanYourTV: never disables MediaTek TV middleware (com.cltv.mal, com.mediatek.tis, tv.service, tv.agent). A Haier TV restarted in a loop with it off",
-   "- TVs where these were already disabled (some Skyworth, Hisense, Xiaomi): Apply or clean again and the app turns them back on",
-   "- Lists from the latest CleanYourTV: 341 TV models, 95 brands"
-  ]
- },
- {
-  "ban": "3.5.8",
-  "ngay": "2026-10-28",
-  "vi": [
-   "- Tuỳ chỉnh thêm: \"Nút Wi-Fi, Cài đặt sát mép trên\", hàng nút không tụt theo đồng hồ to và dòng ngày, thời tiết",
-   "- Tivi khởi động chậm (TCL 43P618): Home sạch chờ đến lúc đọc được cấu hình, bật bộ bắt phím Home ngay khi đọc được, và ghi mốc đó vào chẩn đoán"
-  ],
-  "en": [
-   "- More options: \"Wi-Fi, Settings buttons at the very top\", so they no longer drop with a large clock and the date and weather lines",
-   "- Slow-booting TVs (TCL 43P618): the clean Home waits until its settings are readable, turns the Home key helper on right then, and records the time in the diagnosis"
-  ]
- },
- {
-  "ban": "3.5.7",
-  "ngay": "2026-10-28",
-  "vi": [
-   "- Tivi chặn tín hiệu khởi động (TCL 43P618): lúc vừa bật Home sạch đọc cấu hình chưa được thì đọc lại mỗi 15 giây trong 2 phút đầu, không còn nằm ở Home cũ vài phút",
-   "- Kiểu mở đè Home cũ: bấm tìm giọng nói trên Google TV thì kết quả hiện ra bình thường, không bị Home sạch che (Xiaomi MZTU0)",
-   "- Ô kênh FPT Play (HTV7…): hết vệt trắng ở mép ô, nền theo màu logo. Bấm Áp dụng lại để làm mới ảnh ô"
-  ],
-  "en": [
-   "- TVs that block the boot signal (TCL 43P618): if the clean Home cannot read its settings right after power-on it reads them again every 15 s for 2 minutes instead of leaving the old Home up",
-   "- Open-over-old-Home mode: Google TV voice search results now show instead of being covered (Xiaomi MZTU0)",
-   "- FPT Play channel tiles (HTV7…): no white line at the edge, background follows the logo. Apply again to refresh the tiles"
-  ]
- },
- {
-  "ban": "3.5.6",
-  "ngay": "2026-10-27",
-  "vi": [
-   "Tivi chặn tín hiệu khởi động với app ngoài (TCL 43P618): Home sạch tự mở lên qua dịch vụ Android tự nối lúc khởi động, cần bấm Áp dụng lên tivi một lần",
-   "Dấu khởi động ghi đủ mọi đường Home sạch được gọi dậy, để chẩn đoán chính xác hơn"
-  ],
-  "en": [
-   "TVs that block the boot signal for outside apps (TCL 43P618): the clean Home opens through a service Android connects by itself at boot; Apply to the TV once",
-   "The boot record lists every way the clean Home was woken, for a sharper diagnosis"
-  ]
- },
- {
-  "ban": "3.5.5",
-  "ngay": "2026-10-27",
-  "vi": [
-   "Home sạch ghi lại những gì chạy lúc tivi khởi động vào cài đặt của tivi (không mất như nhật ký), gửi kèm khi bấm Gửi danh sách gói",
-   "Tivi khởi động nhanh (không báo khởi động đủ) cũng được tự mở Home sạch"
-  ],
-  "en": [
-   "The clean Home keeps a record of what ran at boot in the TV settings (it does not rotate away like the log) and sends it with the package list",
-   "TVs with fast boot (no full boot signal) also get the clean Home opened"
-  ]
- },
- {
-  "ban": "3.5.4",
-  "ngay": "2026-10-27",
-  "vi": [
-   "Ô app tô màu (YouTube, TV360…): logo to theo cỡ ô, không còn bé tí ở giữa khi ô lớn",
-   "Dòng \"Mở lần cuối\" trên Home cập nhật ngay khi quay về từ app, không còn hiện \"Hôm kia\" lúc vừa mở"
-  ],
-  "en": [
-   "Colour app tiles (YouTube, TV360…): the logo grows with the tile instead of sitting tiny in the middle of big tiles",
-   "The \"Last opened\" line on Home updates as soon as you come back from the app, no more \"2 days ago\" right after opening it"
-  ]
- },
- {
-  "ban": "3.5.3",
-  "ngay": "2026-10-27",
-  "vi": [
-   "Ô tìm thời tiết: báo \"Đang tìm…\", báo không thấy hoặc điện thoại không vào được dịch vụ tìm địa danh, tự thử lại một lần khi mạng chậm",
-   "Gửi danh sách gói kèm chẩn đoán lúc khởi động (Home sạch có được gọi dậy không), để sửa lỗi tivi về Home gốc sau khi rút điện trên TCL và Google TV"
-  ],
-  "en": [
-   "Weather search: shows \"Searching…\", says when nothing is found or the phone cannot reach the place search, and retries once on a slow network",
-   "Sending the package list now includes a boot diagnosis (did the clean Home wake up), to fix TVs that go back to the stock Home after a power cut on TCL and Google TV"
-  ]
- },
- {
-  "ban": "3.5.2",
-  "ngay": "2026-10-27",
-  "vi": [
-   "Rút điện bật lại: Home sạch không còn mất hình nền, thời tiết, ô kênh, màu chữ (tivi Android 11 trở lên đọc thư mục cấu hình chậm lúc khởi động)",
-   "Sony BRAVIA XR: ẩn dòng Khởi động lại không chạy trong menu nút Cài đặt"
-  ],
-  "en": [
-   "After a power cut the clean Home keeps its wallpaper, weather, channel tiles and text colour (Android 11+ TVs read the settings folder late at boot)",
-   "Sony BRAVIA XR: the Restart row that did nothing is hidden from the Settings button menu"
-  ]
- },
- {
-  "ban": "3.5.1",
-  "ngay": "2026-10-27",
-  "vi": [
-   "Remote của tivi không còn chậm trên hộp yếu (gõ chữ từ điện thoại chỉ bật theo dõi màn hình lúc đang gõ)",
-   "Tivi giữ Home Google (TCL Google TV…): rút điện bật lại tự về Home sạch, không cần bật thêm công tắc",
-   "Ảnh dọc làm hình nền và màn chờ động hiện trọn ảnh, hai bên là ảnh làm mờ, không bị cắt",
-   "Danh sách theo CleanYourTV mới: 335 mẫu tivi, 94 hãng"
-  ],
-  "en": [
-   "The TV remote is no longer slow on weak boxes (phone typing watches the screen only while typing)",
-   "TVs that keep the Google home (TCL Google TV…): after a power cut the clean Home comes back by itself",
-   "Portrait photos as wallpaper and in the moving screensaver show whole, with blurred sides",
-   "Lists follow the latest CleanYourTV: 335 TV models, 94 brands"
-  ]
- },
- {
-  "ban": "3.5.0",
-  "ngay": "2026-10-27",
-  "vi": [
-   "Remote trên điện thoại: kết nối tivi → Remote trên điện thoại. Phím điều hướng, OK, Home, quay lại, âm lượng, nguồn",
-   "Gõ hoặc nói để điền chữ vào ô đang chọn trên tivi (tìm YouTube, mật khẩu Wi-Fi), tiếng Việt có dấu",
-   "Hẹn giờ tắt tivi 15–120 phút, tivi tự đếm nên đóng app vẫn tắt đúng hẹn",
-   "Mở, gỡ app trên tivi; cài file APK từ điện thoại sang tivi",
-   "Màn chờ động (Tuỳ chỉnh): đồng hồ trên ảnh nền trôi chậm, nhiều ảnh thì 20 giây đổi một ảnh, hiện khi để yên ở Home sạch và làm màn chờ của tivi"
-  ],
-  "en": [
-   "Phone remote: connect a TV → Phone remote. D-pad, OK, Home, Back, volume, power",
-   "Type or speak into the field selected on the TV (YouTube search, Wi-Fi password), accents included",
-   "Sleep timer 15–120 minutes; the TV counts down itself, so closing the app is fine",
-   "Open and uninstall TV apps; install an APK from the phone onto the TV",
-   "Moving screensaver (Options): a clock over your wallpaper drifting slowly, a new picture every 20 s, shown when Home is idle and as the TV screensaver"
-  ]
- },
- {
-  "ban": "3.4.2",
-  "ngay": "2026-10-27",
-  "vi": [
-   "Thêm 61 kênh FPT Play chọn sẵn (toàn quốc, HTV, địa phương), không cần dán link",
-   "Tivi TCL rút điện bật lại: Home sạch tự lên, tự bật lại nút Home",
-   "Hộp RockChip: sửa lỗi không cài được Home sạch (màn cài đặt lần đầu tranh Home)",
-   "Màn nhỏ: nút trên cùng tự thu thành icon để không che đồng hồ, lời chào, thời tiết"
-  ],
-  "en": [
-   "61 ready FPT Play channels (national, HTV, local), no link pasting needed",
-   "TCL TVs after a power cut: the clean Home comes up and the Home key works again",
-   "RockChip boxes: fixed the clean Home failing to install (first-run setup screen claimed Home)",
-   "Small screens: top buttons shrink to icons so the clock, greeting and weather fit"
-  ]
- },
- {
-  "ban": "3.4.1",
-  "ngay": "2026-10-27",
-  "vi": [
-   "• Ảnh nền riêng tự đổi: sau khi chọn ảnh của bạn, bấm \"Thêm ảnh để hình nền tự đổi\" (tối đa 20 ảnh) và chọn bao lâu đổi một lần (5, 15, 30, 60 phút). Góp ý của build.dng."
-  ],
-  "en": [
-   "• Rotating wallpapers of your own: after picking your picture, press \"Add pictures to rotate the wallpaper\" (up to 20) and choose how often it changes (5, 15, 30, 60 minutes)."
-  ]
- },
- {
-  "ban": "3.4.0",
-  "ngay": "2026-10-27",
-  "vi": [
-   "• Giao diện Kiểu macOS: thanh menu mờ trên cùng, Dock kính mờ ô nhỏ nằm giữa đáy màn hình, ô đang chọn nổi lên sáng theo màu app, ảnh nền lượn tím hồng có logo VGS ở giữa.",
-   "• Chọn màu chữ đồng hồ, ngày, thời tiết (Trắng, Vàng, Xanh ngọc, Xanh lá, Hồng, Cam, Đen) cho ảnh nền sáng khó đọc. Góp ý của nggh, tranhoangnt555, Nam Tran."
-  ],
-  "en": [
-   "• macOS style: translucent menu bar on top, a small glass Dock centred at the bottom, the focused tile lifts and glows in the app's colour, a violet–pink wave wallpaper with the VGS logo in the middle.",
-   "• Pick the clock, date and weather text colour (White, Yellow, Cyan, Green, Pink, Orange, Black) for bright wallpapers."
-  ]
- },
- {
-  "ban": "3.3.0",
-  "ngay": "2026-10-27",
-  "vi": [
-   "- Danh sách mẫu tivi lên 332 mẫu, 93 hãng.",
-   "- Home sạch theo bản gốc CleanYourTV mới: app có ảnh banner bị cắt xấu được vẽ từ icon, bảng chọn nguồn có thể chỉ hiện cổng đang cắm thiết bị (Nâng cao), sửa vài lỗi hiệu ứng."
-  ],
-  "en": [
-   "- TV list now has 332 models from 93 brands.",
-   "- Home sạch follows the latest CleanYourTV: apps whose banner crops badly are drawn from their icon, the Inputs list can show connected ports only (Advanced), a few effect fixes."
-  ]
- },
- {
-  "ban": "3.2.0",
-  "ngay": "2026-10-26",
-  "vi": [
-   "- \"Nút hẹn giờ tắt tivi\" (Tuỳ chỉnh → Hiển thị): một nút trên cùng của Home sạch, bấm lần lượt 15, 30, 60, 90 phút, bấm nữa là huỷ (góp ý duongghoangg1103).",
-   "- Dùng ảnh nền riêng thì chữ đồng hồ, ngày, thời tiết có bóng mờ phía sau, không bị chìm trên ảnh sáng (góp ý losphets).",
-   "- Sửa ảnh nền riêng không lên hoặc phải áp dụng vài lần trên một số tivi Android 11: app kiểm ảnh đã sang tivi chưa, ghi lại nếu thiếu và báo rõ nếu tivi chặn."
-  ],
-  "en": [
-   "- \"Sleep timer button\" (Options → Display): a top button on the clean Home, each press sets 15, 30, 60, 90 minutes, then off.",
-   "- With your own picture, the clock, date and weather get a soft shadow so they stay readable on bright photos.",
-   "- Fixes your wallpaper not showing (or needing several applies) on some Android 11 TVs: the app checks it reached the TV, writes it again if not, and says so if the TV blocks it."
-  ]
- },
- {
-  "ban": "3.1.2",
-  "ngay": "2026-10-26",
-  "vi": [
-   "- Thẻ \"Cộng đồng VGS\" ở màn chính và màn xong: nhóm Facebook Vietnam Gaming Setup, nhóm Telegram VGS, tham gia VGSZone."
-  ],
-  "en": [
-   "- \"The VGS community\" card on the main and final screens: the Vietnam Gaming Setup Facebook group, VGS on Telegram, VGSZone."
-  ]
- },
- {
-  "ban": "3.1.1",
-  "ngay": "2026-10-26",
-  "vi": [
-   "- \"Dò một nút trên remote\" ở Tuỳ chỉnh → Remote: nút app lạ trên remote (VTVgo, FPT Play…) không mở app nữa sau khi đổi Home thì bấm Dò, bấm nút đó trên remote, chọn app cho nó, Áp dụng lên tivi (góp ý Hoàng Hữu, TCL 65C655)."
-  ],
-  "en": [
-   "- \"Detect a remote button\" under Options → Remote: if a remote's own app button (VTVgo, FPT Play…) stopped opening its app after the Home change, tap Detect, press it, pick its app and apply."
-  ]
- },
- {
-  "ban": "3.1.0",
-  "ngay": "2026-10-26",
-  "vi": [
-   "- Ô FPT Play trên màn chính: chọn nhanh VTV1–9, HTV7, HTV9 HD, hoặc dán link chia sẻ từ FPT Play (kênh, trận đấu, phim). Bấm ô là FPT Play trên tivi mở thẳng nội dung đó. Cần app \"FPT Play for Android TV\".",
-   "- Danh sách IPTV của bạn: dán link m3u (hoặc nội dung), chọn kênh, mỗi kênh một ô có logo; bấm là mở bằng VLC, MX Player, Just Player hoặc Kodi trên tivi.",
-   "- Tối đa 12 ô kênh, lấy từ VTVgo, FPT Play và IPTV."
-  ],
-  "en": [
-   "- FPT Play tiles on Home: quick-pick VTV1–9, HTV7, HTV9 HD, or paste a share link from FPT Play (channel, match, film); the tile opens it straight in FPT Play on the TV. Needs \"FPT Play for Android TV\".",
-   "- Your IPTV list: paste an m3u link (or its content), pick channels, each a tile with its logo, played with VLC, MX Player, Just Player or Kodi on the TV.",
-   "- Up to 12 channel tiles from VTVgo, FPT Play and IPTV."
-  ]
- },
- {
-  "ban": "3.0.3",
-  "ngay": "2026-10-26",
-  "vi": [
-   "- Danh sách mẫu tivi lên 316 mẫu, 90 hãng.",
-   "- Home sạch theo bản gốc CleanYourTV mới: âm lịch không còn hiện \"ngày 0\" sát ngày sóc, nút Netflix trên remote TCL mở đúng app, menu Cài đặt có mục Khởi động lại, màn hình chờ dùng cùng hình nền với Home."
-  ],
-  "en": [
-   "- TV list now has 316 models from 90 brands.",
-   "- Home sạch follows the latest CleanYourTV: no lunar \"day 0\" just before a new moon, the TCL Netflix key opens Netflix, a Restart item in the Settings menu, the screensaver uses Home's wallpaper."
-  ]
- },
- {
-  "ban": "3.0.2",
-  "ngay": "2026-10-26",
-  "vi": [
-   "- Màn \"Tivi đã sạch!\" hỏi rõ hai lựa chọn: \"Tắt ADB (an toàn hơn)\" hoặc \"Giữ ADB để chỉnh tiếp\" (lần sau đổi giao diện không phải bật lại gỡ lỗi trên tivi). Chưa chọn mà rời app quá 1 phút thì tivi vẫn tự tắt ADB cho an toàn."
-  ],
-  "en": [
-   "- The \"TV is clean!\" screen asks: \"Turn ADB off (safer)\" or \"Keep ADB on to tweak later\" (no need to enable debugging again next time). Leave without choosing for over a minute and the TV still turns ADB off."
-  ]
- },
- {
-  "ban": "3.0.1",
-  "ngay": "2026-10-26",
-  "vi": [
-   "- Tivi để múi giờ khác điện thoại (Xiaomi / Redmi bản Trung Quốc để giờ Bắc Kinh, nhanh hơn Việt Nam 1 tiếng, lại giấu mục chỉnh giờ): khi kết nối, app báo lệch và có nút \"Đặt giờ tivi theo điện thoại\"."
-  ],
-  "en": [
-   "- TV in a different time zone from the phone (China-market Xiaomi / Redmi run Beijing time and hide the setting): on connect the app says so and offers \"Use the phone's time zone on the TV\"."
-  ]
- },
- {
-  "ban": "3.0.0",
-  "ngay": "2026-10-26",
-  "vi": [
-   "- Kênh truyền hình trên màn chính: chọn được mọi kênh của VTVgo (kênh địa phương như Hà Nội 1, Vĩnh Long 1, Quảng Ngãi…, VTV5 Tây Nam Bộ, VTVcab…), mỗi kênh một ô có logo, bấm là xem ngay (góp ý caicotdien04, xemtivi661).",
-   "- Ảnh riêng vừa khung, không cắt: cả ảnh nằm trọn trên màn, hai bên là ảnh làm mờ (góp ý hieuinter).",
-   "- \"Luôn mở Home sạch khi bật tivi\" ở Tuỳ chỉnh: cho tivi tự mở lại Home gốc, HDMI hay app cũ mỗi lần bật.",
-   "- \"Ô icon đều nhau\" tắt được cả khi dùng giao diện Kiểu Apple TV, để dùng lại ảnh banner của app (góp ý contact.khanhtoan).",
-   "- Tivi Xiaomi gỡ mất Home sạch ngay sau khi cài: app tự cài lại bằng tên Xiaomi cho phép."
-  ],
-  "en": [
-   "- TV channels on Home: pick any VTVgo channel (local ones, VTV5 regions, VTVcab…), each a tile with its logo that plays the channel at once.",
-   "- Fit your picture, no cropping: the whole picture fits with a blurred copy at the sides.",
-   "- \"Always open the clean Home at power-on\" under Options, for TVs that come back to the stock Home, HDMI or the last app.",
-   "- \"Uniform icon tiles\" can be turned off even with the Apple TV look, to bring back app banners.",
-   "- When a Xiaomi TV removes the clean Home right after install, the app reinstalls it under a name Xiaomi allows."
-  ]
- },
- {
-  "ban": "2.10.12",
-  "ngay": "2026-10-26",
-  "vi": [
-   "- Kết nối vào máy không phải tivi (điện thoại, máy tính bảng) thì app cảnh báo đỏ và khoá nút dọn, tránh dọn nhầm làm máy không khởi động được.",
-   "- \"Mở một app khi bật tivi\" có thêm lựa chọn \"Cả khi bật lại từ chế độ chờ\": bấm nút nguồn remote để bật là mở app luôn (góp ý dmenh568, quan1sd1998).",
-   "- Thêm \"Chữ giờ, ngày trắng sáng\" ở Tuỳ chỉnh → Hiển thị (góp ý tranhoangnt555).",
-   "- Home sạch theo bản gốc CleanYourTV mới nhất; danh sách 307 mẫu tivi."
-  ],
-  "en": [
-   "- Connecting to a device that is not a TV (phone, tablet) now shows a red warning and locks cleaning, so a phone cannot be cleaned into a boot loop.",
-   "- \"Open an app at power-on\" gains \"Also when waking from standby\": turning the TV on with the remote opens the app too.",
-   "- New \"Bright white clock and date\" under Customize → Display.",
-   "- Home sạch follows the latest CleanYourTV; 307 TV models."
-  ]
- },
- {
-  "ban": "2.10.11",
-  "ngay": "2026-10-25",
-  "vi": [
-   "- Danh sách mẫu tivi lên 300 mẫu, 86 hãng (thêm Sony KD-55X75K có phím app trên remote, Philips, TCL, Skyworth, máy chiếu HY320…).",
-   "- Home sạch dựa trên bản gốc CleanYourTV 3.0."
-  ],
-  "en": [
-   "- TV list now has 300 models from 86 brands (adds Sony KD-55X75K remote app keys, Philips, TCL, Skyworth, HY320 projectors…).",
-   "- Home sạch is based on CleanYourTV 3.0."
-  ]
- },
- {
-  "ban": "2.10.10",
-  "ngay": "2026-10-25",
-  "vi": [
-   "- Thêm công tắc \"Giữ nút âm lượng để tăng / giảm liên tục\" ở Đổi giao diện → Tuỳ chỉnh → Remote: dành cho tivi giữ nút chỉ nhảy một nấc sau khi cài Home sạch (hay gặp trên Sony). Đổi lại, nút Input / Apps / nút app trên remote về như tivi gốc."
-  ],
-  "en": [
-   "- New \"Hold volume to keep raising / lowering\" switch under Change Home look → Customize → Remote, for TVs where holding volume moves only one step after Home sạch (common on Sony). In return the remote's Input / Apps / app buttons work as the TV's own."
-  ]
- },
- {
-  "ban": "2.10.9",
-  "ngay": "2026-10-25",
-  "vi": [
-   "• Ảnh nền riêng nét hơn: nén chất lượng cao, màu 32-bit, không còn lớp phủ màu của theme (góp ý của caothanhlhp3)",
-   "• Tivi Xiaomi bản Trung Quốc: Home sạch hiện tiếng Việt dù tivi để tiếng Trung"
-  ],
-  "en": [
-   "• Sharper own wallpapers: higher quality, 32-bit colour, no theme overlay",
-   "• China Xiaomi TVs: the clean Home shows Vietnamese even with the TV in Chinese"
-  ]
- },
- {
-  "ban": "2.10.8",
-  "ngay": "2026-10-25",
-  "vi": [
-   "• Đổi giao diện: kiểm file đã tới tivi, tivi Android đời cũ (Sony 2015…) không còn đổi theme mà không ăn",
-   "• Thêm mẫu tivi, tổng 293 mẫu có danh sách dọn sẵn",
-   "• Home sạch mới: Nâng cao thêm \"Về Home khi bật tivi\" cho tivi tự mở Live TV lúc bật nguồn"
-  ],
-  "en": [
-   "• Theme changes: the app checks the files reached the TV (older Android TVs)",
-   "• 293 TV models with a ready list",
-   "• Newer clean Home: Advanced adds \"Back to Home at power-on\""
-  ]
- },
- {
-  "ban": "2.10.7",
-  "ngay": "2026-10-25",
-  "vi": [
-   "• Thời tiết: ô tìm nhận cả thành phố nước ngoài (Bali, Osaka…) cho người ở xa (góp ý từ Indonesia, Nhật)",
-   "• Tivi có cài launcher khác (Launchpad TV…): bước cài Home sạch không còn bị hộp \"chọn Home\" làm hỏng",
-   "• Để ngày dưới đồng hồ không còn mất tên phường/xã ở dòng thời tiết"
-  ],
-  "en": [
-   "• Weather: the search finds cities abroad (Bali, Osaka…)",
-   "• TVs with other launchers installed: the Home chooser no longer breaks the install",
-   "• Date under the clock no longer cuts the place name"
-  ]
- },
- {
-  "ban": "2.10.6",
-  "ngay": "2026-10-25",
-  "vi": [
-   "• Gửi danh sách / góp ý: ô liên hệ chỉ nhận email, VGS trả lời qua thư"
-  ],
-  "en": [
-   "• Sending feedback: the contact field takes an email; VGS replies by email"
-  ]
- },
- {
-  "ban": "2.10.5",
-  "ngay": "2026-10-25",
-  "vi": [
-   "• Tivi cài nhiều launcher (Xiaomi nội địa Redmi A Pro…): hộp \"chọn Home\" không còn làm app trả về Home gốc mỗi lần đổi giao diện, app tự đóng hộp và đặt Home sạch"
-  ],
-  "en": [
-   "• TVs with several launchers (China Xiaomi…): the Home chooser no longer makes the app roll back; it closes it and sets the clean Home"
-  ]
- },
- {
-  "ban": "2.10.4",
-  "ngay": "2026-10-25",
-  "vi": [
-   "• Sony BRAVIA 2015: không còn tắt các gói màn Cài đặt cần; tivi này mặc định giữ ADB bật để không bị khoá ngoài",
-   "• \"Mở một app khi bật tivi\": thêm nút \"Mở màn chọn app trên tivi\", bấm là tivi mở đúng chỗ chọn (góp ý của dmenh568)",
-   "• Tất cả app một hàng: viên Thư viện ứng dụng không còn chen vào hàng app (góp ý của Giun2911)",
-   "• Home sạch mới: nút YouTube/Netflix trên remote TCL vẫn mở đúng app khi Home sạch mở đè Home gốc; Nâng cao thêm \"Ngày nằm dưới đồng hồ\", \"Bấm OK trong thư viện là mở app\""
-  ],
-  "en": [
-   "• 2015 Sony BRAVIA: Settings-related packages are kept; ADB stays on by default there",
-   "• \"Open an app at power-on\": a button opens the picker on the TV",
-   "• Single row: the App library pill no longer sits in the row",
-   "• Newer clean Home: TCL remote app buttons keep working; Advanced adds date under the clock and OK-opens in the library"
-  ]
- },
- {
-  "ban": "2.10.3",
-  "ngay": "2026-10-25",
-  "vi": [
-   "• Sửa lỗi cài Home sạch xong app báo nhầm \"Nút Home vẫn mở com.android.tv.settings / app khác\" rồi trả tivi như cũ (Sony VH21, VU1, BF1, Xiaomi, onn…). Giờ app chờ và bấm Home thử lại"
-  ],
-  "en": [
-   "• Fixed a false \"Home still opens Settings / another app\" after installing the clean Home; the app now waits and retries"
-  ]
- },
- {
-  "ban": "2.10.2",
-  "ngay": "2026-10-25",
-  "vi": [
-   "• Sony BRAVIA 2015: không còn tự tắt gói làm Cài đặt mở ra màn trống. Đã dính thì vào \"Bật lại app đã tắt\", tích com.sony.dtv.b2b.hotelmode",
-   "• Tivi Android 8: sửa lỗi gửi ảnh nền xong mà hình nền không đổi",
-   "• Ô tìm phường/xã không còn giật khi chạy CleanTV ngay trên tivi",
-   "• Dòng thông số đổi thành \"RAM 0,8/1,4 GB · ROM 2,6/8 GB\" (góp ý của khangnck)",
-   "• Tuỳ chỉnh: thêm \"Mở một app khi bật tivi\""
-  ],
-  "en": [
-   "• 2015 Sony BRAVIA: no longer disables the package Settings needs",
-   "• Android 8 TVs: wallpaper now changes after sending",
-   "• Ward search no longer lags when CleanTV runs on the TV",
-   "• Stats line reads \"RAM 0.8/1.4 GB · ROM 2.6/8 GB\"",
-   "• Options: \"Open an app at power-on\""
-  ]
- },
- {
-  "ban": "2.10.1",
-  "ngay": "2026-10-25",
-  "vi": [
-   "• Ô kênh VTV trên màn chính hiện logo kênh thay cho chữ (Áp dụng lên tivi một lần để cập nhật)"
-  ],
-  "en": [
-   "• VTV channel tiles show the channel logo (apply to the TV once to update)"
-  ]
- },
- {
-  "ban": "2.10.0",
-  "ngay": "2026-10-25",
-  "vi": [
-   "• Kênh VTV trên màn chính: Đổi giao diện → thẻ Home → chọn VTV1…VTV9. Mỗi kênh thành một ô ở đầu dock, bấm là xem luôn trên VTVgo (cần cài VTVgo trên tivi). Góp ý của khoald92vn, trananhht9",
-   "• Sửa lại câu chữ tiếng Việt trong app cho dễ đọc"
-  ],
-  "en": [
-   "• VTV channels on Home: Change look → Home tab → pick VTV1…VTV9. Each becomes a dock tile that opens the channel straight in VTVgo (needs VTVgo on the TV)",
-   "• Clearer Vietnamese wording"
-  ]
- },
- {
-  "ban": "2.9.0",
-  "ngay": "2026-10-25",
-  "vi": [
-   "• Giao diện mới \"Kiểu Apple TV\": nửa trên đổi màu theo app đang chọn, tên app lớn, dock kính mờ, ô icon đều, viền chọn trắng",
-   "• Kết nối lại tivi thì app tự chọn đúng giao diện đang dùng"
-  ],
-  "en": [
-   "• New \"Apple TV style\" theme: the top follows the focused app's colour, large app name, frosted dock, even icon tiles, white focus",
-   "• Reconnecting picks the theme the TV is using"
-  ]
- },
- {
-  "ban": "2.8.3",
-  "ngay": "2026-10-25",
-  "vi": [
-   "• Thêm 19 mẫu tivi có danh sách dọn sẵn, tổng 280 mẫu (TCL 75P8K, Sony BRAVIA VU3, Tuvio, Dcolor GD2, Acer…)"
-  ],
-  "en": [
-   "• 19 more TV models with a ready list, 280 in all (TCL 75P8K, Sony BRAVIA VU3, Tuvio, Dcolor GD2, Acer…)"
-  ]
- },
- {
-  "ban": "2.8.2",
-  "ngay": "2026-10-24",
-  "vi": [
-   "• Sửa lỗi kẹt \"Đang gửi ảnh nền\" khi đặt ảnh riêng trên tivi Android 8 (Sony BRAVIA 2015…)",
-   "• Tuỳ chỉnh: thêm \"Số app mỗi hàng\" 4 / 5 / 6 / 7, icon nhỏ lại cho vừa (góp ý của bạn dùng Sony)"
-  ],
-  "en": [
-   "• Fixes \"Sending wallpaper\" hanging with your own photo on Android 8 TVs (Sony BRAVIA 2015…)",
-   "• Options: new \"Apps per row\" 4 / 5 / 6 / 7"
-  ]
- },
- {
-  "ban": "2.8.1",
-  "ngay": "2026-10-24",
-  "vi": [
-   "• Vị trí hàng app: thêm \"Giữa màn hình\" và \"Thấp nhất\" (góp ý của bạn dùng Xiaomi)",
-   "• Dòng thời tiết có biểu tượng ☀️ ⛅ 🌧️ ở đầu"
-  ],
-  "en": [
-   "• App rows position: new \"Middle\" and \"Lowest\"",
-   "• The weather line starts with an icon ☀️ ⛅ 🌧️"
-  ]
- },
- {
-  "ban": "2.8.0",
-  "ngay": "2026-10-24",
-  "vi": [
-   "• Tuỳ chỉnh mới: Tất cả app một hàng, Ô icon đều nhau (kiểu Apple TV), Ẩn lời chào",
-   "• Tivi Xiaomi: nút INPUT trên remote mở lại bảng chọn nguồn",
-   "• TCL Google TV: mở app từ remote/Play ổn hơn khi đã tắt Home Google",
-   "• Nâng cao: thêm 14 tuỳ chọn (màn chờ đồng hồ trên hình nền, kiểu viền ô, app thành nút tròn…)",
-   "• DNS chặn quảng cáo: ghi rõ đừng bật nếu router đã chặn (Pi-hole, AdGuard Home, VPN)"
-  ],
-  "en": [
-   "• New options: Every app in one row, Uniform icon tiles (Apple TV style), Hide the greeting",
-   "• Xiaomi TVs: the remote INPUT button opens the input picker again",
-   "• TCL Google TV: steadier app launches with the Google Home off",
-   "• Advanced: 14 new options (clock screensaver over the wallpaper, focus style, apps as round buttons…)",
-   "• Ad-blocking DNS: note to leave it off when the router already filters"
-  ]
- },
- {
-  "ban": "2.7.3",
-  "ngay": "2026-10-24",
-  "vi": [
-   "Tuỳ chỉnh → \"Cỡ chữ đồng hồ, lịch, thời tiết\": Vừa / Lớn / Rất lớn.",
-   "Sửa DNS chặn quảng cáo AdGuard: bật / tắt có hiệu lực cả khi Đổi giao diện, kết nối lại thì công tắc hiện đúng trạng thái trên tivi. DNS là cài đặt của tivi (Cài đặt → Mạng → DNS riêng tư), không phải app."
-  ],
-  "en": [
-   "Customise → \"Clock, date and weather size\": Normal / Large / Extra large.",
-   "AdGuard DNS fixed: turning it on / off now applies from Change look too, and the switch shows the TV's real state on reconnect. It is a TV DNS setting (Settings → Network → Private DNS), not an app."
-  ]
- },
- {
-  "ban": "2.7.2",
-  "ngay": "2026-10-24",
-  "vi": [
-   "Nút \"Đang phát\" trên Home sạch: hiện khi có app đang phát nhạc / video, bấm vào thấy từng app để tạm dừng / phát tiếp, hoặc \"Dừng tất cả\" khi nhiều app phát chồng tiếng. Bấm Đổi giao diện → Áp dụng lên tivi một lần để bật."
-  ],
-  "en": [
-   "\"Now playing\" on the clean Home: shows while apps play music / video; pause or resume each, or \"Stop all\" when several play over each other. Change look → Apply once to turn it on."
-  ]
- },
- {
-  "ban": "2.7.1",
-  "ngay": "2026-10-24",
-  "vi": [
-   "Tuỳ chỉnh → \"Vị trí hàng app\": dời dock và các hàng app lên cao hơn hoặc thấp xuống.",
-   "Nút Apps trên remote (Sony…) không còn mở Home sạch như nút Back; que / tivi Xiaomi vẫn dùng nút đó làm Home như cũ."
-  ],
-  "en": [
-   "Customise → \"App rows position\": move the dock and app rows higher or lower.",
-   "The remote's Apps key (Sony…) no longer opens the clean Home like Back; Xiaomi sticks / TVs keep using it as Home."
-  ]
- },
- {
-  "ban": "2.7",
-  "ngay": "2026-10-24",
-  "vi": [
-   "260 mẫu tivi của 78 hãng: thêm máy chiếu HOTACK, Magcubic HY300 Pro, Sharp Google TV, Sony KD-55X8000C, Sber… cùng 18 mẫu có sẵn bảng phím remote.",
-   "Home sạch theo CleanYourTV mới nhất."
-  ],
-  "en": [
-   "260 TV models from 78 brands: HOTACK and Magcubic HY300 Pro projectors, Sharp Google TV, Sony KD-55X8000C, Sber… and 18 models with a remote key map.",
-   "Clean Home on the latest CleanYourTV."
-  ]
- },
- {
-  "ban": "2.6.12",
-  "ngay": "2026-10-24",
-  "vi": [
-   "TCL Google TV: tắt \"Nút app trên remote\" (Tuỳ chỉnh → Remote) thì giữ âm lượng lại tăng / giảm liên tục, kể cả khi Home Google đã tắt."
-  ],
-  "en": [
-   "TCL Google TV: turning off \"Remote app buttons\" (Customise → Remote) restores the volume ramp, even with Google's Home disabled."
-  ]
- },
- {
-  "ban": "2.6.11",
-  "ngay": "2026-10-24",
-  "vi": [
-   "TCL Google TV: ưu tiên giữ âm lượng chỉ khi Home Google còn bật (nút YouTube / Netflix tự chạy qua nó). Tivi đã tắt Home Google thì vẫn giữ nút app trên remote như bản 2.6.7."
-  ],
-  "en": [
-   "TCL Google TV: the volume-ramp default applies only while Google's Home is still on (its own app keys keep working). With Google's Home disabled the remote app-button map stays on, as in 2.6.7."
-  ]
- },
- {
-  "ban": "2.6.10",
-  "ngay": "2026-10-24",
-  "vi": [
-   "TCL Google TV: giữ nút âm lượng lại tăng / giảm liên tục sau khi thay Home (bấm Đổi giao diện → Áp dụng lên tivi một lần). Muốn nút YouTube / Netflix trên remote chạy cả khi Home Google đã tắt thì bật \"Nút app trên remote\", đổi lại giữ âm lượng chỉ nhảy một nấc."
-  ],
-  "en": [
-   "TCL Google TV: holding volume ramps again after replacing Home (Change look → Apply once). Turn on \"Remote app buttons\" for YouTube / Netflix keys with Google's Home disabled, at the cost of one volume step per press."
-  ]
- },
- {
-  "ban": "2.6.9",
-  "ngay": "2026-10-24",
-  "vi": [
-   "Chạy CleanTV ngay trên tivi (TCL…): Áp dụng không cài lại Home sạch khi đã đúng bản, gửi ảnh nhanh hơn, nên giao diện / lịch âm / thời tiết lên được.",
-   "Nút \"Chọn ảnh có trên tivi / USB\": tivi không có trình chọn ảnh vẫn đặt được ảnh nền riêng (chép ảnh JPG vào USB rồi cắm vào tivi)."
-  ],
-  "en": [
-   "Running CleanTV on the TV (TCL…): Apply no longer reinstalls the clean Home when it is already current, and pictures upload faster, so themes / lunar date / weather take effect.",
-   "\"Pick a picture on the TV / USB\": set your own wallpaper even when the TV has no photo picker (copy a JPG to a USB stick)."
-  ]
- },
- {
-  "ban": "2.6.8",
-  "ngay": "2026-10-24",
-  "vi": [
-   "Gỡ lỗi không dây (Chromecast, Google TV đời mới): ghép đôi xong mà mạng không báo cổng kết nối thì app tự dò cổng của tivi (khoảng 30 giây), không phải nhập tay."
-  ],
-  "en": [
-   "Wireless debugging (Chromecast, newer Google TVs): if the network doesn't announce the connect port after pairing, the app probes the TV's ports itself (about 30 seconds)."
-  ]
- },
- {
-  "ban": "2.6.7",
-  "ngay": "2026-10-24",
-  "vi": [
-   "Sửa 2.6.5: trên TCL Google TV, nút YouTube / Netflix / Prime trên remote chạy lại sau khi thay Home (bấm Đổi giao diện → Áp dụng lên tivi một lần). Nút Web mở trình duyệt nếu tivi có."
-  ],
-  "en": [
-   "Fixes 2.6.5: on TCL Google TV the remote's YouTube / Netflix / Prime buttons work again after replacing Home (Change look → Apply once). The Web button opens a browser if the TV has one."
-  ]
- },
- {
-  "ban": "2.6.6",
-  "ngay": "2026-10-24",
-  "vi": [
-   "Tivi tự canh gác: đang thay Home mà rớt kết nối (mất Wi-Fi, hết pin) thì 3 phút sau tivi tự bật lại Home gốc.",
-   "Xong việc rời app quá 1 phút thì tivi tự tắt ADB (bật \"Giữ ADB bật cho lần sau\" nếu muốn giữ).",
-   "Lưu kịch bản khôi phục: một file lệnh adb đưa tivi về như cũ từ máy tính, kể cả khi mất điện thoại.",
-   "Xem trước các lệnh sẽ chạy trên tivi trước khi dọn / cài Home.",
-   "Bản dựng tái tạo được, công bố dấu chữ ký để tự kiểm tra APK."
-  ],
-  "en": [
-   "The TV guards itself: if the connection drops while Home is being replaced, the TV restores its stock Home after 3 minutes.",
-   "Leave the app for over a minute when done and the TV turns ADB off (tick \"Keep ADB on for next time\" to keep it).",
-   "Save a restore script: adb commands that put the TV back from a computer, even without this phone.",
-   "Preview the commands before cleaning / installing Home.",
-   "Reproducible builds and a published signing fingerprint to verify the APK."
-  ]
- },
- {
-  "ban": "2.6.5",
-  "ngay": "2026-10-24",
-  "vi": [
-   "Nút app trên remote (YouTube, Netflix, Prime, bánh răng Cài đặt) vẫn chạy sau khi thay Home: app tự lấy bảng phím của mẫu tivi (17 mẫu có sẵn, TCL có bảng chung). Bật / tắt ở Đổi giao diện → Tuỳ chỉnh → Remote."
-  ],
-  "en": [
-   "Remote app buttons (YouTube, Netflix, Prime, the Settings gear) keep working after replacing Home: the app applies the model's key map (17 models, plus a shared TCL map). Toggle it under Change look → Customise → Remote."
-  ]
- },
- {
-  "ban": "2.6.4",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Sửa lỗi 2.6.2–2.6.3: trên Google TV, Home sạch giờ mở đè Home Google được ngay khi áp dụng (trước đó app thử lúc Home Google đang nằm sẵn trên màn nên luôn báo không được)."
-  ],
-  "en": [
-   "Fixes 2.6.2–2.6.3: on Google TV the clean Home now opens over Google's Home right when applied (before, the app tested while Google's Home was already on screen, so it always reported failure)."
-  ]
- },
- {
-  "ban": "2.6.3",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Google TV / tivi không cho tắt Home gốc: cho Home sạch mở đè giờ thử thêm một lần (chờ dịch vụ bắt phím khởi động), nhiều máy lần đầu báo hỏng nay chạy ngay."
-  ],
-  "en": [
-   "Google TV / TVs that won't disable the stock Home: opening the clean Home over it now retries once (waiting for the key helper to start), so sets that failed on the first try work straight away."
-  ]
- },
- {
-  "ban": "2.6.2",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Google TV còn trình cài đặt setupwraith (nhiều TCL): app không tắt Home Google mà thử cho Home sạch tự mở đè khi bấm Home. Không được thì tivi vẫn như cũ và app chỉ cách quên Wi-Fi như trước."
-  ],
-  "en": [
-   "Google TV with setupwraith still on (many TCL sets): instead of disabling Google's Home, the app now tries letting the clean Home open over it on Home. If that fails the TV stays as it was and the app explains the forget-Wi-Fi fix as before."
-  ]
- },
- {
-  "ban": "2.6.1",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Tivi không cho tắt Home gốc (tắt xong tự bật lại, vd SCBC R3 Android 14): nút Home giờ vẫn ra Home sạch — app để Home gốc bật và cho Home sạch tự mở đè lên.",
-   "Không được thì app trả tivi như cũ và báo rõ lý do, không thử tắt lặp lại."
-  ],
-  "en": [
-   "TVs that turn the stock Home back on after it is disabled (e.g. SCBC R3, Android 14): the Home button now still opens the clean Home, which opens over the stock one.",
-   "If that fails too, the app leaves the TV as it was and says why, instead of retrying."
-  ]
- },
- {
-  "ban": "2.6",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Theo CleanYourTV mới nhất: 248 mẫu tivi của 73 hãng, theme Sweden, sửa tivi TCL tự tắt dịch vụ bắt phím sau khi khởi động lại",
-   "Dòng thời tiết chuyển xuống dưới ngày và lịch âm, chữ nhỏ bằng dòng ngày, không còn chiếm đầu màn hình — góp ý nguyenthanhsn88",
-   "An toàn hơn: chốt cuối không bao giờ tắt gói lõi của Android hay gói đang giữ nút Home (giống repo gốc); tivi lưu hai mạng Wi-Fi trùng tên thì giữ trình cài đặt Google để khỏi rớt mạng"
-  ],
-  "en": [
-   "Latest CleanYourTV: 248 TV models from 73 brands, Sweden theme, TCL key helpers survive a reboot",
-   "Weather line moved under the date and lunar date, at the date's size",
-   "Safer: a last check never disables core Android packages or the package holding Home (as the original repo does); two saved Wi-Fi networks with the same name keep the Google setup app"
-  ]
- },
- {
-  "ban": "2.5.6",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Đổi giao diện lần sau (chỉnh dock, thời tiết…) không còn thay ảnh nền riêng bằng ảnh theme: app đọc lại ảnh đang có trên tivi và giữ nguyên"
-  ],
-  "en": [
-   "Changing the theme screen later (dock, weather…) keeps your own wallpaper: the app reads it back from the TV"
-  ]
- },
- {
-  "ban": "2.5.5",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Đặt ảnh của bạn làm hình nền thì app tự tắt \"ánh sáng nền theo màu app\", ảnh không còn bị ám đỏ / vàng / xanh khi đổi ô app (bật lại được trong Nâng cao) — góp ý dangngoctri2010"
-  ],
-  "en": [
-   "With your own wallpaper the focused-app glow is turned off, so the photo no longer tints red / yellow / blue (re-enable in Advanced)"
-  ]
- },
- {
-  "ban": "2.5.4",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Dock: mục \"Thứ tự trên dock\" có nút ↑ ↓ để đổi thứ tự app, không phải bỏ chọn rồi chọn lại — góp ý daohoangthong1",
-   "Thẻ Tuỳ chỉnh có \"File cấu hình\": Lưu ra file mọi lựa chọn (theme, dock, thời tiết, tuỳ chỉnh, Nâng cao, ảnh nền riêng) và Mở file để dùng lại hoặc mang sang tivi khác — góp ý 9000000",
-   "Cài Home sạch quá 2 phút chưa xong (hay gặp khi chạy CleanTV thẳng trên tivi) thì app dừng và chỉ cách tắt \"Xác minh ứng dụng qua USB\", không xoay mãi — góp ý khanhtoan"
-  ],
-  "en": [
-   "Dock order with ↑ ↓ buttons",
-   "Options → Settings file: save every choice to a file and open it again or on another TV",
-   "Installing the clean Home stops after 2 minutes with a hint to turn off \"Verify apps over USB\""
-  ]
- },
- {
-  "ban": "2.5.3",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Khôi phục có mục \"Bật lại từng app\": đọc từ tivi mọi app đang tắt (kể cả khi đã cài lại CleanTV hay không có bản sao lưu), tích app cần bật rồi bấm Bật lại — góp ý @9000000 (GitHub)",
-   "Màn tivi đã kết nối luôn có nút vào mục này, kể cả tivi chưa dọn bằng CleanTV"
-  ],
-  "en": [
-   "Restore has \"Re-enable single apps\": every disabled app read from the TV (even after reinstalling CleanTV or with no backup), tick and re-enable"
-  ]
- },
- {
-  "ban": "2.5.2",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Home sạch: app không có ảnh dành cho tivi (Chrome, Cửa hàng Play, Thư viện, Aptoide…) có ô tô màu theo icon và icon to hơn, không còn ô xám trống — góp ý của toan.arc90; tắt được ở thẻ Tuỳ chỉnh"
-  ],
-  "en": [
-   "Clean Home: apps with no TV banner (Chrome, Play Store, Gallery…) get a tile in their icon's colour with a bigger icon; switch off under Options"
-  ]
- },
- {
-  "ban": "2.5.1",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Bấm Dọn mà bạn tự tích gói nhiều danh sách ghi phải giữ (vd nút Input của TCL) thì app hỏi lại: bỏ tích rồi dọn, hoặc vẫn tắt",
-   "Nút Gửi danh sách gói gửi kèm vài dòng chẩn đoán màn Home, để VGS xử lý tivi / hộp chưa nhận Home sạch"
-  ],
-  "en": [
-   "Ticked a package most tested lists keep (e.g. the TCL Input key)? The app asks again before cleaning",
-   "The package list you send now includes a few Home diagnostics"
-  ]
- },
- {
-  "ban": "2.5",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Khoá trẻ em: phụ huynh đặt khung giờ khoá (tối, giờ học, giờ trưa hoặc tự đặt, chọn ngày trong tuần) và mã PIN 4 số ngay trên điện thoại",
-   "Tới giờ, tivi hiện màn khoá che mọi thứ (cả HDMI, YouTube), chặn phím remote; nhập đúng PIN trên tivi thì mở 60 phút, sai 5 lần phải chờ 1 phút; tắt tivi bật lại vẫn khoá",
-   "Từ điện thoại: mở tạm 60 phút, khoá lại ngay, tắt và gỡ khoá; Khôi phục tivi này cũng gỡ khoá"
-  ],
-  "en": [
-   "Kids lock: parents set lock periods (night, study time, nap or custom, by weekday) and a 4-digit PIN on the phone",
-   "During a period the TV shows a lock screen over everything (HDMI, YouTube too) and blocks the remote; the PIN unlocks it for 60 minutes, 5 wrong tries mean a 1-minute wait; it stays locked after a restart",
-   "From the phone: unlock for 60 minutes, lock now, turn off and remove; Restore this TV removes it too"
-  ]
- },
- {
-  "ban": "2.4.1",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Màn Xong có thẻ \"Giúp người dùng cùng dòng tivi\": chọn Ổn hết / Có chỗ chưa ổn, ghi chú, bấm gửi model tivi và danh sách gói đang tắt cho VGS (không gửi tên, email hay danh sách app) — góp ý của nguyenducbinh9x (tivi Hiker)"
-  ],
-  "en": [
-   "Done screen: \"Help owners of the same TV\" — rate it, add a note and send the TV model and disabled packages to VGS (no name, email or app list)"
-  ]
- },
- {
-  "ban": "2.4",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Màn Đổi giao diện làm lại: ảnh xem trước ở đầu, chia 3 thẻ Giao diện · Home · Tuỳ chỉnh, nút Áp dụng luôn ở đáy",
-   "Nâng cao thành màn riêng: ô tìm, lọc Đã đổi / Cẩn thận, chia 6 nhóm, mục đã đổi có chấm tím",
-   "Tivi chưa khớp mẫu: app gợi ý mẫu gần giống cùng hãng (vd Sony VU3 → VU31), nút Chọn mẫu khác tìm trong toàn bộ danh sách — góp ý của Luongnam1020"
-  ],
-  "en": [
-   "Redesigned theme screen: live preview on top, 3 tabs (Look · Home · Options), Apply always at the bottom",
-   "Advanced is its own screen: search, Changed / Careful filters, 6 groups, a dot on changed items",
-   "Unmatched TVs: close matches of the same brand are suggested (e.g. Sony VU3 → VU31), and any list can be picked by search"
-  ]
- },
- {
-  "ban": "2.3.1",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Xem màn hình tivi: nút Lưu ảnh (vào Ảnh › CleanTV) và Chia sẻ (Zalo, Messenger…) — góp ý của nguyenthanhsn88"
-  ],
-  "en": [
-   "View TV screen: Save (to Pictures › CleanTV) and Share buttons"
-  ]
- },
- {
-  "ban": "2.3",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Theo CleanYourTV mới nhất: 243 mẫu tivi của 70 hãng (thêm TCL, Sony, Motorola, TiVo, AIWA…)",
-   "Nâng cao có 64 tuỳ chọn, thêm: hàng app mờ dần khi cuộn, ảnh nền theo buổi sáng/chiều/tối, biểu tượng Wi-Fi đổi màu, chỉnh Home điện ảnh",
-   "Thời tiết: ô tìm phường/xã lên đầu, thành phố lớn là nút chọn nhanh",
-   "Tivi lưu nhiều mạng Wi-Fi: đọc đúng mạng đang dùng trước khi tắt trình cài đặt Google"
-  ],
-  "en": [
-   "Latest CleanYourTV: 243 TV models from 70 brands (new TCL, Sony, Motorola, TiVo, AIWA…)",
-   "Advanced has 64 options, new: rows fade as they scroll, wallpapers by time of day, coloured Wi-Fi icon, cinematic Home tuning",
-   "Weather: ward search box first, big cities as quick picks",
-   "TVs with several saved Wi-Fi networks: the one in use is read correctly before the Google setup app is disabled"
-  ]
- },
- {
-  "ban": "2.2",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Home sạch theo CleanYourTV mới nhất: bấm nút Menu trên remote ở một app là mở menu Di chuyển / Thêm vào dock (tiện cho remote không giữ OK được), chặn Home gốc tự bật lại chạy lại được, góc dải dock bo khớp ô app, Home áp ngay chỉnh trong cài đặt launcher.",
-   "Danh sách đã thử lên 232 mẫu / 67 hãng (thêm 2 máy chiếu Formovie, nhiều Sony, Grundig, Fire TV Stick…); Nâng cao 56 tuỳ chọn, đã Việt hoá hết.",
-   "Xiaomi bản Trung Quốc: cổng HDMI đang cắm thiết bị (tivi đổi tên dòng thành tên thiết bị, kiểu \"Playback_2 · HDMI2\") giờ cũng mở đúng cổng.",
-   "Hộp/tivi Android 7 trở xuống: app báo rõ ngay là chỉ dọn được, Home sạch cần Android 8+."
-  ],
-  "en": [
-   "The clean Home follows the latest CleanYourTV: the remote's Menu key on an app opens Move / Add to dock (handy where OK can't be held), the stock-Home redirect works again, dock band corners match the tiles, Launcher settings apply at once.",
-   "Tested lists: 232 models / 67 brands (two Formovie projectors, more Sony, Grundig, Fire TV Stick…); 56 Advanced options, all translated.",
-   "China-market Xiaomi: HDMI ports with a device plugged in (the row is renamed after the device, e.g. \"Playback_2 · HDMI2\") now open the right port.",
-   "Android 7 and older: the app says right away it can only clean; the clean Home needs Android 8+."
-  ]
- },
- {
-  "ban": "2.1.7",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Fire TV / Fire TV Stick / Fire TV Cube: app nhận ra Fire OS và báo ngay là chỉ dọn được quảng cáo, theo dõi, app rác; màn Home thì Amazon khoá cho launcher của họ nên không thay được. Bỏ bước cài Home sạch trên Fire TV để khỏi tưởng app lỗi."
-  ],
-  "en": [
-   "Fire TV / Stick / Cube: the app recognises Fire OS and says right away that it can clean ads, tracking and junk apps but can't replace Home, which Amazon locks to its launcher. The clean Home step is skipped there."
-  ]
- },
- {
-  "ban": "2.1.6",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Sửa 2.1.5: tivi Xiaomi bản Trung Quốc giờ thật sự mở đúng cổng HDMI/AV từ Home sạch (2.1.5 chưa gửi lệnh trình phát Xiaomi lên tivi). Đã cài 2.1.5 thì cập nhật rồi Đổi giao diện → Áp dụng."
-  ],
-  "en": [
-   "Fix for 2.1.5: China-market Xiaomi TVs now really open the right HDMI/AV port from the clean Home (2.1.5 did not send Xiaomi's player action to the TV). On 2.1.5, update and Change theme → Apply."
-  ]
- },
- {
-  "ban": "2.1.5",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Ảnh nền riêng: ở mục Giao diện bấm \"Dùng ảnh của bạn làm hình nền\", chọn ảnh trong điện thoại, app tự cắt khung 16:9 và đưa lên tivi; bỏ ảnh riêng là về ảnh của theme.",
-   "Tivi Xiaomi bản Trung Quốc (MiTV-ASTP0…): chọn HDMI1/2/3 hay AV trên Home sạch mở đúng cổng qua trình phát của Xiaomi (trước báo \"TV này không hỗ trợ\").",
-   "Nút Home bị app khác giành mà không phải màn Home (hộp nhà mạng NES như SEI RT-G2): app tự bật \"Remote gửi phím Home lạ\" rồi thử lại."
-  ],
-  "en": [
-   "Your own wallpaper: under Theme press \"Use your own picture as wallpaper\", pick a photo on the phone; the app crops it to 16:9 and sends it to the TV. Removing it goes back to the theme's picture.",
-   "China-market Xiaomi TVs (MiTV-ASTP0…): HDMI1/2/3 and AV rows on the clean Home now switch through Xiaomi's player (before: \"This TV doesn't support it\").",
-   "Home button taken by an app that is not a home screen (NES operator boxes such as SEI RT-G2): the app turns on the Home-key helper and tries again."
-  ]
- },
- {
-  "ban": "2.1.4",
-  "ngay": "2026-10-23",
-  "vi": [
-   "Thời tiết theo phường/xã: ô \"Hoặc tìm phường / xã của bạn\" tìm trong 3.321 phường/xã sau sáp nhập 2025 (gõ không dấu được, vd \"ben thanh\"), tivi hiện tên phường/xã đó.",
-   "Google TV: bước kiểm Wi-Fi chỉ xét mạng đang kết nối (trước xét cả mạng cũ đã lưu, nên quên rồi vào lại mạng nhà vẫn bị chặn). Tivi chạy dây LAN thì không vướng nữa.",
-   "Tivi đang không có Home nào (Home gốc bị tắt từ trước, hiện màn dự phòng của Cài đặt): cài thẳng Home sạch thay vì báo lỗi."
-  ],
-  "en": [
-   "Weather by ward/commune: \"Or find your ward / commune\" searches all 3,321 wards after the 2025 merger (accents optional); the TV shows that name.",
-   "Google TV: the Wi-Fi check now only looks at the network in use (before, an old saved network created by setupwraith still blocked it). On Ethernet it no longer applies.",
-   "TVs left without any Home (stock Home disabled earlier, Settings' fallback screen showing): the clean Home installs instead of an error."
-  ]
- },
- {
-  "ban": "2.1.3",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Trước khi dọn, app hỏi tivi app nào đang mở cổng HDMI / kênh và app nào mở Cài đặt, rồi luôn giữ lại (Sony KDL-43W800G mất HDMI, Sony W800C không vào Cài đặt sau khi dọn).",
-   "Công tắc mới \"Tên app to phía trên dock\" ở mục Tuỳ chỉnh thêm: tắt cho Home gọn hơn.",
-   "Cài Home sạch trên Google TV mà setupwraith giành Home: lời báo chỉ từng bước quên Wi-Fi rồi kết nối lại.",
-   "Âm lịch tính theo múi giờ của điện thoại: tivi để tiếng Anh ở Việt Nam không còn lệch một ngày."
-  ],
-  "en": [
-   "Before cleaning, the app asks the TV which apps open HDMI inputs / channels and Settings, and always keeps them (a Sony KDL-43W800G lost HDMI, a Sony W800C lost Settings).",
-   "New \"Large app name above the dock\" switch under More options.",
-   "Installing the clean Home on Google TV when setupwraith claims Home: the note now gives the forget-Wi-Fi steps.",
-   "The lunar date uses the phone's time zone: English-language TVs in Vietnam are no longer a day off."
-  ]
- },
- {
-  "ban": "2.1.2",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Luôn giữ các gói lõi của Android (ext services/shared, module metadata, overlay mainline), theo CleanYourTV sau vụ một Mi TV Stick không khởi động lại được (#884).",
-   "Google TV mở Home chậm (Sony 65S30 / BRAVIA BF1): app đọc được màn đang hiện bằng cách thứ hai; vẫn không rõ mà tivi còn setupwraith thì hiện thẳng hướng dẫn quên Wi-Fi, thay vì báo \"không rõ\"."
-  ],
-  "en": [
-   "Android core packages (ext services/shared, module metadata, mainline overlays) are always kept, following CleanYourTV after a Mi TV Stick never booted again (#884).",
-   "Google TVs that open Home slowly (Sony 65S30 / BRAVIA BF1): the app reads the screen a second way; if it still can't tell and setupwraith is on, it shows the forget-Wi-Fi fix instead of \"unknown\"."
-  ]
- },
- {
-  "ban": "2.1.1",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Mục Nâng cao Việt hoá: 54 tuỳ chọn đều có tên và giải thích tiếng Việt dễ hiểu, tìm kiếm được bằng tiếng Việt; tên khoá kỹ thuật vẫn hiện nhỏ bên dưới để tra.",
-   "Sửa: \"Tự bật lại bắt phím remote\" (restore_key_services) cần quyền đặc biệt, app giờ tự cấp khi bật tuỳ chọn (trước đó bật lên vẫn không có tác dụng)."
-  ],
-  "en": [
-   "Advanced options localised: all 54 have Vietnamese names and plain descriptions, searchable in Vietnamese; the technical key still shows underneath.",
-   "Fix: restore_key_services needs a special permission, which the app now grants when the option is on (before, turning it on had no effect)."
-  ]
- },
- {
-  "ban": "2.1",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Giữ OK trên một app ở Home sạch: menu Di chuyển, Thêm vào dock / Thay bằng app khác, Bỏ khỏi Home (khi bật thư viện app), Thông tin ứng dụng. Đổi chỗ và đổi app trên dock ngay trên tivi, không cần điện thoại (CleanTV bật sẵn; tắt được ở Nâng cao: tile_menu).",
-   "Home sạch theo CleanYourTV mới nhất, có nút mở cài đặt launcher ngay trên thanh trên cùng; danh sách lên 227 mẫu tivi, Nâng cao 54 tuỳ chọn."
-  ],
-  "en": [
-   "Hold OK on an app on the clean Home: Move, Add to dock / Replace with another app, Remove from Home (with the app library) and App info. Rearrange the dock right on the TV, no phone needed (on by default in CleanTV; Advanced: tile_menu).",
-   "The clean Home follows the latest CleanYourTV, with launcher settings straight from the top bar; 227 tested TV models, 54 Advanced options."
-  ]
- },
- {
-  "ban": "2.0.2",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Rớt kết nối giữa lúc dọn: app chờ tivi trả lời lại (tối đa khoảng 1,5 phút) rồi làm tiếp từ gói đang dở, gói đã tắt dù mất kết nối vẫn được ghi vào sao lưu.",
-   "Tivi tự khởi động lại ngay sau khi tắt một gói: app dừng hẳn, báo tên gói nghi phạm để lần sau bỏ tích, và gửi tên gói về để VGS đưa vào danh sách giữ.",
-   "Thay lỗi tiếng Anh \"connect() must be called first\" bằng hướng dẫn tiếng Việt: kết nối lại để dọn tiếp hoặc Khôi phục."
-  ],
-  "en": [
-   "Connection lost while cleaning: the app waits for the TV (up to about 1.5 minutes) and carries on from the package it was on; a package disabled while the link dropped is still recorded in the backup.",
-   "The TV restarted right after a package was disabled: the app stops, names the suspect package so it can be left out next time, and reports it so VGS can keep it.",
-   "The raw \"connect() must be called first\" error is replaced by clear steps: reconnect to continue, or Restore."
-  ]
- },
- {
-  "ban": "2.0.1",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Chạy CleanTV ngay trên tivi mà tivi chưa mở ADB qua mạng: thay dòng lỗi tiếng Anh bằng hướng dẫn (bật \"Gỡ lỗi qua mạng\", hoặc dùng điện thoại ghép bằng mã, hoặc adb tcpip 5555), thêm nút mở Tuỳ chọn nhà phát triển."
-  ],
-  "en": [
-   "Running CleanTV on a TV that has not opened ADB over the network: the raw error is replaced by steps (turn on \"Network debugging\", or pair from a phone, or adb tcpip 5555), plus a button to Developer options."
-  ]
- },
- {
-  "ban": "2.0",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Home sạch cập nhật theo CleanYourTV mới nhất: dịch đủ tiếng Việt (vẫn font Lexend), thư viện app luôn hiện kể cả khi vừa cài/gỡ app, bật lại phím remote sau khi hệ thống buộc dừng Home sạch (tuỳ chọn restore_key_services trong Nâng cao).",
-   "Danh sách đã thử lên 225 mẫu tivi / 65 hãng; mục Nâng cao có 52 tuỳ chọn.",
-   "Google TV bấm Home vẫn về Home Google: lời báo chỉ cách quên Wi-Fi rồi kết nối lại (không cần dây LAN), đã có người dùng Skyworth làm được.",
-   "Tổng hợp 1.9.1–1.9.3: an toàn cho tivi bo mạch CVTE, Home sạch riêng cho Xiaomi bản Trung Quốc và không bao giờ để màn đen, dock 8 app, sao lưu thêm trên tivi, khôi phục không cần sao lưu, nút cộng đồng VGS."
-  ],
-  "en": [
-   "The clean Home follows the latest CleanYourTV: complete Vietnamese (still Lexend), the app library always shows after an install/uninstall, remote helpers come back after the system force-stops the Home (restore_key_services under Advanced).",
-   "Tested lists: 225 TV models from 65 brands; Advanced has 52 options.",
-   "Google TV Home still opening Google's Home: the note now explains forgetting and re-joining the Wi-Fi (no Ethernet needed), confirmed on a Skyworth.",
-   "All of 1.9.1–1.9.3: CVTE safety, a Xiaomi China-market clean Home and never a black screen, dock of 8, backup on the TV, restore without a backup, VGS community link."
-  ]
- },
- {
-  "ban": "1.9.3",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Bản sao lưu được lưu thêm một bản ngay trên tivi: gỡ app, xoá dữ liệu hay đổi điện thoại, kết nối lại là app tự lấy về để Khôi phục.",
-   "Khôi phục khi không có sao lưu (người khác dọn, mất cả hai bản): bật lại mọi gói đang tắt, gỡ Home sạch, trả Home gốc, DNS và trợ năng; hỏi xác nhận rõ vì gói bạn tự tắt trước đó cũng bật lại.",
-   "Màn “Tivi đã sạch” có nút tham gia cộng đồng VGS."
-  ],
-  "en": [
-   "The backup is also stored on the TV itself: after reinstalling the app, clearing its data or switching phones, the app reads it back on connect so Restore still works.",
-   "Restore without a backup (cleaned by someone else, both copies gone): re-enables every disabled package, removes the clean Home, brings back the stock Home, DNS and accessibility; asks for clear confirmation since packages you disabled yourself come back too.",
-   "The “TV is clean” screen links to the VGS community."
-  ]
- },
- {
-  "ban": "1.9.2",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Tivi Xiaomi bản Trung Quốc (MiTV-ASTP0…): hãng chỉ nhận Home có tên trong danh sách, nên app cài Home sạch bản riêng mang tên được nhận; bản Home sạch cũ bị chặn sẽ được gỡ.",
-   "Nút Home không chuyển được sang Home sạch thì app bật lại Home gốc của hãng và đặt làm mặc định, không để màn đen (trước đó Home gốc có thể vẫn bị tắt).",
-   "Dock chọn được tới 8 app (bằng số cột tối đa); dài hơn số cột thì tràn xuống hàng sau."
-  ],
-  "en": [
-   "China-market Xiaomi TVs (MiTV-ASTP0…): the firmware only accepts allow-listed Home apps, so the app installs a clean Home build under an accepted name and removes the blocked older one.",
-   "If the Home button still doesn't reach the clean Home, the app turns the maker's Home back on and makes it the default, instead of leaving a black screen (before, the stock Home could stay disabled).",
-   "The dock holds up to 8 apps (the most columns); more than the columns spill onto the next row."
-  ]
- },
- {
-  "ban": "1.9.1",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Tivi bo mạch CVTE (JVC, Vision, Super General, Artel…): app không bao giờ tắt Home gốc của hãng, chỉ đặt Home sạch làm mặc định. Một chiếc JVC đã treo ở màn khởi động sau khi tắt Home gốc (báo trên CleanYourTV #741).",
-   "Trên bo CVTE, bắt phím remote (Home, Input) không bật cùng lượt cài: tắt mở tivi một lần, thấy Home sạch lên bình thường rồi mới bật.",
-   "Thêm mục hỏi đáp: tivi kẹt ở màn khởi động thì làm gì."
-  ],
-  "en": [
-   "CVTE-board TVs (JVC, Vision, Super General, Artel…): the app never disables the stock Home, it only makes the clean Home the default. A JVC hung on its boot animation after its stock Home was disabled (CleanYourTV #741).",
-   "On CVTE boards the remote-key helpers (Home, Input) are not turned on in the same pass: restart the TV once, check the clean Home comes up, then turn them on.",
-   "New FAQ: what to do if the TV is stuck on the boot animation."
-  ]
- },
- {
-  "ban": "1.9",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Nút \"Bỏ qua, chỉ cài Home sạch\" ở bước chọn gói: không tắt gói nào, sao lưu vẫn chạy ngầm để Khôi phục được (góp ý trên GitHub).",
-   "Mục Nâng cao: 50 tuỳ chọn của Home sạch cho người dùng nâng cao, có tìm kiếm, nhóm \"Cẩn thận\" riêng cho remote và cổng HDMI.",
-   "Thay được launcher cài thêm (Dangbei trên tivi nội địa Trung, Projectivy…): đặt Home sạch làm mặc định, giữ launcher kia nguyên.",
-   "Nút Back ở màn Home sạch về đúng màn trước; quay lại không mất chỉnh sửa."
-  ],
-  "en": [
-   "A \"Skip, just install the clean Home\" button: no packages disabled, the backup still runs so Restore works (GitHub suggestion).",
-   "Advanced: 50 clean Home options for power users, with search and a separate \"Careful\" group for remote and HDMI settings.",
-   "Add-on launchers (Dangbei on Chinese-market TVs, Projectivy…) can be replaced: the clean Home becomes the default, the other launcher stays.",
-   "Back from the clean Home screen returns to the right screen; going back no longer loses your edits."
-  ]
- },
- {
-  "ban": "1.8",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Home sạch theo CleanYourTV 2.6: bấm Home từ app về nhanh hơn, đỡ giật trên tivi yếu; ô đầu và cuối dock không còn bị mép bo che.",
-   "Bật \"Nút Input trên remote\" thì bấm Input mở bảng chọn HDMI của Home sạch (cho tivi bấm Input không ra gì sau khi dọn).",
-   "Không bao giờ coi app kiểm tra xuất xưởng (vd trên Xiaomi Mi TV 4A) là Home của hãng."
-  ],
-  "en": [
-   "Clean Home follows CleanYourTV 2.6: back to Home from an app is faster on slow TVs; the first and last dock tiles are no longer clipped.",
-   "With \"Remote Input button\" on, Input opens the clean Home's source picker (for TVs where it did nothing after cleaning).",
-   "A factory-test app (e.g. on Xiaomi Mi TV 4A) is never taken for the maker's Home."
-  ]
- },
- {
-  "ban": "1.7",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Âm lịch ngay dưới ngày dương trên Home sạch, ví dụ \"13/9 âm lịch · Bính Ngọ\" (bật / tắt trong Đổi giao diện).",
-   "Theme Phong cảnh: 14 tranh phong cảnh tự đổi mỗi giờ (từ CleanYourTV).",
-   "Mục Tuỳ chỉnh thêm: hiện tên dưới mọi app, thư viện app, chế độ tivi yếu, kính mờ, hiện bộ nhớ, đồng hồ khi để yên, làm tối hình nền.",
-   "Đổi giao diện mở ra đúng các lựa chọn đang có trên tivi.",
-   "Thử nghiệm: CleanTV chạy thẳng trên tivi, không cần điện thoại Android (dùng iPhone cũng được). Trên tivi cài app Downloader, gõ cleantv.alexvgs.tech/tv để tải, mở CleanTV → Dọn một tivi → Kết nối tivi này."
-  ],
-  "en": [
-   "Lunar date under the date on the clean Home, e.g. \"Lunar 13/9 · Year of the Horse\".",
-   "Scenes theme: 14 landscapes rotating hourly (from CleanYourTV).",
-   "More options: names under every app, app library, slow-TV mode, frosted glass, memory line, idle clock, dimmed wallpaper.",
-   "Changing the theme now opens with the TV's current choices.",
-   "Experimental: CleanTV runs on the TV itself, no Android phone needed (works for iPhone owners too). On the TV install the Downloader app, enter cleantv.alexvgs.tech/tv, then open CleanTV → Clean a TV → Connect this TV."
-  ]
- },
- {
-  "ban": "1.5",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Nhóm riêng \"Tìm kiếm giọng nói & Trợ lý Google\", không bao giờ tích sẵn: dọn xong nút mic trên remote vẫn dùng được.",
-   "Gói mà người làm danh sách tắt theo ý riêng (khoảng 880 dòng trên 213 danh sách) không còn tích sẵn, bạn tự chọn. Gói quảng cáo, theo dõi vẫn tích sẵn như cũ.",
-   "Ai đã mất nút mic: Khôi phục rồi dọn lại, bỏ tích \"Google\" (katniss)."
-  ],
-  "en": [
-   "A separate \"Voice search & Google Assistant\" group, never pre-ticked: the remote's mic button keeps working.",
-   "Packages a list author disabled by personal choice (about 880 lines across 213 lists) are no longer pre-ticked. Ads and tracking stay pre-ticked.",
-   "Lost the mic button? Restore, then clean again without \"Google\" (katniss)."
-  ]
- },
- {
-  "ban": "1.4",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Gói Chromecast, Google Home tách thành nhóm riêng \"Google Home & truyền từ điện thoại\", không bao giờ tích sẵn: dọn xong điện thoại vẫn thấy, điều khiển và cast được tới tivi.",
-   "Ai đã lỡ tắt: Khôi phục rồi dọn lại, bỏ tích nhóm này."
-  ],
-  "en": [
-   "Chromecast and Google Home packages get their own group, never pre-ticked: the Google Home phone app keeps finding, controlling and casting to the TV.",
-   "Already disabled them? Restore, then clean again without that group."
-  ]
- },
- {
-  "ban": "1.3",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Theme, dock, thời tiết bạn chọn giờ luôn được áp trên tivi Android 14 (trước đó có lúc tivi không đọc được cấu hình).",
-   "Danh sách đã thử cho 213 mẫu tivi (trước là 147), thêm nhiều TCL, Xiaomi, Skyworth, onn, Fire TV, máy chiếu.",
-   "Tivi TCL nhận nút trên remote ổn hơn.",
-   "Home sạch cập nhật theo bản CleanYourTV mới nhất: nhẹ hơn trên tivi yếu, Việt hoá thêm phần sắp xếp app, thư viện app, hình nền."
-  ],
-  "en": [
-   "Your theme, dock and weather now always apply on Android 14 TVs (the TV sometimes couldn't read the settings before).",
-   "Tested lists for 213 TV models (up from 147): more TCL, Xiaomi, Skyworth, onn, Fire TV and projectors.",
-   "Remote buttons work better on TCL TVs.",
-   "The clean Home follows the latest CleanYourTV: lighter on slow TVs."
-  ]
- },
- {
-  "ban": "1.2",
-  "ngay": "2026-10-22",
-  "vi": [
-   "Sửa lỗi của bản 1.1 có thể làm tivi Google TV kẹt màn: thử nút Home không thành công thì app bật lại mọi thứ, tivi giữ nguyên như trước.",
-   "Không bao giờ tắt Home Google khi trình cài đặt Google còn giữ Wi-Fi."
-  ],
-  "en": [
-   "Fixes a 1.1 bug that could leave Google TV stuck: if taking over the Home button fails, the app turns everything back on.",
-   "Never disables Google's Home while the setup wizard still holds the Wi-Fi."
-  ]
- },
- {
-  "ban": "1.1",
-  "ngay": "2026-10-21",
-  "vi": [
-   "Sửa lỗi bấm Home trên remote lại về màn cũ: app bấm thử nút Home thật trên tivi.",
-   "Chữ tiếng Việt chắc hơn trên tivi đời cũ.",
-   "Đã rút bản này sáng 22/10 vì có thể làm Google TV kẹt màn, thay bằng 1.2."
-  ],
-  "en": [
-   "Fixes the remote's Home button going back to the old screen: the app tests the real Home button.",
-   "Sturdier Vietnamese text on older TVs.",
-   "Withdrawn on 22/10 (it could leave Google TV stuck); replaced by 1.2."
-  ]
- },
- {
-  "ban": "1.0",
-  "ngay": "2026-10-21",
-  "vi": [
-   "Có bản mới là điện thoại hiện thông báo, chạm vào là cập nhật.",
-   "Mở app cũng có hộp mời nâng cấp; ghi chú bản mới có cả tiếng Anh."
-  ],
-  "en": [
-   "A phone notification when an update is out; tap it to update.",
-   "The app also asks when you open it; release notes in English too."
-  ]
- },
- {
-  "ban": "0.9",
-  "ngay": "2026-10-21",
-  "vi": [
-   "Tivi từng dọn bằng CleanYourTV / công cụ khác giờ đổi được giao diện (trước không gom được nút, còn vạch đen).",
-   "Nút màn hình chờ tự bật lại Backdrop nếu nó đã bị tắt."
-  ],
-  "en": [
-   "TVs cleaned earlier with CleanYourTV or other tools can now change theme.",
-   "The screensaver button turns Backdrop back on if it was disabled."
-  ]
- },
- {
-  "ban": "0.8",
-  "ngay": "2026-10-21",
-  "vi": [
-   "Nút Màn hình chờ trên Home sạch: bấm là chạy ảnh nền hoặc album ảnh, tiện lúc nghe nhạc.",
-   "Các nút góc trên gom thành một cụm icon gọn: Máy chiếu, Mạng, Màn chờ, Cài đặt."
-  ],
-  "en": [
-   "A Screensaver button on the clean Home: start your photos or album in one press.",
-   "The top buttons become one tidy icon cluster: Projector, Network, Screensaver, Settings."
-  ]
- },
- {
-  "ban": "0.7",
-  "ngay": "2026-10-21",
-  "vi": [
-   "Đếm ẩn danh lượt tải và lượt dùng (không lưu IP, email hay tên) để biết tivi nào cần hỗ trợ thêm."
-  ],
-  "en": [
-   "Anonymous counts of downloads and use (no IP, email or name) to see which TVs need more support."
-  ]
- },
- {
-  "ban": "0.6",
-  "ngay": "2026-10-21",
-  "vi": [
-   "Máy chiếu: app tìm màn lấy nét, chỉnh hình của hãng (Formovie, XGIMI, JMGO…) để ghim vào nút Máy chiếu trên Home sạch.",
-   "Gói lấy nét, chỉnh hình không bao giờ bị tắt."
-  ],
-  "en": [
-   "Projectors: the app finds the maker's focus and keystone screens to pin on a Projector button.",
-   "Focus and keystone packages are never disabled."
-  ]
- },
- {
-  "ban": "0.5",
-  "ngay": "2026-10-21",
-  "vi": [
-   "Nhận được Home riêng của hãng (ví dụ máy chiếu Formovie Nemo) để thay bằng Home sạch."
-  ],
-  "en": [
-   "Handles makers' own Home apps (e.g. Formovie Nemo projectors)."
-  ]
- },
- {
-  "ban": "0.4",
-  "ngay": "2026-10-21",
-  "vi": [
-   "Hướng dẫn đổi giao diện cho tivi đã dọn, không phải dọn lại."
-  ],
-  "en": [
-   "A guide to changing the theme on an already cleaned TV."
-  ]
- },
- {
-  "ban": "0.3",
-  "ngay": "2026-10-21",
-  "vi": [
-   "Sửa lỗi vỡ dấu tiếng Việt trên Home sạch (chữ \"Cài đặt\"…): đổi sang font Lexend."
-  ],
-  "en": [
-   "Fixes broken Vietnamese accents on the clean Home with the Lexend font."
-  ]
- },
- {
-  "ban": "0.2",
-  "ngay": "2026-10-21",
-  "vi": [
-   "Hướng dẫn có hình bật chế độ nhà phát triển (tiếng Việt và English).",
-   "Mục giấy phép mã nguồn mở."
-  ],
-  "en": [
-   "A picture guide to developer mode (Vietnamese and English).",
-   "Open-source licences screen."
-  ]
- },
- {
-  "ban": "0.1",
-  "ngay": "2026-10-21",
-  "vi": [
-   "Ra mắt CleanTV: dọn quảng cáo, app rác của hãng trên tivi Android qua Wi-Fi, khôi phục một chạm.",
-   "Home sạch với theme VGS, cực quang, bầu trời theo giờ, thời tiết, dock app hay xem.",
-   "Song ngữ Việt / Anh, tự cập nhật, góp ý ở vgs.zone."
-  ],
-  "en": [
-   "CleanTV launches: strip ads and junk from Android TVs over Wi-Fi, one-tap restore.",
-   "A clean Home with VGS, aurora and time-of-day sky themes, weather and a dock.",
-   "Vietnamese / English, self-updating, feedback at vgs.zone."
-  ]
- }
+  {
+    "ban": "4.0.3",
+    "ngay": "2026-11-03",
+    "vi": [
+      "- Nút Cài đặt mở Thư viện kiểu Projectivy: bấm ra danh sách app, giữ vào cài đặt tivi, ẩn viên Thư viện",
+      "- Đồng bộ toàn diện CleanTV 4.0 - 4.0.3: dọn bộ nhớ cache TV, chống treo TV360, tự cấp quyền Xiaomi, hẹn tắt ADB",
+      "- Bảo toàn 100% các widget Samsung The Frame: Thời tiết góc, Đếm ngược ngày/Tết, Thẻ Hôm nay (Danh ngôn & Ngày này năm xưa), Lịch âm",
+      "- Giữ nguyên tùy biến thanh Dock và bộ 27 theme hoàn chỉnh của nhánh tet"
+    ],
+    "en": [
+      "- Projectivy-style Settings button: press for the app library, hold for TV settings, Library pill hidden",
+      "- Full sync with CleanTV 4.0 - 4.0.3: TV storage cleaner, TV360 fix, auto-start permissions, ADB timeout",
+      "- Preserved Samsung The Frame widgets: Corner weather, Event/Tet countdown, Today card (Quotes & History), Lunar calendar",
+      "- Preserved Dock customization and 27 themes from tet branch"
+    ]
+  },
+  {
+    "ban": "4.0.2",
+    "ngay": "2026-11-02",
+    "vi": [
+      "- Bật tivi vào thẳng kênh: ở \"Mở một app khi bật tivi\" chọn được ô kênh (📺 VTV1…)",
+      "- Ô kênh TV360: xem xong bấm Back về TV360 vẫn chọn được kênh, phim khác (trước đây TV360 đứng hình)",
+      "- Tivi hết bộ nhớ: nút \"Xem app chiếm chỗ\" liệt kê app nặng nhất, gỡ bản cập nhật hoặc xoá dữ liệu ngay trong CleanTV",
+      "- Dọn xong hoặc cài Home sạch xong, kịch bản khôi phục tự lưu vào thư mục Download của tivi",
+      "- Tivi Xiaomi: Home sạch được phép tự chạy để nút gán trên remote ăn ổn định hơn",
+      "- Ghi rõ khi nào viên Thư viện cuối hàng app ẩn được"
+    ],
+    "en": [
+      "- Power on straight into a channel: \"Open an app at power-on\" now lists channel tiles (📺 VTV1…)",
+      "- TV360 channel tiles: Back to TV360 still lets you pick other channels and films (TV360 used to freeze)",
+      "- Out of storage: \"See what uses the space\" lists the biggest apps, uninstall updates or clear data right in CleanTV",
+      "- After cleaning or installing the clean Home, the restore script is saved to the TV's Download folder",
+      "- Xiaomi TVs: the clean Home may auto-start so remapped remote buttons work reliably",
+      "- Says when the Library pill after the last row can be hidden"
+    ]
+  },
+  {
+    "ban": "4.0.1",
+    "ngay": "2026-11-01",
+    "vi": [
+      "- Tivi hết bộ nhớ thì báo rõ còn trống bao nhiêu, cần bao nhiêu, kèm nút Dọn bộ nhớ đệm (xoá cache các app, không mất dữ liệu) rồi cài tiếp. Trước đây cài treo 2 phút rồi báo nhầm do Play Protect",
+      "- Màn thông tin tivi hiện bộ nhớ còn trống",
+      "- Đổi giao diện không còn tắt hẳn rồi mở lại Home sạch: tránh lỗi làm tivi TCL Android 11 tự khởi động lại; tivi TCL tự cho Home sạch chạy lại sau khi bật máy",
+      "- CleanTV chạy ngay trên tivi: rời app để đi thử Home thì 20 phút sau mới tự tắt ADB (trước là 1 phút); ADB đã tắt thì nói rõ cách bật lại",
+      "- Remote TCL: các nút app của hãng không còn cùng mở một app",
+      "- Home sạch lên bản mới nhất của Clean Your TV: gán nút remote mở thư viện app, mở app khởi động cả khi bật màn hình, đổi màu quầng sáng ngay cho tivi yếu"
+    ],
+    "en": [
+      "- Out of storage: the app says how much is free and how much is needed, with a Clear cache button (app caches only, no data lost) that then carries on installing. Before, the install hung for 2 minutes and blamed Play Protect",
+      "- The TV info screen shows free storage",
+      "- Applying a look no longer force-stops the clean Home: avoids a crash that restarted TCL Android 11 TVs; TCL TVs let the clean Home start again after boot",
+      "- CleanTV on the TV: leave to try Home and ADB turns off after 20 minutes (was 1); if it already did, the app says how to turn it back on",
+      "- TCL remotes: the brand app buttons no longer all open the same app",
+      "- The clean Home is on the latest Clean Your TV: a remote button can open the App library, the start-up app can open when the screen comes on, instant glow colour for slow TVs"
+    ]
+  },
+  {
+    "ban": "4.0",
+    "ngay": "2026-10-31",
+    "vi": [
+      "- Home sạch lên bản mới nhất của Clean Your TV: giữ lâu nút riêng của hãng trên remote để mở một app khác, đồng hồ 12 hoặc 24 giờ, bấm Back ở Home mở màn hình đồng hồ, giao diện Halloween",
+      "- Bật tivi xong tự mở app: có thể chờ có mạng rồi mới mở (sau mất điện Wi-Fi lên chậm, app khỏi báo lỗi). Mục Nâng cao có thêm 7 tuỳ chọn",
+      "- Sau màn hình chờ (chế độ Môi trường xung quanh), tivi không còn quay về giao diện Google TV cũ khi đã bật Luôn mở Home sạch",
+      "- Nút OK, mũi tên, Back không gán mở app được nữa (gán nhầm OK là kẹt tivi)",
+      "- Ảnh nền dọc: công tắc vừa khung tắt được để ảnh phủ kín màn; thêm khung mờ sau đồng hồ cho ảnh nền sáng",
+      "- Ẩn app khỏi Home ngay trong danh sách app; công tắc nút Input tắt rồi thì giữ tắt",
+      "- CleanTV chạy trên tivi: lưu/mở file cấu hình, kịch bản khôi phục và APK ngay trong Download hoặc USB của tivi; tự xin quyền cài bản cập nhật"
+    ],
+    "en": [
+      "- Home updated to the latest Clean Your TV: hold a vendor remote button to open another app, 12/24-hour clock, Back on Home opens the clock screen, Halloween skin",
+      "- Open-on-start app can wait for the network first (after a power cut Wi-Fi comes back slowly). Advanced has 7 new options",
+      "- After the screensaver (Ambient mode) the TV no longer falls back to the old Google TV home when Always open Home is on",
+      "- OK, arrows and Back can no longer be mapped to open an app (mapping OK locked the TV)",
+      "- Portrait wallpapers: fit-to-screen can be turned off to fill the screen; optional soft panel behind the clock for bright wallpapers",
+      "- Hide an app from Home right from the app list; the Input button switch stays off once turned off",
+      "- CleanTV on the TV itself: save/open settings files, the restore script and APKs in the TV's Download folder or USB; asks for permission to install its own updates"
+    ]
+  },
+  {
+    "ban": "3.5.16",
+    "ngay": "2026-10-28",
+    "vi": [
+      "- Luôn mở / Mở đè Home sạch: xin thêm quyền tự khởi động (tivi Xiaomi chặn app ngoài tự chạy lúc bật) và kiểm lại quyền đã cấp; tivi từ chối thì app báo rõ",
+      "- Lỗi ảnh nền không sang được tivi: bấm \"Gửi danh sách cho VGS\" sẽ gửi kèm lỗi để VGS tìm nguyên nhân"
+    ],
+    "en": [
+      "- Always open / redirect Home: also grants auto-start (Xiaomi blocks third-party apps from starting at power-on) and checks the permissions really took; if the TV refuses, the app says so",
+      "- Wallpaper not reaching the TV: \"Send the list to VGS\" now includes the error so VGS can find the cause"
+    ]
+  },
+  {
+    "ban": "3.5.15",
+    "ngay": "2026-10-28",
+    "vi": [
+      "- Đồng bộ toàn diện CleanTV 3.5.14: Hỗ trợ 101 kênh TV360, 16 ô kênh, icon app to",
+      "- Sửa triệt để sự kiện Ngày này năm xưa: loại bỏ text hỏng Wikipedia, hỗ trợ mục sự kiện con, bộ lọc an toàn phòng khách",
+      "- Bảo toàn trọn vẹn Widget phong cách Samsung The Frame: Thời tiết góc, Đếm ngược ngày/Tết, Thẻ sự kiện & danh ngôn, Lịch âm",
+      "- Thanh Dock 9 ô biểu tượng, tuỳ chỉnh dải nền dock độc lập, bộ 27 theme hoàn chỉnh"
+    ],
+    "en": [
+      "- Full sync with CleanTV 3.5.14: 101 TV360 channels, 16 channel tiles, big app icons",
+      "- Fixed Today in History: cleaned corrupted Wikipedia markup, added sub-bullet support, family-safe filter",
+      "- Preserved Samsung The Frame widgets: Corner weather, Event/Tet countdown, Today quote & history card, Lunar calendar",
+      "- 9-column Dock, independent dock background band toggle, 27 complete themes"
+    ]
+  },
+  {
+    "ban": "3.5.14",
+    "ngay": "2026-10-28",
+    "vi": [
+      "- Thêm nguồn kênh TV360 (Viettel): 101 kênh trong nước, bấm ô là mở thẳng kênh trong app TV360 (cần bản 6.4 trở lên trên tivi). Kênh có ổ khoá cần đăng nhập TV360"
+    ],
+    "en": [
+      "- New channel source TV360 (Viettel): 101 Vietnamese channels, a tile opens the channel straight in TV360 (needs 6.4 or later on the TV). Locked channels need a TV360 login"
+    ]
+  },
+  {
+    "ban": "3.5.13",
+    "ngay": "2026-10-28",
+    "vi": [
+      "- Ô kênh trên Home sạch tăng từ 12 lên 16, đủ chỗ cho người gộp kênh VTVgo và FPT Play",
+      "- Công tắc mới \"Icon to trong ô app\": app không có ảnh tivi có icon gần kín ô",
+      "- Công tắc lọc quảng cáo DNS có thêm lưu ý: tivi nào bị YouTube hay app kênh chập chờn thì tắt đi",
+      "- Nâng cao: mô tả tuỳ chọn âm lượng nhảy hai nấc chỉ rõ công tắc nào dùng khi giữ nút chỉ nhảy một nấc"
+    ],
+    "en": [
+      "- Channel tiles on Home go from 12 to 16",
+      "- New switch \"Big icons in app tiles\": apps without a TV banner get an icon that fills most of the tile",
+      "- The ad-blocking DNS switch now notes it can make YouTube or channel apps stall on some TVs",
+      "- Advanced: the volume double-step option now points to the right switch for a held key that moves only one step"
+    ]
+  },
+  {
+    "ban": "3.5.12",
+    "ngay": "2026-10-28",
+    "vi": [
+      "- Công tắc mới \"Thư viện trong menu Cài đặt\": bỏ nút Thư viện trên thanh đầu, mở bằng cách giữ OK trên nút Cài đặt của Home sạch",
+      "- Sửa nhỏ Home sạch: đặt lại giao diện không còn hiện lại giao diện cũ lúc vừa bật tivi"
+    ],
+    "en": [
+      "- New switch \"Library in the Settings menu\": no Library button in the top bar, open it by holding OK on Home's Settings button",
+      "- Small Home fix: a theme reset no longer shows the old theme right after power-on"
+    ]
+  },
+  {
+    "ban": "3.5.11",
+    "ngay": "2026-10-28",
+    "vi": [
+      "- Sửa Khôi phục khi chọn giữ Home sạch: tắt bộ bắt phím của Home sạch, bỏ kiểu mở đè và \"luôn mở khi bật tivi\", thu lại quyền. Nút Home về hẳn Home gốc, rút điện bật lại không bị Home sạch giành lại (Chromecast)",
+      "- Có thể sửa luôn lỗi tìm giọng nói trong YouTube sau khi khôi phục"
+    ],
+    "en": [
+      "- Fixed Restore when keeping the clean Home: its Home-key helper is switched off, open-over and open-at-power-on are cleared and its permissions taken back. Home goes to the stock Home for good, even after a power cut (Chromecast)",
+      "- This may also fix YouTube voice search after a restore"
+    ]
+  },
+  {
+    "ban": "3.5.10",
+    "ngay": "2026-10-28",
+    "vi": [
+      "- Lưu ra file, mở file, chọn ảnh hay chuyển sang app khác rồi quay lại: app tự kiểm và nối lại tivi nếu điện thoại đã cắt kết nối, không phải kết nối lại bằng tay"
+    ],
+    "en": [
+      "- Saving or opening a file, picking a picture or switching apps and coming back: the app checks the TV connection and reconnects by itself if the phone dropped it"
+    ]
+  },
+  {
+    "ban": "3.5.9",
+    "ngay": "2026-10-28",
+    "vi": [
+      "- An toàn hơn theo CleanYourTV: không bao giờ tắt phần mềm lõi của tivi MediaTek (com.cltv.mal, com.mediatek.tis, tv.service, tv.agent). Một tivi Haier đã khởi động lại liên tục sau khi tắt gói này",
+      "- Tivi đã lỡ tắt các gói đó (vài máy Skyworth, Hisense, Xiaomi): bấm Áp dụng hoặc dọn lại là app tự bật lại",
+      "- Danh sách theo CleanYourTV mới: 341 mẫu tivi, 95 hãng"
+    ],
+    "en": [
+      "- Safer, following CleanYourTV: never disables MediaTek TV middleware (com.cltv.mal, com.mediatek.tis, tv.service, tv.agent). A Haier TV restarted in a loop with it off",
+      "- TVs where these were already disabled (some Skyworth, Hisense, Xiaomi): Apply or clean again and the app turns them back on",
+      "- Lists from the latest CleanYourTV: 341 TV models, 95 brands"
+    ]
+  },
+  {
+    "ban": "3.5.8",
+    "ngay": "2026-10-28",
+    "vi": [
+      "- Tuỳ chỉnh thêm: \"Nút Wi-Fi, Cài đặt sát mép trên\", hàng nút không tụt theo đồng hồ to và dòng ngày, thời tiết",
+      "- Tivi khởi động chậm (TCL 43P618): Home sạch chờ đến lúc đọc được cấu hình, bật bộ bắt phím Home ngay khi đọc được, và ghi mốc đó vào chẩn đoán"
+    ],
+    "en": [
+      "- More options: \"Wi-Fi, Settings buttons at the very top\", so they no longer drop with a large clock and the date and weather lines",
+      "- Slow-booting TVs (TCL 43P618): the clean Home waits until its settings are readable, turns the Home key helper on right then, and records the time in the diagnosis"
+    ]
+  },
+  {
+    "ban": "3.5.7",
+    "ngay": "2026-10-28",
+    "vi": [
+      "- Tivi chặn tín hiệu khởi động (TCL 43P618): lúc vừa bật Home sạch đọc cấu hình chưa được thì đọc lại mỗi 15 giây trong 2 phút đầu, không còn nằm ở Home cũ vài phút",
+      "- Kiểu mở đè Home cũ: bấm tìm giọng nói trên Google TV thì kết quả hiện ra bình thường, không bị Home sạch che (Xiaomi MZTU0)",
+      "- Ô kênh FPT Play (HTV7…): hết vệt trắng ở mép ô, nền theo màu logo. Bấm Áp dụng lại để làm mới ảnh ô"
+    ],
+    "en": [
+      "- TVs that block the boot signal (TCL 43P618): if the clean Home cannot read its settings right after power-on it reads them again every 15 s for 2 minutes instead of leaving the old Home up",
+      "- Open-over-old-Home mode: Google TV voice search results now show instead of being covered (Xiaomi MZTU0)",
+      "- FPT Play channel tiles (HTV7…): no white line at the edge, background follows the logo. Apply again to refresh the tiles"
+    ]
+  },
+  {
+    "ban": "3.5.6",
+    "ngay": "2026-10-27",
+    "vi": [
+      "Tivi chặn tín hiệu khởi động với app ngoài (TCL 43P618): Home sạch tự mở lên qua dịch vụ Android tự nối lúc khởi động, cần bấm Áp dụng lên tivi một lần",
+      "Dấu khởi động ghi đủ mọi đường Home sạch được gọi dậy, để chẩn đoán chính xác hơn"
+    ],
+    "en": [
+      "TVs that block the boot signal for outside apps (TCL 43P618): the clean Home opens through a service Android connects by itself at boot; Apply to the TV once",
+      "The boot record lists every way the clean Home was woken, for a sharper diagnosis"
+    ]
+  },
+  {
+    "ban": "3.5.5",
+    "ngay": "2026-10-27",
+    "vi": [
+      "Home sạch ghi lại những gì chạy lúc tivi khởi động vào cài đặt của tivi (không mất như nhật ký), gửi kèm khi bấm Gửi danh sách gói",
+      "Tivi khởi động nhanh (không báo khởi động đủ) cũng được tự mở Home sạch"
+    ],
+    "en": [
+      "The clean Home keeps a record of what ran at boot in the TV settings (it does not rotate away like the log) and sends it with the package list",
+      "TVs with fast boot (no full boot signal) also get the clean Home opened"
+    ]
+  },
+  {
+    "ban": "3.5.4",
+    "ngay": "2026-10-27",
+    "vi": [
+      "Ô app tô màu (YouTube, TV360…): logo to theo cỡ ô, không còn bé tí ở giữa khi ô lớn",
+      "Dòng \"Mở lần cuối\" trên Home cập nhật ngay khi quay về từ app, không còn hiện \"Hôm kia\" lúc vừa mở"
+    ],
+    "en": [
+      "Colour app tiles (YouTube, TV360…): the logo grows with the tile instead of sitting tiny in the middle of big tiles",
+      "The \"Last opened\" line on Home updates as soon as you come back from the app, no more \"2 days ago\" right after opening it"
+    ]
+  },
+  {
+    "ban": "3.5.3",
+    "ngay": "2026-10-27",
+    "vi": [
+      "Ô tìm thời tiết: báo \"Đang tìm…\", báo không thấy hoặc điện thoại không vào được dịch vụ tìm địa danh, tự thử lại một lần khi mạng chậm",
+      "Gửi danh sách gói kèm chẩn đoán lúc khởi động (Home sạch có được gọi dậy không), để sửa lỗi tivi về Home gốc sau khi rút điện trên TCL và Google TV"
+    ],
+    "en": [
+      "Weather search: shows \"Searching…\", says when nothing is found or the phone cannot reach the place search, and retries once on a slow network",
+      "Sending the package list now includes a boot diagnosis (did the clean Home wake up), to fix TVs that go back to the stock Home after a power cut on TCL and Google TV"
+    ]
+  },
+  {
+    "ban": "3.5.2",
+    "ngay": "2026-10-27",
+    "vi": [
+      "Rút điện bật lại: Home sạch không còn mất hình nền, thời tiết, ô kênh, màu chữ (tivi Android 11 trở lên đọc thư mục cấu hình chậm lúc khởi động)",
+      "Sony BRAVIA XR: ẩn dòng Khởi động lại không chạy trong menu nút Cài đặt"
+    ],
+    "en": [
+      "After a power cut the clean Home keeps its wallpaper, weather, channel tiles and text colour (Android 11+ TVs read the settings folder late at boot)",
+      "Sony BRAVIA XR: the Restart row that did nothing is hidden from the Settings button menu"
+    ]
+  },
+  {
+    "ban": "3.5.1",
+    "ngay": "2026-10-27",
+    "vi": [
+      "Remote của tivi không còn chậm trên hộp yếu (gõ chữ từ điện thoại chỉ bật theo dõi màn hình lúc đang gõ)",
+      "Tivi giữ Home Google (TCL Google TV…): rút điện bật lại tự về Home sạch, không cần bật thêm công tắc",
+      "Ảnh dọc làm hình nền và màn chờ động hiện trọn ảnh, hai bên là ảnh làm mờ, không bị cắt",
+      "Danh sách theo CleanYourTV mới: 335 mẫu tivi, 94 hãng"
+    ],
+    "en": [
+      "The TV remote is no longer slow on weak boxes (phone typing watches the screen only while typing)",
+      "TVs that keep the Google home (TCL Google TV…): after a power cut the clean Home comes back by itself",
+      "Portrait photos as wallpaper and in the moving screensaver show whole, with blurred sides",
+      "Lists follow the latest CleanYourTV: 335 TV models, 94 brands"
+    ]
+  },
+  {
+    "ban": "3.5.0",
+    "ngay": "2026-10-27",
+    "vi": [
+      "Remote trên điện thoại: kết nối tivi → Remote trên điện thoại. Phím điều hướng, OK, Home, quay lại, âm lượng, nguồn",
+      "Gõ hoặc nói để điền chữ vào ô đang chọn trên tivi (tìm YouTube, mật khẩu Wi-Fi), tiếng Việt có dấu",
+      "Hẹn giờ tắt tivi 15–120 phút, tivi tự đếm nên đóng app vẫn tắt đúng hẹn",
+      "Mở, gỡ app trên tivi; cài file APK từ điện thoại sang tivi",
+      "Màn chờ động (Tuỳ chỉnh): đồng hồ trên ảnh nền trôi chậm, nhiều ảnh thì 20 giây đổi một ảnh, hiện khi để yên ở Home sạch và làm màn chờ của tivi"
+    ],
+    "en": [
+      "Phone remote: connect a TV → Phone remote. D-pad, OK, Home, Back, volume, power",
+      "Type or speak into the field selected on the TV (YouTube search, Wi-Fi password), accents included",
+      "Sleep timer 15–120 minutes; the TV counts down itself, so closing the app is fine",
+      "Open and uninstall TV apps; install an APK from the phone onto the TV",
+      "Moving screensaver (Options): a clock over your wallpaper drifting slowly, a new picture every 20 s, shown when Home is idle and as the TV screensaver"
+    ]
+  },
+  {
+    "ban": "3.4.2",
+    "ngay": "2026-10-27",
+    "vi": [
+      "Thêm 61 kênh FPT Play chọn sẵn (toàn quốc, HTV, địa phương), không cần dán link",
+      "Tivi TCL rút điện bật lại: Home sạch tự lên, tự bật lại nút Home",
+      "Hộp RockChip: sửa lỗi không cài được Home sạch (màn cài đặt lần đầu tranh Home)",
+      "Màn nhỏ: nút trên cùng tự thu thành icon để không che đồng hồ, lời chào, thời tiết"
+    ],
+    "en": [
+      "61 ready FPT Play channels (national, HTV, local), no link pasting needed",
+      "TCL TVs after a power cut: the clean Home comes up and the Home key works again",
+      "RockChip boxes: fixed the clean Home failing to install (first-run setup screen claimed Home)",
+      "Small screens: top buttons shrink to icons so the clock, greeting and weather fit"
+    ]
+  },
+  {
+    "ban": "3.4.1",
+    "ngay": "2026-10-27",
+    "vi": [
+      "• Ảnh nền riêng tự đổi: sau khi chọn ảnh của bạn, bấm \"Thêm ảnh để hình nền tự đổi\" (tối đa 20 ảnh) và chọn bao lâu đổi một lần (5, 15, 30, 60 phút). Góp ý của build.dng."
+    ],
+    "en": [
+      "• Rotating wallpapers of your own: after picking your picture, press \"Add pictures to rotate the wallpaper\" (up to 20) and choose how often it changes (5, 15, 30, 60 minutes)."
+    ]
+  },
+  {
+    "ban": "3.4.0",
+    "ngay": "2026-10-27",
+    "vi": [
+      "• Giao diện Kiểu macOS: thanh menu mờ trên cùng, Dock kính mờ ô nhỏ nằm giữa đáy màn hình, ô đang chọn nổi lên sáng theo màu app, ảnh nền lượn tím hồng có logo VGS ở giữa.",
+      "• Chọn màu chữ đồng hồ, ngày, thời tiết (Trắng, Vàng, Xanh ngọc, Xanh lá, Hồng, Cam, Đen) cho ảnh nền sáng khó đọc. Góp ý của nggh, tranhoangnt555, Nam Tran."
+    ],
+    "en": [
+      "• macOS style: translucent menu bar on top, a small glass Dock centred at the bottom, the focused tile lifts and glows in the app's colour, a violet–pink wave wallpaper with the VGS logo in the middle.",
+      "• Pick the clock, date and weather text colour (White, Yellow, Cyan, Green, Pink, Orange, Black) for bright wallpapers."
+    ]
+  },
+  {
+    "ban": "3.3.0",
+    "ngay": "2026-10-27",
+    "vi": [
+      "- Danh sách mẫu tivi lên 332 mẫu, 93 hãng.",
+      "- Home sạch theo bản gốc CleanYourTV mới: app có ảnh banner bị cắt xấu được vẽ từ icon, bảng chọn nguồn có thể chỉ hiện cổng đang cắm thiết bị (Nâng cao), sửa vài lỗi hiệu ứng."
+    ],
+    "en": [
+      "- TV list now has 332 models from 93 brands.",
+      "- Home sạch follows the latest CleanYourTV: apps whose banner crops badly are drawn from their icon, the Inputs list can show connected ports only (Advanced), a few effect fixes."
+    ]
+  },
+  {
+    "ban": "3.2.0",
+    "ngay": "2026-10-26",
+    "vi": [
+      "- \"Nút hẹn giờ tắt tivi\" (Tuỳ chỉnh → Hiển thị): một nút trên cùng của Home sạch, bấm lần lượt 15, 30, 60, 90 phút, bấm nữa là huỷ (góp ý duongghoangg1103).",
+      "- Dùng ảnh nền riêng thì chữ đồng hồ, ngày, thời tiết có bóng mờ phía sau, không bị chìm trên ảnh sáng (góp ý losphets).",
+      "- Sửa ảnh nền riêng không lên hoặc phải áp dụng vài lần trên một số tivi Android 11: app kiểm ảnh đã sang tivi chưa, ghi lại nếu thiếu và báo rõ nếu tivi chặn."
+    ],
+    "en": [
+      "- \"Sleep timer button\" (Options → Display): a top button on the clean Home, each press sets 15, 30, 60, 90 minutes, then off.",
+      "- With your own picture, the clock, date and weather get a soft shadow so they stay readable on bright photos.",
+      "- Fixes your wallpaper not showing (or needing several applies) on some Android 11 TVs: the app checks it reached the TV, writes it again if not, and says so if the TV blocks it."
+    ]
+  },
+  {
+    "ban": "3.1.2",
+    "ngay": "2026-10-26",
+    "vi": [
+      "- Thẻ \"Cộng đồng VGS\" ở màn chính và màn xong: nhóm Facebook Vietnam Gaming Setup, nhóm Telegram VGS, tham gia VGSZone."
+    ],
+    "en": [
+      "- \"The VGS community\" card on the main and final screens: the Vietnam Gaming Setup Facebook group, VGS on Telegram, VGSZone."
+    ]
+  },
+  {
+    "ban": "3.1.1",
+    "ngay": "2026-10-26",
+    "vi": [
+      "- \"Dò một nút trên remote\" ở Tuỳ chỉnh → Remote: nút app lạ trên remote (VTVgo, FPT Play…) không mở app nữa sau khi đổi Home thì bấm Dò, bấm nút đó trên remote, chọn app cho nó, Áp dụng lên tivi (góp ý Hoàng Hữu, TCL 65C655)."
+    ],
+    "en": [
+      "- \"Detect a remote button\" under Options → Remote: if a remote's own app button (VTVgo, FPT Play…) stopped opening its app after the Home change, tap Detect, press it, pick its app and apply."
+    ]
+  },
+  {
+    "ban": "3.1.0",
+    "ngay": "2026-10-26",
+    "vi": [
+      "- Ô FPT Play trên màn chính: chọn nhanh VTV1–9, HTV7, HTV9 HD, hoặc dán link chia sẻ từ FPT Play (kênh, trận đấu, phim). Bấm ô là FPT Play trên tivi mở thẳng nội dung đó. Cần app \"FPT Play for Android TV\".",
+      "- Danh sách IPTV của bạn: dán link m3u (hoặc nội dung), chọn kênh, mỗi kênh một ô có logo; bấm là mở bằng VLC, MX Player, Just Player hoặc Kodi trên tivi.",
+      "- Tối đa 12 ô kênh, lấy từ VTVgo, FPT Play và IPTV."
+    ],
+    "en": [
+      "- FPT Play tiles on Home: quick-pick VTV1–9, HTV7, HTV9 HD, or paste a share link from FPT Play (channel, match, film); the tile opens it straight in FPT Play on the TV. Needs \"FPT Play for Android TV\".",
+      "- Your IPTV list: paste an m3u link (or its content), pick channels, each a tile with its logo, played with VLC, MX Player, Just Player or Kodi on the TV.",
+      "- Up to 12 channel tiles from VTVgo, FPT Play and IPTV."
+    ]
+  },
+  {
+    "ban": "3.0.3",
+    "ngay": "2026-10-26",
+    "vi": [
+      "- Danh sách mẫu tivi lên 316 mẫu, 90 hãng.",
+      "- Home sạch theo bản gốc CleanYourTV mới: âm lịch không còn hiện \"ngày 0\" sát ngày sóc, nút Netflix trên remote TCL mở đúng app, menu Cài đặt có mục Khởi động lại, màn hình chờ dùng cùng hình nền với Home."
+    ],
+    "en": [
+      "- TV list now has 316 models from 90 brands.",
+      "- Home sạch follows the latest CleanYourTV: no lunar \"day 0\" just before a new moon, the TCL Netflix key opens Netflix, a Restart item in the Settings menu, the screensaver uses Home's wallpaper."
+    ]
+  },
+  {
+    "ban": "3.0.2",
+    "ngay": "2026-10-26",
+    "vi": [
+      "- Màn \"Tivi đã sạch!\" hỏi rõ hai lựa chọn: \"Tắt ADB (an toàn hơn)\" hoặc \"Giữ ADB để chỉnh tiếp\" (lần sau đổi giao diện không phải bật lại gỡ lỗi trên tivi). Chưa chọn mà rời app quá 1 phút thì tivi vẫn tự tắt ADB cho an toàn."
+    ],
+    "en": [
+      "- The \"TV is clean!\" screen asks: \"Turn ADB off (safer)\" or \"Keep ADB on to tweak later\" (no need to enable debugging again next time). Leave without choosing for over a minute and the TV still turns ADB off."
+    ]
+  },
+  {
+    "ban": "3.0.1",
+    "ngay": "2026-10-26",
+    "vi": [
+      "- Tivi để múi giờ khác điện thoại (Xiaomi / Redmi bản Trung Quốc để giờ Bắc Kinh, nhanh hơn Việt Nam 1 tiếng, lại giấu mục chỉnh giờ): khi kết nối, app báo lệch và có nút \"Đặt giờ tivi theo điện thoại\"."
+    ],
+    "en": [
+      "- TV in a different time zone from the phone (China-market Xiaomi / Redmi run Beijing time and hide the setting): on connect the app says so and offers \"Use the phone's time zone on the TV\"."
+    ]
+  },
+  {
+    "ban": "3.0.0",
+    "ngay": "2026-10-26",
+    "vi": [
+      "- Kênh truyền hình trên màn chính: chọn được mọi kênh của VTVgo (kênh địa phương như Hà Nội 1, Vĩnh Long 1, Quảng Ngãi…, VTV5 Tây Nam Bộ, VTVcab…), mỗi kênh một ô có logo, bấm là xem ngay (góp ý caicotdien04, xemtivi661).",
+      "- Ảnh riêng vừa khung, không cắt: cả ảnh nằm trọn trên màn, hai bên là ảnh làm mờ (góp ý hieuinter).",
+      "- \"Luôn mở Home sạch khi bật tivi\" ở Tuỳ chỉnh: cho tivi tự mở lại Home gốc, HDMI hay app cũ mỗi lần bật.",
+      "- \"Ô icon đều nhau\" tắt được cả khi dùng giao diện Kiểu Apple TV, để dùng lại ảnh banner của app (góp ý contact.khanhtoan).",
+      "- Tivi Xiaomi gỡ mất Home sạch ngay sau khi cài: app tự cài lại bằng tên Xiaomi cho phép."
+    ],
+    "en": [
+      "- TV channels on Home: pick any VTVgo channel (local ones, VTV5 regions, VTVcab…), each a tile with its logo that plays the channel at once.",
+      "- Fit your picture, no cropping: the whole picture fits with a blurred copy at the sides.",
+      "- \"Always open the clean Home at power-on\" under Options, for TVs that come back to the stock Home, HDMI or the last app.",
+      "- \"Uniform icon tiles\" can be turned off even with the Apple TV look, to bring back app banners.",
+      "- When a Xiaomi TV removes the clean Home right after install, the app reinstalls it under a name Xiaomi allows."
+    ]
+  },
+  {
+    "ban": "2.10.12",
+    "ngay": "2026-10-26",
+    "vi": [
+      "- Kết nối vào máy không phải tivi (điện thoại, máy tính bảng) thì app cảnh báo đỏ và khoá nút dọn, tránh dọn nhầm làm máy không khởi động được.",
+      "- \"Mở một app khi bật tivi\" có thêm lựa chọn \"Cả khi bật lại từ chế độ chờ\": bấm nút nguồn remote để bật là mở app luôn (góp ý dmenh568, quan1sd1998).",
+      "- Thêm \"Chữ giờ, ngày trắng sáng\" ở Tuỳ chỉnh → Hiển thị (góp ý tranhoangnt555).",
+      "- Home sạch theo bản gốc CleanYourTV mới nhất; danh sách 307 mẫu tivi."
+    ],
+    "en": [
+      "- Connecting to a device that is not a TV (phone, tablet) now shows a red warning and locks cleaning, so a phone cannot be cleaned into a boot loop.",
+      "- \"Open an app at power-on\" gains \"Also when waking from standby\": turning the TV on with the remote opens the app too.",
+      "- New \"Bright white clock and date\" under Customize → Display.",
+      "- Home sạch follows the latest CleanYourTV; 307 TV models."
+    ]
+  },
+  {
+    "ban": "2.10.11",
+    "ngay": "2026-10-25",
+    "vi": [
+      "- Danh sách mẫu tivi lên 300 mẫu, 86 hãng (thêm Sony KD-55X75K có phím app trên remote, Philips, TCL, Skyworth, máy chiếu HY320…).",
+      "- Home sạch dựa trên bản gốc CleanYourTV 3.0."
+    ],
+    "en": [
+      "- TV list now has 300 models from 86 brands (adds Sony KD-55X75K remote app keys, Philips, TCL, Skyworth, HY320 projectors…).",
+      "- Home sạch is based on CleanYourTV 3.0."
+    ]
+  },
+  {
+    "ban": "2.10.10",
+    "ngay": "2026-10-25",
+    "vi": [
+      "- Thêm công tắc \"Giữ nút âm lượng để tăng / giảm liên tục\" ở Đổi giao diện → Tuỳ chỉnh → Remote: dành cho tivi giữ nút chỉ nhảy một nấc sau khi cài Home sạch (hay gặp trên Sony). Đổi lại, nút Input / Apps / nút app trên remote về như tivi gốc."
+    ],
+    "en": [
+      "- New \"Hold volume to keep raising / lowering\" switch under Change Home look → Customize → Remote, for TVs where holding volume moves only one step after Home sạch (common on Sony). In return the remote's Input / Apps / app buttons work as the TV's own."
+    ]
+  },
+  {
+    "ban": "2.10.9",
+    "ngay": "2026-10-25",
+    "vi": [
+      "• Ảnh nền riêng nét hơn: nén chất lượng cao, màu 32-bit, không còn lớp phủ màu của theme (góp ý của caothanhlhp3)",
+      "• Tivi Xiaomi bản Trung Quốc: Home sạch hiện tiếng Việt dù tivi để tiếng Trung"
+    ],
+    "en": [
+      "• Sharper own wallpapers: higher quality, 32-bit colour, no theme overlay",
+      "• China Xiaomi TVs: the clean Home shows Vietnamese even with the TV in Chinese"
+    ]
+  },
+  {
+    "ban": "2.10.8",
+    "ngay": "2026-10-25",
+    "vi": [
+      "• Đổi giao diện: kiểm file đã tới tivi, tivi Android đời cũ (Sony 2015…) không còn đổi theme mà không ăn",
+      "• Thêm mẫu tivi, tổng 293 mẫu có danh sách dọn sẵn",
+      "• Home sạch mới: Nâng cao thêm \"Về Home khi bật tivi\" cho tivi tự mở Live TV lúc bật nguồn"
+    ],
+    "en": [
+      "• Theme changes: the app checks the files reached the TV (older Android TVs)",
+      "• 293 TV models with a ready list",
+      "• Newer clean Home: Advanced adds \"Back to Home at power-on\""
+    ]
+  },
+  {
+    "ban": "2.10.7",
+    "ngay": "2026-10-25",
+    "vi": [
+      "• Thời tiết: ô tìm nhận cả thành phố nước ngoài (Bali, Osaka…) cho người ở xa (góp ý từ Indonesia, Nhật)",
+      "• Tivi có cài launcher khác (Launchpad TV…): bước cài Home sạch không còn bị hộp \"chọn Home\" làm hỏng",
+      "• Để ngày dưới đồng hồ không còn mất tên phường/xã ở dòng thời tiết"
+    ],
+    "en": [
+      "• Weather: the search finds cities abroad (Bali, Osaka…)",
+      "• TVs with other launchers installed: the Home chooser no longer breaks the install",
+      "• Date under the clock no longer cuts the place name"
+    ]
+  },
+  {
+    "ban": "2.10.6",
+    "ngay": "2026-10-25",
+    "vi": [
+      "• Gửi danh sách / góp ý: ô liên hệ chỉ nhận email, VGS trả lời qua thư"
+    ],
+    "en": [
+      "• Sending feedback: the contact field takes an email; VGS replies by email"
+    ]
+  },
+  {
+    "ban": "2.10.5",
+    "ngay": "2026-10-25",
+    "vi": [
+      "• Tivi cài nhiều launcher (Xiaomi nội địa Redmi A Pro…): hộp \"chọn Home\" không còn làm app trả về Home gốc mỗi lần đổi giao diện, app tự đóng hộp và đặt Home sạch"
+    ],
+    "en": [
+      "• TVs with several launchers (China Xiaomi…): the Home chooser no longer makes the app roll back; it closes it and sets the clean Home"
+    ]
+  },
+  {
+    "ban": "2.10.4",
+    "ngay": "2026-10-25",
+    "vi": [
+      "• Sony BRAVIA 2015: không còn tắt các gói màn Cài đặt cần; tivi này mặc định giữ ADB bật để không bị khoá ngoài",
+      "• \"Mở một app khi bật tivi\": thêm nút \"Mở màn chọn app trên tivi\", bấm là tivi mở đúng chỗ chọn (góp ý của dmenh568)",
+      "• Tất cả app một hàng: viên Thư viện ứng dụng không còn chen vào hàng app (góp ý của Giun2911)",
+      "• Home sạch mới: nút YouTube/Netflix trên remote TCL vẫn mở đúng app khi Home sạch mở đè Home gốc; Nâng cao thêm \"Ngày nằm dưới đồng hồ\", \"Bấm OK trong thư viện là mở app\""
+    ],
+    "en": [
+      "• 2015 Sony BRAVIA: Settings-related packages are kept; ADB stays on by default there",
+      "• \"Open an app at power-on\": a button opens the picker on the TV",
+      "• Single row: the App library pill no longer sits in the row",
+      "• Newer clean Home: TCL remote app buttons keep working; Advanced adds date under the clock and OK-opens in the library"
+    ]
+  },
+  {
+    "ban": "2.10.3",
+    "ngay": "2026-10-25",
+    "vi": [
+      "• Sửa lỗi cài Home sạch xong app báo nhầm \"Nút Home vẫn mở com.android.tv.settings / app khác\" rồi trả tivi như cũ (Sony VH21, VU1, BF1, Xiaomi, onn…). Giờ app chờ và bấm Home thử lại"
+    ],
+    "en": [
+      "• Fixed a false \"Home still opens Settings / another app\" after installing the clean Home; the app now waits and retries"
+    ]
+  },
+  {
+    "ban": "2.10.2",
+    "ngay": "2026-10-25",
+    "vi": [
+      "• Sony BRAVIA 2015: không còn tự tắt gói làm Cài đặt mở ra màn trống. Đã dính thì vào \"Bật lại app đã tắt\", tích com.sony.dtv.b2b.hotelmode",
+      "• Tivi Android 8: sửa lỗi gửi ảnh nền xong mà hình nền không đổi",
+      "• Ô tìm phường/xã không còn giật khi chạy CleanTV ngay trên tivi",
+      "• Dòng thông số đổi thành \"RAM 0,8/1,4 GB · ROM 2,6/8 GB\" (góp ý của khangnck)",
+      "• Tuỳ chỉnh: thêm \"Mở một app khi bật tivi\""
+    ],
+    "en": [
+      "• 2015 Sony BRAVIA: no longer disables the package Settings needs",
+      "• Android 8 TVs: wallpaper now changes after sending",
+      "• Ward search no longer lags when CleanTV runs on the TV",
+      "• Stats line reads \"RAM 0.8/1.4 GB · ROM 2.6/8 GB\"",
+      "• Options: \"Open an app at power-on\""
+    ]
+  },
+  {
+    "ban": "2.10.1",
+    "ngay": "2026-10-25",
+    "vi": [
+      "• Ô kênh VTV trên màn chính hiện logo kênh thay cho chữ (Áp dụng lên tivi một lần để cập nhật)"
+    ],
+    "en": [
+      "• VTV channel tiles show the channel logo (apply to the TV once to update)"
+    ]
+  },
+  {
+    "ban": "2.10.0",
+    "ngay": "2026-10-25",
+    "vi": [
+      "• Kênh VTV trên màn chính: Đổi giao diện → thẻ Home → chọn VTV1…VTV9. Mỗi kênh thành một ô ở đầu dock, bấm là xem luôn trên VTVgo (cần cài VTVgo trên tivi). Góp ý của khoald92vn, trananhht9",
+      "• Sửa lại câu chữ tiếng Việt trong app cho dễ đọc"
+    ],
+    "en": [
+      "• VTV channels on Home: Change look → Home tab → pick VTV1…VTV9. Each becomes a dock tile that opens the channel straight in VTVgo (needs VTVgo on the TV)",
+      "• Clearer Vietnamese wording"
+    ]
+  },
+  {
+    "ban": "2.9.0",
+    "ngay": "2026-10-25",
+    "vi": [
+      "• Giao diện mới \"Kiểu Apple TV\": nửa trên đổi màu theo app đang chọn, tên app lớn, dock kính mờ, ô icon đều, viền chọn trắng",
+      "• Kết nối lại tivi thì app tự chọn đúng giao diện đang dùng"
+    ],
+    "en": [
+      "• New \"Apple TV style\" theme: the top follows the focused app's colour, large app name, frosted dock, even icon tiles, white focus",
+      "• Reconnecting picks the theme the TV is using"
+    ]
+  },
+  {
+    "ban": "2.8.3",
+    "ngay": "2026-10-25",
+    "vi": [
+      "• Thêm 19 mẫu tivi có danh sách dọn sẵn, tổng 280 mẫu (TCL 75P8K, Sony BRAVIA VU3, Tuvio, Dcolor GD2, Acer…)"
+    ],
+    "en": [
+      "• 19 more TV models with a ready list, 280 in all (TCL 75P8K, Sony BRAVIA VU3, Tuvio, Dcolor GD2, Acer…)"
+    ]
+  },
+  {
+    "ban": "2.8.2",
+    "ngay": "2026-10-24",
+    "vi": [
+      "• Sửa lỗi kẹt \"Đang gửi ảnh nền\" khi đặt ảnh riêng trên tivi Android 8 (Sony BRAVIA 2015…)",
+      "• Tuỳ chỉnh: thêm \"Số app mỗi hàng\" 4 / 5 / 6 / 7, icon nhỏ lại cho vừa (góp ý của bạn dùng Sony)"
+    ],
+    "en": [
+      "• Fixes \"Sending wallpaper\" hanging with your own photo on Android 8 TVs (Sony BRAVIA 2015…)",
+      "• Options: new \"Apps per row\" 4 / 5 / 6 / 7"
+    ]
+  },
+  {
+    "ban": "2.8.1",
+    "ngay": "2026-10-24",
+    "vi": [
+      "• Vị trí hàng app: thêm \"Giữa màn hình\" và \"Thấp nhất\" (góp ý của bạn dùng Xiaomi)",
+      "• Dòng thời tiết có biểu tượng ☀️ ⛅ 🌧️ ở đầu"
+    ],
+    "en": [
+      "• App rows position: new \"Middle\" and \"Lowest\"",
+      "• The weather line starts with an icon ☀️ ⛅ 🌧️"
+    ]
+  },
+  {
+    "ban": "2.8.0",
+    "ngay": "2026-10-24",
+    "vi": [
+      "• Tuỳ chỉnh mới: Tất cả app một hàng, Ô icon đều nhau (kiểu Apple TV), Ẩn lời chào",
+      "• Tivi Xiaomi: nút INPUT trên remote mở lại bảng chọn nguồn",
+      "• TCL Google TV: mở app từ remote/Play ổn hơn khi đã tắt Home Google",
+      "• Nâng cao: thêm 14 tuỳ chọn (màn chờ đồng hồ trên hình nền, kiểu viền ô, app thành nút tròn…)",
+      "• DNS chặn quảng cáo: ghi rõ đừng bật nếu router đã chặn (Pi-hole, AdGuard Home, VPN)"
+    ],
+    "en": [
+      "• New options: Every app in one row, Uniform icon tiles (Apple TV style), Hide the greeting",
+      "• Xiaomi TVs: the remote INPUT button opens the input picker again",
+      "• TCL Google TV: steadier app launches with the Google Home off",
+      "• Advanced: 14 new options (clock screensaver over the wallpaper, focus style, apps as round buttons…)",
+      "• Ad-blocking DNS: note to leave it off when the router already filters"
+    ]
+  },
+  {
+    "ban": "2.7.3",
+    "ngay": "2026-10-24",
+    "vi": [
+      "Tuỳ chỉnh → \"Cỡ chữ đồng hồ, lịch, thời tiết\": Vừa / Lớn / Rất lớn.",
+      "Sửa DNS chặn quảng cáo AdGuard: bật / tắt có hiệu lực cả khi Đổi giao diện, kết nối lại thì công tắc hiện đúng trạng thái trên tivi. DNS là cài đặt của tivi (Cài đặt → Mạng → DNS riêng tư), không phải app."
+    ],
+    "en": [
+      "Customise → \"Clock, date and weather size\": Normal / Large / Extra large.",
+      "AdGuard DNS fixed: turning it on / off now applies from Change look too, and the switch shows the TV's real state on reconnect. It is a TV DNS setting (Settings → Network → Private DNS), not an app."
+    ]
+  },
+  {
+    "ban": "2.7.2",
+    "ngay": "2026-10-24",
+    "vi": [
+      "Nút \"Đang phát\" trên Home sạch: hiện khi có app đang phát nhạc / video, bấm vào thấy từng app để tạm dừng / phát tiếp, hoặc \"Dừng tất cả\" khi nhiều app phát chồng tiếng. Bấm Đổi giao diện → Áp dụng lên tivi một lần để bật."
+    ],
+    "en": [
+      "\"Now playing\" on the clean Home: shows while apps play music / video; pause or resume each, or \"Stop all\" when several play over each other. Change look → Apply once to turn it on."
+    ]
+  },
+  {
+    "ban": "2.7.1",
+    "ngay": "2026-10-24",
+    "vi": [
+      "Tuỳ chỉnh → \"Vị trí hàng app\": dời dock và các hàng app lên cao hơn hoặc thấp xuống.",
+      "Nút Apps trên remote (Sony…) không còn mở Home sạch như nút Back; que / tivi Xiaomi vẫn dùng nút đó làm Home như cũ."
+    ],
+    "en": [
+      "Customise → \"App rows position\": move the dock and app rows higher or lower.",
+      "The remote's Apps key (Sony…) no longer opens the clean Home like Back; Xiaomi sticks / TVs keep using it as Home."
+    ]
+  },
+  {
+    "ban": "2.7",
+    "ngay": "2026-10-24",
+    "vi": [
+      "260 mẫu tivi của 78 hãng: thêm máy chiếu HOTACK, Magcubic HY300 Pro, Sharp Google TV, Sony KD-55X8000C, Sber… cùng 18 mẫu có sẵn bảng phím remote.",
+      "Home sạch theo CleanYourTV mới nhất."
+    ],
+    "en": [
+      "260 TV models from 78 brands: HOTACK and Magcubic HY300 Pro projectors, Sharp Google TV, Sony KD-55X8000C, Sber… and 18 models with a remote key map.",
+      "Clean Home on the latest CleanYourTV."
+    ]
+  },
+  {
+    "ban": "2.6.12",
+    "ngay": "2026-10-24",
+    "vi": [
+      "TCL Google TV: tắt \"Nút app trên remote\" (Tuỳ chỉnh → Remote) thì giữ âm lượng lại tăng / giảm liên tục, kể cả khi Home Google đã tắt."
+    ],
+    "en": [
+      "TCL Google TV: turning off \"Remote app buttons\" (Customise → Remote) restores the volume ramp, even with Google's Home disabled."
+    ]
+  },
+  {
+    "ban": "2.6.11",
+    "ngay": "2026-10-24",
+    "vi": [
+      "TCL Google TV: ưu tiên giữ âm lượng chỉ khi Home Google còn bật (nút YouTube / Netflix tự chạy qua nó). Tivi đã tắt Home Google thì vẫn giữ nút app trên remote như bản 2.6.7."
+    ],
+    "en": [
+      "TCL Google TV: the volume-ramp default applies only while Google's Home is still on (its own app keys keep working). With Google's Home disabled the remote app-button map stays on, as in 2.6.7."
+    ]
+  },
+  {
+    "ban": "2.6.10",
+    "ngay": "2026-10-24",
+    "vi": [
+      "TCL Google TV: giữ nút âm lượng lại tăng / giảm liên tục sau khi thay Home (bấm Đổi giao diện → Áp dụng lên tivi một lần). Muốn nút YouTube / Netflix trên remote chạy cả khi Home Google đã tắt thì bật \"Nút app trên remote\", đổi lại giữ âm lượng chỉ nhảy một nấc."
+    ],
+    "en": [
+      "TCL Google TV: holding volume ramps again after replacing Home (Change look → Apply once). Turn on \"Remote app buttons\" for YouTube / Netflix keys with Google's Home disabled, at the cost of one volume step per press."
+    ]
+  },
+  {
+    "ban": "2.6.9",
+    "ngay": "2026-10-24",
+    "vi": [
+      "Chạy CleanTV ngay trên tivi (TCL…): Áp dụng không cài lại Home sạch khi đã đúng bản, gửi ảnh nhanh hơn, nên giao diện / lịch âm / thời tiết lên được.",
+      "Nút \"Chọn ảnh có trên tivi / USB\": tivi không có trình chọn ảnh vẫn đặt được ảnh nền riêng (chép ảnh JPG vào USB rồi cắm vào tivi)."
+    ],
+    "en": [
+      "Running CleanTV on the TV (TCL…): Apply no longer reinstalls the clean Home when it is already current, and pictures upload faster, so themes / lunar date / weather take effect.",
+      "\"Pick a picture on the TV / USB\": set your own wallpaper even when the TV has no photo picker (copy a JPG to a USB stick)."
+    ]
+  },
+  {
+    "ban": "2.6.8",
+    "ngay": "2026-10-24",
+    "vi": [
+      "Gỡ lỗi không dây (Chromecast, Google TV đời mới): ghép đôi xong mà mạng không báo cổng kết nối thì app tự dò cổng của tivi (khoảng 30 giây), không phải nhập tay."
+    ],
+    "en": [
+      "Wireless debugging (Chromecast, newer Google TVs): if the network doesn't announce the connect port after pairing, the app probes the TV's ports itself (about 30 seconds)."
+    ]
+  },
+  {
+    "ban": "2.6.7",
+    "ngay": "2026-10-24",
+    "vi": [
+      "Sửa 2.6.5: trên TCL Google TV, nút YouTube / Netflix / Prime trên remote chạy lại sau khi thay Home (bấm Đổi giao diện → Áp dụng lên tivi một lần). Nút Web mở trình duyệt nếu tivi có."
+    ],
+    "en": [
+      "Fixes 2.6.5: on TCL Google TV the remote's YouTube / Netflix / Prime buttons work again after replacing Home (Change look → Apply once). The Web button opens a browser if the TV has one."
+    ]
+  },
+  {
+    "ban": "2.6.6",
+    "ngay": "2026-10-24",
+    "vi": [
+      "Tivi tự canh gác: đang thay Home mà rớt kết nối (mất Wi-Fi, hết pin) thì 3 phút sau tivi tự bật lại Home gốc.",
+      "Xong việc rời app quá 1 phút thì tivi tự tắt ADB (bật \"Giữ ADB bật cho lần sau\" nếu muốn giữ).",
+      "Lưu kịch bản khôi phục: một file lệnh adb đưa tivi về như cũ từ máy tính, kể cả khi mất điện thoại.",
+      "Xem trước các lệnh sẽ chạy trên tivi trước khi dọn / cài Home.",
+      "Bản dựng tái tạo được, công bố dấu chữ ký để tự kiểm tra APK."
+    ],
+    "en": [
+      "The TV guards itself: if the connection drops while Home is being replaced, the TV restores its stock Home after 3 minutes.",
+      "Leave the app for over a minute when done and the TV turns ADB off (tick \"Keep ADB on for next time\" to keep it).",
+      "Save a restore script: adb commands that put the TV back from a computer, even without this phone.",
+      "Preview the commands before cleaning / installing Home.",
+      "Reproducible builds and a published signing fingerprint to verify the APK."
+    ]
+  },
+  {
+    "ban": "2.6.5",
+    "ngay": "2026-10-24",
+    "vi": [
+      "Nút app trên remote (YouTube, Netflix, Prime, bánh răng Cài đặt) vẫn chạy sau khi thay Home: app tự lấy bảng phím của mẫu tivi (17 mẫu có sẵn, TCL có bảng chung). Bật / tắt ở Đổi giao diện → Tuỳ chỉnh → Remote."
+    ],
+    "en": [
+      "Remote app buttons (YouTube, Netflix, Prime, the Settings gear) keep working after replacing Home: the app applies the model's key map (17 models, plus a shared TCL map). Toggle it under Change look → Customise → Remote."
+    ]
+  },
+  {
+    "ban": "2.6.4",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Sửa lỗi 2.6.2–2.6.3: trên Google TV, Home sạch giờ mở đè Home Google được ngay khi áp dụng (trước đó app thử lúc Home Google đang nằm sẵn trên màn nên luôn báo không được)."
+    ],
+    "en": [
+      "Fixes 2.6.2–2.6.3: on Google TV the clean Home now opens over Google's Home right when applied (before, the app tested while Google's Home was already on screen, so it always reported failure)."
+    ]
+  },
+  {
+    "ban": "2.6.3",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Google TV / tivi không cho tắt Home gốc: cho Home sạch mở đè giờ thử thêm một lần (chờ dịch vụ bắt phím khởi động), nhiều máy lần đầu báo hỏng nay chạy ngay."
+    ],
+    "en": [
+      "Google TV / TVs that won't disable the stock Home: opening the clean Home over it now retries once (waiting for the key helper to start), so sets that failed on the first try work straight away."
+    ]
+  },
+  {
+    "ban": "2.6.2",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Google TV còn trình cài đặt setupwraith (nhiều TCL): app không tắt Home Google mà thử cho Home sạch tự mở đè khi bấm Home. Không được thì tivi vẫn như cũ và app chỉ cách quên Wi-Fi như trước."
+    ],
+    "en": [
+      "Google TV with setupwraith still on (many TCL sets): instead of disabling Google's Home, the app now tries letting the clean Home open over it on Home. If that fails the TV stays as it was and the app explains the forget-Wi-Fi fix as before."
+    ]
+  },
+  {
+    "ban": "2.6.1",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Tivi không cho tắt Home gốc (tắt xong tự bật lại, vd SCBC R3 Android 14): nút Home giờ vẫn ra Home sạch — app để Home gốc bật và cho Home sạch tự mở đè lên.",
+      "Không được thì app trả tivi như cũ và báo rõ lý do, không thử tắt lặp lại."
+    ],
+    "en": [
+      "TVs that turn the stock Home back on after it is disabled (e.g. SCBC R3, Android 14): the Home button now still opens the clean Home, which opens over the stock one.",
+      "If that fails too, the app leaves the TV as it was and says why, instead of retrying."
+    ]
+  },
+  {
+    "ban": "2.6",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Theo CleanYourTV mới nhất: 248 mẫu tivi của 73 hãng, theme Sweden, sửa tivi TCL tự tắt dịch vụ bắt phím sau khi khởi động lại",
+      "Dòng thời tiết chuyển xuống dưới ngày và lịch âm, chữ nhỏ bằng dòng ngày, không còn chiếm đầu màn hình — góp ý nguyenthanhsn88",
+      "An toàn hơn: chốt cuối không bao giờ tắt gói lõi của Android hay gói đang giữ nút Home (giống repo gốc); tivi lưu hai mạng Wi-Fi trùng tên thì giữ trình cài đặt Google để khỏi rớt mạng"
+    ],
+    "en": [
+      "Latest CleanYourTV: 248 TV models from 73 brands, Sweden theme, TCL key helpers survive a reboot",
+      "Weather line moved under the date and lunar date, at the date's size",
+      "Safer: a last check never disables core Android packages or the package holding Home (as the original repo does); two saved Wi-Fi networks with the same name keep the Google setup app"
+    ]
+  },
+  {
+    "ban": "2.5.6",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Đổi giao diện lần sau (chỉnh dock, thời tiết…) không còn thay ảnh nền riêng bằng ảnh theme: app đọc lại ảnh đang có trên tivi và giữ nguyên"
+    ],
+    "en": [
+      "Changing the theme screen later (dock, weather…) keeps your own wallpaper: the app reads it back from the TV"
+    ]
+  },
+  {
+    "ban": "2.5.5",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Đặt ảnh của bạn làm hình nền thì app tự tắt \"ánh sáng nền theo màu app\", ảnh không còn bị ám đỏ / vàng / xanh khi đổi ô app (bật lại được trong Nâng cao) — góp ý dangngoctri2010"
+    ],
+    "en": [
+      "With your own wallpaper the focused-app glow is turned off, so the photo no longer tints red / yellow / blue (re-enable in Advanced)"
+    ]
+  },
+  {
+    "ban": "2.5.4",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Dock: mục \"Thứ tự trên dock\" có nút ↑ ↓ để đổi thứ tự app, không phải bỏ chọn rồi chọn lại — góp ý daohoangthong1",
+      "Thẻ Tuỳ chỉnh có \"File cấu hình\": Lưu ra file mọi lựa chọn (theme, dock, thời tiết, tuỳ chỉnh, Nâng cao, ảnh nền riêng) và Mở file để dùng lại hoặc mang sang tivi khác — góp ý 9000000",
+      "Cài Home sạch quá 2 phút chưa xong (hay gặp khi chạy CleanTV thẳng trên tivi) thì app dừng và chỉ cách tắt \"Xác minh ứng dụng qua USB\", không xoay mãi — góp ý khanhtoan"
+    ],
+    "en": [
+      "Dock order with ↑ ↓ buttons",
+      "Options → Settings file: save every choice to a file and open it again or on another TV",
+      "Installing the clean Home stops after 2 minutes with a hint to turn off \"Verify apps over USB\""
+    ]
+  },
+  {
+    "ban": "2.5.3",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Khôi phục có mục \"Bật lại từng app\": đọc từ tivi mọi app đang tắt (kể cả khi đã cài lại CleanTV hay không có bản sao lưu), tích app cần bật rồi bấm Bật lại — góp ý @9000000 (GitHub)",
+      "Màn tivi đã kết nối luôn có nút vào mục này, kể cả tivi chưa dọn bằng CleanTV"
+    ],
+    "en": [
+      "Restore has \"Re-enable single apps\": every disabled app read from the TV (even after reinstalling CleanTV or with no backup), tick and re-enable"
+    ]
+  },
+  {
+    "ban": "2.5.2",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Home sạch: app không có ảnh dành cho tivi (Chrome, Cửa hàng Play, Thư viện, Aptoide…) có ô tô màu theo icon và icon to hơn, không còn ô xám trống — góp ý của toan.arc90; tắt được ở thẻ Tuỳ chỉnh"
+    ],
+    "en": [
+      "Clean Home: apps with no TV banner (Chrome, Play Store, Gallery…) get a tile in their icon's colour with a bigger icon; switch off under Options"
+    ]
+  },
+  {
+    "ban": "2.5.1",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Bấm Dọn mà bạn tự tích gói nhiều danh sách ghi phải giữ (vd nút Input của TCL) thì app hỏi lại: bỏ tích rồi dọn, hoặc vẫn tắt",
+      "Nút Gửi danh sách gói gửi kèm vài dòng chẩn đoán màn Home, để VGS xử lý tivi / hộp chưa nhận Home sạch"
+    ],
+    "en": [
+      "Ticked a package most tested lists keep (e.g. the TCL Input key)? The app asks again before cleaning",
+      "The package list you send now includes a few Home diagnostics"
+    ]
+  },
+  {
+    "ban": "2.5",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Khoá trẻ em: phụ huynh đặt khung giờ khoá (tối, giờ học, giờ trưa hoặc tự đặt, chọn ngày trong tuần) và mã PIN 4 số ngay trên điện thoại",
+      "Tới giờ, tivi hiện màn khoá che mọi thứ (cả HDMI, YouTube), chặn phím remote; nhập đúng PIN trên tivi thì mở 60 phút, sai 5 lần phải chờ 1 phút; tắt tivi bật lại vẫn khoá",
+      "Từ điện thoại: mở tạm 60 phút, khoá lại ngay, tắt và gỡ khoá; Khôi phục tivi này cũng gỡ khoá"
+    ],
+    "en": [
+      "Kids lock: parents set lock periods (night, study time, nap or custom, by weekday) and a 4-digit PIN on the phone",
+      "During a period the TV shows a lock screen over everything (HDMI, YouTube too) and blocks the remote; the PIN unlocks it for 60 minutes, 5 wrong tries mean a 1-minute wait; it stays locked after a restart",
+      "From the phone: unlock for 60 minutes, lock now, turn off and remove; Restore this TV removes it too"
+    ]
+  },
+  {
+    "ban": "2.4.1",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Màn Xong có thẻ \"Giúp người dùng cùng dòng tivi\": chọn Ổn hết / Có chỗ chưa ổn, ghi chú, bấm gửi model tivi và danh sách gói đang tắt cho VGS (không gửi tên, email hay danh sách app) — góp ý của nguyenducbinh9x (tivi Hiker)"
+    ],
+    "en": [
+      "Done screen: \"Help owners of the same TV\" — rate it, add a note and send the TV model and disabled packages to VGS (no name, email or app list)"
+    ]
+  },
+  {
+    "ban": "2.4",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Màn Đổi giao diện làm lại: ảnh xem trước ở đầu, chia 3 thẻ Giao diện · Home · Tuỳ chỉnh, nút Áp dụng luôn ở đáy",
+      "Nâng cao thành màn riêng: ô tìm, lọc Đã đổi / Cẩn thận, chia 6 nhóm, mục đã đổi có chấm tím",
+      "Tivi chưa khớp mẫu: app gợi ý mẫu gần giống cùng hãng (vd Sony VU3 → VU31), nút Chọn mẫu khác tìm trong toàn bộ danh sách — góp ý của Luongnam1020"
+    ],
+    "en": [
+      "Redesigned theme screen: live preview on top, 3 tabs (Look · Home · Options), Apply always at the bottom",
+      "Advanced is its own screen: search, Changed / Careful filters, 6 groups, a dot on changed items",
+      "Unmatched TVs: close matches of the same brand are suggested (e.g. Sony VU3 → VU31), and any list can be picked by search"
+    ]
+  },
+  {
+    "ban": "2.3.1",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Xem màn hình tivi: nút Lưu ảnh (vào Ảnh › CleanTV) và Chia sẻ (Zalo, Messenger…) — góp ý của nguyenthanhsn88"
+    ],
+    "en": [
+      "View TV screen: Save (to Pictures › CleanTV) and Share buttons"
+    ]
+  },
+  {
+    "ban": "2.3",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Theo CleanYourTV mới nhất: 243 mẫu tivi của 70 hãng (thêm TCL, Sony, Motorola, TiVo, AIWA…)",
+      "Nâng cao có 64 tuỳ chọn, thêm: hàng app mờ dần khi cuộn, ảnh nền theo buổi sáng/chiều/tối, biểu tượng Wi-Fi đổi màu, chỉnh Home điện ảnh",
+      "Thời tiết: ô tìm phường/xã lên đầu, thành phố lớn là nút chọn nhanh",
+      "Tivi lưu nhiều mạng Wi-Fi: đọc đúng mạng đang dùng trước khi tắt trình cài đặt Google"
+    ],
+    "en": [
+      "Latest CleanYourTV: 243 TV models from 70 brands (new TCL, Sony, Motorola, TiVo, AIWA…)",
+      "Advanced has 64 options, new: rows fade as they scroll, wallpapers by time of day, coloured Wi-Fi icon, cinematic Home tuning",
+      "Weather: ward search box first, big cities as quick picks",
+      "TVs with several saved Wi-Fi networks: the one in use is read correctly before the Google setup app is disabled"
+    ]
+  },
+  {
+    "ban": "2.2",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Home sạch theo CleanYourTV mới nhất: bấm nút Menu trên remote ở một app là mở menu Di chuyển / Thêm vào dock (tiện cho remote không giữ OK được), chặn Home gốc tự bật lại chạy lại được, góc dải dock bo khớp ô app, Home áp ngay chỉnh trong cài đặt launcher.",
+      "Danh sách đã thử lên 232 mẫu / 67 hãng (thêm 2 máy chiếu Formovie, nhiều Sony, Grundig, Fire TV Stick…); Nâng cao 56 tuỳ chọn, đã Việt hoá hết.",
+      "Xiaomi bản Trung Quốc: cổng HDMI đang cắm thiết bị (tivi đổi tên dòng thành tên thiết bị, kiểu \"Playback_2 · HDMI2\") giờ cũng mở đúng cổng.",
+      "Hộp/tivi Android 7 trở xuống: app báo rõ ngay là chỉ dọn được, Home sạch cần Android 8+."
+    ],
+    "en": [
+      "The clean Home follows the latest CleanYourTV: the remote's Menu key on an app opens Move / Add to dock (handy where OK can't be held), the stock-Home redirect works again, dock band corners match the tiles, Launcher settings apply at once.",
+      "Tested lists: 232 models / 67 brands (two Formovie projectors, more Sony, Grundig, Fire TV Stick…); 56 Advanced options, all translated.",
+      "China-market Xiaomi: HDMI ports with a device plugged in (the row is renamed after the device, e.g. \"Playback_2 · HDMI2\") now open the right port.",
+      "Android 7 and older: the app says right away it can only clean; the clean Home needs Android 8+."
+    ]
+  },
+  {
+    "ban": "2.1.7",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Fire TV / Fire TV Stick / Fire TV Cube: app nhận ra Fire OS và báo ngay là chỉ dọn được quảng cáo, theo dõi, app rác; màn Home thì Amazon khoá cho launcher của họ nên không thay được. Bỏ bước cài Home sạch trên Fire TV để khỏi tưởng app lỗi."
+    ],
+    "en": [
+      "Fire TV / Stick / Cube: the app recognises Fire OS and says right away that it can clean ads, tracking and junk apps but can't replace Home, which Amazon locks to its launcher. The clean Home step is skipped there."
+    ]
+  },
+  {
+    "ban": "2.1.6",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Sửa 2.1.5: tivi Xiaomi bản Trung Quốc giờ thật sự mở đúng cổng HDMI/AV từ Home sạch (2.1.5 chưa gửi lệnh trình phát Xiaomi lên tivi). Đã cài 2.1.5 thì cập nhật rồi Đổi giao diện → Áp dụng."
+    ],
+    "en": [
+      "Fix for 2.1.5: China-market Xiaomi TVs now really open the right HDMI/AV port from the clean Home (2.1.5 did not send Xiaomi's player action to the TV). On 2.1.5, update and Change theme → Apply."
+    ]
+  },
+  {
+    "ban": "2.1.5",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Ảnh nền riêng: ở mục Giao diện bấm \"Dùng ảnh của bạn làm hình nền\", chọn ảnh trong điện thoại, app tự cắt khung 16:9 và đưa lên tivi; bỏ ảnh riêng là về ảnh của theme.",
+      "Tivi Xiaomi bản Trung Quốc (MiTV-ASTP0…): chọn HDMI1/2/3 hay AV trên Home sạch mở đúng cổng qua trình phát của Xiaomi (trước báo \"TV này không hỗ trợ\").",
+      "Nút Home bị app khác giành mà không phải màn Home (hộp nhà mạng NES như SEI RT-G2): app tự bật \"Remote gửi phím Home lạ\" rồi thử lại."
+    ],
+    "en": [
+      "Your own wallpaper: under Theme press \"Use your own picture as wallpaper\", pick a photo on the phone; the app crops it to 16:9 and sends it to the TV. Removing it goes back to the theme's picture.",
+      "China-market Xiaomi TVs (MiTV-ASTP0…): HDMI1/2/3 and AV rows on the clean Home now switch through Xiaomi's player (before: \"This TV doesn't support it\").",
+      "Home button taken by an app that is not a home screen (NES operator boxes such as SEI RT-G2): the app turns on the Home-key helper and tries again."
+    ]
+  },
+  {
+    "ban": "2.1.4",
+    "ngay": "2026-10-23",
+    "vi": [
+      "Thời tiết theo phường/xã: ô \"Hoặc tìm phường / xã của bạn\" tìm trong 3.321 phường/xã sau sáp nhập 2025 (gõ không dấu được, vd \"ben thanh\"), tivi hiện tên phường/xã đó.",
+      "Google TV: bước kiểm Wi-Fi chỉ xét mạng đang kết nối (trước xét cả mạng cũ đã lưu, nên quên rồi vào lại mạng nhà vẫn bị chặn). Tivi chạy dây LAN thì không vướng nữa.",
+      "Tivi đang không có Home nào (Home gốc bị tắt từ trước, hiện màn dự phòng của Cài đặt): cài thẳng Home sạch thay vì báo lỗi."
+    ],
+    "en": [
+      "Weather by ward/commune: \"Or find your ward / commune\" searches all 3,321 wards after the 2025 merger (accents optional); the TV shows that name.",
+      "Google TV: the Wi-Fi check now only looks at the network in use (before, an old saved network created by setupwraith still blocked it). On Ethernet it no longer applies.",
+      "TVs left without any Home (stock Home disabled earlier, Settings' fallback screen showing): the clean Home installs instead of an error."
+    ]
+  },
+  {
+    "ban": "2.1.3",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Trước khi dọn, app hỏi tivi app nào đang mở cổng HDMI / kênh và app nào mở Cài đặt, rồi luôn giữ lại (Sony KDL-43W800G mất HDMI, Sony W800C không vào Cài đặt sau khi dọn).",
+      "Công tắc mới \"Tên app to phía trên dock\" ở mục Tuỳ chỉnh thêm: tắt cho Home gọn hơn.",
+      "Cài Home sạch trên Google TV mà setupwraith giành Home: lời báo chỉ từng bước quên Wi-Fi rồi kết nối lại.",
+      "Âm lịch tính theo múi giờ của điện thoại: tivi để tiếng Anh ở Việt Nam không còn lệch một ngày."
+    ],
+    "en": [
+      "Before cleaning, the app asks the TV which apps open HDMI inputs / channels and Settings, and always keeps them (a Sony KDL-43W800G lost HDMI, a Sony W800C lost Settings).",
+      "New \"Large app name above the dock\" switch under More options.",
+      "Installing the clean Home on Google TV when setupwraith claims Home: the note now gives the forget-Wi-Fi steps.",
+      "The lunar date uses the phone's time zone: English-language TVs in Vietnam are no longer a day off."
+    ]
+  },
+  {
+    "ban": "2.1.2",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Luôn giữ các gói lõi của Android (ext services/shared, module metadata, overlay mainline), theo CleanYourTV sau vụ một Mi TV Stick không khởi động lại được (#884).",
+      "Google TV mở Home chậm (Sony 65S30 / BRAVIA BF1): app đọc được màn đang hiện bằng cách thứ hai; vẫn không rõ mà tivi còn setupwraith thì hiện thẳng hướng dẫn quên Wi-Fi, thay vì báo \"không rõ\"."
+    ],
+    "en": [
+      "Android core packages (ext services/shared, module metadata, mainline overlays) are always kept, following CleanYourTV after a Mi TV Stick never booted again (#884).",
+      "Google TVs that open Home slowly (Sony 65S30 / BRAVIA BF1): the app reads the screen a second way; if it still can't tell and setupwraith is on, it shows the forget-Wi-Fi fix instead of \"unknown\"."
+    ]
+  },
+  {
+    "ban": "2.1.1",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Mục Nâng cao Việt hoá: 54 tuỳ chọn đều có tên và giải thích tiếng Việt dễ hiểu, tìm kiếm được bằng tiếng Việt; tên khoá kỹ thuật vẫn hiện nhỏ bên dưới để tra.",
+      "Sửa: \"Tự bật lại bắt phím remote\" (restore_key_services) cần quyền đặc biệt, app giờ tự cấp khi bật tuỳ chọn (trước đó bật lên vẫn không có tác dụng)."
+    ],
+    "en": [
+      "Advanced options localised: all 54 have Vietnamese names and plain descriptions, searchable in Vietnamese; the technical key still shows underneath.",
+      "Fix: restore_key_services needs a special permission, which the app now grants when the option is on (before, turning it on had no effect)."
+    ]
+  },
+  {
+    "ban": "2.1",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Giữ OK trên một app ở Home sạch: menu Di chuyển, Thêm vào dock / Thay bằng app khác, Bỏ khỏi Home (khi bật thư viện app), Thông tin ứng dụng. Đổi chỗ và đổi app trên dock ngay trên tivi, không cần điện thoại (CleanTV bật sẵn; tắt được ở Nâng cao: tile_menu).",
+      "Home sạch theo CleanYourTV mới nhất, có nút mở cài đặt launcher ngay trên thanh trên cùng; danh sách lên 227 mẫu tivi, Nâng cao 54 tuỳ chọn."
+    ],
+    "en": [
+      "Hold OK on an app on the clean Home: Move, Add to dock / Replace with another app, Remove from Home (with the app library) and App info. Rearrange the dock right on the TV, no phone needed (on by default in CleanTV; Advanced: tile_menu).",
+      "The clean Home follows the latest CleanYourTV, with launcher settings straight from the top bar; 227 tested TV models, 54 Advanced options."
+    ]
+  },
+  {
+    "ban": "2.0.2",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Rớt kết nối giữa lúc dọn: app chờ tivi trả lời lại (tối đa khoảng 1,5 phút) rồi làm tiếp từ gói đang dở, gói đã tắt dù mất kết nối vẫn được ghi vào sao lưu.",
+      "Tivi tự khởi động lại ngay sau khi tắt một gói: app dừng hẳn, báo tên gói nghi phạm để lần sau bỏ tích, và gửi tên gói về để VGS đưa vào danh sách giữ.",
+      "Thay lỗi tiếng Anh \"connect() must be called first\" bằng hướng dẫn tiếng Việt: kết nối lại để dọn tiếp hoặc Khôi phục."
+    ],
+    "en": [
+      "Connection lost while cleaning: the app waits for the TV (up to about 1.5 minutes) and carries on from the package it was on; a package disabled while the link dropped is still recorded in the backup.",
+      "The TV restarted right after a package was disabled: the app stops, names the suspect package so it can be left out next time, and reports it so VGS can keep it.",
+      "The raw \"connect() must be called first\" error is replaced by clear steps: reconnect to continue, or Restore."
+    ]
+  },
+  {
+    "ban": "2.0.1",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Chạy CleanTV ngay trên tivi mà tivi chưa mở ADB qua mạng: thay dòng lỗi tiếng Anh bằng hướng dẫn (bật \"Gỡ lỗi qua mạng\", hoặc dùng điện thoại ghép bằng mã, hoặc adb tcpip 5555), thêm nút mở Tuỳ chọn nhà phát triển."
+    ],
+    "en": [
+      "Running CleanTV on a TV that has not opened ADB over the network: the raw error is replaced by steps (turn on \"Network debugging\", or pair from a phone, or adb tcpip 5555), plus a button to Developer options."
+    ]
+  },
+  {
+    "ban": "2.0",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Home sạch cập nhật theo CleanYourTV mới nhất: dịch đủ tiếng Việt (vẫn font Lexend), thư viện app luôn hiện kể cả khi vừa cài/gỡ app, bật lại phím remote sau khi hệ thống buộc dừng Home sạch (tuỳ chọn restore_key_services trong Nâng cao).",
+      "Danh sách đã thử lên 225 mẫu tivi / 65 hãng; mục Nâng cao có 52 tuỳ chọn.",
+      "Google TV bấm Home vẫn về Home Google: lời báo chỉ cách quên Wi-Fi rồi kết nối lại (không cần dây LAN), đã có người dùng Skyworth làm được.",
+      "Tổng hợp 1.9.1–1.9.3: an toàn cho tivi bo mạch CVTE, Home sạch riêng cho Xiaomi bản Trung Quốc và không bao giờ để màn đen, dock 8 app, sao lưu thêm trên tivi, khôi phục không cần sao lưu, nút cộng đồng VGS."
+    ],
+    "en": [
+      "The clean Home follows the latest CleanYourTV: complete Vietnamese (still Lexend), the app library always shows after an install/uninstall, remote helpers come back after the system force-stops the Home (restore_key_services under Advanced).",
+      "Tested lists: 225 TV models from 65 brands; Advanced has 52 options.",
+      "Google TV Home still opening Google's Home: the note now explains forgetting and re-joining the Wi-Fi (no Ethernet needed), confirmed on a Skyworth.",
+      "All of 1.9.1–1.9.3: CVTE safety, a Xiaomi China-market clean Home and never a black screen, dock of 8, backup on the TV, restore without a backup, VGS community link."
+    ]
+  },
+  {
+    "ban": "1.9.3",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Bản sao lưu được lưu thêm một bản ngay trên tivi: gỡ app, xoá dữ liệu hay đổi điện thoại, kết nối lại là app tự lấy về để Khôi phục.",
+      "Khôi phục khi không có sao lưu (người khác dọn, mất cả hai bản): bật lại mọi gói đang tắt, gỡ Home sạch, trả Home gốc, DNS và trợ năng; hỏi xác nhận rõ vì gói bạn tự tắt trước đó cũng bật lại.",
+      "Màn “Tivi đã sạch” có nút tham gia cộng đồng VGS."
+    ],
+    "en": [
+      "The backup is also stored on the TV itself: after reinstalling the app, clearing its data or switching phones, the app reads it back on connect so Restore still works.",
+      "Restore without a backup (cleaned by someone else, both copies gone): re-enables every disabled package, removes the clean Home, brings back the stock Home, DNS and accessibility; asks for clear confirmation since packages you disabled yourself come back too.",
+      "The “TV is clean” screen links to the VGS community."
+    ]
+  },
+  {
+    "ban": "1.9.2",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Tivi Xiaomi bản Trung Quốc (MiTV-ASTP0…): hãng chỉ nhận Home có tên trong danh sách, nên app cài Home sạch bản riêng mang tên được nhận; bản Home sạch cũ bị chặn sẽ được gỡ.",
+      "Nút Home không chuyển được sang Home sạch thì app bật lại Home gốc của hãng và đặt làm mặc định, không để màn đen (trước đó Home gốc có thể vẫn bị tắt).",
+      "Dock chọn được tới 8 app (bằng số cột tối đa); dài hơn số cột thì tràn xuống hàng sau."
+    ],
+    "en": [
+      "China-market Xiaomi TVs (MiTV-ASTP0…): the firmware only accepts allow-listed Home apps, so the app installs a clean Home build under an accepted name and removes the blocked older one.",
+      "If the Home button still doesn't reach the clean Home, the app turns the maker's Home back on and makes it the default, instead of leaving a black screen (before, the stock Home could stay disabled).",
+      "The dock holds up to 8 apps (the most columns); more than the columns spill onto the next row."
+    ]
+  },
+  {
+    "ban": "1.9.1",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Tivi bo mạch CVTE (JVC, Vision, Super General, Artel…): app không bao giờ tắt Home gốc của hãng, chỉ đặt Home sạch làm mặc định. Một chiếc JVC đã treo ở màn khởi động sau khi tắt Home gốc (báo trên CleanYourTV #741).",
+      "Trên bo CVTE, bắt phím remote (Home, Input) không bật cùng lượt cài: tắt mở tivi một lần, thấy Home sạch lên bình thường rồi mới bật.",
+      "Thêm mục hỏi đáp: tivi kẹt ở màn khởi động thì làm gì."
+    ],
+    "en": [
+      "CVTE-board TVs (JVC, Vision, Super General, Artel…): the app never disables the stock Home, it only makes the clean Home the default. A JVC hung on its boot animation after its stock Home was disabled (CleanYourTV #741).",
+      "On CVTE boards the remote-key helpers (Home, Input) are not turned on in the same pass: restart the TV once, check the clean Home comes up, then turn them on.",
+      "New FAQ: what to do if the TV is stuck on the boot animation."
+    ]
+  },
+  {
+    "ban": "1.9",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Nút \"Bỏ qua, chỉ cài Home sạch\" ở bước chọn gói: không tắt gói nào, sao lưu vẫn chạy ngầm để Khôi phục được (góp ý trên GitHub).",
+      "Mục Nâng cao: 50 tuỳ chọn của Home sạch cho người dùng nâng cao, có tìm kiếm, nhóm \"Cẩn thận\" riêng cho remote và cổng HDMI.",
+      "Thay được launcher cài thêm (Dangbei trên tivi nội địa Trung, Projectivy…): đặt Home sạch làm mặc định, giữ launcher kia nguyên.",
+      "Nút Back ở màn Home sạch về đúng màn trước; quay lại không mất chỉnh sửa."
+    ],
+    "en": [
+      "A \"Skip, just install the clean Home\" button: no packages disabled, the backup still runs so Restore works (GitHub suggestion).",
+      "Advanced: 50 clean Home options for power users, with search and a separate \"Careful\" group for remote and HDMI settings.",
+      "Add-on launchers (Dangbei on Chinese-market TVs, Projectivy…) can be replaced: the clean Home becomes the default, the other launcher stays.",
+      "Back from the clean Home screen returns to the right screen; going back no longer loses your edits."
+    ]
+  },
+  {
+    "ban": "1.8",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Home sạch theo CleanYourTV 2.6: bấm Home từ app về nhanh hơn, đỡ giật trên tivi yếu; ô đầu và cuối dock không còn bị mép bo che.",
+      "Bật \"Nút Input trên remote\" thì bấm Input mở bảng chọn HDMI của Home sạch (cho tivi bấm Input không ra gì sau khi dọn).",
+      "Không bao giờ coi app kiểm tra xuất xưởng (vd trên Xiaomi Mi TV 4A) là Home của hãng."
+    ],
+    "en": [
+      "Clean Home follows CleanYourTV 2.6: back to Home from an app is faster on slow TVs; the first and last dock tiles are no longer clipped.",
+      "With \"Remote Input button\" on, Input opens the clean Home's source picker (for TVs where it did nothing after cleaning).",
+      "A factory-test app (e.g. on Xiaomi Mi TV 4A) is never taken for the maker's Home."
+    ]
+  },
+  {
+    "ban": "1.7",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Âm lịch ngay dưới ngày dương trên Home sạch, ví dụ \"13/9 âm lịch · Bính Ngọ\" (bật / tắt trong Đổi giao diện).",
+      "Theme Phong cảnh: 14 tranh phong cảnh tự đổi mỗi giờ (từ CleanYourTV).",
+      "Mục Tuỳ chỉnh thêm: hiện tên dưới mọi app, thư viện app, chế độ tivi yếu, kính mờ, hiện bộ nhớ, đồng hồ khi để yên, làm tối hình nền.",
+      "Đổi giao diện mở ra đúng các lựa chọn đang có trên tivi.",
+      "Thử nghiệm: CleanTV chạy thẳng trên tivi, không cần điện thoại Android (dùng iPhone cũng được). Trên tivi cài app Downloader, gõ cleantv.alexvgs.tech/tv để tải, mở CleanTV → Dọn một tivi → Kết nối tivi này."
+    ],
+    "en": [
+      "Lunar date under the date on the clean Home, e.g. \"Lunar 13/9 · Year of the Horse\".",
+      "Scenes theme: 14 landscapes rotating hourly (from CleanYourTV).",
+      "More options: names under every app, app library, slow-TV mode, frosted glass, memory line, idle clock, dimmed wallpaper.",
+      "Changing the theme now opens with the TV's current choices.",
+      "Experimental: CleanTV runs on the TV itself, no Android phone needed (works for iPhone owners too). On the TV install the Downloader app, enter cleantv.alexvgs.tech/tv, then open CleanTV → Clean a TV → Connect this TV."
+    ]
+  },
+  {
+    "ban": "1.5",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Nhóm riêng \"Tìm kiếm giọng nói & Trợ lý Google\", không bao giờ tích sẵn: dọn xong nút mic trên remote vẫn dùng được.",
+      "Gói mà người làm danh sách tắt theo ý riêng (khoảng 880 dòng trên 213 danh sách) không còn tích sẵn, bạn tự chọn. Gói quảng cáo, theo dõi vẫn tích sẵn như cũ.",
+      "Ai đã mất nút mic: Khôi phục rồi dọn lại, bỏ tích \"Google\" (katniss)."
+    ],
+    "en": [
+      "A separate \"Voice search & Google Assistant\" group, never pre-ticked: the remote's mic button keeps working.",
+      "Packages a list author disabled by personal choice (about 880 lines across 213 lists) are no longer pre-ticked. Ads and tracking stay pre-ticked.",
+      "Lost the mic button? Restore, then clean again without \"Google\" (katniss)."
+    ]
+  },
+  {
+    "ban": "1.4",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Gói Chromecast, Google Home tách thành nhóm riêng \"Google Home & truyền từ điện thoại\", không bao giờ tích sẵn: dọn xong điện thoại vẫn thấy, điều khiển và cast được tới tivi.",
+      "Ai đã lỡ tắt: Khôi phục rồi dọn lại, bỏ tích nhóm này."
+    ],
+    "en": [
+      "Chromecast and Google Home packages get their own group, never pre-ticked: the Google Home phone app keeps finding, controlling and casting to the TV.",
+      "Already disabled them? Restore, then clean again without that group."
+    ]
+  },
+  {
+    "ban": "1.3",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Theme, dock, thời tiết bạn chọn giờ luôn được áp trên tivi Android 14 (trước đó có lúc tivi không đọc được cấu hình).",
+      "Danh sách đã thử cho 213 mẫu tivi (trước là 147), thêm nhiều TCL, Xiaomi, Skyworth, onn, Fire TV, máy chiếu.",
+      "Tivi TCL nhận nút trên remote ổn hơn.",
+      "Home sạch cập nhật theo bản CleanYourTV mới nhất: nhẹ hơn trên tivi yếu, Việt hoá thêm phần sắp xếp app, thư viện app, hình nền."
+    ],
+    "en": [
+      "Your theme, dock and weather now always apply on Android 14 TVs (the TV sometimes couldn't read the settings before).",
+      "Tested lists for 213 TV models (up from 147): more TCL, Xiaomi, Skyworth, onn, Fire TV and projectors.",
+      "Remote buttons work better on TCL TVs.",
+      "The clean Home follows the latest CleanYourTV: lighter on slow TVs."
+    ]
+  },
+  {
+    "ban": "1.2",
+    "ngay": "2026-10-22",
+    "vi": [
+      "Sửa lỗi của bản 1.1 có thể làm tivi Google TV kẹt màn: thử nút Home không thành công thì app bật lại mọi thứ, tivi giữ nguyên như trước.",
+      "Không bao giờ tắt Home Google khi trình cài đặt Google còn giữ Wi-Fi."
+    ],
+    "en": [
+      "Fixes a 1.1 bug that could leave Google TV stuck: if taking over the Home button fails, the app turns everything back on.",
+      "Never disables Google's Home while the setup wizard still holds the Wi-Fi."
+    ]
+  },
+  {
+    "ban": "1.1",
+    "ngay": "2026-10-21",
+    "vi": [
+      "Sửa lỗi bấm Home trên remote lại về màn cũ: app bấm thử nút Home thật trên tivi.",
+      "Chữ tiếng Việt chắc hơn trên tivi đời cũ.",
+      "Đã rút bản này sáng 22/10 vì có thể làm Google TV kẹt màn, thay bằng 1.2."
+    ],
+    "en": [
+      "Fixes the remote's Home button going back to the old screen: the app tests the real Home button.",
+      "Sturdier Vietnamese text on older TVs.",
+      "Withdrawn on 22/10 (it could leave Google TV stuck); replaced by 1.2."
+    ]
+  },
+  {
+    "ban": "1.0",
+    "ngay": "2026-10-21",
+    "vi": [
+      "Có bản mới là điện thoại hiện thông báo, chạm vào là cập nhật.",
+      "Mở app cũng có hộp mời nâng cấp; ghi chú bản mới có cả tiếng Anh."
+    ],
+    "en": [
+      "A phone notification when an update is out; tap it to update.",
+      "The app also asks when you open it; release notes in English too."
+    ]
+  },
+  {
+    "ban": "0.9",
+    "ngay": "2026-10-21",
+    "vi": [
+      "Tivi từng dọn bằng CleanYourTV / công cụ khác giờ đổi được giao diện (trước không gom được nút, còn vạch đen).",
+      "Nút màn hình chờ tự bật lại Backdrop nếu nó đã bị tắt."
+    ],
+    "en": [
+      "TVs cleaned earlier with CleanYourTV or other tools can now change theme.",
+      "The screensaver button turns Backdrop back on if it was disabled."
+    ]
+  },
+  {
+    "ban": "0.8",
+    "ngay": "2026-10-21",
+    "vi": [
+      "Nút Màn hình chờ trên Home sạch: bấm là chạy ảnh nền hoặc album ảnh, tiện lúc nghe nhạc.",
+      "Các nút góc trên gom thành một cụm icon gọn: Máy chiếu, Mạng, Màn chờ, Cài đặt."
+    ],
+    "en": [
+      "A Screensaver button on the clean Home: start your photos or album in one press.",
+      "The top buttons become one tidy icon cluster: Projector, Network, Screensaver, Settings."
+    ]
+  },
+  {
+    "ban": "0.7",
+    "ngay": "2026-10-21",
+    "vi": [
+      "Đếm ẩn danh lượt tải và lượt dùng (không lưu IP, email hay tên) để biết tivi nào cần hỗ trợ thêm."
+    ],
+    "en": [
+      "Anonymous counts of downloads and use (no IP, email or name) to see which TVs need more support."
+    ]
+  },
+  {
+    "ban": "0.6",
+    "ngay": "2026-10-21",
+    "vi": [
+      "Máy chiếu: app tìm màn lấy nét, chỉnh hình của hãng (Formovie, XGIMI, JMGO…) để ghim vào nút Máy chiếu trên Home sạch.",
+      "Gói lấy nét, chỉnh hình không bao giờ bị tắt."
+    ],
+    "en": [
+      "Projectors: the app finds the maker's focus and keystone screens to pin on a Projector button.",
+      "Focus and keystone packages are never disabled."
+    ]
+  },
+  {
+    "ban": "0.5",
+    "ngay": "2026-10-21",
+    "vi": [
+      "Nhận được Home riêng của hãng (ví dụ máy chiếu Formovie Nemo) để thay bằng Home sạch."
+    ],
+    "en": [
+      "Handles makers' own Home apps (e.g. Formovie Nemo projectors)."
+    ]
+  },
+  {
+    "ban": "0.4",
+    "ngay": "2026-10-21",
+    "vi": [
+      "Hướng dẫn đổi giao diện cho tivi đã dọn, không phải dọn lại."
+    ],
+    "en": [
+      "A guide to changing the theme on an already cleaned TV."
+    ]
+  },
+  {
+    "ban": "0.3",
+    "ngay": "2026-10-21",
+    "vi": [
+      "Sửa lỗi vỡ dấu tiếng Việt trên Home sạch (chữ \"Cài đặt\"…): đổi sang font Lexend."
+    ],
+    "en": [
+      "Fixes broken Vietnamese accents on the clean Home with the Lexend font."
+    ]
+  },
+  {
+    "ban": "0.2",
+    "ngay": "2026-10-21",
+    "vi": [
+      "Hướng dẫn có hình bật chế độ nhà phát triển (tiếng Việt và English).",
+      "Mục giấy phép mã nguồn mở."
+    ],
+    "en": [
+      "A picture guide to developer mode (Vietnamese and English).",
+      "Open-source licences screen."
+    ]
+  },
+  {
+    "ban": "0.1",
+    "ngay": "2026-10-21",
+    "vi": [
+      "Ra mắt CleanTV: dọn quảng cáo, app rác của hãng trên tivi Android qua Wi-Fi, khôi phục một chạm.",
+      "Home sạch với theme VGS, cực quang, bầu trời theo giờ, thời tiết, dock app hay xem.",
+      "Song ngữ Việt / Anh, tự cập nhật, góp ý ở vgs.zone."
+    ],
+    "en": [
+      "CleanTV launches: strip ads and junk from Android TVs over Wi-Fi, one-tap restore.",
+      "A clean Home with VGS, aurora and time-of-day sky themes, weather and a dock.",
+      "Vietnamese / English, self-updating, feedback at vgs.zone."
+    ]
+  }
 ]

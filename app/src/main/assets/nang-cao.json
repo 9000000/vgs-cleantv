@@ -928,5 +928,79 @@
     "canThan": false,
     "ten": "Thanh phát nhạc (Mini Player)",
     "moTaVi": "Hiện thanh điều khiển bài hát đang phát (Spotify, YouTube Music...) trên thanh trên cùng (mặc định bật)."
+  },
+  {
+    "khoa": "library_excluded_apps",
+    "kieu": "ds",
+    "moTa": "Packages the App library catalogue never offers, even with app_library on. Different from hidden_apps, which only keeps a package off Home while still listing it in the catalogue; empty (off) by default",
+    "canThan": false,
+    "ten": "Không gợi ý trong Thư viện app",
+    "moTaVi": "Các app này không bao giờ hiện trong Thư viện app, kể cả khi bật Thư viện app. Khác với Ẩn app khỏi Home (chỉ bỏ khỏi Home, vẫn còn trong thư viện). Ghi tên gói, cách nhau bằng dấu phẩy."
+  },
+  {
+    "khoa": "open_on_start_network_wait",
+    "kieu": "so",
+    "min": 0,
+    "max": 600,
+    "moTa": "Seconds the first Home after the TV starts waits for a working internet connection before it opens the boot_to_live_tv or Open on start app. A streaming app opened before the network is back shows an error, and after a power cut Wi-Fi can take minutes, as the router starts again too. Home stays on screen meanwhile, and leaving Home cancels the opening. 0, the default, opens the app at once",
+    "canThan": false,
+    "ten": "Chờ mạng trước khi mở app khi bật tivi",
+    "moTaVi": "Số giây (0–600) chờ có mạng rồi mới mở app tự mở khi bật tivi hoặc Live TV. Mất điện xong Wi-Fi có khi vài phút mới lên, mở app sớm sẽ báo lỗi. Trong lúc chờ vẫn ở Home, rời Home thì huỷ. 0 (mặc định) là mở ngay."
+  },
+  {
+    "khoa": "open_on_start_on_wake",
+    "kieu": "bool",
+    "moTa": "With open_on_start_choice, the picked app also opens each time the screen comes back on, for TVs whose remote powers them into a light sleep with no boot. It opens over whatever was in front, an HDMI input included, and open_on_start_network_wait applies. Off by default",
+    "canThan": false,
+    "ten": "Mở app khởi động cả khi bật màn hình",
+    "moTaVi": "Đi cùng \"chọn app mở khi bật tivi\": app đã chọn cũng mở mỗi lần màn hình sáng lại, cho tivi mà remote chỉ cho ngủ nhẹ chứ không khởi động lại. App mở đè lên mọi thứ đang hiện, kể cả cổng HDMI, và vẫn chờ mạng nếu bật chờ mạng. Mặc định tắt."
+  },
+  {
+    "khoa": "icon_only_vpn",
+    "kieu": "bool",
+    "moTa": "With vpn_pill, the VPN pill as a round icon button too, matching icon_only_buttons: an open lock on the plain glass button while no VPN is up, the closed lock in a green outline while one is, solid green only while focused, like the pill; \"VPN\" / \"VPN off\" become its TalkBack description (false by default)",
+    "canThan": false,
+    "ten": "Nút VPN chỉ có biểu tượng",
+    "moTaVi": "Khi bật nút VPN: hiện thành nút tròn chỉ có ổ khoá như các nút biểu tượng khác (khoá mở khi chưa có VPN, khoá đóng viền xanh khi đang bật). Mặc định tắt."
+  },
+  {
+    "khoa": "game_day",
+    "kieu": "chu",
+    "moTa": "Each team's next game in the F1 panel's place under the clock (\"Minnesota Wild at Dallas Stars\", \"Puck drop in 2h 18m\", \"Live now\"), rotating every few seconds with the F1 weekend when race_calendar is on: the package of an add-on that publishes them, such as the Game Day add-on (io.github.justinnewman.gameday). The launcher only reads it and stays offline. Off (empty) unless set",
+    "canThan": false,
+    "ten": "Lịch thi đấu thể thao (add-on)",
+    "moTaVi": "Tên gói add-on cung cấp lịch trận đấu (như Game Day) để hiện trận sắp tới dưới đồng hồ, xen với lịch F1. Launcher chỉ đọc, không dùng mạng. Để trống là tắt."
+  },
+  {
+    "khoa": "seasonal_skin",
+    "kieu": "chu",
+    "moTa": "Names a festive skin like festival (halloween), read only when festival is empty or missing. Launchers that predate it ignore the key, so a theme that sets it shows the rest of its look there without the wrong skin; festival_until, greeting and accent_color apply to it as to festival",
+    "canThan": false,
+    "ten": "Giao diện theo mùa",
+    "moTaVi": "Tên giao diện lễ hội (ví dụ halloween), chỉ dùng khi chưa đặt Lễ hội. Hạn lễ hội, lời chào và màu nhấn áp dụng như với Lễ hội."
+  },
+  {
+    "khoa": "clock_format",
+    "kieu": "chu",
+    "moTa": "The launcher's clocks (Home and the clock screensaver) in 12- or 24-hour time whatever the TV is set to; system (the default) follows the TV. Launcher settings' Clock row sets it too",
+    "canThan": false,
+    "ten": "Kiểu đồng hồ",
+    "moTaVi": "12 hoặc 24 giờ cho đồng hồ trên Home và màn hình chờ đồng hồ, bất kể cài đặt tivi. system (mặc định) theo tivi."
+  },
+  {
+    "khoa": "back_opens_clock",
+    "kieu": "bool",
+    "moTa": "Back on the Home screen opens the clock screensaver (the same screen as home_idle_clock_minutes) instead of doing nothing. Back inside apps, Settings and the App library is unchanged; any key leaves the clock for Home. false by default",
+    "canThan": false,
+    "ten": "Nút Back ở Home mở đồng hồ",
+    "moTaVi": "Bấm Back khi đang ở Home thì mở màn hình chờ đồng hồ thay vì không làm gì. Back trong app và Cài đặt vẫn như cũ; bấm phím bất kỳ để về Home. Mặc định tắt."
+  },
+  {
+    "khoa": "glow_snap",
+    "kieu": "bool",
+    "moTa": "The ambient glow takes the next app's colour in one frame instead of dimming and fading back in. Each frame of the fade repaints the whole screen, so on a slow GPU (a Mali-G52 on a Xiaomi MiTV-MOEU0) it cut the late frames on Home from 60% to 27%. false by default",
+    "canThan": false,
+    "ten": "Đổi màu quầng sáng ngay",
+    "moTaVi": "Quầng sáng nền đổi sang màu app kế tiếp trong một khung hình thay vì mờ dần rồi hiện lại. Mỗi khung chuyển màu vẽ lại cả màn, nên tivi chip đồ hoạ yếu sẽ mượt hơn khi bật. Mặc định tắt."
   }
 ]

@@ -24,6 +24,24 @@ object AnhNen {
         veKhung(goc, vuaKhung)
     }.getOrNull()
 
+    /** Ảnh cao hơn rộng: chỉ đọc kích thước, tính cả xoay EXIF (ảnh điện thoại chụp dọc thường lưu ngang + cờ xoay). */
+    fun laAnhDoc(ctx: Context, uri: Uri): Boolean = runCatching {
+        val bien = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        ctx.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bien) }
+        val xoay = ctx.contentResolver.openInputStream(uri)?.use { xoay90(android.media.ExifInterface(it)) } ?: false
+        if (xoay) bien.outWidth > bien.outHeight else bien.outHeight > bien.outWidth
+    }.getOrElse { false }
+
+    fun laAnhDocByte(du: ByteArray): Boolean = runCatching {
+        val bien = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeByteArray(du, 0, du.size, bien)
+        val xoay = xoay90(android.media.ExifInterface(du.inputStream()))
+        if (xoay) bien.outWidth > bien.outHeight else bien.outHeight > bien.outWidth
+    }.getOrElse { false }
+
+    private fun xoay90(exif: android.media.ExifInterface) =
+        exif.getAttributeInt(android.media.ExifInterface.TAG_ORIENTATION, 1) in 5..8
+
     fun chuanBi(ctx: Context, uri: Uri, vuaKhung: Boolean = false): ByteArray? = runCatching {
         val goc: Bitmap = if (Build.VERSION.SDK_INT >= 28) {
             ImageDecoder.decodeBitmap(ImageDecoder.createSource(ctx.contentResolver, uri)) { dec, info, _ ->
@@ -54,9 +72,9 @@ object AnhNen {
      * ảnh đó phóng to, làm mờ (thu nhỏ 1/24 rồi phóng lại) và tối đi, như khung ảnh dọc trên điện thoại.
      */
     private fun veKhung(goc: Bitmap, vuaKhung: Boolean): ByteArray {
-        // Ảnh dọc (cao hơn rộng) luôn vừa khung: cắt cho kín 16:9 thì chỉ còn một dải giữa ảnh (3.5.1, góp ý build.dng
-        // 27/10/2026: ảnh dọc trên ảnh nền và màn chờ động bị cắt mất).
-        val ra = if (!vuaKhung && goc.height <= goc.width) phuKin(goc) else {
+        // Công tắc quyết định cả với ảnh dọc (góp ý dungduongmobile89 30/10/2026: muốn ảnh dọc phủ kín như trước 3.5.1);
+        // chọn ảnh dọc thì app tự bật vừa khung (laAnhDoc), như góp ý build.dng 27/10.
+        val ra = if (!vuaKhung) phuKin(goc) else {
             val nen = phuKin(goc)
             val mo = Bitmap.createScaledBitmap(Bitmap.createScaledBitmap(nen, RONG / 24, CAO / 24, true), RONG, CAO, true)
             val kq = mo.copy(Bitmap.Config.ARGB_8888, true)

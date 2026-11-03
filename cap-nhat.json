@@ -1,25 +1,25 @@
 {
   "app": {
-    "versionCode": 115,
-    "versionName": "3.6.0",
-    "apk": "https://github.com/9000000/vgs-cleantv/releases/latest/download/CleanTV-v3.6.0.apk",
+    "versionCode": 116,
+    "versionName": "4.0.3",
+    "apk": "https://github.com/9000000/vgs-cleantv/releases/latest/download/CleanTV-v4.0.3.apk",
     "releaseUrl": "https://github.com/9000000/vgs-cleantv/releases/latest",
     "co": 17393234,
-    "ghiChu": "CleanTV v3.6.0",
-    "ghiChuEn": "CleanTV v3.6.0 release",
-    "ngay": "2026-11-01"
+    "ghiChu": "CleanTV v4.0.3: Đồng bộ toàn diện CleanTV 4.0.3, tích hợp nút Cài đặt mở Thư viện kiểu Projectivy, quản lý dọn bộ nhớ cache TV, bảo toàn 100% widget Samsung Frame & Tết.",
+    "ghiChuEn": "CleanTV v4.0.3: Full sync with CleanTV 4.0.3, Projectivy-style Settings button, TV storage cleaner, preserving Samsung Frame widgets & Tet customizations.",
+    "ngay": "2026-11-03"
   },
   "duLieu": {
     "du-lieu.json": {
-      "phienBan": "737ecd8e55b27b1c",
+      "phienBan": "14732b68b1ee6cb6",
       "url": "/ota/du-lieu.json",
-      "co": 2003864,
-      "tuBan": 107
+      "co": 2458766,
+      "tuBan": 113
     },
     "tvhome.apk": {
       "phienBan": "01cc982b5df9f9df",
       "url": "/ota/tvhome.apk",
-      "co": 686749,
+      "co": 686945,
       "tuBan": 109
     }
   }
