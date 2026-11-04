@@ -1026,7 +1026,7 @@ private fun ManHomeSach(vm: PhienLamViec) {
     }
 }
 
-/** Ảnh xem trước Home: ảnh riêng / ảnh theme / dải màu, đồng hồ, dòng âm lịch + thời tiết, dock giả. */
+/** Ảnh xem trước Home: ảnh riêng / ảnh xem trước theme / dải màu. */
 @Composable
 private fun XemTruocHome(vm: PhienLamViec) {
     val ctx = LocalContext.current
@@ -1035,22 +1035,11 @@ private fun XemTruocHome(vm: PhienLamViec) {
     val anh = remember(th.id, anhRieng) {
         runCatching {
             if (anhRieng != null) android.graphics.BitmapFactory.decodeByteArray(anhRieng, 0, anhRieng.size, android.graphics.BitmapFactory.Options().apply { inSampleSize = 4 })
-            else (th.anhNen ?: th.anhXem)?.let { a -> ctx.assets.open(a).use { android.graphics.BitmapFactory.decodeStream(it, null, android.graphics.BitmapFactory.Options().apply { inSampleSize = 4 }) } }
+            else (th.anhXem ?: th.anhNen)?.let { a -> ctx.assets.open(a).use { android.graphics.BitmapFactory.decodeStream(it, null, android.graphics.BitmapFactory.Options().apply { inSampleSize = 4 }) } }
         }.getOrNull()?.asImageBitmap()
     }
     Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(RoundedCornerShape(16.dp)).background(Brush.linearGradient(th.mau.map { Color(it) })).border(1.dp, Vien, RoundedCornerShape(16.dp))) {
         if (anh != null) Image(anh, null, Modifier.fillMaxSize(), contentScale = androidx.compose.ui.layout.ContentScale.Crop)
-        if (vm.lamToiNen > 0) Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = vm.lamToiNen / 100f)))
-        val mauDau = vm.mauChu?.let { Color(android.graphics.Color.parseColor(it)) } ?: Color.White
-        Column(Modifier.align(Alignment.TopStart).padding(12.dp)) {
-            if (vm.tenChao.isNotBlank()) Text(t("XIN CHÀO, ", "HELLO, ") + vm.tenChao.uppercase(), fontSize = 9.sp, color = mauDau.copy(alpha = 0.8f), maxLines = 1)
-            Text(java.text.SimpleDateFormat("HH:mm", java.util.Locale.US).format(java.util.Date()), fontSize = 26.sp, fontWeight = FontWeight.Light, color = mauDau)
-            val dong = listOfNotNull(if (vm.amLich) t("âm lịch", "lunar date") else null, vm.thanhPho?.ten).joinToString(" · ")
-            if (dong.isNotEmpty()) Text(dong, fontSize = 10.sp, color = mauDau.copy(alpha = 0.85f), maxLines = 1)
-        }
-        Row(Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(horizontal = 14.dp, vertical = 14.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            repeat(5) { i -> Box(Modifier.weight(1f).height(24.dp).clip(RoundedCornerShape(5.dp)).background(if (i == 0) Color.White else Color.White.copy(alpha = if (i < vm.dock.size) 0.6f else 0.25f))) }
-        }
     }
     Phu(t(th.tenVi, th.tenEn) + " · " + t(th.moTaVi, th.moTaEn) + if (anhRieng != null) t(" · ảnh của bạn", " · your picture") else "")
 }
@@ -1679,12 +1668,12 @@ private fun ChonChip(chu: String, chon: Boolean, onClick: () -> Unit) {
             .border(1.dp, if (chon) Tim else Vien, RoundedCornerShape(50)).clickable(onClick = onClick).padding(horizontal = 11.dp, vertical = 5.dp))
 }
 
-/** Thẻ xem trước theme: ảnh nền thật (nếu có) hoặc dải màu, kèm dock giả. */
+/** Thẻ xem trước theme: hiển thị ảnh xem trước (nếu có) hoặc dải màu. */
 @Composable
 private fun TheTheme(th: Theme, chon: Boolean, onClick: () -> Unit) {
     val ctx = LocalContext.current
     val anh = remember(th.id) {
-        (th.anhNen ?: th.anhXem)?.let { a -> runCatching {
+        (th.anhXem ?: th.anhNen)?.let { a -> runCatching {
             ctx.assets.open(a).use { android.graphics.BitmapFactory.decodeStream(it, null, android.graphics.BitmapFactory.Options().apply { inSampleSize = 8 }) }
         }.getOrNull()?.asImageBitmap() }
     }
@@ -1693,10 +1682,6 @@ private fun TheTheme(th: Theme, chon: Boolean, onClick: () -> Unit) {
             .background(Brush.linearGradient(th.mau.map { Color(it) }))
             .border(if (chon) 2.dp else 1.dp, if (chon) Hong else Vien, RoundedCornerShape(12.dp))) {
             if (anh != null) Image(anh, null, Modifier.fillMaxSize(), contentScale = androidx.compose.ui.layout.ContentScale.Crop)
-            Row(Modifier.align(Alignment.BottomCenter).padding(bottom = 10.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                repeat(4) { i -> Box(Modifier.size(width = 20.dp, height = 12.dp).clip(RoundedCornerShape(3.dp)).background(if (i == 0) Color.White else Color.White.copy(alpha = 0.55f))) }
-            }
-            Text("5:05", Modifier.align(Alignment.TopStart).padding(8.dp), fontSize = 13.sp, fontWeight = FontWeight.Light)
             if (chon) Icon(Icons.Rounded.CheckCircle, null, Modifier.align(Alignment.TopEnd).padding(6.dp).size(18.dp), tint = Hong)
         }
         Text(t(th.tenVi, th.tenEn), fontSize = 13.sp, fontWeight = if (chon) FontWeight.Bold else FontWeight.Normal,

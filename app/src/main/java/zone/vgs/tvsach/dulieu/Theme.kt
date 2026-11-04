@@ -37,7 +37,8 @@ val THEMES = listOf(
         "Violet VGS logo, sky follows the time of day, transparent dock",
         mapOf("background_color" to "#140A3A", "sky_intensity" to 55, "dock_band" to false, "dock_opacity" to 0, "dock_glass" to false),
         "theme/vgs.jpg",
-        listOf(0xFF0D0A38, 0xFF22168A, 0xFF4C1FD0)
+        listOf(0xFF0D0A38, 0xFF22168A, 0xFF4C1FD0),
+        anhXem = "theme/vgs.jpg"
     ),
 
     // 2. Kiểu Apple TV (CleanTV 2.9.0)
@@ -79,7 +80,8 @@ val THEMES = listOf(
             "header_scale" to 80, "wallpaper_true_color" to true
         ),
         "theme/macos.jpg",
-        listOf(0xFF2A1A7A, 0xFF7C3AED, 0xFFDB2777)
+        listOf(0xFF2A1A7A, 0xFF7C3AED, 0xFFDB2777),
+        anhXem = "theme/macos.jpg"
     ),
 
 
@@ -98,7 +100,8 @@ val THEMES = listOf(
             "wallpaper" to false
         ),
         null,
-        listOf(0xFF000000, 0xFF1A1A1A)
+        listOf(0xFF000000, 0xFF1A1A1A),
+        anhXem = "theme/default-preview.jpg"
     ),
 
     // 4. Cực quang (Aurora)
@@ -168,7 +171,7 @@ val THEMES = listOf(
         null,
         listOf(0xFF1A2236, 0xFF4A3A5A),
         boAnh = "theme/phong-canh",
-        anhXem = "theme/phong-canh/02-golden-coast.jpg"
+        anhXem = "theme/phong-canh/screenshot.jpg"
     ),
 
     // 8. 6 cột (Six columns)
@@ -183,7 +186,8 @@ val THEMES = listOf(
             "wallpaper" to false
         ),
         null,
-        listOf(0xFF000000, 0xFF111122)
+        listOf(0xFF000000, 0xFF111122),
+        anhXem = "theme/six-columns-preview.jpg"
     ),
 
     // 9. Cổ điển (Retro - CleanYourTV Addons)
@@ -261,7 +265,7 @@ val THEMES = listOf(
         null,
         listOf(0xFF05070C, 0xFF142233, 0xFF283E55),
         boAnh = "theme/sweden",
-        anhXem = "theme/sweden/001.jpg"
+        anhXem = "theme/sweden/screenshot.jpg"
     ),
 
     // 11. Lễ hội Dussehra (Dussehra)
@@ -321,7 +325,7 @@ val THEMES = listOf(
         null,
         listOf(0xFF05070C, 0xFF14241B, 0xFF283B2D),
         boAnh = "theme/nature-calm",
-        anhXem = "theme/nature-calm/001.jpg"
+        anhXem = "theme/nature-calm/screenshot.jpg"
     ),
 
     Theme(
