@@ -2,7 +2,6 @@
 build/
 app/build/
 local.properties
-upstream/
 *.keystore
 .idea/
 ky.properties
