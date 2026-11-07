@@ -36,7 +36,7 @@
 - App cảnh báo khi kết nối nhầm vào điện thoại hoặc máy tính bảng, và báo khi giờ tivi lệch giờ điện thoại (Xiaomi bản Trung Quốc).
 
 **Home sạch** (launcher CleanYourTV, bản vá VGS)
-- **27 giao diện phong phú**: VGS, Kiểu Apple TV, Kiểu macOS, Cực quang, Bầu trời theo giờ, Điện ảnh, Kính mờ, Thu Phần Lan, Phong cảnh, Thụy Điển, Tối giản, Nhiều app, Neon Đêm, Tinh Vân, Thiền Trà, Sa Mạc, Ngọc Bích, Điện Ảnh Noir, Hoàng Hôn Pastel, Đại Dương Sâu, Retro Synthwave, Băng Giá, Điện Ảnh Top Shelf, Lưới Đa Năng 7 cột, Google TV Tinh Gọn, Bầu Trời Hoàng Kim, Trung Tâm Chỉ Huy HUD, Thung Lũng Tĩnh Tại.
+- **30 giao diện phong phú**: VGS, Kiểu Apple TV, Kiểu macOS, Mặc định, Cực quang, Kính trong suốt, Thu Phần Lan, Phong cảnh, 6 cột, Cổ điển, Thụy Điển, Lễ hội Dussehra, Thiên nhiên, Không gian Trái Đất, Thế giới Khối Voxel, Giáng sinh, Điện ảnh, Thanh Dock Kính Mờ, Halloween, Tối giản, Mưa Đỏ Neon, Bắc Âu Stockholm, Bão tố Sấm sét, Anime / Kiếm sĩ, Kính Mờ Thiên Nhiên, Thư Viện Kính, Gia Đình, Istanbul, Istanbul v2, Hoàng Hôn Anime.
 - Đồng hồ, **lịch âm có can chi**, thời tiết theo 3.321 phường/xã hoặc thành phố nước ngoài, lời chào, **dock tối đa 9 app**, cụm nút Máy chiếu · Mạng · Màn hình chờ · Cài đặt, **thanh Mini Player điều khiển nhạc đang phát ngầm** (MediaSession: Spotify, YouTube Music, Zing MP3...) và nút Đang phát.
 - **Bộ Widget thông minh phong cách Samsung The Frame**: Thời tiết góc trên nút cài đặt, Dải thẻ sự kiện & đếm ngược Tết / Rằm / Mùng 1, Khối Hôm nay (Danh ngôn & sự kiện Ngày này năm xưa), Khối Thời tiết & Dự báo 4 ngày kèm AQI, Tự động xoay carousel nội dung.
 - **Ảnh nền riêng** chọn từ điện thoại, từ tivi hay USB. Có thể để vừa khung không cắt, hoặc tối đa 20 ảnh tự đổi. Có màn chờ động: đồng hồ hiện trên ảnh nền trôi chậm.
@@ -124,7 +124,7 @@ Báo lỗi, xin hỗ trợ tivi mới: [vgs.zone/gop-y](https://vgs.zone/gop-y) 
 - Warns when it is connected to a phone or tablet instead of a TV, and when the TV's clock is off from the phone's.
 
 **Clean Home** (CleanYourTV launcher with VGS patches)
-- **27 versatile themes**: VGS, Apple TV style, macOS style, Aurora, Sky by the hour, Cinema, Scenes, Minimal, More apps, Neon Night, Cosmic Nebula, Zen Forest, Desert Sunset, Emerald Matrix, Noir, Pastel Twilight, Ocean Abyss, Retro Synthwave, Nordic Winter, Top Shelf, Ultra Dashboard 7-Col, Google TV Pure, Sunset Gold, Tactical HUD, Cosy Valley Zen...
+- **30 versatile themes**: VGS, Apple TV style, macOS style, Default, Aurora, Glass, Ruska, Scenes, Six columns, Retro, Sweden, Dussehra, Nature calm, Aerial Earth, Blocky Voxel, Christmas, Cinematic, Dock Glass, Halloween, Minimalist, Red Rain, Stockholm, Storm, Anime Weeb, Ambient Glass, Glass Gallery, Family, Istanbul, Istanbul v2, Twilight.
 - Clock, **Vietnamese lunar date with Can Chi**, ward-level weather (3,321 wards) or city abroad, greeting, **9-app dock**, Projector · Network · Screensaver · Settings cluster, **Mini Player for background music playback** (Spotify, YouTube Music, Zing MP3...) and Now playing button.
 - **Samsung The Frame Style Smart Widgets**: Corner weather above settings, Event & Lunar / Tet countdown row, Today card (Daily quotes & Today in History milestones), Weather & 4-day forecast with AQI, and automatic carousel rotation.
 - **Your own wallpaper** from the phone, the TV or a USB stick: fit without cropping, or up to 20 rotating pictures; an animated screensaver with the clock over a slowly drifting wallpaper.

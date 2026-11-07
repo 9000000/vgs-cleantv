@@ -630,6 +630,226 @@ val THEMES = listOf(
         boAnh = "theme/weeb",
         anhXem = "theme/weeb/screenshot.jpg"
     ),
+
+    // --- Theme mới lấy từ CleanYourTV (origin/main 3f175120) ---
+
+    Theme(
+        "ambient-glass", "Kính Mờ Thiên Nhiên", "Ambient Glass",
+        "Lưới 5 cột tối, dock kính mờ, 8 ảnh núi và sa mạc đổi mỗi 5 phút kèm chú thích",
+        "A dark five-column grid with a frosted dock, eight alpine and desert photos rotating every 5 minutes with captions",
+        mapOf(
+            "dock_apps" to listOf(
+                "com.google.android.youtube.tv",
+                "com.netflix.ninja",
+                "com.amazon.amazonvideo.livingroom",
+                "com.apple.atve.androidtv.appletv"
+            ),
+            "fill_dock" to true,
+            "columns" to 5,
+            "rows_below_dock" to 0,
+            "single_row" to false,
+            "background_color" to "#05070C",
+            "wallpaper" to true,
+            "wallpaper_captions" to true,
+            "wallpaper_rotation_minutes" to 5,
+            "wallpaper_order" to "sequential",
+            "wallpaper_true_color" to false,
+            "wallpaper_dim" to 0,
+            "ambient_glow" to false,
+            "app_glow" to false,
+            "header_white" to true,
+            "clock_wallpaper" to true,
+            "clock_wallpaper_dim" to 25,
+            "dock_glass" to true,
+            "dock_opacity" to 40,
+            "dock_even_padding" to true,
+            "icon_only_buttons" to true,
+            "icon_only_inputs" to true,
+            "fade_rows" to false,
+            "focus_overshoot" to false,
+            "advanced_effects" to false
+        ),
+        null,
+        listOf(0xFF05070C, 0xFF1E293B, 0xFF475569),
+        boAnh = "theme/ambient-glass",
+        anhXem = "theme/ambient-glass/screenshot.jpg"
+    ),
+
+    Theme(
+        "glass-gallery", "Thư Viện Kính", "Glass Gallery",
+        "Dock kính 7 ô, thư viện ứng dụng, 3 ảnh trừu tượng đổi mỗi 30 phút",
+        "Seven-slot glass dock, app library, three abstract wallpapers rotating every 30 minutes",
+        mapOf(
+            "columns" to 7,
+            "rows_below_dock" to 0,
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 30,
+            "wallpaper_order" to "sequential",
+            "wallpaper_captions" to false,
+            "wallpaper_true_color" to false,
+            "wallpaper_dim" to 20,
+            "background_color" to "#000000",
+            "dock_row" to true,
+            "dock_glass" to true,
+            "dock_band" to true,
+            "dock_opacity" to 30,
+            "dock_even_padding" to true,
+            "dock_title" to false,
+            "glass_style" to "glass",
+            "ambient_glow" to false,
+            "app_glow" to false,
+            "cinematic_home" to false,
+            "header_white" to true,
+            "show_greeting" to false,
+            "icon_only_buttons" to true,
+            "icon_only_inputs" to true,
+            "animations" to true,
+            "advanced_effects" to false,
+            "focus_overshoot" to true,
+            "fade_rows" to false,
+            "app_library" to true,
+            "library_button" to true,
+            "show_library_pill" to false,
+            "library_ok_opens" to true,
+            "single_row" to false,
+            "dock_apps" to listOf(
+                "com.google.android.youtube.tv",
+                "com.netflix.ninja",
+                "com.disney.disneyplus",
+                "com.wbd.stream",
+                "com.amazon.amazonvideo.livingroom",
+                "com.google.android.youtube.tvmusic",
+                "com.google.android.play.games"
+            )
+        ),
+        null,
+        listOf(0xFF000000, 0xFF0B1220, 0xFF1E293B),
+        boAnh = "theme/glass-gallery",
+        anhXem = "theme/glass-gallery/screenshot.jpg"
+    ),
+
+    Theme(
+        "family", "Gia Đình", "Family",
+        "Hình vẽ gia đình trên nền đen, đổi theo sáng / chiều / tối, dock viền mảnh",
+        "Family line drawings on black, recoloured for morning, evening and night, rim dock",
+        mapOf(
+            "background_color" to "#000000",
+            "dock_glass" to false,
+            "dock_band" to false,
+            "glass_style" to "rim",
+            "dock_title" to false,
+            "columns" to 6,
+            "ambient_glow" to false,
+            "app_glow" to false,
+            "icon_only_buttons" to true,
+            "icon_only_inputs" to true,
+            "show_greeting" to true,
+            "clock_wallpaper" to true,
+            "tile_menu" to true,
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 60,
+            "wallpaper_moods" to mapOf(
+                "morning" to listOf("morning.jpg"),
+                "evening" to listOf("evening.jpg"),
+                "night" to listOf("night.jpg")
+            ),
+            "wallpaper_dim" to 0,
+            "wallpaper_order" to "sequential",
+            "sky_intensity" to 0
+        ),
+        null,
+        listOf(0xFF000000, 0xFF1F2937, 0xFFE2A76F),
+        boAnh = "theme/family",
+        anhXem = "theme/family/screenshot.jpg"
+    ),
+
+    Theme(
+        "istanbul", "Istanbul", "Istanbul",
+        "Ba tranh Istanbul vẽ bằng code: sáng, hoàng hôn và đêm, dock viền mảnh",
+        "Three code-drawn Istanbul scenes: morning, sunset and night, rim dock",
+        mapOf(
+            "background_color" to "#000000",
+            "dock_glass" to false,
+            "dock_band" to false,
+            "glass_style" to "rim",
+            "dock_title" to false,
+            "columns" to 6,
+            "ambient_glow" to false,
+            "app_glow" to false,
+            "icon_only_buttons" to true,
+            "icon_only_inputs" to true,
+            "show_greeting" to true,
+            "tile_menu" to true,
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 60,
+            "wallpaper_moods" to mapOf(
+                "morning" to listOf("morning.jpg"),
+                "evening" to listOf("evening.jpg"),
+                "night" to listOf("night.jpg")
+            ),
+            "wallpaper_dim" to 0,
+            "wallpaper_order" to "sequential",
+            "sky_intensity" to 0
+        ),
+        null,
+        listOf(0xFF000000, 0xFF1B2A41, 0xFFB86B3D),
+        boAnh = "theme/istanbul",
+        anhXem = "theme/istanbul/screenshot.jpg"
+    ),
+
+    Theme(
+        "istanbul_v2", "Istanbul (v2)", "Istanbul v2",
+        "Ba tranh Istanbul chi tiết: sáng, hoàng hôn và đêm, làm tối 15%",
+        "Three detailed Istanbul skylines: morning, sunset and night, 15% dim",
+        mapOf(
+            "background_color" to "#000000",
+            "dock_glass" to false,
+            "dock_band" to false,
+            "glass_style" to "rim",
+            "dock_title" to false,
+            "columns" to 6,
+            "ambient_glow" to false,
+            "app_glow" to false,
+            "icon_only_buttons" to true,
+            "icon_only_inputs" to true,
+            "show_greeting" to true,
+            "tile_menu" to true,
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 60,
+            "wallpaper_moods" to mapOf(
+                "morning" to listOf("morning.jpg"),
+                "evening" to listOf("evening.jpg"),
+                "night" to listOf("night.jpg")
+            ),
+            "wallpaper_dim" to 15,
+            "wallpaper_order" to "sequential",
+            "sky_intensity" to 0
+        ),
+        null,
+        listOf(0xFF000000, 0xFF12263A, 0xFFD98E5A),
+        boAnh = "theme/istanbul_v2",
+        anhXem = "theme/istanbul_v2/screenshot.jpg"
+    ),
+
+    Theme(
+        "twilight", "Hoàng Hôn Anime", "Twilight",
+        "Ba ảnh anime phong cảnh đổi mỗi giờ kèm chú thích, dock kính mờ 60%",
+        "Three anime landscape wallpapers rotating hourly with captions, 60% frosted dock",
+        mapOf(
+            "wallpaper" to true,
+            "wallpaper_rotation_minutes" to 60,
+            "wallpaper_order" to "sequential",
+            "wallpaper_captions" to true,
+            "wallpaper_dim" to 30,
+            "ambient_glow" to false,
+            "dock_glass" to true,
+            "dock_opacity" to 60
+        ),
+        null,
+        listOf(0xFF05070C, 0xFF1B2340, 0xFFE07A5F),
+        boAnh = "theme/twilight",
+        anhXem = "theme/twilight/screenshot.jpg"
+    ),
 )
 
 

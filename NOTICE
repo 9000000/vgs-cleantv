@@ -44,3 +44,9 @@ The full licence texts shown inside the app are in app/src/main/assets/giay-phep
 Ward/commune coordinates (app/src/main/assets/xa.json): centroids from OpenStreetMap,
 © OpenStreetMap contributors, available under the Open Database License (ODbL 1.0),
 https://www.openstreetmap.org/copyright. Ward names: vietmap-company/vietnam_administrative_address.
+
+Theme artwork (app/src/main/assets/theme/): the ambient-glass, glass-gallery, family, istanbul,
+istanbul_v2 and twilight themes and their pictures come from CleanYourTV commit 3f175120
+(https://github.com/Gathin23/cleanyourtv/tree/3f175120/themes). The pictures are CC0 1.0 except
+ambient-glass, whose eight photos are CC0 1.0 / Unsplash License. Per-theme credits and source
+links: https://github.com/Gathin23/cleanyourtv/blob/3f175120/themes/<name>/CREDITS.md

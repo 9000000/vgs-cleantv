@@ -1525,7 +1525,10 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // Nâng cao ghi sau cùng: người dùng đã chủ động đặt thì đè lên giá trị theme (chỉ các mục chưa có ở Home / Tuỳ chỉnh).
         val daDat = mutableListOf<String>()
         nangCao.forEach { (k, chu) ->
-            if (k in KHOA_DA_CO) return@forEach
+            // Giá trị cấu trúc của theme (vd wallpaper_moods) đã được themeChon.ghiVao ghi đúng kiểu JSON;
+            // đừng ghi đè bằng chuỗi đã làm phẳng của mục Nâng cao.
+            val gocTheme = themeChon.cauHinh[k]
+            if (k in KHOA_DA_CO || gocTheme is Map<*, *> || gocTheme is Collection<*>) return@forEach
             val tc = dsNangCao.firstOrNull { it.khoa == k }
             val v = if (tc != null) zone.vgs.tvsach.dulieu.NangCao.giaTri(tc, chu)
                     else when {

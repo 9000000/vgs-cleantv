@@ -8,7 +8,7 @@ import java.io.File
 class ThemeTest {
     @Test
     fun danhSachThemeHopLe() {
-        assertEquals("Có 24 giao diện (bao gồm các chủ đề cổ điển và toàn bộ 11 chủ đề mới từ CleanYourTV)", 24, THEMES.size)
+        assertEquals("Có 30 giao diện (bao gồm các chủ đề cổ điển và toàn bộ 27 chủ đề từ CleanYourTV)", 30, THEMES.size)
         val ids = THEMES.map { it.id }
         assertEquals("Không trùng id theme", ids.size, ids.toSet().size)
 
@@ -34,6 +34,20 @@ class ThemeTest {
                 val f = File(assetRoot, path)
                 assertTrue("File ảnh xem trước tồn tại: $path (${th.id})", f.exists() && f.isFile && f.length() > 0)
             }
+        }
+    }
+
+    @Test
+    fun wallpaperMoodsGhiThanhJsonObject() {
+        val th = THEMES.first { it.id == "family" }
+        val o = org.json.JSONObject()
+        th.ghiVao(o)
+        val moods = o.optJSONObject("wallpaper_moods") ?: error("wallpaper_moods phải là JSON object")
+        listOf("morning", "evening", "night").forEach { buoi ->
+            val ds = moods.optJSONArray(buoi) ?: error("Thiếu nhóm ảnh $buoi")
+            assertEquals("Nhóm $buoi phải có đúng 1 ảnh", 1, ds.length())
+            val ten = ds.getString(0)
+            assertTrue("Thiếu ảnh $ten của nhóm $buoi", File("src/main/assets/theme/family/$ten").isFile)
         }
     }
 
