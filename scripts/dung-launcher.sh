@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Dựng launcher của cleanyourtv (upstream/launcher) và chép vào assets của app, kèm dữ liệu 147 mẫu tivi.
+# Dựng launcher của cleanyourtv (upstream/launcher) và chép vào assets của app, kèm dữ liệu 407 mẫu tivi.
 # Chạy lại khi cập nhật upstream: git -C upstream pull && scripts/dung-launcher.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."

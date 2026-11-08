@@ -43,6 +43,8 @@ object NangCao {
     fun giaTri(tc: TuyChon, chu: String): Any? {
         val s = chu.trim()
         if (s.isEmpty()) return null
+        // wallpaper_moods là object JSON lồng nhau; ghi thẳng chuỗi vào config.json thì launcher bỏ qua.
+        if (tc.khoa == "wallpaper_moods") return jsonMoods(s)
         return when (tc.kieu) {
             "bool" -> s.toBooleanStrictOrNull()
             "so" -> s.toIntOrNull()?.coerceIn(tc.min, tc.max)
@@ -52,6 +54,20 @@ object NangCao {
             else -> s
         }
     }
+
+    /** wallpaper_moods: {"morning": ["a.jpg"], ...} → JSONObject chỉ gồm ba buổi hợp lệ; null nếu sai. */
+    private fun jsonMoods(s: String): JSONObject? = runCatching {
+        val vao = JSONObject(s)
+        val ra = JSONObject()
+        for (buoi in listOf("morning", "evening", "night")) {
+            val a = vao.optJSONArray(buoi) ?: continue
+            val ten = (0 until a.length()).mapNotNull { i ->
+                a.optString(i, "").trim().takeIf { it.isNotEmpty() }
+            }
+            if (ten.isNotEmpty()) ra.put(buoi, JSONArray(ten))
+        }
+        ra.takeIf { it.length() > 0 }
+    }.getOrNull()
 
     /** Giá trị đang có trong config.json trên tivi → chữ để hiện lại. */
     fun docChu(tc: TuyChon, j: JSONObject): String? {
@@ -68,6 +84,9 @@ object NangCao {
             is Number -> v.toString()
             is String -> v
             is JSONArray -> (0 until v.length()).joinToString(", ") { v.get(it).toString() }
+            is JSONObject -> v.toString()
+            // Map lồng nhau (vd wallpaper_moods) phải hiện lại dạng JSON để người dùng sửa đúng.
+            is Map<*, *> -> runCatching { JSONObject(v).toString() }.getOrElse { v.toString() }
             is Collection<*> -> v.joinToString(", ") { it.toString() }
             is Array<*> -> v.joinToString(", ") { it.toString() }
             else -> v.toString()

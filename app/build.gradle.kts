@@ -60,7 +60,14 @@ android {
     // APK launcher đóng sẵn: không nén lại để đọc nhanh.
     androidResources { noCompress += "apk" }
     packaging {
-        resources { excludes += setOf("META-INF/versions/9/OSGI-INF/MANIFEST.MF", "META-INF/DEPENDENCIES") }
+        resources {
+            excludes += setOf(
+                "META-INF/versions/9/OSGI-INF/MANIFEST.MF",
+                "META-INF/DEPENDENCIES",
+                // BouncyCastle kéo cả bảng hằng số lượng tử (PQC) ~1 MB; app chỉ dùng X.509/ASN.1 nên bỏ.
+                "org/bouncycastle/pqc/**"
+            )
+        }
     }
 }
 

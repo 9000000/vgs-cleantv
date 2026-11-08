@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gom 148 danh sách debloat của cleanyourtv thành một file JSON cho app.
+"""Gom 407 danh sách debloat của cleanyourtv thành một file JSON cho app.
 
 Chạy: python3 -I scripts/lam-du-lieu.py upstream app/src/main/assets/du-lieu.json
 

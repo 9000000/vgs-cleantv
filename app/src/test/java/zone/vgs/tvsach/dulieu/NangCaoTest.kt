@@ -35,6 +35,18 @@ class NangCaoTest {
         assertNull(NangCao.giaTri(tc("chu"), "   "))
     }
 
+    @Test fun wallpaperMoodsDocJson() {
+        val tc = tc("chu").copy(khoa = "wallpaper_moods")
+        val o = NangCao.giaTri(tc, """{"morning":["a.jpg","b.jpg"],"night":["c.jpg"],"noon":["x.jpg"]}""")
+        assertTrue("phải trả về JSONObject", o is JSONObject)
+        val j = o as JSONObject
+        assertEquals("chỉ giữ ba buổi hợp lệ", 2, j.length())
+        assertEquals("a.jpg", j.getJSONArray("morning").getString(0))
+        assertNull("chữ không phải JSON thì bỏ", NangCao.giaTri(tc, "morning=a.jpg"))
+        assertNull("không có buổi hợp lệ thì bỏ", NangCao.giaTri(tc, """{"noon":["x.jpg"]}"""))
+        assertEquals("""{"morning":["a.jpg"]}""", NangCao.chuTuGiaTri(mapOf("morning" to listOf("a.jpg"))))
+    }
+
     @Test fun docLaiTuTivi() {
         val j = JSONObject("""{"columns":6,"hidden_apps":["a","b"]}""")
         assertEquals("6", NangCao.docChu(tc("so").copy(khoa = "columns"), j))

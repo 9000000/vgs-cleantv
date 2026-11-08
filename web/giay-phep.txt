@@ -21,7 +21,7 @@ that are off on the TV, your rating and note (and a contact only if you type one
 
 CleanTV dùng các phần mềm mã nguồn mở sau. / CleanTV uses the following open-source software.
 
-1. CleanYourTV — danh sách 147 mẫu tivi và màn Home sạch (launcher), có sửa thêm dòng thời tiết
+1. CleanYourTV — danh sách 407 mẫu tivi và màn Home sạch (launcher), có sửa thêm dòng thời tiết
    và tuỳ chọn ẩn dải dock / TV lists and the clean Home launcher, modified (weather line, dock band option)
    https://github.com/Gathin23/cleanyourtv — MIT License (văn bản ở mục A / text in section A)
 2. LibADB Android — Muntashir Al-Islam — https://github.com/MuntashirAkon/libadb-android
@@ -32,6 +32,7 @@ CleanTV dùng các phần mềm mã nguồn mở sau. / CleanTV uses the followi
 6. Phông chữ Lexend (trong Home sạch, thay Outfit vì đủ dấu tiếng Việt) / Lexend font (in the clean Home)
    The Lexend Project Authors — https://github.com/googlefonts/lexend — SIL Open Font License 1.1 (mục C / section C)
 7. Dữ liệu thời tiết / Weather data: Open-Meteo.com — https://open-meteo.com — CC BY 4.0
+   Toạ độ phường/xã / Ward locations: © OpenStreetMap contributors — https://www.openstreetmap.org/copyright — ODbL 1.0
 8. DNS chặn quảng cáo (tuỳ chọn) / Optional ad-blocking DNS: AdGuard DNS — https://adguard-dns.io
 
 Tên các hãng tivi chỉ dùng để nói tivi nào chạy được; CleanTV không liên quan tới các hãng đó.

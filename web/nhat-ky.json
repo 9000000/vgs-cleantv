@@ -1,5 +1,19 @@
 [
   {
+    "ban": "4.0.8",
+    "ngay": "2026-11-07",
+    "vi": [
+      "Thêm 6 giao diện từ CleanYourTV: Ambient Glass, Glass Gallery, Family, Istanbul, Istanbul v2, Twilight (tổng 30 giao diện).",
+      "Ảnh nền theo buổi (wallpaper_moods) chuyển đúng theo giờ trong ngày và không bị ghi đè khi lưu cấu hình.",
+      "Giữ nguyên chất lượng ảnh gốc; cập nhật giấy phép và ghi công tác giả ảnh."
+    ],
+    "en": [
+      "Added 6 themes from CleanYourTV: Ambient Glass, Glass Gallery, Family, Istanbul, Istanbul v2, Twilight (30 themes in total).",
+      "Time-of-day wallpaper moods (wallpaper_moods) now switch correctly and are no longer overwritten when saving the configuration.",
+      "Original image quality preserved; licences and artwork credits updated."
+    ]
+  },
+  {
     "ban": "4.0.4",
     "ngay": "2026-11-03",
     "vi": [

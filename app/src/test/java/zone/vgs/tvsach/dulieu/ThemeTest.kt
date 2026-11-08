@@ -52,6 +52,23 @@ class ThemeTest {
     }
 
     @Test
+    fun wallpaperMoodsTroDungAnh() {
+        val assetRoot = File("src/main/assets")
+        THEMES.forEach { th ->
+            val moods = th.cauHinh["wallpaper_moods"] as? Map<*, *> ?: return@forEach
+            val boAnh = th.boAnh ?: error("${th.id} có wallpaper_moods nhưng thiếu boAnh")
+            moods.forEach { (buoi, ds) ->
+                assertTrue("${th.id}: buổi $buoi không hợp lệ", buoi in listOf("morning", "evening", "night"))
+                val files = ds as? List<*> ?: error("${th.id}: buổi $buoi phải là danh sách")
+                assertTrue("${th.id}: buổi $buoi không được rỗng", files.isNotEmpty())
+                files.forEach { ten ->
+                    assertTrue("${th.id}: thiếu ảnh $ten của buổi $buoi", File(assetRoot, "$boAnh/$ten").isFile)
+                }
+            }
+        }
+    }
+
+    @Test
     fun kiemTraChuyenDoiGiaTriNangCao() {
         assertEquals("true", NangCao.chuTuGiaTri(true))
         assertEquals("false", NangCao.chuTuGiaTri(false))

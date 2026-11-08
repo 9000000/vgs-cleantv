@@ -21,7 +21,7 @@ that are off on the TV, your rating and note (and a contact only if you type one
 
 CleanTV dùng các phần mềm mã nguồn mở sau. / CleanTV uses the following open-source software.
 
-1. CleanYourTV — danh sách 147 mẫu tivi và màn Home sạch (launcher), có sửa thêm dòng thời tiết
+1. CleanYourTV — danh sách 407 mẫu tivi và màn Home sạch (launcher), có sửa thêm dòng thời tiết
    và tuỳ chọn ẩn dải dock / TV lists and the clean Home launcher, modified (weather line, dock band option)
    https://github.com/Gathin23/cleanyourtv — MIT License (văn bản ở mục A / text in section A)
 2. LibADB Android — Muntashir Al-Islam — https://github.com/MuntashirAkon/libadb-android

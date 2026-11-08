@@ -30,7 +30,7 @@
 ### App làm gì
 **Dọn tivi**
 - **Kết nối tivi qua Wi-Fi** bằng ADB: quét mạng hoặc gõ IP. Google TV đời mới thì ghép bằng mã 6 số (Gỡ lỗi không dây), app tự dò cổng. Trong app có hướng dẫn 7 bước kèm hình.
-- **So với 341 danh sách đã thử** của cộng đồng CleanYourTV (95 hãng: TCL, Sony, Xiaomi, Philips, Hisense, Skyworth, onn, Chromecast, hộp FPT / VNPT, máy chiếu…). Chưa khớp mẫu thì app gợi ý mẫu gần giống, tivi lạ thì dùng luật chung an toàn.
+- **So với 407 danh sách đã thử** của cộng đồng CleanYourTV (109 hãng: TCL, Sony, Xiaomi, Philips, Hisense, Skyworth, onn, Chromecast, hộp FPT / VNPT, máy chiếu…). Chưa khớp mẫu thì app gợi ý mẫu gần giống, tivi lạ thì dùng luật chung an toàn.
 - **Chỉ tắt, không gỡ** quảng cáo, theo dõi, app rác. App không đụng cổng HDMI, remote, bàn phím, CH Play, gói đang giữ Wi-Fi, gói lõi Android và Home đang dùng. Google Home / cast và tìm kiếm giọng nói không bao giờ được tích sẵn.
 - Gói nhiều người dùng cùng mẫu giữ lại thì app hỏi lại trước khi tắt. Lỡ tắt nhầm thì vào "Bật lại từng app": app đọc thẳng từ tivi, kể cả khi không còn bản sao lưu.
 - App cảnh báo khi kết nối nhầm vào điện thoại hoặc máy tính bảng, và báo khi giờ tivi lệch giờ điện thoại (Xiaomi bản Trung Quốc).
@@ -45,7 +45,7 @@
   - Bố cục: dock tối đa 9 app, số app mỗi hàng, vị trí hàng app, tất cả app một hàng, ô icon đều nhau, dải nền thanh dock độc lập, icon to trong ô app.
   - Chữ: cỡ chữ và màu chữ đồng hồ / ngày / thời tiết, chữ trắng sáng, nút Wi-Fi / Cài đặt sát mép trên.
   - Nút trên Home: nút hẹn giờ tắt tivi, mở một app khi bật tivi, thư viện app trong menu Cài đặt.
-  - Thêm hơn 90 tuỳ chọn Nâng cao. Lưu cả bộ cài đặt ra file để mang sang tivi khác.
+  - Thêm 80 tuỳ chọn Nâng cao. Lưu cả bộ cài đặt ra file để mang sang tivi khác.
 - **Nút Home về đúng Home sạch**: app bấm thử nút Home thật. Tivi không cho tắt Home gốc (Google TV còn trình cài đặt, TCL, hộp nhà mạng) thì Home sạch tự mở đè lên, không phải quên Wi-Fi. Rút điện bật lại Home sạch cũng tự lên; tìm giọng nói Google TV vẫn hiện kết quả.
 - **Nút trên remote vẫn chạy**: YouTube, Netflix, Prime, bánh răng Cài đặt chạy theo bảng phím của từng mẫu tivi. "Dò một nút" thì gán nút lạ (VTVgo, FPT Play…) cho app tuỳ chọn. Giữ nút âm lượng vẫn tăng giảm liên tục.
 - Máy chiếu (Formovie, XGIMI, JMGO…): ghim màn lấy nét / chỉnh hình vào nút Máy chiếu. Xiaomi bản Trung Quốc có Home sạch riêng (hiện tiếng Việt). Bo mạch CVTE thì giữ Home của hãng.
@@ -71,7 +71,7 @@
 Cần JDK 17 và Android SDK (compileSdk 35).
 
 ```bash
-scripts/dung-launcher.sh          # tải CleanYourTV, áp patches/launcher-vgs.patch, dựng Home sạch + dữ liệu 341 mẫu vào assets
+scripts/dung-launcher.sh          # tải CleanYourTV, áp patches/launcher-vgs.patch, dựng Home sạch + dữ liệu 407 mẫu vào assets
 ./gradlew assembleRelease         # thiếu ky.properties thì APK ký bằng khoá debug
 ./gradlew :app:testReleaseUnitTest
 ```
@@ -118,7 +118,7 @@ Báo lỗi, xin hỗ trợ tivi mới: [vgs.zone/gop-y](https://vgs.zone/gop-y) 
 ### What it does
 **Cleaning**
 - **Connects over Wi-Fi** with ADB: scan or type the IP. Newer Google TVs pair with a 6-digit code and the app finds the port. A 7-step picture guide is built in.
-- **Matches 341 tested lists** from the CleanYourTV community (95 brands). It suggests close models when yours isn't listed, and unknown TVs get safe general rules.
+- **Matches 407 tested lists** from the CleanYourTV community (109 brands). It suggests close models when yours isn't listed, and unknown TVs get safe general rules.
 - **Disables, never uninstalls** ads, tracking and junk. Leaves HDMI inputs, the remote, keyboards, Play Store, the Wi-Fi owner, core Android packages and the Home in use alone. Google Home / casting and voice search are never pre-ticked.
 - Asks again before disabling a package most owners of the same model kept. "Re-enable apps" reads what is disabled straight from the TV, even without a backup.
 - Warns when it is connected to a phone or tablet instead of a TV, and when the TV's clock is off from the phone's.
@@ -133,7 +133,7 @@ Báo lỗi, xin hỗ trợ tivi mới: [vgs.zone/gop-y](https://vgs.zone/gop-y) 
   - Layout: up to 9 dock apps, apps per row, row position, one-row layout, uniform icon tiles, independent dock background band, big app icons.
   - Text: clock size and custom text color, bright white text, Wi-Fi / Settings buttons at the very top.
   - Buttons on Home: sleep-timer button, app to open at power-on, Library in Settings menu.
-  - Plus 90+ Advanced options. Export the whole setup to a file for other TVs.
+  - Plus 80 Advanced options. Export the whole setup to a file for other TVs.
 - **Home lands on the clean Home**: the app tests the real Home key. Where the stock Home can't be disabled (Google TV with its setup app, TCL, operator boxes) the clean Home opens over it, with no need to forget Wi-Fi. After a power cut it comes back by itself, and Google TV voice search still shows its results.
 - **Remote keys keep working**: YouTube, Netflix, Prime and the Settings gear follow each model's key map. "Learn a key" binds an unknown app key to the app you pick. Holding volume still ramps.
 - Projectors get focus / keystone shortcuts. Chinese Xiaomi TVs get an allowed Home build (in Vietnamese). CVTE boards keep their stock Home.
