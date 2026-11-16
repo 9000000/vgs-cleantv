@@ -49,3 +49,27 @@
 - **Status**: Fixed
 
 ---
+
+## [2026-11-16 12:00] - Lỗi biên dịch upstream/launcher khi đồng bộ CleanYourTV ddc3b2cd (thiếu ClockFormat & ACTION_APP_LIBRARY)
+
+- **Type**: Process
+- **Severity**: Low
+- **File**: `upstream/launcher/app/src/main/java/com/gathin/tvhome/ClockDream.java:25`, `MainActivity.java:108`
+- **Agent**: mon
+- **Root Cause**:
+  1. Thư mục submodule `upstream` đang neo ở nhánh tuỳ biến `ff941ddc` của `tet` nên khi chép các file mới từ `ddc3b2cd` đã sót file `ClockFormat.java` (mới thêm ở upstream giữa `ff941ddc` và `ddc3b2cd`) và hằng số `ACTION_APP_LIBRARY` + hàm `openLibraryIfAsked()` trong `MainActivity.java`.
+  2. Toán tử chuyển hướng `>` của PowerShell ghi file theo bảng mã UTF-16LE có BOM, gây lỗi `unmappable character for encoding UTF-8` trong `javac`.
+- **Error Message**:
+  ```
+  ClockDream.java:25: error: cannot find symbol ClockFormat
+  RemoteKeys.java:429: error: cannot find symbol MainActivity.ACTION_APP_LIBRARY
+  ClockFormat.java:1: error: unmappable character (0xFF) for encoding UTF-8
+  ```
+- **Fix Applied**:
+  1. Dùng `git -C upstream checkout ddc3b2cd -- ...` để lấy nguyên bản UTF-8 cho `ClockFormat.java` và `ClockFormatTest.java`.
+  2. Bổ sung `ACTION_APP_LIBRARY` và `openLibraryIfAsked(Intent)` vào `MainActivity.java` đồng bộ với `RemoteKeys.java`.
+  3. Đặt dấu ngoặc kép cho tham số `"-PlauncherApplicationId=com.ts.launcher"` trên PowerShell khi dựng `tvhome-xiaomi.apk`.
+- **Prevention**: Khi trích xuất file từ Git trong môi trường Windows PowerShell, luôn dùng `git checkout <commit> -- <path>` hoặc Python ghi UTF-8 thay vì toán tử `>` của PowerShell; luôn chạy `./gradlew testReleaseUnitTest assembleRelease` để kiểm chứng toàn bộ symbol liên kết.
+- **Status**: Fixed
+
+---

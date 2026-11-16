@@ -205,6 +205,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var luonVeHome by mutableStateOf(false)
     /** Nút hẹn giờ tắt tivi trên Home sạch (sleep_timer_button, cần HomeKeyService). 3.2.0, góp ý duongghoangg1103. */
     var nutHenTat by mutableStateOf(false)
+    /** Nút Ngủ trên Home sạch (sleep_button, cần HomeKeyService, Android 9+). 4.1.2, góp ý hanhphucnoidau1999: máy chiếu remote
+     *  chỉ có nút nguồn. Mặc định bật cho máy chiếu, tắt cho tivi; luôn ghi rõ vào config để lựa chọn không đổi theo máy. */
+    var nutNgu by mutableStateOf(false)
     /**
      * Nút remote người dùng tự gán (3.1.1, "Dò phím remote"; góp ý Hoàng Hữu: nút VTVgo của remote TCL 65C655 chết sau khi
      * tắt Home gốc). Mỗi dòng là một mục app_keys: "scan:<mã quét>:<gói>" hoặc "<keycode>:<gói>". Cần HomeKeyService lọc phím.
@@ -238,7 +241,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     val appGanDuoc: List<String> get() = trangThai?.let { tt -> tt.coBieuTuong.filter { it in tt.caiDat && it !in tt.daTat }.sortedBy { zone.vgs.tvsach.dulieu.tenDep(it).lowercase() } } ?: emptyList()
 
     /** HomeKeyService cần bật: phím Home lạ, phím app remote, hoặc mở app khi bật từ chế độ chờ. */
-    val canDichVuPhim get() = nutHome || dungPhimRemote || (moKhiBat && moKhiThuc) || luonVeHome || phimGan.isNotEmpty() || nutHenTat
+    val canDichVuPhim get() = nutHome || dungPhimRemote || (moKhiBat && moKhiThuc) || luonVeHome || phimGan.isNotEmpty() || nutHenTat || nutNgu
     /**
      * Ô kênh đặt ở đầu dock, theo thứ tự chọn: VTVgo (3.0.0, mọi kênh), FPT Play và IPTV (3.1.0). Tối đa KENH_TOI_DA (link_tiles).
      */
@@ -365,6 +368,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var thuVienTrongMenu by mutableStateOf(false)
     /** Bấm nút Cài đặt mở Thư viện app, giữ vào cài đặt tivi, kiểu Projectivy (góp ý thangmath 02/11/2026). */
     var nutCaiDatThuVien by mutableStateOf(false)
+    /** Home chỉ còn dock, app khác mở từ Thư viện (dock_only, góp ý ngocnd156 04/11/2026). */
+    var chiHienDock by mutableStateOf(false)
     var dongHoKhiYen by mutableStateOf(0)
     var tiviYeu by mutableStateOf(false)
     var hieuUngKinh by mutableStateOf(false)
@@ -386,14 +391,14 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         "weather", "weather_lat", "weather_lon", "weather_place", "weather_provider", "weather_api_key",
         "greeting", "show_greeting", "greeting_name",
         "header_white", "lunar_date", "lunar_utc_offset", "home_idle_clock_minutes",
-        "projector_actions", "shamsi_date", "race_calendar",
+        "projector_actions", "shamsi_date", "race_calendar", "sleep_timer_button", "sleep_button",
         // 3. Tuỳ chỉnh (TheTuyChinh)
-        "dock_title", "dock_band", "always_show_names", "icon_tile_color",
-        "rows_below_dock", "single_row", "dock_row", "uniform_tiles",
+        "dock_title", "dock_band", "always_show_names", "icon_tile_color", "icon_fill",
+        "rows_below_dock", "single_row", "dock_row", "dock_only", "uniform_tiles",
         "top_compact", "top_menu", "header_size", "header_scale",
         "columns", "rows_offset_dp", "rows_middle",
         "open_on_start_choice", "open_on_start", "boot_to_app", "wake_open_app", "wake_to_app", "power_on_home_always",
-        "weather_corner", "show_events", "show_today", "show_weather", "today_carousel", "countdown_events",
+        "weather_corner", "weather_clock", "show_events", "show_today", "show_weather", "today_carousel", "countdown_events",
         "input_action", "input_uri_scheme", "input_key_keycodes", "handle_view_inputs",
         "key_filter", "home_key", "app_keys", "all_apps_home",
         "restore_key_services", "consume_volume_keys", "hold_volume_continuous",
@@ -434,6 +439,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         hienThoiTiet = (nangCao["show_weather"] ?: th.cauHinh["show_weather"]?.toString())?.toBooleanStrictOrNull() ?: true
         tuXoayHomNay = (nangCao["today_carousel"] ?: th.cauHinh["today_carousel"]?.toString())?.toBooleanStrictOrNull() ?: true
         oDeuNhau = (nangCao["uniform_tiles"] ?: th.cauHinh["uniform_tiles"]?.toString())?.toBooleanStrictOrNull() ?: (th.cauHinh["uniform_tiles"] == true)
+        anLoiChao = (nangCao["show_greeting"] ?: th.cauHinh["show_greeting"]?.toString())?.toBooleanStrictOrNull()?.not() ?: (th.cauHinh["show_greeting"] == false)
     }
 
     /** Lưu cấu hình đang chỉnh sửa trong nangCao vào bộ nhớ của theme hiện tại. */
@@ -529,6 +535,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     // Máy chiếu: màn của hãng dò được + những màn đã ghim vào nút "Máy chiếu" trên Home sạch (comp → nhãn).
     var laMayChieu by mutableStateOf(false)
+    /** Máy chiếu chưa có danh sách đúng mẫu: màn Chọn gói không tích sẵn gì và hiện lời cảnh báo (4.0.8). */
+    var mayChieuKhongMau by mutableStateOf(false)
     var mayChieu by mutableStateOf<List<String>?>(null)
     val ghimMayChieu = mutableStateMapOf<String, String>()
     var dangDoMayChieu by mutableStateOf(false)
@@ -865,6 +873,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // Không tự tắt chế độ gỡ lỗi (chỉ tắt khi người dùng chủ động bấm nút Tắt ADB & kết thúc).
         giuAdb = true
         laMayChieu = tv.coVeMayChieu(tt, info)
+        nutNgu = laMayChieu
         man = if (dangKhoiPhuc) Man.KHOI_PHUC else Man.THONG_TIN
     }
 
@@ -879,7 +888,10 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val du = io { DuLieu.nap(ctx) }
         val ds = io { KeHoach.lap(du, mauChon, tt) }
         muc = ds
-        chon.clear(); ds.forEach { chon[it.pkg] = it.chonSan }
+        // 4.0.8 (Movie Legend Q10 Pro, doankhapro09 07/11/2026: dọn theo luật chung xong khởi động lại treo logo): máy chiếu
+        // chưa có danh sách đúng mẫu thì không tích sẵn gói nào — phần mềm máy chiếu khác tivi nhiều, chủ nhà tự chọn từng gói.
+        mayChieuKhongMau = laMayChieu && mauChon == null
+        chon.clear(); ds.forEach { chon[it.pkg] = it.chonSan && !mayChieuKhongMau }
         man = Man.CHON_GOI
     }
 
@@ -957,6 +969,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var khoaPin by mutableStateOf("")
     var khoaPin2 by mutableStateOf("")
     val khoaKhung = androidx.compose.runtime.mutableStateListOf<KhungKhoa>()
+    /** Khoá từng app (15/11/2026): gói đã chọn, và các app trên tivi chọn được. */
+    val khoaApps = androidx.compose.runtime.mutableStateListOf<String>()
+    var khoaAppCo by mutableStateOf<List<String>>(emptyList())
     var khoaBao by mutableStateOf("")
     /** Đúng PIN trên tivi thì mở bao lâu (anh Alex chốt 60 phút). */
     val KHOA_MO_TAM = 60
@@ -964,16 +979,19 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     fun moKhoaTre() = chay(t("Đọc cài đặt khoá trên tivi…", "Reading the lock settings…")) {
         val j = io { tv.docKhoa() }
         khoaTrenTv = j; khoaBao = ""; khoaPin = ""; khoaPin2 = ""
-        khoaKhung.clear()
+        khoaKhung.clear(); khoaApps.clear()
+        khoaAppCo = runCatching { io { tv.appKhoaDuoc() } }.getOrDefault(emptyList())
         if (j != null) {
             khoaBat = j.optBoolean("bat")
+            j.optJSONArray("apps")?.let { a -> for (i in 0 until a.length()) a.optString(i).takeIf { it.isNotBlank() }?.let { khoaApps += it } }
             val ks = j.optJSONArray("khung") ?: org.json.JSONArray()
             for (i in 0 until ks.length()) {
                 val k = ks.getJSONObject(i); val ng = k.optJSONArray("ngay") ?: org.json.JSONArray()
                 khoaKhung += KhungKhoa(k.optString("tu"), k.optString("den"), (0 until ng.length()).map { ng.getInt(it) }.toSet())
             }
         }
-        if (khoaKhung.isEmpty()) { khoaBat = true; khoaKhung += KhungKhoa("21:00", "06:00", (1..7).toSet()) }
+        // Lần đầu gợi ý sẵn khung tối; đã lưu "chỉ khoá app" (không khung giờ) thì để trống.
+        if (j == null && khoaKhung.isEmpty()) { khoaBat = true; khoaKhung += KhungKhoa("21:00", "06:00", (1..7).toSet()) }
         man = Man.KHOA_TRE
     }
 
@@ -983,11 +1001,12 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             if (!Regex("^[0-9]{4}$").matches(khoaPin)) error(t("Mã PIN phải đúng 4 chữ số.", "The PIN must be exactly 4 digits."))
             if (khoaPin != khoaPin2) error(t("Hai lần nhập PIN không giống nhau.", "The two PINs don't match."))
         }
-        if (khoaKhung.isEmpty()) error(t("Thêm ít nhất một khung giờ khoá.", "Add at least one lock period."))
+        if (khoaKhung.isEmpty() && khoaApps.isEmpty()) error(t("Thêm một khung giờ khoá hoặc chọn app cần khoá.", "Add a lock period or pick apps to lock."))
         val gio = Regex("^([01][0-9]|2[0-3]):[0-5][0-9]$")
         khoaKhung.forEach { if (!gio.matches(it.tu) || !gio.matches(it.den) || it.ngay.isEmpty()) error(t("Khung giờ ${it.tu}–${it.den} chưa đúng (giờ dạng 21:00, chọn ít nhất một ngày).", "Period ${it.tu}–${it.den} is not valid.")) }
         val j = org.json.JSONObject().put("bat", khoaBat).put("moTamPhut", KHOA_MO_TAM)
             .put("khung", org.json.JSONArray(khoaKhung.map { org.json.JSONObject().put("tu", it.tu).put("den", it.den).put("ngay", org.json.JSONArray(it.ngay.sorted())) }))
+            .put("apps", org.json.JSONArray(khoaApps.distinct().sorted()))
         if (khoaPin.isNotEmpty()) {
             val muoi = java.util.UUID.randomUUID().toString().replace("-", "").take(16)
             val bam = java.security.MessageDigest.getInstance("SHA-256").digest((muoi + khoaPin).toByteArray()).joinToString("") { "%02x".format(it) }
@@ -999,10 +1018,14 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         khoaTrenTv = io { tv.docKhoa() }
         khoaPin = ""; khoaPin2 = ""
         val chay = khoaTrenTv?.optBoolean("dichVuChay") == true
-        khoaBao = if (!khoaBat) t("Đã lưu. Khoá đang tắt.", "Saved. The lock is off.")
+        val soApp = khoaApps.distinct().size
+        val chuApp = if (soApp > 0) t(" $soApp app đã chọn hỏi PIN mỗi lần mở.", " $soApp chosen app(s) ask for the PIN when opened.") else ""
+        khoaBao = if (!chay && (khoaBat || soApp > 0)) t("Đã lưu nhưng dịch vụ khoá chưa chạy. Tắt tivi bật lại rồi mở lại màn này kiểm tra.", "Saved, but the lock service isn't running yet. Restart the TV and check again.")
+            else if (!khoaBat) t("Đã lưu. Khoá theo giờ đang tắt.", "Saved. The schedule is off.") + chuApp
             else if (chay) t("Đã bật khoá. Trong khung giờ, tivi hiện màn khoá; nhập đúng PIN thì mở $KHOA_MO_TAM phút.", "The lock is on. During the periods the TV shows the lock screen; the PIN unlocks it for $KHOA_MO_TAM minutes.")
-            else t("Đã lưu nhưng dịch vụ khoá chưa chạy. Tắt tivi bật lại rồi mở lại màn này kiểm tra.", "Saved, but the lock service isn't running yet. Restart the TV and check again.")
-        zone.vgs.tvsach.Dem.gui(ctx, "khoa", tenTiviDem(), khoaKhung.size, if (khoaBat) "bat" else "tat")
+            else t("Đã lưu nhưng dịch vụ khoá chưa chạy.", "Saved, but the lock service isn't running yet.")
+        if (khoaBat && chay) khoaBao += chuApp
+        zone.vgs.tvsach.Dem.gui(ctx, "khoa", tenTiviDem(), khoaKhung.size, (if (khoaBat) "bat" else "tat") + (if (soApp > 0) "+app$soApp" else ""))
     }
 
     fun moTamKhoaTre(phut: Int) = chay(t("Đang gửi lệnh…", "Sending…")) {
@@ -1022,6 +1045,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var dsGhiChu by mutableStateOf("")
     var dsLienHe by mutableStateOf("")
     var dsDaGui by mutableStateOf(false)
+    /** Đã nhắc "chưa ghi email" một lần; bấm Gửi lần nữa là gửi không email. */
+    var dsHoiEmail by mutableStateOf(false)
 
     /** Đọc lại gói đang tắt trên tivi rồi gửi kèm model + đánh giá (người dùng tự bấm). */
     fun guiDanhSach() = chay(t("Đang gửi danh sách…", "Sending the list…")) {
@@ -1035,7 +1060,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             .put("giu", org.json.JSONArray((ketQua?.boQua ?: emptyList()).map { it.first }))
         // Gửi từ app chạy trên tivi (29/10/2026): đánh dấu để biết không có điện thoại nào trong cuộc.
         val tuTv = if (zone.vgs.tvsach.ManHinh.laTv) "# app-tren-tivi\n" else ""
-        du.put("chanDoan", (tuTv + io { tv.chanDoanHome(goiHome) } + "\n# phim-home " + phimHomeGhi).take(3000))
+        // Phần nút app (4.1.4) đặt cuối nhưng chừa chỗ: phần Home cắt bớt để cả gói vừa 4500 ký tự máy chủ giữ.
+        val nutApp = io { tv.chanDoanNutApp() }
+        du.put("chanDoan", (tuTv + io { tv.chanDoanHome(goiHome) } + "\n# phim-home " + phimHomeGhi).take(4500 - nutApp.length) + nutApp)
         val ok = io { zone.vgs.tvsach.Dem.guiDanhSach(ctx, du) }
         if (!ok) error(t("Chưa gửi được (mạng?). Thử lại sau nhé.", "Couldn't send (network?). Try again later."))
         dsDaGui = true
@@ -1210,6 +1237,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         thuVienApp = j.optBoolean("app_library", false)
         thuVienTrongMenu = thuVienApp && !j.optBoolean("library_button", true)
         nutCaiDatThuVien = thuVienApp && j.optBoolean("settings_button_library", false)
+        chiHienDock = thuVienApp && j.optBoolean("dock_only", false)
         dongHoKhiYen = j.optInt("home_idle_clock_minutes", 0)
         tiviYeu = j.optBoolean("reduced_motion", false)
         hieuUngKinh = j.optBoolean("dock_glass", false)
@@ -1220,7 +1248,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         dungTiengNen = j.optBoolean("pause_behind_home", true)
         coChuDau = if (cuaTheme("header_scale")) 100 else j.optInt("header_scale", 100)
         motHang = !cuaTheme("single_row") && j.optBoolean("single_row", false)
-        anLoiChao = !cuaTheme("show_greeting") && !j.optBoolean("show_greeting", true)
+        // 4.1.4 (góp ý nguyenthanhsn88 15/11/2026): như uniform_tiles — công tắc hiện đúng trạng thái thật (Kiểu Apple TV /
+        // macOS ẩn lời chào) và bật lại được đè lên theme; trước đây công tắc báo "đang hiện" mà lời chào vẫn ẩn.
+        anLoiChao = !j.optBoolean("show_greeting", true)
         giuAmLuong = !cuaTheme("key_filter") && !j.optBoolean("key_filter", true) && !laTclGoogleTv
         // 3.0.0 (góp ý contact.khanhtoan): công tắc hiện đúng trạng thái thật, kể cả khi theme bật, và tắt được đè lên theme.
         oDeuNhau = j.optBoolean("uniform_tiles", false)
@@ -1228,6 +1258,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         moKhiThuc = j.optBoolean("wake_open_app", false)
         luonVeHome = j.optBoolean("power_on_home_always", false)
         nutHenTat = j.optBoolean("sleep_timer_button", false)
+        nutNgu = j.optBoolean("sleep_button", nutNgu)
         phimGan.clear(); j.optJSONArray("vgs_phim_gan")?.let { a -> (0 until a.length()).map { a.optString(it) }.filter { it.isNotBlank() }.forEach { phimGan.add(it) } }
         chuTrang = !cuaTheme("header_white") && j.optBoolean("header_white", false)
         if (j.optInt("vgs_bo_rieng", 0) > 1) phutDoiAnh = j.optInt("wallpaper_rotation_minutes", 15)
@@ -1336,7 +1367,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val sl = saoLuu ?: io { tv.damBaoSaoLuu(thongTin!!, getprop, ip) }.also { saoLuu = it }
         nhatKy.clear()
         val apk = io { zone.vgs.tvsach.CapNhat.moAsset(ctx, tv.apkHome).readBytes() }
-        val cauHinh = cauHinhHome()
+        val cauHinh = voiAppNgoai(cauHinhHome())
         val anh = anhNenTheme()
         val bo = boAnhTheme()
         napAnhKenh()
@@ -1456,6 +1487,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (thuVienApp && (thuVienTrongMenu || nutCaiDatThuVien)) put("show_library_pill", false)
         // Nút Cài đặt thành lối vào Thư viện: bấm mở danh sách app, giữ vào cài đặt tivi, nút Menu trên nó ra menu cũ.
         if (thuVienApp && nutCaiDatThuVien) put("settings_button_library", true)
+        if (thuVienApp && chiHienDock) put("dock_only", true)
         if (dongHoKhiYen > 0) put("home_idle_clock_minutes", dongHoKhiYen)
         put("reduced_motion", tiviYeu)
         if (tiviYeu) put("animations", false)
@@ -1481,6 +1513,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         put("wake_open_app", moKhiBat && moKhiThuc)
         put("power_on_home_always", luonVeHome)
         if (nutHenTat) put("sleep_timer_button", true)
+        put("sleep_button", nutNgu)
         put("header_white", chuTrang)
         mauChu?.let { put("header_color", it) }
         if (khungDau) put("header_panel", true)
@@ -1545,6 +1578,10 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (daDat.isNotEmpty()) put("vgs_nang_cao", JSONArray(daDat))
         put("vgs_theme", themeChon.id)
     }.toString()
+
+    /** App tự cài kiểu điện thoại (Phim4K…) vào library_apps để hiện trên Home sạch; dò lỗi thì gửi nguyên cấu hình. */
+    private suspend fun voiAppNgoai(json: String): String =
+        runCatching { zone.vgs.tvsach.dulieu.AppNgoai.gop(json, io { tv.appNgoaiKhongLoiTv(dock.toSet()) }) }.getOrDefault(json)
 
     // ---------- Lưu / mở file cấu hình (góp ý 9000000, 23/10/2026) ----------
     var cauHinhBao by mutableStateOf("")
@@ -1686,6 +1723,101 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             t(". Bấm \"Áp dụng lên tivi\" để đưa lên tivi.", ". Press \"Apply to the TV\" to send it.")
     }
 
+    // ---------- Tài khoản VGS: lưu / lấy cấu hình tivi (anh Alex 12/11/2026, zone.vgs.tvsach.TaiKhoanVgs) ----------
+    var vgsDaKetNoi by mutableStateOf(false)
+    var vgsTen by mutableStateOf("")
+    var vgsDs by mutableStateOf<List<zone.vgs.tvsach.TaiKhoanVgs.TiviLuu>>(emptyList())
+    var vgsToiDa by mutableStateOf(10)
+    /** Đang chờ người dùng bấm Xác nhận trên vgs.zone. */
+    var vgsCho by mutableStateOf(false)
+    var vgsBao by mutableStateOf("")
+    var vgsLoi by mutableStateOf("")
+    private var vgsDaNap = false
+
+    val tenTiviVgs get() = thongTin?.tenHienThi?.takeIf { it.isNotBlank() } ?: t("Tivi", "TV")
+
+    /** Gọi khi thẻ tài khoản hiện ra: đã kết nối thì tải danh sách tivi đã lưu (một lần mỗi phiên). */
+    fun napTaiKhoanVgs() {
+        vgsDaKetNoi = zone.vgs.tvsach.TaiKhoanVgs.daKetNoi(ctx)
+        vgsTen = zone.vgs.tvsach.TaiKhoanVgs.tenDaLuu(ctx)
+        if (vgsDaKetNoi && !vgsDaNap) { vgsDaNap = true; viewModelScope.launch { runCatching { napDsVgs() }.onFailure { loiVgs(it) } } }
+    }
+
+    private suspend fun napDsVgs() {
+        val d = io { zone.vgs.tvsach.TaiKhoanVgs.danhSach(ctx) }
+        vgsTen = d.ten; vgsDs = d.ds; vgsToiDa = d.toiDa; vgsDaKetNoi = true
+    }
+
+    private fun loiVgs(e: Throwable) {
+        if (e is zone.vgs.tvsach.TaiKhoanVgs.LoiVgs && e.hetPhien) { zone.vgs.tvsach.TaiKhoanVgs.quen(ctx); vgsDaKetNoi = false; vgsDs = emptyList() }
+        vgsLoi = (e as? zone.vgs.tvsach.TaiKhoanVgs.LoiVgs)?.message
+            ?: t("Không tới được vgs.zone. Kiểm tra mạng điện thoại rồi thử lại.", "Couldn't reach vgs.zone. Check the phone's internet and try again.")
+    }
+
+    /** Ghép tài khoản: mở trang xác nhận trên trình duyệt, hỏi lại 3 giây một lần tới khi xong / hết hạn / huỷ; xong thì chạy [sau]. */
+    fun ketNoiVgs(sau: (() -> Unit)? = null) {
+        if (vgsCho) return
+        vgsLoi = ""; vgsBao = ""; vgsCho = true
+        viewModelScope.launch {
+            try {
+                val m = io { zone.vgs.tvsach.TaiKhoanVgs.xinMa(ctx) }
+                runCatching {
+                    ctx.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(m.link))
+                        .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK))
+                }.onFailure { vgsBao = t("Mở trình duyệt vào: ${m.link}", "Open this in a browser: ${m.link}") }
+                repeat(300) {
+                    kotlinx.coroutines.delay(3000)
+                    if (!vgsCho) return@launch
+                    when (runCatching { io { zone.vgs.tvsach.TaiKhoanVgs.hoiMa(ctx, m) } }.getOrDefault("cho")) {
+                        "dung" -> { vgsCho = false; vgsBao = ""; napDsVgs(); sau?.invoke(); return@launch }
+                        "het" -> { vgsCho = false; vgsLoi = t("Mã kết nối đã hết hạn, bấm lại để thử lần nữa.", "The link code expired, press again to retry."); return@launch }
+                    }
+                }
+                vgsCho = false
+                vgsLoi = t("Chờ lâu quá chưa thấy xác nhận, bấm lại để thử lần nữa.", "No confirmation for too long, press again to retry.")
+            } catch (e: Throwable) { vgsCho = false; loiVgs(e) }
+        }
+    }
+
+    fun huyChoVgs() { vgsCho = false }
+
+    /** Lưu cấu hình Home sạch đang chọn (như file cấu hình) vào tài khoản, cùng tên tivi thì ghi đè. */
+    fun luuLenVgs() {
+        if (!zone.vgs.tvsach.TaiKhoanVgs.daKetNoi(ctx)) { ketNoiVgs { luuLenVgs() }; return }
+        chay(t("Đang lưu vào tài khoản VGS…", "Saving to your VGS account…")) {
+            vgsLoi = ""; vgsBao = ""
+            var j = JSONObject(String(taoFileCauHinh(), Charsets.UTF_8))
+            var boAnh = false
+            if (j.toString().length > 1_400_000 && j.has("vgs_anh_nen")) { j.remove("vgs_anh_nen"); boAnh = true }
+            val ten = tenTiviVgs
+            try {
+                io { zone.vgs.tvsach.TaiKhoanVgs.luu(ctx, ten, j.toString()) }
+                napDsVgs()
+                vgsBao = t("Đã lưu cấu hình \"$ten\" vào tài khoản VGS.", "Saved \"$ten\" to your VGS account.") +
+                    (if (boAnh) t(" Ảnh nền riêng lớn quá nên không lưu kèm.", " Your wallpaper was too large to include.") else "")
+            } catch (e: Throwable) { loiVgs(e) }
+        }
+    }
+
+    /** Lấy một cấu hình đã lưu về: điền lại mọi lựa chọn, bấm Áp dụng lên tivi mới đưa lên. */
+    fun layTuVgs(id: String) = chay(t("Đang lấy cấu hình từ tài khoản VGS…", "Loading from your VGS account…")) {
+        vgsLoi = ""; vgsBao = ""
+        try {
+            val json = io { zone.vgs.tvsach.TaiKhoanVgs.lay(ctx, id) }
+            napFileCauHinh(json)
+            vgsBao = cauHinhBao
+        } catch (e: zone.vgs.tvsach.TaiKhoanVgs.LoiVgs) { loiVgs(e) } catch (e: java.io.IOException) { loiVgs(e) }
+    }
+
+    fun xoaTrenVgs(id: String) = chay(t("Đang xoá…", "Deleting…")) {
+        try { io { zone.vgs.tvsach.TaiKhoanVgs.xoa(ctx, id) }; napDsVgs() } catch (e: Throwable) { loiVgs(e) }
+    }
+
+    fun thoatVgs() = chay(t("Đang thoát tài khoản…", "Signing out…")) {
+        io { zone.vgs.tvsach.TaiKhoanVgs.thoat(ctx) }
+        vgsDaKetNoi = false; vgsTen = ""; vgsDs = emptyList(); vgsBao = ""; vgsLoi = ""; vgsDaNap = false
+    }
+
     /** Ảnh logo kênh (assets/kenh, ảnh nhỏ của VTVgo) cho các kênh đang chọn; launcher không có mạng nên gửi kèm. */
     private suspend fun napAnhKenh() {
         val ds = if (dsKenhGo.isEmpty()) io { zone.vgs.tvsach.dulieu.KenhVtvGo.docNho(ctx) } else dsKenhGo
@@ -1759,7 +1891,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     fun apDungTheme() = chay(t("Đang đổi giao diện…", "Applying the theme…")) { apDungThemeBen() }
 
     private suspend fun apDungThemeBen() {
-        val json = cauHinhHome()
+        val json = voiAppNgoai(cauHinhHome())
         val anh = anhNenTheme()
         napAnhKenh()
         // Cài đè launcher đi kèm app (bản mới có dòng thời tiết…), giữ dữ liệu và dịch vụ trợ năng.
@@ -1774,7 +1906,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         if (bo != null) thongBao = t("Đang gửi ${bo.size} ảnh nền…", "Sending ${bo.size} wallpaper pictures…")
         io { tv.dayCauHinh(json, anh, bo) }
         io { tv.datNutInput(nutInput) }
-        if (dungPhimRemote || (moKhiBat && moKhiThuc) || luonVeHome || phimGan.isNotEmpty() || nutHenTat) io { tv.batBatPhimHome() }
+        if (dungPhimRemote || (moKhiBat && moKhiThuc) || luonVeHome || phimGan.isNotEmpty() || nutHenTat || nutNgu) io { tv.batBatPhimHome() }
         // Đổi giao diện cũng bật / tắt DNS AdGuard theo công tắc (trước 2.7.3 chỉ lúc cài Home sạch mới đặt).
         val dangChan = io { tv.dnsDangChan() }
         if (dnsChanQc && !dangChan) saoLuu?.let { sl -> io { tv.batDnsChanQc(sl) } }
@@ -1899,11 +2031,12 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         man = Man.KET_NOI
     }
 
-    fun chayKhoiPhuc(goLauncher: Boolean) = chay(t("Đang khôi phục…", "Restoring…")) {
+    /** batTatCa: bật lại cả gói đang tắt ngoài bản sao lưu — gói lần dọn trước tắt bị lần dọn sau coi là "vốn đã tắt" (05/11/2026, góp ý ngocnd156). */
+    fun chayKhoiPhuc(goLauncher: Boolean, batTatCa: Boolean = false) = chay(t("Đang khôi phục…", "Restoring…")) {
         val info = thongTin ?: return@chay
         val sl = kho.doc(info.khoaLuu) ?: error(t("Tivi này chưa có bản sao lưu trong máy.", "This phone has no backup for this TV."))
         nhatKy.clear()
-        val loiKp = io { tv.khoiPhuc(sl, goLauncher) { s -> ghiTuIo(s) } }
+        val loiKp = io { tv.khoiPhuc(sl, goLauncher) { s -> ghiTuIo(s) } + (if (batTatCa) tv.batLaiMoiGoiTat { s -> ghiTuIo(s) } else emptyList()) }
         veApp()
         zone.vgs.tvsach.Dem.gui(ctx, "khoi-phuc", tenTiviDem(), sl.daTatBoiApp.size)
         loiKp.forEach { ghi(t("Lỗi: $it", "Error: $it")) }
@@ -1947,8 +2080,13 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     val chonBatLai = androidx.compose.runtime.mutableStateMapOf<String, Boolean>()
     var batLaiBao by mutableStateOf("")
 
+    /** Gói tắt kiểu disable-user trong dsTatTv; gói còn lại là tắt kiểu khác (hãng tắt sẵn hoặc pm disable). */
+    var dsTatNguoiDung by mutableStateOf<Set<String>>(emptySet())
+
+    private fun docLaiDsTat() { dsTatTv = tv.goiDangTat(); dsTatNguoiDung = tv.goiTatBoiNguoiDung().toSet() }
+
     fun docDsTat() = chay(t("Đang đọc app đang tắt trên tivi…", "Reading disabled apps on the TV…")) {
-        dsTatTv = io { tv.goiTatBoiNguoiDung() }; chonBatLai.clear(); batLaiBao = ""
+        io { docLaiDsTat() }; chonBatLai.clear(); batLaiBao = ""
     }
 
     fun batLaiDaChon() = chay(t("Đang bật lại…", "Re-enabling…")) {
@@ -1959,7 +2097,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             thongBao = t("Bật lại ${i + 1}/${ds.size}: $p", "Re-enabling ${i + 1}/${ds.size}: $p")
             if (io { tv.batLaiGoi(p, sl) }) ok++
         }
-        dsTatTv = io { tv.goiTatBoiNguoiDung() }; chonBatLai.clear()
+        io { docLaiDsTat() }; chonBatLai.clear()
         batLaiBao = if (ok == ds.size) t("Đã bật lại $ok app.", "Re-enabled $ok apps.") else t("Bật lại được $ok/${ds.size} app; app còn lại tivi không cho bật.", "Re-enabled $ok/${ds.size}; the TV refused the rest.")
         zone.vgs.tvsach.Dem.gui(ctx, "khoi-phuc", tenTiviDem(), ok, "tung-app")
         if (sl != null) saoLuu = sl
@@ -1979,9 +2117,9 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     fun datLai() {
         thongTin = null; trangThai = null; muc = emptyList(); chon.clear(); ketQua = null
         dock.clear(); tenChao = ""; homeXong = false; dnsChanQc = false; dangKhoiPhuc = false; khoiPhucXong = false; anhTv = null
-        laMayChieu = false; mayChieu = null; ghimMayChieu.clear()
+        laMayChieu = false; nutNgu = false; mayChieuKhongMau = false; mayChieu = null; ghimMayChieu.clear()
         nhatKy.clear(); saoLuu = null; saoLuuTuTv = false; goiTatKhongSaoLuu = null; epSetupwraith = false
-        dsTatTv = null; chonBatLai.clear(); batLaiBao = ""
+        dsTatTv = null; chonBatLai.clear(); batLaiBao = ""; dsDaGui = false; dsHoiEmail = false
         tuyBienTheoTheme.clear()
         themeChon = zone.vgs.tvsach.dulieu.THEMES.first()
         napConfigChoTheme(themeChon)

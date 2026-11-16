@@ -107,15 +107,33 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
      */
     fun docPhimRemote(giay: Int = 20, conDung: () -> Boolean = { true }): Pair<Int, Int>? {
         val tam = "/data/local/tmp/cleantv-phim"
-        sh("logcat -c 2>/dev/null; rm -f $tam; am broadcast -a zone.vgs.cleantv.LEARN_KEY -p $pkgHome >/dev/null 2>&1; " +
+        // 4.0.8 (Chromecast HD, dungnhd22 08/11/2026: phải dò vài lần mới nhận): mỗi lượt dò có mã riêng, Home sạch ghi
+        // kèm mã vào dòng log nên không đọc nhầm phím của lượt trước (logcat -c không xoá được trên một số máy), và gửi lại
+        // lệnh dò mỗi 4 giây phòng dịch vụ bắt phím chưa bind lúc lệnh đầu tới (Home sạch bỏ qua mã đã trả lời).
+        val ma = java.lang.Long.toString(System.nanoTime() and 0xffffffffL, 36)
+        val lenhDo = "am broadcast -a zone.vgs.cleantv.LEARN_KEY -p $pkgHome --es id $ma >/dev/null 2>&1"
+        sh("logcat -c 2>/dev/null; rm -f $tam; $lenhDo; " +
             "(timeout $giay getevent -q 2>/dev/null | grep -m1 -E ' 0001 [0-9a-f]{4} 00000001' > $tam) >/dev/null 2>&1 & true")
         val het = System.currentTimeMillis() + giay * 1000L
+        var guiLuc = System.currentTimeMillis()
         while (System.currentTimeMillis() < het && conDung()) {
             Thread.sleep(800)
-            Regex("""key=(\d+) scan=(\d+)""").find(sh("logcat -d -s CleanTVKey:I 2>/dev/null | tail -1"))?.let {
+            val log = sh("logcat -d -s CleanTVKey:I 2>/dev/null | tail -5")
+            // Home sạch đời mới ghi id=…: chỉ nhận đúng mã lượt này. Đời cũ (chưa cập nhật) không ghi id: nhận dòng cuối.
+            val dong = log.lines().lastOrNull { it.contains(" id=$ma") } ?: log.lines().lastOrNull { it.contains("key=") && !it.contains(" id=") }
+            Regex("""key=(\d+) scan=(\d+)""").find(dong ?: "")?.let {
                 return it.groupValues[1].toInt() to it.groupValues[2].toInt()
             }
-            Regex(""" 0001 ([0-9a-f]{4}) 00000001""").find(sh("cat $tam 2>/dev/null"))?.let { return 0 to it.groupValues[1].toInt(16) }
+            if (System.currentTimeMillis() - guiLuc > 4000) { sh(lenhDo); guiLuc = System.currentTimeMillis() }
+            Regex(""" 0001 ([0-9a-f]{4}) 00000001""").find(sh("cat $tam 2>/dev/null"))?.let { ev ->
+                // getevent thấy phím trước khi dòng log của Home sạch kịp ghi: chờ thêm một nhịp để lấy cả keycode, vì gán
+                // theo riêng scancode dễ hụt (4.0.8).
+                Thread.sleep(1200)
+                val lai = sh("logcat -d -s CleanTVKey:I 2>/dev/null | tail -5").lines()
+                    .lastOrNull { it.contains(" id=$ma") || (it.contains("key=") && !it.contains(" id=")) }
+                Regex("""key=(\d+) scan=(\d+)""").find(lai ?: "")?.let { return it.groupValues[1].toInt() to it.groupValues[2].toInt() }
+                return 0 to ev.groupValues[1].toInt(16)
+            }
         }
         return null
     }
@@ -144,7 +162,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             lopActivity("android.intent.category.LAUNCHER"))
         val banPhim = sh("ime list -s; settings get secure default_input_method").lines()
             .mapNotNull { it.trim().substringBefore('/').takeIf { p -> TEN_GOI.matches(p) } }.toSet()
-        return TrangThaiGoi(caiDat, daTat, coBieuTuong, homeHienTai().substringBefore('/'), banPhim)
+        return TrangThaiGoi(caiDat, daTat, coBieuTuong, homeHienTai().substringBefore('/'), banPhim, lopActivity("android.intent.category.HOME"))
     }
 
     /** Các gói có activity thuộc category này (app hiện biểu tượng). */
@@ -164,7 +182,36 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             "echo '# resolve'; $HOME_QUERY 2>&1 | tail -2; echo '# query'; cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME 2>&1 | grep '/' | head -8; " +
             "echo '# focus'; dumpsys window 2>/dev/null | grep -m2 -E 'mCurrentFocus|mFocusedApp'; echo '# a11y'; settings get secure enabled_accessibility_services")
             .lines().map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n")
-            .let { if (loiGhiFile.isNotEmpty()) "# ghi-file\n$loiGhiFile\n$it" else it }.take(2700)
+            .let { if (loiGhiFile.isNotEmpty()) "# ghi-file\n$loiGhiFile\n$it" else it }.take(2700) + lanSapHome(goi)
+    }.getOrDefault("")
+
+    /**
+     * 4.0.8 (Xiaomi MZTU0, ichtrinhan 07/11/2026: chỉ giao diện VGS làm Home sạch tải lại liên tục): lần sập gần nhất của
+     * Home sạch, đọc từ bộ đệm crash của logcat (Android 7+), để biết sập ở đâu mà không cần người dùng chạy adb.
+     */
+    private fun lanSapHome(goi: String): String = runCatching {
+        // Bị hệ thống giết vì thiếu RAM thì không có dòng crash: Android 11+ ghi lý do thoát (exit-info) — 3 lần gần nhất.
+        val s = sh("logcat -d -b crash -v brief 2>/dev/null | grep -A10 -F 'Process: $goi' | tail -12 | cut -c1-150; " +
+            "dumpsys activity exit-info $goi 2>/dev/null | grep -m3 -E 'reason=' | cut -c1-150").trim()
+        if (s.isEmpty()) "" else "\n# crash\n" + s.lines().map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n").take(1300)
+    }.getOrDefault("")
+
+    /**
+     * 4.1.4 (phimxx1, TCL G10 15/11/2026: gán nút VTVgo sang Zentv bấm không mở gì, gán app khác thì mở): Home sạch mở app
+     * của nút bằng lối vào tivi, không có thì lối điện thoại, cả hai không có thì bỏ qua im lặng. Ghi từng app trong
+     * app_keys có cài không, có lối nào, kèm vài dòng START gần nhất của hệ thống, để biết nút hỏng ở bước nào.
+     */
+    fun chanDoanNutApp(): String = runCatching {
+        val ds = docCauHinhTv()?.optJSONArray("app_keys") ?: return ""
+        val goi = (0 until ds.length()).map { ds.optString(it).substringAfterLast(':').substringBefore('/').trim() }
+            .filter { TEN_GOI.matches(it) }.distinct().take(6)
+        if (goi.isEmpty()) return ""
+        val q = "cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category"
+        val s = sh(goi.joinToString("; ") { p ->
+            "echo \"$p cai=\$(pm path $p 2>/dev/null | head -1 | cut -c1-8) tv=\$($q.LEANBACK_LAUNCHER $p 2>&1 | tail -1 | cut -d/ -f2) " +
+                "dt=\$($q.LAUNCHER $p 2>&1 | tail -1 | cut -d/ -f2)\""
+        } + "; echo '# start'; logcat -d -v brief -s ActivityTaskManager:I 2>/dev/null | grep -E 'START u0' | tail -4 | cut -c1-170")
+        "\n# nut-app\n" + s.lines().map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n").take(1100)
     }.getOrDefault("")
 
     fun homeHienTai(): String = sh(HOME_QUERY).lines().lastOrNull { it.isNotBlank() }?.trim() ?: ""
@@ -422,7 +469,19 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             home in HOME_GOC_BIET -> home
             home == "android" -> {
                 val ung = sh("cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME")
-                val tim = HOME_GOC_BIET.filter { ung.contains("$it/") }
+                var tim = HOME_GOC_BIET.filter { ung.contains("$it/") }
+                // 4.0.8 (Cheerlux C50, 08/11/2026): launcher hãng lạ không có trong HOME_GOC_BIET nên đếm ra "0 Home gốc"
+                // rồi dừng. Không có Home gốc quen thì xét mọi ứng viên còn lại (bỏ Home sạch, Cài đặt/FallbackHome).
+                var hangLaNhieu = false
+                if (tim.isEmpty()) {
+                    tim = ung.lines().map { it.trim().substringBefore('/') }.distinct()
+                        .filter { it.isNotBlank() && it != pkgHome && it !in HOME_SACH && (laHomeHangLa(it) || laLauncherCaiThem(it)) }
+                    // Cheerlux C50 (truongvantung2002, 14/11/2026): máy chiếu có 2 launcher hãng, chưa đặt mặc định → hộp chọn
+                    // Home. Launcher hãng lạ đi đường "giữ bật, chỉ đặt Home sạch mặc định" nên chọn một cái để ghi sao lưu
+                    // là đủ — cái còn lại cũng để nguyên, đặt mặc định xong hộp chọn tự mất. Ưu tiên Home hãng hơn launcher cài thêm.
+                    if (tim.size > 1) { tim = tim.sortedBy { if (laHomeHangLa(it)) 0 else 1 }.take(1); hangLaNhieu = true }
+                }
+                if (hangLaNhieu) bao(t("Máy có nhiều Home gốc, giữ cả, chỉ đặt Home sạch làm mặc định…", "Several stock launchers found: keeping them all, only setting the clean Home as default…"))
                 if (tim.size == 1) tim[0] else return t("Tivi đang hỏi chọn Home (có ${tim.size} Home gốc). Chọn một Home trên tivi rồi thử lại.", "The TV is asking which Home to use (${tim.size} stock launchers). Pick one on the TV and try again.")
             }
             home == SETUP -> return t("Home đang là trình cài đặt của Google TV (setupwraith). Xem lại phần tắt gói: setupwraith phải tắt cùng Home gốc.", "Home is the Google TV setup wizard (setupwraith). Disable setupwraith together with the stock Home.")
@@ -892,6 +951,14 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             Thread.sleep(2500)
             val pkg = goiDangHien()
             if (pkg == pkgHome) return KetQuaPhimHome(true, gianh, "", "", daBatBatPhim)
+            // CleanTV chạy ngay trên tivi (4.0.8, Skyworth pee581 07/11/2026): Home giả lập không đổi màn, màn đang hiện vẫn
+            // là chính CleanTV, trước đây báo "Nút Home vẫn mở zone.vgs.cleantv". Màn hiện không nói được gì: xét Home mặc
+            // định (resolve) — đúng Home sạch thì coi là xong, chưa thì chờ rồi thử lại, không bao giờ tắt CleanTV.
+            if (pkg.startsWith(PKG_CLEANTV)) {
+                if (homeHienTai().startsWith("$pkgHome/")) return KetQuaPhimHome(true, gianh, "", "", daBatBatPhim)
+                if (lan < 3) { Thread.sleep(2000); return@repeat }
+                return tra(homeHienTai().substringBefore('/'))
+            }
             // Đã tắt mà vẫn hiện: hãng bật lại sau lưng.
             if (pkg in gianh) {
                 chuyenDe(pkg)?.let { return it }
@@ -945,8 +1012,24 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             // xem): phím Home chưa ăn, chưa phải Home cũ giành nút. Chờ rồi bấm lại thay vì báo hỏng ngay lượt đầu (25/10/2026:
             // Sony VH21 / BF1, Xiaomi MOOR2, onn 4K… báo "Nút Home vẫn mở com.android.tv.settings"; Sony VU1 "com.goodtoolapps.zeus").
             if (lan < 3 && pkg.isNotBlank() && pkg != SETUP && (pkg in KHONG_PHAI_HOME || pkg.contains("packageinstaller") || !coManHome(pkg))) {
+                // Bảng của hãng nằm đè mà phím Home không đóng (Sony BRAVIA Android 8–9: com.sony.dtv.tvsettingsbroadcast,
+                // athanh8807 09/11/2026, 6 lần từ 2.10): từ lượt hai bấm Back đóng nó rồi mới bấm Home lại.
+                if (lan >= 1 && !coManHome(pkg)) { sh("input keyevent KEYCODE_BACK"); Thread.sleep(800); sh("input keyevent KEYCODE_BACK") }
                 Thread.sleep(2000)
                 return@repeat
+            }
+            // Còn lại là một app KHÔNG có màn Home mà Home mặc định đã là Home sạch: chưa có gì chứng tỏ Home cũ giành nút.
+            // Thử từ màn khác (mở Cài đặt rồi bấm Home): ra Home sạch thì nút Home chạy đúng, chỉ là bảng kia không đóng
+            // bằng phím Home. Trước 4.0.9 nhánh này báo hỏng và trả Home gốc (Sony tvsettingsbroadcast).
+            if (pkg.isNotBlank() && pkg != SETUP && pkg !in HOME_GOC_BIET && !coManHome(pkg) && homeHienTai().startsWith("$pkgHome/")) {
+                bao(t("Màn '$pkg' không đóng bằng phím Home, thử bấm Home từ màn khác…", "'$pkg' doesn't close with the Home key, trying Home from another screen…"))
+                repeat(2) {
+                    sh("am start -a android.settings.SETTINGS >/dev/null 2>&1")
+                    Thread.sleep(1500)
+                    sh("input keyevent KEYCODE_HOME")
+                    Thread.sleep(2500)
+                    if (goiDangHien() == pkgHome) return KetQuaPhimHome(true, gianh, pkg, "man-de", daBatBatPhim)
+                }
             }
             if (lan == 3 || sl == null || pkg == SETUP || !nenTatVuiGianhHome(pkg)) return tra(pkg)
             bao(t("Nút Home vẫn mở '$pkg', tắt nó…", "The Home button still opens '$pkg', disabling it…"))
@@ -1165,17 +1248,43 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
 
     fun xoaSaoLuuTrenTv() { runCatching { sh("rm -f $TEP_SAO_LUU_TV") } }
 
+    /**
+     * Bật một gói, chờ tối đa [giay] giây (06/11/2026, Sony VU3 ngocnd156: pm enable treo 30 phút, phải rút điện).
+     * Không dựa vào lệnh timeout (Android 6 không có): chạy nền rồi tự canh. Treo thì trả "TREO", tivi có thể vẫn bật xong sau đó.
+     */
+    fun batGoiCoHan(p: String, giay: Int = 20): String = runCatching {
+        sh("f=/data/local/tmp/cleantv-bat; pm enable --user 0 $p > \$f 2>&1 & k=\$!; i=0; " +
+            "while kill -0 \$k 2>/dev/null && [ \$i -lt $giay ]; do sleep 1; i=\$((i+1)); done; " +
+            "if kill -0 \$k 2>/dev/null; then kill \$k 2>/dev/null; echo TREO; else cat \$f; fi; rm -f \$f")
+    }.getOrElse { "${it.message}" }
+
     /** Gói đang bị tắt bằng tay / bằng shell (enabled=3: disable-user), không gồm gói hãng tắt sẵn từ xưởng. */
     /** Bật lại một gói; trả true khi tivi báo đã bật. Có bản sao lưu thì bỏ gói đó khỏi danh sách CleanTV đã tắt. */
     fun batLaiGoi(p: String, sl: BanSaoLuu?): Boolean {
-        val ok = runCatching { sh("pm enable --user 0 $p") }.getOrDefault("").contains("enabled")
+        val ok = batGoiCoHan(p).contains("enabled")
         if (ok && sl != null && p in sl.daTatBoiApp) { sl.daTatBoiApp -= p; luuSaoLuu(sl) }
         return ok
     }
 
+    /** Mọi gói đang tắt, kể cả kiểu khác disable-user (06/11/2026: Sony VU3 còn 7 gói m2.* tắt mà danh sách cũ không thấy). */
+    fun goiDangTat(): List<String> =
+        sh("pm list packages -d").lines().map { it.trim().removePrefix("package:") }.filter { TEN_GOI.matches(it) }.sorted()
+
     fun goiTatBoiNguoiDung(): List<String> =
         sh("for p in \$(pm list packages -d | cut -d: -f2); do dumpsys package \$p | grep -q 'User 0:.*enabled=3' && echo \$p; done")
             .lines().map { it.trim() }.filter { TEN_GOI.matches(it) }.sorted()
+
+    /** Bật lại mọi gói đang tắt kiểu disable-user; trả danh sách lỗi. */
+    fun batLaiMoiGoiTat(bao: (String) -> Unit): List<String> {
+        val loi = mutableListOf<String>()
+        val ds = goiTatBoiNguoiDung()
+        ds.forEachIndexed { i, p ->
+            bao(t("Bật lại ${i + 1}/${ds.size}: $p", "Re-enabling ${i + 1}/${ds.size}: $p"))
+            val out = batGoiCoHan(p)
+            if (!out.contains("enabled")) loi += if (out.contains("TREO")) t("$p: tivi treo khi bật gói này, đã bỏ qua", "$p: the TV hung enabling it, skipped") else "$p: ${out.trim()}"
+        }
+        return loi
+    }
 
     /**
      * Khôi phục khi KHÔNG có bản sao lưu (gỡ app, đổi máy, người khác dọn — 22/10/2026): bật lại mọi gói đang tắt kiểu
@@ -1183,13 +1292,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
      * trả DNS AdGuard của app về tự động, đặt lại Home hệ thống của hãng; tuỳ chọn gỡ Home sạch.
      */
     fun khoiPhucKhongSaoLuu(goLauncher: Boolean, bao: (String) -> Unit): List<String> {
-        val loi = mutableListOf<String>()
-        val ds = goiTatBoiNguoiDung()
-        ds.forEachIndexed { i, p ->
-            bao(t("Bật lại ${i + 1}/${ds.size}: $p", "Re-enabling ${i + 1}/${ds.size}: $p"))
-            val out = runCatching { sh("pm enable --user 0 $p") }.getOrElse { "${it.message}" }
-            if (!out.contains("enabled")) loi += "$p: ${out.trim()}"
-        }
+        val loi = batLaiMoiGoiTat(bao).toMutableList()
         nhaNutHome(null)
         if (sh("settings get global private_dns_specifier").trim() == "dns.adguard-dns.com") {
             bao(t("Trả DNS về tự động…", "Setting DNS back to automatic…"))
@@ -1219,8 +1322,9 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         val ds = sl.daTatBoiApp.toList()
         ds.forEachIndexed { i, p ->
             bao(t("Bật lại ${i + 1}/${ds.size}: $p", "Re-enabling ${i + 1}/${ds.size}: $p"))
-            val out = runCatching { sh("pm enable --user 0 $p") }.getOrElse { t("lỗi ${it.message}", "error ${it.message}") }
-            if (out.contains("enabled")) { sl.daTatBoiApp -= p; luuSaoLuu(sl) } else loi += "$p: ${out.trim()}"
+            val out = batGoiCoHan(p)
+            if (out.contains("enabled")) { sl.daTatBoiApp -= p; luuSaoLuu(sl) }
+            else loi += if (out.contains("TREO")) t("$p: tivi treo khi bật gói này, đã bỏ qua", "$p: the TV hung enabling it, skipped") else "$p: ${out.trim()}"
         }
         if (sl.launcherDaCai) {
             bao(t("Trả Home gốc…", "Restoring the stock Home…"))
@@ -1264,6 +1368,18 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
 
     fun khoaDaCai(): Boolean = sh("pm path $PKG_KHOA 2>/dev/null").contains("package:")
 
+    /** versionCode của app khoá trên tivi (0 nếu chưa cài / đọc không được). */
+    private fun banKhoaTrenTv(): Int =
+        Regex("""versionCode=(\d+)""").find(sh("dumpsys package $PKG_KHOA 2>/dev/null | grep -m1 versionCode"))?.groupValues?.get(1)?.toIntOrNull() ?: 0
+
+    /** App chọn được để khoá riêng (1.1, 15/11/2026): có biểu tượng mở được, trừ app nhận Home và app khoá. */
+    fun appKhoaDuoc(): List<String> {
+        // Cài đặt có màn HOME dự phòng (FallbackHome) nhưng vẫn cho khoá: khoá Cài đặt thì trẻ không tắt được dịch vụ khoá.
+        val home = lopActivity("android.intent.category.HOME") - setOf("com.android.tv.settings", "com.android.settings")
+        return (lopActivity("android.intent.category.LEANBACK_LAUNCHER") + lopActivity("android.intent.category.LAUNCHER"))
+            .filter { it !in home && it != PKG_KHOA && TEN_GOI.matches(it) }.sorted()
+    }
+
     /** Trạng thái trên tivi (không có PIN): {bat, khung, moTamPhut, coPin, moTamDen, dangKhoa, dichVuChay}; null nếu chưa cài. */
     fun docKhoa(): org.json.JSONObject? {
         if (!khoaDaCai()) return null
@@ -1275,7 +1391,8 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
     /** Cài (nếu cần), cấp quyền tự canh gác, ghi cấu hình, bật dịch vụ khoá. [json] không chứa dấu nháy đơn. */
     fun caiKhoa(apk: ByteArray, json: String, bao: (String) -> Unit) {
         require(!json.contains('\'')) { "json" }
-        if (!khoaDaCai()) {
+        // Bản cũ (1.0) chưa biết khoá từng app: cài đè, giữ nguyên PIN và giờ khoá đã lưu.
+        if (!khoaDaCai() || banKhoaTrenTv() < KHOA_BAN) {
             bao(t("Cài app Khoá trẻ em lên tivi…", "Installing the Kids lock app on the TV…"))
             adb.ghiFile("/data/local/tmp/khoa.apk", apk)
             val out = sh("pm install -r /data/local/tmp/khoa.apk; rm -f /data/local/tmp/khoa.apk")
@@ -1361,6 +1478,11 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
 
     /** App người dùng tự cài (gỡ được). */
     fun appTuCai(): Set<String> = sh("pm list packages -3").lines().map { it.substringAfter("package:").trim() }.filter { it.isNotBlank() }.toSet()
+
+    /** App tự cài chỉ có lối vào kiểu điện thoại, để Home sạch hiện cả khi Thư viện app tắt (dulieu/AppNgoai). */
+    fun appNgoaiKhongLoiTv(dock: Set<String> = emptySet()): Set<String> = zone.vgs.tvsach.dulieu.AppNgoai.loc(
+        appTuCai(), lopActivity("android.intent.category.LAUNCHER"),
+        lopActivity("android.intent.category.LEANBACK_LAUNCHER"), lopActivity("android.intent.category.HOME"), dock)
 
     /** Mở một app trên tivi (màn chính kiểu tivi, không có thì kiểu điện thoại). */
     fun moApp(pkg: String): Boolean {
@@ -1491,6 +1613,8 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         const val PKG_HOME_XIAOMI = "com.ts.launcher"
         /** App Khoá trẻ em (module khoa/). */
         const val PKG_KHOA = "zone.vgs.cleantv.khoa"
+        /** versionCode của khoa.apk đi kèm (2 = khoá từng app); tivi có bản thấp hơn thì cài đè. */
+        const val KHOA_BAN = 2
         /** Bản sao lưu trên tivi: thư mục của shell, còn sau khi gỡ app / Home sạch, chỉ mất khi khôi phục cài đặt gốc. */
         const val TEP_SAO_LUU_TV = "/data/local/tmp/cleantv-sao-luu.json"
         const val GAC = "/data/local/tmp/cleantv-gac"
@@ -1523,7 +1647,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             "com.google.android.leanbacklauncher", "com.mitv.tvhome",
         )
         /** Nhận Home nhưng không phải màn Home dùng được. */
-        private val KHONG_PHAI_HOME = setOf(SETUP, "com.android.tv.settings", "com.android.settings", "com.android.provision")
+        private val KHONG_PHAI_HOME = setOf(SETUP, "com.android.tv.settings", "com.android.settings", "com.android.provision", PKG_CLEANTV, "zone.vgs.cleantv.manager")
         /**
          * App kiểm tra xuất xưởng cũng khai báo HOME (Xiaomi Mi TV 4A: com.duokan.factorytest/.FactoryLauncher) — không bao
          * giờ là Home của hãng, không tắt (theo upstream 0357546, 22/10/2026).
